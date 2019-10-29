@@ -37,7 +37,7 @@
 									},
 									"font": "Arial;13;1",
 									"left": 520,
-									"top": 293,
+									"top": 269,
 									"width": 217,
 									"height": 13,
 									"text": "User"
@@ -63,7 +63,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 316,
+											"top": 292,
 											"width": 207,
 											"height": 13
 										},
@@ -78,7 +78,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 331,
+											"top": 307,
 											"width": 207,
 											"height": 13
 										},
@@ -93,7 +93,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 346,
+											"top": 322,
 											"width": 207,
 											"height": 13
 										},
@@ -108,7 +108,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 361,
+											"top": 337,
 											"width": 207,
 											"height": 13
 										},
@@ -123,7 +123,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 376,
+											"top": 352,
 											"width": 207,
 											"height": 13
 										},
@@ -138,7 +138,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 391,
+											"top": 367,
 											"width": 207,
 											"height": 13
 										},
@@ -153,7 +153,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 406,
+											"top": 382,
 											"width": 207,
 											"height": 13
 										},
@@ -168,7 +168,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 421,
+											"top": 397,
 											"width": 207,
 											"height": 13
 										},
@@ -183,7 +183,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 436,
+											"top": 412,
 											"width": 207,
 											"height": 13
 										},
@@ -198,23 +198,53 @@
 											},
 											"font": "Arial;13;0",
 											"left": 525,
-											"top": 451,
+											"top": 427,
+											"width": 207,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFuA9qnXxknKaE=",
+											"_parent": {
+												"$ref": "AAAAAAFt+ar4IW6qRyo="
+											},
+											"model": {
+												"$ref": "AAAAAAFuA9qnKxkknkw="
+											},
+											"font": "Arial;13;0",
+											"left": 525,
+											"top": 442,
+											"width": 207,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFuA9rJMxkuofw=",
+											"_parent": {
+												"$ref": "AAAAAAFt+ar4IW6qRyo="
+											},
+											"model": {
+												"$ref": "AAAAAAFuA9rJAhkrafg="
+											},
+											"font": "Arial;13;0",
+											"left": 525,
+											"top": 457,
 											"width": 207,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 520,
-									"top": 311,
+									"top": 287,
 									"width": 217,
-									"height": 158
+									"height": 188
 								}
 							],
 							"font": "Arial;13;0",
 							"left": 520,
-							"top": 288,
+							"top": 264,
 							"width": 217,
-							"height": 181,
+							"height": 211,
 							"nameLabel": {
 								"$ref": "AAAAAAFt+ar4IG6pujs="
 							},
@@ -454,7 +484,7 @@
 									"top": 541,
 									"width": 243.560546875,
 									"height": 13,
-									"text": "Leave Application"
+									"text": "Leave Application Transaction"
 								},
 								{
 									"_type": "ERDColumnCompartmentView",
@@ -528,6 +558,21 @@
 										},
 										{
 											"_type": "ERDColumnView",
+											"_id": "AAAAAAFuA8vnsBj2AX4=",
+											"_parent": {
+												"$ref": "AAAAAAFt+auOnm7UNEM="
+											},
+											"model": {
+												"$ref": "AAAAAAFuA8vnYRjzIto="
+											},
+											"font": "Arial;13;0",
+											"left": 517,
+											"top": 624,
+											"width": 233.560546875,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
 											"_id": "AAAAAAFt+bLqum/fiIM=",
 											"_parent": {
 												"$ref": "AAAAAAFt+auOnm7UNEM="
@@ -537,7 +582,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 517,
-											"top": 624,
+											"top": 639,
 											"width": 233.560546875,
 											"height": 13
 										},
@@ -552,7 +597,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 517,
-											"top": 639,
+											"top": 654,
 											"width": 233.560546875,
 											"height": 13
 										},
@@ -567,7 +612,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 517,
-											"top": 654,
+											"top": 669,
 											"width": 233.560546875,
 											"height": 13
 										},
@@ -582,7 +627,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 517,
-											"top": 669,
+											"top": 684,
 											"width": 233.560546875,
 											"height": 13
 										}
@@ -591,7 +636,7 @@
 									"left": 512,
 									"top": 559,
 									"width": 243.560546875,
-									"height": 128
+									"height": 143
 								}
 							],
 							"font": "Arial;13;0",
@@ -624,7 +669,7 @@
 									},
 									"font": "Arial;13;1",
 									"left": 808,
-									"top": 85,
+									"top": 61,
 									"width": 201,
 									"height": 13,
 									"text": "Authorization Level"
@@ -650,7 +695,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 813,
-											"top": 108,
+											"top": 84,
 											"width": 191,
 											"height": 13
 										},
@@ -665,7 +710,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 813,
-											"top": 123,
+											"top": 99,
 											"width": 191,
 											"height": 13
 										},
@@ -680,21 +725,21 @@
 											},
 											"font": "Arial;13;0",
 											"left": 813,
-											"top": 138,
+											"top": 114,
 											"width": 191,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 808,
-									"top": 103,
+									"top": 79,
 									"width": 201,
 									"height": 53
 								}
 							],
 							"font": "Arial;13;0",
 							"left": 808,
-							"top": 80,
+							"top": 56,
 							"width": 201,
 							"height": 121,
 							"nameLabel": {
@@ -766,13 +811,28 @@
 											"top": 587,
 											"width": 183,
 											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFuA9h/7xkW+BQ=",
+											"_parent": {
+												"$ref": "AAAAAAFt+bCNoG+H/7g="
+											},
+											"model": {
+												"$ref": "AAAAAAFuA9h/uhkTR+4="
+											},
+											"font": "Arial;13;0",
+											"left": 821,
+											"top": 602,
+											"width": 183,
+											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 816,
 									"top": 567,
 									"width": 193,
-									"height": 38
+									"height": 53
 								}
 							],
 							"font": "Arial;13;0",
@@ -889,7 +949,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 694,
-									"top": 495,
+									"top": 498,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -906,7 +966,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 695,
-									"top": 487,
+									"top": 493,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 30,
@@ -940,7 +1000,7 @@
 								"$ref": "AAAAAAFt+ar4IG6o4JY="
 							},
 							"lineStyle": 2,
-							"points": "680:468;680:536",
+							"points": "680:474;680:536",
 							"nameLabel": {
 								"$ref": "AAAAAAFt+cZBYnA8uK8="
 							},
@@ -970,7 +1030,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 598,
-									"top": 495,
+									"top": 498,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -987,7 +1047,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 599,
-									"top": 487,
+									"top": 493,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 30,
@@ -1021,7 +1081,7 @@
 								"$ref": "AAAAAAFt+ar4IG6o4JY="
 							},
 							"lineStyle": 2,
-							"points": "584:468;584:536",
+							"points": "584:474;584:536",
 							"nameLabel": {
 								"$ref": "AAAAAAFt+cfZUXBbjf4="
 							},
@@ -1526,7 +1586,7 @@
 								"$ref": "AAAAAAFt+a0Z5W8dlK0="
 							},
 							"lineStyle": 1,
-							"points": "1009:117;1085:99"
+							"points": "1009:102;1085:91"
 						},
 						{
 							"_type": "ERDRelationshipView",
@@ -1755,11 +1815,11 @@
 								"$ref": "AAAAAAFt+ardZm6ip4I="
 							},
 							"font": "Arial;13;0",
-							"left": 232,
-							"top": 152,
+							"left": 216,
+							"top": 104,
 							"width": 164,
-							"height": 97,
-							"text": "Keeps track of continuity in service and number of years worked for awardarding additional leave after 5 years"
+							"height": 141,
+							"text": "Keeps track of continuity in service and number of years worked for awardarding additional leave after 5 years\n=================\nEmployment Types:\nContract\nPublic Service\n\n"
 						},
 						{
 							"_type": "UMLNoteLinkView",
@@ -1775,7 +1835,7 @@
 								"$ref": "AAAAAAFt+dcFHLNEcWo="
 							},
 							"lineStyle": 1,
-							"points": "334:295;324:249"
+							"points": "330:295;316:245"
 						},
 						{
 							"_type": "UMLNoteView",
@@ -1784,8 +1844,8 @@
 								"$ref": "AAAAAAFt+ardZm6ip4I="
 							},
 							"font": "Arial;13;0",
-							"left": 16,
-							"top": 160,
+							"left": 8,
+							"top": 168,
 							"width": 105,
 							"height": 77,
 							"text": "Tracks variable vacation leave per position"
@@ -1804,7 +1864,7 @@
 								"$ref": "AAAAAAFt+atKvm7F3Rs="
 							},
 							"lineStyle": 1,
-							"points": "89:303;76:237"
+							"points": "85:303;70:245"
 						},
 						{
 							"_type": "ERDRelationshipView",
@@ -1824,8 +1884,8 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": 800,
-									"top": 227,
+									"left": 760,
+									"top": 203,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -1841,8 +1901,8 @@
 										"$ref": "AAAAAAFt+fd9QrVXock="
 									},
 									"font": "Arial;13;0",
-									"left": 689,
-									"top": 256,
+									"left": 609,
+									"top": 232,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 30,
@@ -1859,7 +1919,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 881,
-									"top": 219,
+									"top": 195,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 30,
@@ -1876,7 +1936,7 @@
 								"$ref": "AAAAAAFt+ar4IG6o4JY="
 							},
 							"lineStyle": 2,
-							"points": "704:288;704:248;896:248;896:200",
+							"points": "624:264;624:224;896:224;896:176",
 							"nameLabel": {
 								"$ref": "AAAAAAFt+fd9QrVY0uM="
 							},
@@ -1894,11 +1954,69 @@
 								"$ref": "AAAAAAFt+ardZm6ip4I="
 							},
 							"font": "Arial;13;0",
-							"left": 152,
-							"top": 760,
+							"left": 96,
+							"top": 864,
 							"width": 312,
 							"height": 25,
 							"text": "HR Leave ERD"
+						},
+						{
+							"_type": "UMLNoteView",
+							"_id": "AAAAAAFuA81L0xkAfns=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ardZm6ip4I="
+							},
+							"font": "Arial;13;0",
+							"left": 472,
+							"top": 752,
+							"width": 145,
+							"height": 137,
+							"text": "States:\nIn Progress\nSupervisor Approved\nSupervisor Denied\nHR Approved\nHR Denied\nPS Approved\nPS Denied"
+						},
+						{
+							"_type": "UMLNoteLinkView",
+							"_id": "AAAAAAFuA81MEhkDttw=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ardZm6ip4I="
+							},
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFuA81L0xkAfns="
+							},
+							"tail": {
+								"$ref": "AAAAAAFt+auOnm7SBAs="
+							},
+							"lineStyle": 1,
+							"points": "593:713;575:751"
+						},
+						{
+							"_type": "UMLNoteView",
+							"_id": "AAAAAAFuA9yjIxk1sNQ=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ardZm6ip4I="
+							},
+							"font": "Arial;13;0",
+							"left": 672,
+							"top": 752,
+							"width": 113,
+							"height": 73,
+							"text": "Think about this as bank transaction records"
+						},
+						{
+							"_type": "UMLNoteLinkView",
+							"_id": "AAAAAAFuA9yjZBk4qXs=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ardZm6ip4I="
+							},
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFuA9yjIxk1sNQ="
+							},
+							"tail": {
+								"$ref": "AAAAAAFt+auOnm7SBAs="
+							},
+							"lineStyle": 1,
+							"points": "685:713;707:751"
 						}
 					]
 				},
@@ -2140,7 +2258,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+ar4H26mFR4="
 							},
-							"name": "Vacation",
+							"name": "Vacation Balance",
 							"length": 0
 						},
 						{
@@ -2149,7 +2267,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+ar4H26mFR4="
 							},
-							"name": "Personal",
+							"name": "Personal Casual Balance",
 							"length": 0
 						},
 						{
@@ -2158,7 +2276,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+ar4H26mFR4="
 							},
-							"name": "Sick",
+							"name": "Sick Balance",
 							"length": 0
 						},
 						{
@@ -2167,7 +2285,25 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+ar4H26mFR4="
 							},
-							"name": "ETC",
+							"name": "Berevement Balance",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAFuA9qnKxkknkw=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ar4H26mFR4="
+							},
+							"name": "Maternity Balance",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAFuA9rJAhkrafg=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ar4H26mFR4="
+							},
+							"name": "Pre Retirement Balance",
 							"length": 0
 						}
 					]
@@ -2329,7 +2465,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFt+ardZm6hloU="
 					},
-					"name": "Leave Application",
+					"name": "Leave Application Transaction",
 					"ownedElements": [
 						{
 							"_type": "ERDRelationship",
@@ -2396,7 +2532,16 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
 							},
-							"name": "Num Days",
+							"name": "Start Date",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAFuA8vnYRjzIto=",
+							"_parent": {
+								"$ref": "AAAAAAFt+auOnm7QoiE="
+							},
+							"name": "End Date",
 							"length": 0
 						},
 						{
@@ -2538,7 +2683,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+bCNoG+DqnM="
 							},
-							"name": "Leave Type",
+							"name": "Position",
 							"length": 0
 						},
 						{
@@ -2547,7 +2692,16 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+bCNoG+DqnM="
 							},
-							"name": "Leave Days",
+							"name": "Vacation Days",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAFuA9h/uhkTR+4=",
+							"_parent": {
+								"$ref": "AAAAAAFt+bCNoG+DqnM="
+							},
+							"name": "Additional Days",
 							"length": 0
 						}
 					]
