@@ -1,2 +1,2 @@
-# mopd_hr_leave
-MOPD HR Leave App
+# design_diagrams
+Star UML design diagrams
