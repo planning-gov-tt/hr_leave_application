@@ -40,7 +40,7 @@
 									"top": 557,
 									"width": 217,
 									"height": 13,
-									"text": "User"
+									"text": "Employee"
 								},
 								{
 									"_type": "ERDColumnCompartmentView",
@@ -1746,11 +1746,11 @@
 										"$ref": "AAAAAAFuGC0KEM5X80o="
 									},
 									"font": "Arial;13;1",
-									"left": 568,
+									"left": 544,
 									"top": 381,
-									"width": 163.13720703125,
+									"width": 239.25537109375,
 									"height": 13,
-									"text": "User Authorization Level"
+									"text": "Employee  Authorization Level"
 								},
 								{
 									"_type": "ERDColumnCompartmentView",
@@ -1772,9 +1772,9 @@
 												"$ref": "AAAAAAFuGC0wa85i9Io="
 											},
 											"font": "Arial;13;0",
-											"left": 573,
+											"left": 549,
 											"top": 404,
-											"width": 153.13720703125,
+											"width": 229.25537109375,
 											"height": 13
 										},
 										{
@@ -1787,23 +1787,23 @@
 												"$ref": "AAAAAAFuGC2Dwc5ss0I="
 											},
 											"font": "Arial;13;0",
-											"left": 573,
+											"left": 549,
 											"top": 419,
-											"width": 153.13720703125,
+											"width": 229.25537109375,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
-									"left": 568,
+									"left": 544,
 									"top": 399,
-									"width": 163.13720703125,
+									"width": 239.25537109375,
 									"height": 38
 								}
 							],
 							"font": "Arial;13;0",
-							"left": 568,
+							"left": 544,
 							"top": 376,
-							"width": 163.13720703125,
+							"width": 239.25537109375,
 							"height": 96,
 							"nameLabel": {
 								"$ref": "AAAAAAFuGC0KEM5Ys+Q="
@@ -1982,7 +1982,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFt+ardZm6hloU="
 					},
-					"name": "User",
+					"name": "Employee",
 					"ownedElements": [
 						{
 							"_type": "ERDRelationship",
@@ -2187,7 +2187,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+ar4H26mFR4="
 							},
-							"name": "User Id",
+							"name": "Employee Id",
 							"length": 0,
 							"primaryKey": true
 						},
@@ -2960,7 +2960,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFt+ardZm6hloU="
 					},
-					"name": "User Authorization Level",
+					"name": "Employee  Authorization Level",
 					"columns": [
 						{
 							"_type": "ERDColumn",
