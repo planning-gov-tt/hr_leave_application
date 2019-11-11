@@ -1750,7 +1750,7 @@
 									"top": 381,
 									"width": 239.25537109375,
 									"height": 13,
-									"text": "Employee  Authorization Level"
+									"text": "Employee Authorization Level"
 								},
 								{
 									"_type": "ERDColumnCompartmentView",
@@ -2960,7 +2960,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFt+ardZm6hloU="
 					},
-					"name": "Employee  Authorization Level",
+					"name": "Employee Authorization Level",
 					"columns": [
 						{
 							"_type": "ERDColumn",
