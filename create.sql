@@ -8,11 +8,20 @@ GO
 USE [HRLeave];
 GO
 
+DECLARE @Short int;
+SET @Short = 10;
+DECLARE @Medium int;
+SET @Medium = 30
+DECLARE @Long int;
+SET @Long = 60
+
+
 CREATE TABLE [dbo].[authorization] (
   [auth_id] CHAR (1) PRIMARY KEY, -- might not need the id - just use the auth_name
   [auth_name] NVARCHAR (15) NOT NULL,
-  [auth_description] NVARCHAR (50)
+  [auth_description] NVARCHAR (100)
 );
+
 
 -- 'user' is a resered word, so using 'employee' instead
 CREATE TABLE [dbo].[employee] (
@@ -35,15 +44,74 @@ CREATE TABLE [dbo].[employee] (
   [pre_retirement] INT NOT NULL
 );
 
+
 CREATE TABLE [dbo].[employeeauthorization] (
-  [employee_id] NVARCHAR (10),
-  [auth_id] CHAR (1),
+  [employee_id] NVARCHAR (10) NOT NULL,
+  [auth_id] CHAR (1) NOT NULL,
 
   PRIMARY KEY ([employee_id], [auth_id]),
   FOREIGN KEY ([employee_id])
-    REFERENCES [dbo].[employee] ([employee_id])
-    ON DELETE CASCADE ON UPDATE CASCADE,
+    REFERENCES [dbo].[employee] ([employee_id]),
   FOREIGN KEY ([auth_id])
     REFERENCES [dbo].[authorization] ([auth_id])
-    ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+-- problems with setting both to ON DELETE CASCADE ON UPDATE CASCADE,
+CREATE TABLE [dbo].[assignment] (
+  [supervisee_id] NVARCHAR (10) NOT NULL,
+  [supervisor_id] NVARCHAR (10) NOT NULL,
+  CHECK ([supervisee_id] != [supervisor_id]),
+
+  PRIMARY KEY ([supervisee_id], supervisor_id),
+  FOREIGN KEY ([supervisee_id])
+    REFERENCES [dbo].[employee] ([employee_id]),
+    -- ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY ([supervisor_id])
+    REFERENCES [dbo].[employee] ([employee_id])
+    -- ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+-- CREATE TABLE [dbo].[notification] ();
+
+
+CREATE TABLE [dbo].[transactionstate] (
+  [state_id] NVARCHAR (20) PRIMARY KEY
+);
+
+
+CREATE TABLE [dbo].[leavetype] (
+  [type_id] NVARCHAR (20) PRIMARY KEY
+);
+
+
+CREATE TABLE [dbo].[leavetransaction] (
+  [transaction_id] INT IDENTITY (1, 1) PRIMARY KEY,
+  [created_at] DATETIME DEFAULT CURRENT_TIMESTAMP,
+  -- [last_modified] TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- will put in log table
+  [employee_id] NVARCHAR (10) NOT NULL,
+  [leave_type] NVARCHAR (20) NOT NULL,
+  [start_date] DATE NOT NULL,
+  [end_date] DATE NOT NULL,
+  [supervisor_id] NVARCHAR (10) NOT NULL,
+  [hr_manager_id] NVARCHAR (10), -- can be null if the HR 1 has not yet approved
+  [state] NVARCHAR (20) NOT NULL,
+  [message] NVARCHAR (120),
+  [file_path] NVARCHAR (30),
+
+  FOREIGN KEY ([employee_id])
+    REFERENCES [dbo].[employee] ([employee_id]),
+  FOREIGN KEY ([leave_type])
+    REFERENCES [dbo].[leavetype] ([type_id])
+    ON UPDATE CASCADE,
+  FOREIGN KEY ([supervisor_id])
+    REFERENCES [dbo].[employee] ([employee_id]),
+  FOREIGN KEY ([hr_manager_id])
+    REFERENCES [dbo].[employee] ([employee_id]),
+  FOREIGN KEY ([state])
+    REFERENCES [dbo].[transactionstate] ([state_id])
+    ON UPDATE CASCADE
+);
+-- create update trigger for modified: https://stackoverflow.com/questions/22594567/sql-server-on-update-set-current-timestamp/22594779
+
