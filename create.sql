@@ -115,3 +115,42 @@ CREATE TABLE [dbo].[leavetransaction] (
 );
 -- create update trigger for modified: https://stackoverflow.com/questions/22594567/sql-server-on-update-set-current-timestamp/22594779
 
+
+CREATE TABLE [dbo].[department] (
+  [dept_id] INT IDENTITY (1, 1) PRIMARY KEY,
+  [dept_abbr] CHAR (5),
+  [dept_name] NVARCHAR (30) NOT NULL
+);
+
+
+CREATE TABLE [dbo].[position] (
+  [pos_id] INT IDENTITY (1, 1) PRIMARY KEY,
+  [pos_name] NVARCHAR (30) NOT NULL,
+  [pos_description] NVARCHAR (60),
+  [vacation] INT NOT NULL -- the standard number of vacations days awarded per year per position 
+);
+
+
+CREATE TABLE [dbo].[employmenttype] (
+  type_id NVARCHAR (15) PRIMARY KEY
+);
+
+
+CREATE TABLE [dbo].[employeeposition] (
+  [id] INT IDENTITY (1, 1) PRIMARY KEY,
+  [employee_id] NVARCHAR (10) NOT NULL,
+  [position_id] NVARCHAR (2) NOT NULL,
+  [start_date] DATETIME NOT NULL,
+  [end_date] DATETIME NOT NULL,
+  [employment_type] NVARCHAR (15) NOT NULL,
+  [dept_id] NVARCHAR (2),
+
+  FOREIGN KEY ([employee_id])
+    REFERENCES [dbo].[employee] ([employee_id]),
+  FOREIGN KEY ([position_id])
+    REFERENCES [dbo].[position] ([pos_id]),
+  FOREIGN KEY ([employment_type])
+    REFERENCES [dbo].[employmenttype] (type_id),
+  FOREIGN KEY ([dept_id])
+    REFERENCES [dbo].[department] (dept_id)
+);

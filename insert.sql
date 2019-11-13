@@ -59,3 +59,15 @@ INSERT INTO [dbo].[leavetransaction] ([transaction_id], [employee_id], [leave_ty
 (1, '1', 'Sick', '20191113', '20191114', '2', NULL, 'Submitted', NULL, '1/20191113_sick.pdf');
 
 SET IDENTITY_INSERT [dbo].[leavetransaction] OFF;
+
+
+SET IDENTITY_INSERT [dbo].[department] ON;
+
+INSERT INTO [dbo].[department] ([dept_id], [dept_abbr], [dept_name]) VALUES
+(1, 'IT', 'Information Technology'),
+(2, 'HR', 'Human Resources');
+
+SET IDENTITY_INSERT [dbo].[department] OFF;
+
+
+
