@@ -6,6 +6,7 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <title><%: Page.Title %> - My ASP.NET Application</title>
 
     <asp:PlaceHolder runat="server">
@@ -15,7 +16,7 @@
     <!-- Popper.JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
 
-    <webopt:bundlereference runat="server" path="~/Content/css" />
+    <link href="Content/bootstrap.css" rel="stylesheet" type="text/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link href="Styles/MasterStyleSheet.css" rel="stylesheet" type="text/css"/>
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -50,11 +51,11 @@
                     <strong>MoPD</strong>
                 </div>
 
-                <ul class="list-unstyled components">
-                    <li class="active">
+                <ul class="list-unstyled">
+                    <li>
                         <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                            <i class="fa fa-home" style="color:white;"></i>
-                            Home
+                            <i class="fa fa-home"></i>
+                            <span>Home</span>
                         </a>
                         <ul class="collapse list-unstyled" id="homeSubmenu">
                             <li>
@@ -70,8 +71,38 @@
                     </li>
                     <li>
                         <a href="#">
-                            <i class="fa fa-briefcase"></i>
-                            About
+                            <i class="fa fa-book"></i>
+                            <span>Understanding Leave</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-file"></i>
+                            <span>Apply for Leave</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-bug"></i>
+                            <span>Report Bugs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-user-circle"></i>
+                            <span>My Account</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-bell"></i>
+                            <span>Notifications</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-info"></i>
+                            <span>About</span>
                         </a>
                     </li>
                     <li>
@@ -125,10 +156,34 @@
                 $('#sidebar').toggleClass('active');
 
                 if ($('#sidebar').hasClass('active')) {
+                    //sidebar collapse
                     $('#mopd-logo').css('display', 'none');
+
+                    $("#sidebar").one("transitionstart", function () {
+                        $('li').each(function () {
+                            $(this).css('display', 'none');
+                        });
+                    });
+
+                    $("#sidebar").one("transitionend", function () {
+                        $('li').each(function () {
+                            $(this).fadeIn();
+                        });
+                    });
 
                 } else {
                     $('#mopd-logo').fadeIn(285);
+                    $("#sidebar").one("transitionstart", function () {
+                        $('li').each(function () {
+                            $(this).css('display', 'none');
+                        });
+                    });
+
+                    $("#sidebar").one("transitionend", function () {
+                        $('li').each(function () {
+                            $(this).fadeIn();
+                        });
+                    });
                 }
             });
 
