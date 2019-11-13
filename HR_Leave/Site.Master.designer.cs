@@ -13,6 +13,33 @@ namespace HR_Leave {
     public partial class SiteMaster {
         
         /// <summary>
+        /// supervisorPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel supervisorPanel;
+        
+        /// <summary>
+        /// hr1Panel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel hr1Panel;
+        
+        /// <summary>
+        /// hr2Panel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel hr2Panel;
+        
+        /// <summary>
         /// MainContent control.
         /// </summary>
         /// <remarks>
