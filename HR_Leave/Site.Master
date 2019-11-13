@@ -51,7 +51,7 @@
                     <strong>MoPD</strong>
                 </div>
 
-                <ul class="list-unstyled">
+                <ul class="list-unstyled components">
                     <li>
                         <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
                             <i class="fa fa-home"></i>
@@ -159,10 +159,8 @@
                     //sidebar collapse
                     $('#mopd-logo').css('display', 'none');
 
-                    $("#sidebar").one("transitionstart", function () {
-                        $('li').each(function () {
-                            $(this).css('display', 'none');
-                        });
+                    $('li').each(function () {
+                        $(this).css('display', 'none');
                     });
 
                     $("#sidebar").one("transitionend", function () {
@@ -172,11 +170,11 @@
                     });
 
                 } else {
+                    //sidebar expand
                     $('#mopd-logo').fadeIn(285);
-                    $("#sidebar").one("transitionstart", function () {
-                        $('li').each(function () {
-                            $(this).css('display', 'none');
-                        });
+
+                    $('li').each(function () {
+                        $(this).css('display', 'none');
                     });
 
                     $("#sidebar").one("transitionend", function () {
