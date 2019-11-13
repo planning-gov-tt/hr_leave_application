@@ -814,6 +814,21 @@
 										},
 										{
 											"_type": "ERDColumnView",
+											"_id": "AAAAAAFuZiYw2QJKqlk=",
+											"_parent": {
+												"$ref": "AAAAAAFt+cN3LXAaPH0="
+											},
+											"model": {
+												"$ref": "AAAAAAFuZiYwoQJHQz8="
+											},
+											"font": "Arial;13;0",
+											"left": 301,
+											"top": 939,
+											"width": 183,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
 											"_id": "AAAAAAFt+cOm43AtQrw=",
 											"_parent": {
 												"$ref": "AAAAAAFt+cN3LXAaPH0="
@@ -823,7 +838,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 301,
-											"top": 939,
+											"top": 954,
 											"width": 183,
 											"height": 13
 										}
@@ -832,7 +847,7 @@
 									"left": 296,
 									"top": 919,
 									"width": 193,
-									"height": 38
+									"height": 53
 								}
 							],
 							"font": "Arial;13;0",
@@ -1637,8 +1652,8 @@
 								"$ref": "AAAAAAFt+ardZm6ip4I="
 							},
 							"font": "Arial;13;0",
-							"left": 256,
-							"top": 472,
+							"left": 216,
+							"top": 320,
 							"width": 164,
 							"height": 141,
 							"text": "Keeps track of continuity in service and number of years worked for awardarding additional leave after 5 years\n=================\nEmployment Types:\nContract\nPublic Service\n\n"
@@ -1654,10 +1669,10 @@
 								"$ref": "AAAAAAFt+fW3mbUo9EE="
 							},
 							"tail": {
-								"$ref": "AAAAAAFt+dcFHLNEcWo="
+								"$ref": "AAAAAAFuZhas/gIVb2I="
 							},
 							"lineStyle": 1,
-							"points": "370:663;356:613"
+							"points": "359:503;336:461"
 						},
 						{
 							"_type": "UMLNoteView",
@@ -2553,6 +2568,155 @@
 							"headNameLabel": {
 								"$ref": "AAAAAAFuZZ+tdQHqfz8="
 							}
+						},
+						{
+							"_type": "ERDEntityView",
+							"_id": "AAAAAAFuZhas/gIVb2I=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ardZm6ip4I="
+							},
+							"model": {
+								"$ref": "AAAAAAFuZhas/AITOx8="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFuZhas/gIWn/U=",
+									"_parent": {
+										"$ref": "AAAAAAFuZhas/gIVb2I="
+									},
+									"font": "Arial;13;1",
+									"left": 312,
+									"top": 509,
+									"width": 152,
+									"height": 13,
+									"text": "Employment Type"
+								},
+								{
+									"_type": "ERDColumnCompartmentView",
+									"_id": "AAAAAAFuZhas/gIXpQE=",
+									"_parent": {
+										"$ref": "AAAAAAFuZhas/gIVb2I="
+									},
+									"model": {
+										"$ref": "AAAAAAFuZhas/AITOx8="
+									},
+									"subViews": [
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFuZhbUJAIj3eI=",
+											"_parent": {
+												"$ref": "AAAAAAFuZhas/gIXpQE="
+											},
+											"model": {
+												"$ref": "AAAAAAFuZhbT6AIgVNE="
+											},
+											"font": "Arial;13;0",
+											"left": 317,
+											"top": 532,
+											"width": 142,
+											"height": 13
+										}
+									],
+									"font": "Arial;13;0",
+									"left": 312,
+									"top": 527,
+									"width": 152,
+									"height": 23
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 312,
+							"top": 504,
+							"width": 152,
+							"height": 104,
+							"nameLabel": {
+								"$ref": "AAAAAAFuZhas/gIWn/U="
+							},
+							"columnCompartment": {
+								"$ref": "AAAAAAFuZhas/gIXpQE="
+							}
+						},
+						{
+							"_type": "ERDRelationshipView",
+							"_id": "AAAAAAFuZhcvOgIyxqA=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ardZm6ip4I="
+							},
+							"model": {
+								"$ref": "AAAAAAFuZhcvOgIuIss="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFuZhcvOgIz/T0=",
+									"_parent": {
+										"$ref": "AAAAAAFuZhcvOgIyxqA="
+									},
+									"visible": false,
+									"font": "Arial;13;0",
+									"left": 402,
+									"top": 628,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFuZhcvOgIyxqA="
+									},
+									"edgePosition": 1
+								},
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFuZhcvOgI0L9k=",
+									"_parent": {
+										"$ref": "AAAAAAFuZhcvOgIyxqA="
+									},
+									"font": "Arial;13;0",
+									"left": 403,
+									"top": 626,
+									"height": 13,
+									"alpha": 0.5235987755982988,
+									"distance": 30,
+									"hostEdge": {
+										"$ref": "AAAAAAFuZhcvOgIyxqA="
+									},
+									"edgePosition": 2
+								},
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFuZhcvOgI1vf4=",
+									"_parent": {
+										"$ref": "AAAAAAFuZhcvOgIyxqA="
+									},
+									"font": "Arial;13;0",
+									"left": 403,
+									"top": 632,
+									"height": 13,
+									"alpha": -0.5235987755982988,
+									"distance": 30,
+									"hostEdge": {
+										"$ref": "AAAAAAFuZhcvOgIyxqA="
+									}
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFt+dcFHLNEcWo="
+							},
+							"tail": {
+								"$ref": "AAAAAAFuZhas/gIVb2I="
+							},
+							"lineStyle": 2,
+							"points": "388:607;388:664",
+							"nameLabel": {
+								"$ref": "AAAAAAFuZhcvOgIz/T0="
+							},
+							"tailNameLabel": {
+								"$ref": "AAAAAAFuZhcvOgI0L9k="
+							},
+							"headNameLabel": {
+								"$ref": "AAAAAAFuZhcvOgI1vf4="
+							}
 						}
 					]
 				},
@@ -3408,6 +3572,15 @@
 						},
 						{
 							"_type": "ERDColumn",
+							"_id": "AAAAAAFuZiYwoQJHQz8=",
+							"_parent": {
+								"$ref": "AAAAAAFt+cN3LXAWtMQ="
+							},
+							"name": "Dept Abbreviation",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
 							"_id": "AAAAAAFt+cOmr3AqlBo=",
 							"_parent": {
 								"$ref": "AAAAAAFt+cN3LXAWtMQ="
@@ -3495,7 +3668,11 @@
 							},
 							"name": "Employment Type",
 							"documentation": "Contract\nPublic Officer",
-							"length": 0
+							"length": 0,
+							"foreignKey": true,
+							"referenceTo": {
+								"$ref": "AAAAAAFuZhbT6AIgVNE="
+							}
 						},
 						{
 							"_type": "ERDColumn",
@@ -3503,8 +3680,12 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+dcFHLNCBqU="
 							},
-							"name": "Dept",
-							"length": 0
+							"name": "Dept Id",
+							"length": 0,
+							"foreignKey": true,
+							"referenceTo": {
+								"$ref": "AAAAAAFt+cOP/3Ajc34="
+							}
 						}
 					]
 				},
@@ -3784,6 +3965,56 @@
 							"_id": "AAAAAAFuZZ9xIQHYwu8=",
 							"_parent": {
 								"$ref": "AAAAAAFuZZ9dRgHLQEc="
+							},
+							"name": "type_id",
+							"length": 0,
+							"primaryKey": true
+						}
+					]
+				},
+				{
+					"_type": "ERDEntity",
+					"_id": "AAAAAAFuZhas/AITOx8=",
+					"_parent": {
+						"$ref": "AAAAAAFt+ardZm6hloU="
+					},
+					"name": "Employment Type",
+					"ownedElements": [
+						{
+							"_type": "ERDRelationship",
+							"_id": "AAAAAAFuZhcvOgIuIss=",
+							"_parent": {
+								"$ref": "AAAAAAFuZhas/AITOx8="
+							},
+							"end1": {
+								"_type": "ERDRelationshipEnd",
+								"_id": "AAAAAAFuZhcvOgIv/bA=",
+								"_parent": {
+									"$ref": "AAAAAAFuZhcvOgIuIss="
+								},
+								"reference": {
+									"$ref": "AAAAAAFuZhas/AITOx8="
+								}
+							},
+							"end2": {
+								"_type": "ERDRelationshipEnd",
+								"_id": "AAAAAAFuZhcvOgIwFzg=",
+								"_parent": {
+									"$ref": "AAAAAAFuZhcvOgIuIss="
+								},
+								"reference": {
+									"$ref": "AAAAAAFt+dcFHLNCBqU="
+								},
+								"cardinality": "0..*"
+							}
+						}
+					],
+					"columns": [
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAFuZhbT6AIgVNE=",
+							"_parent": {
+								"$ref": "AAAAAAFuZhas/AITOx8="
 							},
 							"name": "type_id",
 							"length": 0,
