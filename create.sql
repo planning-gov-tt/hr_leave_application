@@ -141,7 +141,8 @@ CREATE TABLE [dbo].[employeeposition] (
   [employee_id] NVARCHAR (10) NOT NULL,
   [position_id] NVARCHAR (2) NOT NULL,
   [start_date] DATETIME NOT NULL,
-  [end_date] DATETIME NOT NULL,
+  [expected_end_date] DATETIME NOT NULL,
+  [actual_end_date] DATETIME,
   [employment_type] NVARCHAR (15) NOT NULL,
   [dept_id] NVARCHAR (2),
 

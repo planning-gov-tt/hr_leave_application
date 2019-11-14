@@ -65,9 +65,39 @@ SET IDENTITY_INSERT [dbo].[department] ON;
 
 INSERT INTO [dbo].[department] ([dept_id], [dept_abbr], [dept_name]) VALUES
 (1, 'IT', 'Information Technology'),
-(2, 'HR', 'Human Resources');
+(2, 'HR', 'Human Resources'),
+(3, 'AC', 'Accounts');
 
 SET IDENTITY_INSERT [dbo].[department] OFF;
 
 
+SET IDENTITY_INSERT [dbo].[position] ON;
 
+INSERT INTO [dbo].[position] ([pod_id], [pos_name], [pos_description], [vacation]) VALUES 
+(1, 'IT Technician', 'Does stuff.', 20),
+(2, 'Security Specialist', 'Secures stuff.', 15),
+(3, 'Database Specialist', NULL, 15),
+(4, 'Director', NULL, 25),
+(5, 'Associate Professional', NULL, 0),
+(6, 'System''s Specialist', NULL, 30);
+
+SET IDENTITY_INSERT [dbo].[position] OFF;
+
+
+INSERT INTO [dbo].[employmenttype] ([type_id]) VALUES 
+('Contract'),
+('Public Service');
+
+
+SET IDENTITY_INSERT [dbo].[employeeposition] ON;
+
+INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start_date], [expected_end_date], [actual_end_date], [employment_type], [dept_id]) VALUES
+(1, '1', 5, '20190927', '20200927', NULL, 'Contract', 1),
+(2, '3', 5, '20190927', '20200927', NULL, 'Contract', 1),
+
+-- multiple periods of employment for one person
+(3, '2', 6, '20101005', '20131005', NULL, 'Contract', 1),
+(4, '2', 6, '20131005', '20160927', NULL, 'Contract', 1),
+(5, '2', 6, '20160927', '20191225', NULL, 'Contract', 1);
+
+SET IDENTITY_INSERT [dbo].[employeeposition] OFF;
