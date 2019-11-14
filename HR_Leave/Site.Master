@@ -45,33 +45,33 @@
         </asp:ScriptManager>
         <div class="wrapper">
             <!-- Sidebar -->
-            <nav id="sidebar">
+            <nav id="sidebar" runat="server">
                 <div class="sidebar-header">
-                    <img id="mopd-logo" src="Assets/mopd_logo.jpg" alt="Ministry of Planning and Development"/>
+                    <a href="Default.aspx"><img id="mopd-logo" src="Assets/mopd_logo.jpg" alt="Ministry of Planning and Development"/></a>
                     <strong>MoPD</strong>
                 </div>
 
                 <ul class="list-unstyled components">
                     <li>
-                        <a href="#">
+                        <a href="Default.aspx">
                             <i class="fa fa-home"></i>
                             <span>Home</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="About.aspx">
                             <i class="fa fa-info-circle"></i>
                             <span>About Us</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="UnderstandingLeave.aspx">
                             <i class="fa fa-book"></i>
                             <span>Understanding Leave</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="ApplyForLeave.aspx">
                             <i class="fa fa-file"></i>
                             <span>Apply for Leave</span>
                         </a>
@@ -141,19 +141,25 @@
                         </li>
                     </asp:Panel>
                     <li>
-                        <a href="#">
+                        <a href="Notifications.aspx">
                             <i class="fa fa-bell"></i>
                             <span>Notifications</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="MyAccount.aspx">
                             <i class="fa fa-user-circle"></i>
                             <span>My Account</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="Help.aspx">
+                            <i class="fa fa-question-circle"></i>
+                            <span>Help</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="ReportBugs.aspx">
                             <i class="fa fa-bug"></i>
                             <span>Report Bugs</span>
                         </a>

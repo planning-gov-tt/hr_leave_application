@@ -74,7 +74,7 @@ namespace HR_Leave
             // 2 - Supervisor
             // 3 - HR 1
             // 4 - HR 2
-            int authorizationLevel = 1;
+            int authorizationLevel = 3;
             if(authorizationLevel == 2)
             {
                 supervisorPanel.Style.Add("display", "block");
@@ -82,9 +82,11 @@ namespace HR_Leave
             {
                 hr1Panel.Style.Add("display", "block");
             } else if (authorizationLevel == 4)
-                {
-                    hr2Panel.Style.Add("display", "block");
-                }
+            {
+                hr2Panel.Style.Add("display", "block");
+            }
+
+
         }
 
         protected void Unnamed_LoggingOut(object sender, LoginCancelEventArgs e)
