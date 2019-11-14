@@ -1134,6 +1134,21 @@
 										},
 										{
 											"_type": "ERDColumnView",
+											"_id": "AAAAAAFuai61Q9sje7A=",
+											"_parent": {
+												"$ref": "AAAAAAFt+dcFHbNGQDU="
+											},
+											"model": {
+												"$ref": "AAAAAAFuai61JdsgwG0="
+											},
+											"font": "Arial;13;0",
+											"left": 301,
+											"top": 767,
+											"width": 182,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
 											"_id": "AAAAAAFt+deZ3rNn5ak=",
 											"_parent": {
 												"$ref": "AAAAAAFt+dcFHbNGQDU="
@@ -1143,7 +1158,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 301,
-											"top": 767,
+											"top": 782,
 											"width": 182,
 											"height": 13
 										},
@@ -1158,7 +1173,7 @@
 											},
 											"font": "Arial;13;0",
 											"left": 301,
-											"top": 782,
+											"top": 797,
 											"width": 182,
 											"height": 13
 										}
@@ -1167,7 +1182,7 @@
 									"left": 296,
 									"top": 687,
 									"width": 192,
-									"height": 113
+									"height": 128
 								}
 							],
 							"font": "Arial;13;0",
@@ -3657,7 +3672,16 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+dcFHLNCBqU="
 							},
-							"name": "End Date",
+							"name": "Expected End Date",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
+							"_id": "AAAAAAFuai61JdsgwG0=",
+							"_parent": {
+								"$ref": "AAAAAAFt+dcFHLNCBqU="
+							},
+							"name": "Actual End Date",
 							"length": 0
 						},
 						{
