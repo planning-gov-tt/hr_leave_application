@@ -1,19 +1,20 @@
-USE master;
+-- USE master;
+-- GO
+
+-- IF DB_ID (N'HRLeave') IS NULL
+-- CREATE DATABASE [HRLeave];
+-- GO
+
+-- USE [HRLeave]; -- chris local db
+USE [HRLeaveTestDB]; -- dbserver
 GO
 
-IF DB_ID (N'HRLeave') IS NULL
-CREATE DATABASE [HRLeave];
-GO
-
-USE [HRLeave];
-GO
-
-DECLARE @Short int;
-SET @Short = 10;
-DECLARE @Medium int;
-SET @Medium = 30
-DECLARE @Long int;
-SET @Long = 60
+-- DECLARE @Short int;
+-- SET @Short = 10;
+-- DECLARE @Medium int;
+-- SET @Medium = 30
+-- DECLARE @Long int;
+-- SET @Long = 60
 
 
 CREATE TABLE [dbo].[authorization] (
@@ -139,12 +140,12 @@ CREATE TABLE [dbo].[employmenttype] (
 CREATE TABLE [dbo].[employeeposition] (
   [id] INT IDENTITY (1, 1) PRIMARY KEY,
   [employee_id] NVARCHAR (10) NOT NULL,
-  [position_id] NVARCHAR (2) NOT NULL,
+  [position_id] INT NOT NULL,
   [start_date] DATETIME NOT NULL,
   [expected_end_date] DATETIME NOT NULL,
   [actual_end_date] DATETIME,
   [employment_type] NVARCHAR (15) NOT NULL,
-  [dept_id] NVARCHAR (2),
+  [dept_id] INT,
 
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id]),

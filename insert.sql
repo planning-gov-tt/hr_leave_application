@@ -1,4 +1,5 @@
-USE [HRLeave];
+-- USE [HRLeave]; -- chris local db
+USE [HRLeaveTestDB]; -- dbserver
 GO
 
 
@@ -73,7 +74,7 @@ SET IDENTITY_INSERT [dbo].[department] OFF;
 
 SET IDENTITY_INSERT [dbo].[position] ON;
 
-INSERT INTO [dbo].[position] ([pod_id], [pos_name], [pos_description], [vacation]) VALUES 
+INSERT INTO [dbo].[position] ([pos_id], [pos_name], [pos_description], [vacation]) VALUES 
 (1, 'IT Technician', 'Does stuff.', 20),
 (2, 'Security Specialist', 'Secures stuff.', 15),
 (3, 'Database Specialist', NULL, 15),
