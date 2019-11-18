@@ -1,32 +1,37 @@
--- USE master;
--- GO
-
--- IF DB_ID (N'HRLeave') IS NULL
--- CREATE DATABASE [HRLeave];
--- GO
-
 -- USE [HRLeave]; -- chris local db
-USE [HRLeaveTestDB]; -- dbserver
+USE [HRLeaveTestDb]; -- dbserver
 GO
 
--- DECLARE @Short int;
--- SET @Short = 10;
--- DECLARE @Medium int;
--- SET @Medium = 30
--- DECLARE @Long int;
--- SET @Long = 60
+
+CREATE TABLE [dbo].[permission] (
+  [permission_id] NVARCHAR (30) PRIMARY KEY,
+  [permission_description] NVARCHAR (50)
+);
 
 
-CREATE TABLE [dbo].[authorization] (
-  [auth_id] CHAR (1) PRIMARY KEY, -- might not need the id - just use the auth_name
-  [auth_name] NVARCHAR (15) NOT NULL,
-  [auth_description] NVARCHAR (100)
+CREATE TABLE [dbo].[role] (
+  [role_id] NVARCHAR (20) PRIMARY KEY,
+  [role_description] NVARCHAR (50)
+);
+
+
+CREATE TABLE [dbo].[rolepermission] (
+  [role_id] NVARCHAR (20),
+  [permission_id] NVARCHAR (30),
+  
+  PRIMARY KEY ([role_id], [permission_id]),
+  FOREIGN KEY ([role_id])
+    REFERENCES [dbo].[role] ([role_id])
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY ([permission_id])
+    REFERENCES [dbo].[permission] ([permission_id])
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
 -- 'user' is a resered word, so using 'employee' instead
 CREATE TABLE [dbo].[employee] (
-  [employee_id] NVARCHAR (10) PRIMARY KEY,
+  [employee_id] NVARCHAR (10) PRIMARY KEY, -- employee's file number
   [ihris_id] NVARCHAR (10) NOT NULL,
 
   -- active directory info
@@ -46,16 +51,16 @@ CREATE TABLE [dbo].[employee] (
 );
 
 
-CREATE TABLE [dbo].[employeeauthorization] (
-  [employee_id] NVARCHAR (10) NOT NULL,
-  [auth_id] CHAR (1) NOT NULL,
+CREATE TABLE [dbo].[employeerole] (
+  [employee_id] NVARCHAR (10),
+  [role_id] NVARCHAR (20),
 
-  PRIMARY KEY ([employee_id], [auth_id]),
+  PRIMARY KEY ([employee_id], [role_id]),
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id]),
-  FOREIGN KEY ([auth_id])
-    REFERENCES [dbo].[authorization] ([auth_id])
-);
+  FOREIGN KEY ([role_id])
+    REFERENCES [dbo].[role] ([role_id])
+)
 
 
 -- problems with setting both to ON DELETE CASCADE ON UPDATE CASCADE,

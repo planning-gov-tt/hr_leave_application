@@ -1,13 +1,55 @@
 -- USE [HRLeave]; -- chris local db
-USE [HRLeaveTestDB]; -- dbserver
+USE [HRLeaveTestDb]; -- dbserver
 GO
 
 
-INSERT INTO [dbo].[authorization] ([auth_id], [auth_name], [auth_description]) VALUES 
-('1', 'Employee', 'You can apply for leave.'),
-('2', 'Supervisor', 'You can apply for and approve leave for supervisees.'),
-('3', 'HR 2', 'You can apply for leave, add employees and edit vacation leave.'),
-('4', 'HR 1', 'You can approve leave that supervisors have pre-approved.');
+INSERT INTO [dbo].[permission] ([permission_id]) VALUES
+('emp_permissions'),
+('sup_permissions'),
+('crud_emp_info'),
+('approve_sick'),
+('approve_casual'),
+('approve_vacation'),
+('approve_contract'),
+('approve_public_officer'),
+('assign_role');
+
+
+INSERT INTO [dbo].[role] ([role_id]) VALUES
+('emp'),
+('sup'),
+('hr3'),
+('hr2'),
+('hr1'),
+('hr_contract'),
+('hr_public_officer');
+
+
+INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
+('emp', 'emp_permissions'),
+
+('sup', 'emp_permissions'),
+('sup', 'sup_permissions'),
+
+('hr3', 'emp_permissions'),
+('hr3', 'crud_emp_info'),
+
+('hr2', 'emp_permissions'),
+('hr2', 'sup_permissions'),
+('hr2', 'crud_emp_info'),
+('hr2', 'approve_sick'),
+('hr2', 'approve_casual'),
+
+('hr1', 'emp_permissions'),
+('hr1', 'approve_sick'),
+('hr1', 'approve_casual'),
+('hr1', 'crud_emp_info'),
+('hr1', 'approve_vacation'),
+('hr1', 'assign_role'),
+
+('hr_contract', 'approve_contract'),
+
+('hr_public_officer', 'approve_public_officer');
 
 
 INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [pre_retirement]) VALUES 
@@ -19,13 +61,13 @@ INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name
 ('6', '6', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'melanie.noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50);
 
 
-INSERT INTO [dbo].[employeeauthorization] ([employee_id], [auth_id]) VALUES 
-('1', '1'),
-('2', '2'),
-('3', '1'),
-('4', '2'),
-('5', '1'),
-('6', '4');
+INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
+('1', 'emp'),
+('2', 'sup'),
+('3', 'emp'),
+('4', 'sup'),
+('5', 'emp'),
+('6', 'hr1');
 
 
 INSERT INTO [dbo].[assignment] ([supervisee_id], [supervisor_id]) VALUES
