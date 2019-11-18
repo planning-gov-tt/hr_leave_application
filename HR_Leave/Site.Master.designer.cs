@@ -49,6 +49,15 @@ namespace HR_Leave {
         protected global::System.Web.UI.WebControls.Panel hr2Panel;
         
         /// <summary>
+        /// sidebarCollapse control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlButton sidebarCollapse;
+        
+        /// <summary>
         /// MainContent control.
         /// </summary>
         /// <remarks>

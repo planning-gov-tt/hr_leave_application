@@ -20,7 +20,7 @@
     min-height: 100vh;
 }
 
-
+/*style sidenav header*/
 #mopd-logo{
     width:200px;
     height:200px;
@@ -35,37 +35,6 @@
     padding: 20px;
 }
 
-#sidebar ul.components {
-    padding-top: 20px;
-    border-bottom: 1px solid #47748b;
-}
-
-#sidebar ul p {
-    color: #fff;
-    padding: 10px;
-}
-
-#sidebar ul li a {
-    padding: 10px;
-    font-size: 1.1em;
-    display: block;
-}
-#sidebar ul li a:hover {
-    color: #7386d5;
-    background: #fff;
-}
-
-#sidebar ul li.active > a, a[aria-expanded="true"] {
-    color: #fff;
-    background: #6d7fcc;
-}
-
-#sidebar.active {
-    min-width: 95px;
-    max-width: 95px;
-    text-align: center;
-}
-
 #sidebar .sidebar-header strong {
     display: none;
 }
@@ -75,17 +44,43 @@
     display: block;
     font-size: 1.2em;
 }
+/*end style sidenav header*/
+
+/*style sidenav links*/
+#sidebar ul.components {
+    padding-top: 10px;
+}
+
+#sidebar ul li a {
+    padding: 10px 0px 10px 25px;
+    font-size: 1.1em;
+    display: block;
+}
+#sidebar ul li a:hover {
+    color: #7386d5;
+    background: #fff;
+}
 
 #sidebar ul li a {
     text-align: left;
     width: 100%;
 }
 #sidebar ul li a i{
+    /*style icon for link*/
     width: 20px;
     text-align:center
 }
 #sidebar ul li a span{
+    /*style text for link*/
     width: 100px;
+}
+/*end style sidenav links*/
+
+/*style collapsed sidenav*/
+#sidebar.active {
+    min-width: 95px;
+    max-width: 95px;
+    text-align: center;
 }
 
 #sidebar.active ul li a {
@@ -101,10 +96,12 @@
     font-size: 1.8em;
     margin-bottom: 5px;
 }
+/*end style collapsed sidenav*/
 
 
-/*Style dropdowns*/
+/*style dropdown*/
 
+/*style children of dropdown menu*/
 #sidebar ul li ul li{
     background-color:#6778bf;
 }
@@ -115,6 +112,41 @@ a, a:hover, a:focus {
     transition: all 0.3s;
 }
 
+.dropdown-arrow{
+    font-size: 0.6em;
+    padding-left:5px;
+}
+
+/*indent children of dropdown menu when sidenav is expanded*/
+#sidebar .submenu li a i{
+    margin-left:15px;
+}
+
+/*remove indent of children of dropdown menu when sidenav is collapsed*/
+#sidebar.active .submenu li a i{
+    margin-left:0px;
+}
+
+
 #content{
     padding:25px;
+    width:100%;
 }
+
+#content h1{
+    text-align:center;
+}
+
+/*style role panels*/
+#supervisorPanel{
+    display:none;
+}
+
+#hr1Panel{
+    display:none;
+}
+
+#hr2Panel{
+    display:none;
+}
+/*end style role panels*/
