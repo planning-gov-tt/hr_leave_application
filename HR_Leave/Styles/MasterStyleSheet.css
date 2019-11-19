@@ -14,7 +14,6 @@
 #sidebar {
     background: #7386D5;
     color: #fff;
-    transition: all 0.2s;
     min-width: 250px;
     max-width: 250px;
     min-height: 100vh;
@@ -107,7 +106,11 @@
 a, a:hover, a:focus {
     color: inherit;
     text-decoration: none;
-    transition: all 0.3s;
+}
+
+.dropup-arrow{
+    display:none;
+    font-size: 0.6em;
 }
 
 .dropdown-arrow{

@@ -44,10 +44,13 @@
         </asp:ScriptManager>
         <div class="wrapper">
             <!-- Sidebar -->
-            <nav id="sidebar" runat="server">
+            <nav id="sidebar">
                 <div class="sidebar-header">
-                    <a href="<%= ResolveClientUrl("~/Default.aspx") %>"><img id="mopd-logo" src="<%= ResolveClientUrl("~/Assets/mopd_logo.jpg") %>" alt="Ministry of Planning and Development"/></a>
-                    <strong>MoPD</strong>
+                    <a href="<%= ResolveClientUrl("~/Default.aspx") %>">
+                        <img id="mopd-logo" src="<%= ResolveClientUrl("~/Assets/mopd_logo.jpg") %>" alt="Ministry of Planning and Development"/>
+                        <strong>MoPD</strong>
+                    </a>
+                    
                 </div>
 
                 <ul class="list-unstyled components">
@@ -77,10 +80,11 @@
                     </li>
                     <asp:Panel ID="supervisorPanel" runat="server">
                         <li>
-                            <a href="#supervisorSubmenu" data-toggle="collapse" aria-expanded="false" class="navbar-link">
+                            <a href="#supervisorSubmenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
                                 <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="Supervisor Actions">
                                     <i class="fa fa-eye navbar-link-icon"></i>
                                     <span class="navbar-link-text">Supervisor Actions</span>
+                                    <span class="dropup-arrow">&#9650;</span>
                                     <span class="dropdown-arrow">&#9660;</span>
                                 </span>
                             </a>
@@ -108,10 +112,11 @@
                     </asp:Panel>
                     <asp:Panel ID="hr1Panel" runat="server">
                         <li>
-                            <a href="#hr1Submenu" data-toggle="collapse" aria-expanded="false" class="navbar-link">
+                            <a href="#hr1Submenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
                                 <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="HR 1 Actions">
                                     <i class="fa fa-eye navbar-link-icon"></i>
                                     <span class="navbar-link-text">HR 1 Actions</span>
+                                    <span class="dropup-arrow">&#9650;</span>
                                     <span class="dropdown-arrow">&#9660;</span>
                                 </span>
                                 
@@ -171,12 +176,10 @@
             <div id="content">
                 <nav class="navbar navbar-expand-lg navbar-light bg-light">
                     <div class="container-fluid">
-
-                        <button type="button" id="sidebarCollapse" class="btn btn-info" runat="server">
+                        <button type="button" id="sidebarCollapse" class="btn btn-info">
                             <i class="fa fa-align-left"></i>
                             <span>Toggle Sidebar</span>
                         </button>
-
                     </div>
                 </nav>
                 <asp:ContentPlaceHolder ID="MainContent" runat="server">
@@ -191,12 +194,41 @@
     </form>
 
     <script type="text/javascript">
+        var storage = window.sessionStorage;
+
         $(document).ready(function () {
-            $(".tooltipped").tooltip('disable');
 
-            $('#sidebarCollapse').on('click', function () {
+            // maintain state of sidebar based on session storage
+            var isActive = storage.getItem("isActive");
+            if (isActive != null) {
+                $('#sidebar').css('transition', 'none');
+                isActive = isActive.toString().localeCompare("true");
+                if (isActive == 0) {
+                    $('#sidebar').addClass("active");
+
+                    //enable tooltips
+                    $(".tooltipped").tooltip('enable');
+
+                    // hide logo
+                    $('#mopd-logo').css('display', 'none');
+
+                } else {
+                    $('#sidebar').removeClass("active");
+
+                    //disable tooltips
+                    $(".tooltipped").tooltip('disable');
+
+                }
+            } else {
+                $(".tooltipped").tooltip('disable');
+            }
+
+            $('#sidebarCollapse').click(function () {
                 $('#sidebar').toggleClass('active');
+                $('#sidebar').css('transition', 'all 0.2s');
 
+                storage.setItem("isActive", $('#sidebar').hasClass("active"));
+                
                 if ($('#sidebar').hasClass('active')) {
                     // sidebar collapse
 
@@ -221,6 +253,7 @@
                 } else {
                     // sidebar expand
 
+
                     $(".tooltipped").tooltip('disable');
 
                     // fade in logo
@@ -240,7 +273,16 @@
                 }
             });
 
-            
+            $('.dropdown-parent').click(function () {
+                if ($('.dropup-arrow').is(':visible')) {
+                    $('.dropdown-arrow').css('display', 'inline-block');
+                    $('.dropup-arrow').css('display', 'none');
+                } else if ($('.dropup-arrow').is(':hidden')) {
+                    $('.dropdown-arrow').css('display', 'none');
+                    $('.dropup-arrow').css('display', 'inline-block');
+                }
+            });
+
         });
     </script>
 </body>
