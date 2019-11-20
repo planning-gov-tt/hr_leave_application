@@ -8,12 +8,12 @@
             font-size: 1.3em;
         }
 
-        div.row{
+        #applyForLeaveContainer div.row{
             margin-top:50px;
         }
     </style>
     <h1><%: Title %></h1>
-    <div class="container-fluid text-center">
+    <div id="applyForLeaveContainer" class="container-fluid text-center">
         <div class="row form-group" >
             <div style="display:inline-block; margin-right:15%;">
                 <label for="txtFrom" style="font-size:1.5em">From:</label>

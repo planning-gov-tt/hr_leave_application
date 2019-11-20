@@ -74,7 +74,7 @@ namespace HR_Leave
             // 2 - Supervisor
             // 3 - HR 1
             // 4 - HR 2
-            int authorizationLevel = 2;
+            int authorizationLevel = 1;
             if (authorizationLevel == 2)
             {
                 supervisorPanel.Style.Add("display", "block");
