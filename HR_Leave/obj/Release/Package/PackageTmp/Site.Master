@@ -13,12 +13,11 @@
         <%: Scripts.Render("~/bundles/modernizr") %>
     </asp:PlaceHolder>
     
-    <!-- Popper.JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
 
     <link href="Content/bootstrap.css" rel="stylesheet" type="text/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link href="Styles/MasterStyleSheet.css" rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" rel="stylesheet" />
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 </head>
 <body>
@@ -45,60 +44,67 @@
         </asp:ScriptManager>
         <div class="wrapper">
             <!-- Sidebar -->
-            <nav id="sidebar" runat="server">
+            <nav id="sidebar">
                 <div class="sidebar-header">
-                    <a href="<%= ResolveClientUrl("~/Default.aspx") %>"><img id="mopd-logo" src="<%= ResolveClientUrl("~/Assets/mopd_logo.jpg") %>" alt="Ministry of Planning and Development"/></a>
-                    <strong>MoPD</strong>
+                    <a href="<%= ResolveClientUrl("~/Default.aspx") %>">
+                        <img id="mopd-logo" src="<%= ResolveClientUrl("~/Assets/mopd_logo.jpg") %>" alt="Ministry of Planning and Development"/>
+                        <strong>MoPD</strong>
+                    </a>
+                    
                 </div>
 
                 <ul class="list-unstyled components">
                     <li>
-                        <a href="<%= ResolveClientUrl("~/Default.aspx") %>">
-                            <i class="fa fa-home"></i>
-                            <span>Home</span>
+                        <a href="<%= ResolveClientUrl("~/Default.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Home">
+                            <i class="fa fa-home navbar-link-icon"></i>
+                            <span class="navbar-link-text">Home</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<%= ResolveClientUrl("~/Employee/About.aspx") %>">
-                            <i class="fa fa-info-circle"></i>
-                            <span>About Us</span>
+                        <a href="<%= ResolveClientUrl("~/Employee/About.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="About Us">
+                            <i class="fa fa-info-circle navbar-link-icon"></i>
+                            <span class="navbar-link-text">About Us</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<%= ResolveClientUrl("~/Employee/UnderstandingLeave.aspx") %>">
-                            <i class="fa fa-book"></i>
-                            <span>Understanding Leave</span>
+                        <a href="<%= ResolveClientUrl("~/Employee/UnderstandingLeave.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Understanding Leave">
+                            <i class="fa fa-book navbar-link-icon"></i>
+                            <span class="navbar-link-text">Understanding Leave</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<%= ResolveClientUrl("~/Employee/ApplyForLeave.aspx") %>">
-                            <i class="fa fa-file"></i>
-                            <span>Apply for Leave</span>
+                        <a href="<%= ResolveClientUrl("~/Employee/ApplyForLeave.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Apply for Leave">
+                            <i class="fa fa-file navbar-link-icon"></i>
+                            <span class="navbar-link-text">Apply for Leave</span>
                         </a>
                     </li>
                     <asp:Panel ID="supervisorPanel" runat="server">
                         <li>
-                            <a href="#supervisorSubmenu" data-toggle="collapse" aria-expanded="false">
-                                <i class="fa fa-eye"></i>
-                                <span>Supervisor Actions <span class="dropdown-arrow">&#9660;</span></span>
+                            <a href="#supervisorSubmenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
+                                <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="Supervisor Actions">
+                                    <i class="fa fa-eye navbar-link-icon"></i>
+                                    <span class="navbar-link-text">Supervisor Actions</span>
+                                    <span class="dropup-arrow">&#9650;</span>
+                                    <span class="dropdown-arrow">&#9660;</span>
+                                </span>
                             </a>
                             <ul class="collapse list-unstyled submenu" id="supervisorSubmenu">
                                 <li>
-                                    <a href="#">
-                                        <i class="fa fa-users"></i>
-                                        <span>My Employees</span>
+                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="My Employees">
+                                        <i class="fa fa-users navbar-link-icon"></i>
+                                        <span class="navbar-link-text">My Employees</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i class="fa fa-inbox"></i>
-                                        <span>Leave Applications</span>
+                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Applications">
+                                        <i class="fa fa-inbox navbar-link-icon"></i>
+                                        <span class="navbar-link-text">Leave Applications</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i class="fa fa-pie-chart"></i>
-                                        <span>Reports</span>
+                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
+                                        <i class="fa fa-pie-chart navbar-link-icon"></i>
+                                        <span class="navbar-link-text">Reports</span>
                                     </a>
                                 </li>
                             </ul>
@@ -106,27 +112,32 @@
                     </asp:Panel>
                     <asp:Panel ID="hr1Panel" runat="server">
                         <li>
-                            <a href="#hr1Submenu" data-toggle="collapse" aria-expanded="false">
-                                <i class="fa fa-eye"></i>
-                                <span>HR 1 Actions <span class="dropdown-arrow">&#9660;</span></span>
+                            <a href="#hr1Submenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
+                                <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="HR 1 Actions">
+                                    <i class="fa fa-eye navbar-link-icon"></i>
+                                    <span class="navbar-link-text">HR 1 Actions</span>
+                                    <span class="dropup-arrow">&#9650;</span>
+                                    <span class="dropdown-arrow">&#9660;</span>
+                                </span>
+                                
                             </a>
                             <ul class="collapse list-unstyled submenu" id="hr1Submenu">
                                 <li>
-                                    <a href="#">
-                                        <i class="fa fa-users"></i>
-                                        <span>All Employees</span>
+                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
+                                        <i class="fa fa-users navbar-link-icon"></i>
+                                        <span class="navbar-link-text">All Employees</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i class="fa fa-inbox"></i>
-                                        <span>Leave Applications</span>
+                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Applications">
+                                        <i class="fa fa-inbox navbar-link-icon"></i>
+                                        <span class="navbar-link-text">Leave Applications</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i class="fa fa-pie-chart"></i>
-                                        <span>Reports</span>
+                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
+                                        <i class="fa fa-pie-chart navbar-link-icon"></i>
+                                        <span class="navbar-link-text">Reports</span>
                                     </a>
                                 </li>
                             </ul>
@@ -134,34 +145,28 @@
                     </asp:Panel>
                     <asp:Panel ID="hr2Panel" runat="server">
                         <li>
-                            <a href="#">
-                                <i class="fa fa-users"></i>
-                                <span>All Employees</span>
+                            <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
+                                <i class="fa fa-users navbar-link-icon"></i>
+                                <span class="navbar-link-text">All Employees</span>
                             </a>
                         </li>
                     </asp:Panel>
                     <li>
-                        <a href="<%= ResolveClientUrl("~/Employee/Notifications.aspx") %>">
-                            <i class="fa fa-bell"></i>
-                            <span>Notifications</span>
+                        <a href="<%= ResolveClientUrl("~/Employee/Notifications.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Notifications">
+                            <i class="fa fa-bell navbar-link-icon"></i>
+                            <span class="navbar-link-text">Notifications</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<%= ResolveClientUrl("~/Employee/MyAccount.aspx") %>">
-                            <i class="fa fa-user-circle"></i>
-                            <span>My Account</span>
+                        <a href="<%= ResolveClientUrl("~/Employee/MyAccount.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="My Account">
+                            <i class="fa fa-user-circle navbar-link-icon"></i>
+                            <span class="navbar-link-text">My Account</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<%= ResolveClientUrl("~/Employee/Help.aspx") %>">
-                            <i class="fa fa-question-circle"></i>
-                            <span>Help</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<%= ResolveClientUrl("~/Employee/ReportBugs.aspx") %>">
-                            <i class="fa fa-bug"></i>
-                            <span>Report Bugs</span>
+                        <a href="<%= ResolveClientUrl("~/Employee/Help.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Help">
+                            <i class="fa fa-question-circle navbar-link-icon"></i>
+                            <span class="navbar-link-text">Help</span>
                         </a>
                     </li>
                 </ul>
@@ -171,12 +176,10 @@
             <div id="content">
                 <nav class="navbar navbar-expand-lg navbar-light bg-light">
                     <div class="container-fluid">
-
                         <button type="button" id="sidebarCollapse" class="btn btn-info">
                             <i class="fa fa-align-left"></i>
                             <span>Toggle Sidebar</span>
                         </button>
-
                     </div>
                 </nav>
                 <asp:ContentPlaceHolder ID="MainContent" runat="server">
@@ -190,21 +193,57 @@
         </footer>
     </form>
 
-
     <script type="text/javascript">
+        var storage = window.sessionStorage;
+
         $(document).ready(function () {
 
-            $('#sidebarCollapse').on('click', function () {
-                $('#sidebar').toggleClass('active');
+            // maintain state of sidebar based on session storage
+            var isActive = storage.getItem("isActive");
+            if (isActive != null) {
+                $('#sidebar').css('transition', 'none');
+                isActive = isActive.toString().localeCompare("true");
+                if (isActive == 0) {
+                    $('#sidebar').addClass("active");
 
-                if ($('#sidebar').hasClass('active')) {
-                    //sidebar collapse
+                    //enable tooltips
+                    $(".tooltipped").tooltip('enable');
+
+                    // hide logo
                     $('#mopd-logo').css('display', 'none');
 
+                } else {
+                    $('#sidebar').removeClass("active");
+
+                    //disable tooltips
+                    $(".tooltipped").tooltip('disable');
+
+                }
+            } else {
+                $(".tooltipped").tooltip('disable');
+            }
+
+            $('#sidebarCollapse').click(function () {
+                $('#sidebar').toggleClass('active');
+                $('#sidebar').css('transition', 'all 0.2s');
+
+                storage.setItem("isActive", $('#sidebar').hasClass("active"));
+                
+                if ($('#sidebar').hasClass('active')) {
+                    // sidebar collapse
+
+                    //enable tooltips
+                    $(".tooltipped").tooltip('enable');
+
+                    // hide logo
+                    $('#mopd-logo').css('display', 'none');
+
+                    // hide each list item for smooth transition to collapsed
                     $('#sidebar li').each(function () {
                         $(this).css('display', 'none');
                     });
 
+                    // on transition end, fade in each list element
                     $("#sidebar").one("transitionend", function () {
                         $('#sidebar li').each(function () {
                             $(this).fadeIn();
@@ -212,13 +251,20 @@
                     });
 
                 } else {
-                    //sidebar expand
+                    // sidebar expand
+
+
+                    $(".tooltipped").tooltip('disable');
+
+                    // fade in logo
                     $('#mopd-logo').fadeIn(285);
 
+                    // hide each list item for smooth transition to expanded
                     $('#sidebar li').each(function () {
                         $(this).css('display', 'none');
                     });
 
+                    // on transition end, fade in each list element
                     $("#sidebar").one("transitionend", function () {
                         $('#sidebar li').each(function () {
                             $(this).fadeIn();
@@ -227,6 +273,15 @@
                 }
             });
 
+            $('.dropdown-parent').click(function () {
+                if ($('.dropup-arrow').is(':visible')) {
+                    $('.dropdown-arrow').css('display', 'inline-block');
+                    $('.dropup-arrow').css('display', 'none');
+                } else if ($('.dropup-arrow').is(':hidden')) {
+                    $('.dropdown-arrow').css('display', 'none');
+                    $('.dropup-arrow').css('display', 'inline-block');
+                }
+            });
 
         });
     </script>
