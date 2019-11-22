@@ -1,0 +1,156 @@
+﻿body {
+    background: #fafafa;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+}
+
+.wrapper {
+    display: flex;
+    align-items: stretch;
+}
+
+#sidebar {
+    background: #7386D5;
+    color: #fff;
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+}
+
+/*style sidenav header*/
+#sidebar #mopd-logo{
+    width:200px;
+    height:200px;
+    border: 1px solid black;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    text-align:center;
+}
+
+#sidebar .sidebar-header strong {
+    display: none;
+}
+
+
+#sidebar.active .sidebar-header strong {
+    display: block;
+    font-size: 1.2em;
+}
+/*end style sidenav header*/
+
+/*style sidenav links*/
+#sidebar ul.components {
+    padding-top: 10px;
+}
+
+#sidebar .navbar-link{
+    padding: 10px 0px 10px 25px;
+    font-size: 1.1em;
+    display: block;
+    text-align: left;
+    width: 100%;
+}
+#sidebar .navbar-link:hover {
+    color: #7386d5;
+    background: #fff;
+}
+
+#sidebar .navbar-link-icon{
+    /*style icon for link*/
+    width: 20px;
+    text-align:center
+}
+#sidebar .navbar-link-text{
+    /*style text for link*/
+    width: 100px;
+}
+/*end style sidenav links*/
+
+/*style collapsed sidenav*/
+#sidebar.active {
+    min-width: 85px;
+    max-width: 85px;
+    text-align: center;
+}
+#sidebar.active .navbar-link-text{
+    display:none;
+}
+
+#sidebar.active .navbar-link {
+    padding: 15px 10px;
+    text-align: center;
+    font-size: 0.85em;
+}
+
+#sidebar.active .navbar-link-icon {
+    width:100%;
+    margin-right:  0;
+    display: block;
+    font-size: 1.8em;
+    margin-bottom: 5px;
+}
+/*end style collapsed sidenav*/
+
+
+/*style dropdown*/
+
+/*style children of dropdown menu*/
+#sidebar .submenu li{
+    background-color:#6778bf;
+}
+
+a, a:hover, a:focus {
+    color: inherit;
+    text-decoration: none;
+}
+
+.dropup-arrow{
+    display:none;
+    font-size: 0.6em;
+}
+
+.dropdown-arrow{
+    font-size: 0.6em;
+    display:inline-block;
+}
+
+
+/*indent children of dropdown menu when sidenav is expanded*/
+#sidebar .submenu .navbar-link-icon{
+    margin-left:15px;
+}
+
+/*remove indent of children of dropdown menu when sidenav is collapsed*/
+#sidebar.active .submenu .navbar-link-icon{
+    margin-left:0px;
+}
+
+/* style main content */
+#content{
+    padding:25px;
+    width:100%;
+}
+
+#content h1{
+    text-align:center;
+}
+
+/* end style main content*/
+
+/*style role panels*/
+#supervisorPanel{
+    display:none;
+}
+
+#hr1Panel{
+    display:none;
+}
+
+#hr2Panel{
+    display:none;
+}
+/*end style role panels*/
