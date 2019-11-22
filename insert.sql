@@ -6,6 +6,9 @@ GO
 INSERT INTO [dbo].[permission] ([permission_id]) VALUES
 ('emp_permissions'),
 ('sup_permissions'),
+('hr1_permissions'),
+('hr2_permissions'),
+('hr3_permissions'),
 ('crud_emp_info'),
 ('approve_sick'),
 ('approve_casual'),
@@ -33,14 +36,17 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 
 ('hr3', 'emp_permissions'),
 ('hr3', 'crud_emp_info'),
+('hr3', 'hr3_permissions'),
 
 ('hr2', 'emp_permissions'),
 ('hr2', 'sup_permissions'),
+('hr2', 'hr2_permissions'),
 ('hr2', 'crud_emp_info'),
 ('hr2', 'approve_sick'),
 ('hr2', 'approve_casual'),
 
 ('hr1', 'emp_permissions'),
+('hr1', 'hr1_permissions'),
 ('hr1', 'approve_sick'),
 ('hr1', 'approve_casual'),
 ('hr1', 'crud_emp_info'),
