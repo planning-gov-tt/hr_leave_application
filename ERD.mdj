@@ -3237,8 +3237,8 @@
 							"left": 384,
 							"top": 32,
 							"width": 161,
-							"height": 169,
-							"text": "PERMISSIONS:\nemp_permissions\nsup_permissions\ncrud_emp_info\napprove_sick\napprove_casual\napprove_vacation\napprove_contract\napprove_public_officer\nassign_role\n"
+							"height": 207,
+							"text": "PERMISSIONS:\nemp_permissions\nsup_permissions\nhr1_permissions\nhr2_permissions\nhr3_permissions\ncrud_emp_info\napprove_sick\napprove_casual\napprove_vacation\napprove_contract\napprove_public_officer\nassign_role\n"
 						},
 						{
 							"_type": "UMLNoteLinkView",
@@ -3254,7 +3254,7 @@
 								"$ref": "AAAAAAFufpri4ZLF1EU="
 							},
 							"lineStyle": 1,
-							"points": "592:191;545:163"
+							"points": "591:199;545:176"
 						},
 						{
 							"_type": "UMLNoteView",
