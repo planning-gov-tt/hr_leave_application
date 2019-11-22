@@ -3263,11 +3263,11 @@
 								"$ref": "AAAAAAFt+ardZm6ip4I="
 							},
 							"font": "Arial;13;0",
-							"left": 448,
+							"left": 424,
 							"top": 488,
-							"width": 89,
-							"height": 100,
-							"text": "ROLES:\nemp\nsup\nhr3\nhr2\nhr1"
+							"width": 115.1513671875,
+							"height": 130,
+							"text": "ROLES:\nemp\nsup\nhr3\nhr2\nhr1\nhr_contract\nhr_public_officer"
 						},
 						{
 							"_type": "UMLNoteLinkView",
@@ -3283,7 +3283,7 @@
 								"$ref": "AAAAAAFufpq8spK4KhM="
 							},
 							"lineStyle": 1,
-							"points": "607:586;537:556"
+							"points": "607:593;539:571"
 						},
 						{
 							"_type": "ERDRelationshipView",
