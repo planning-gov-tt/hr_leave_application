@@ -69,6 +69,24 @@ namespace HR_Leave
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // auth levels
+            // 1 - Employee
+            // 2 - Supervisor
+            // 3 - HR 1
+            // 4 - HR 2
+            int authorizationLevel = 2;
+            if (authorizationLevel == 2)
+            {
+                supervisorPanel.Style.Add("display", "block");
+            }
+            else if (authorizationLevel == 3)
+            {
+                hr1Panel.Style.Add("display", "block");
+            }
+            else if (authorizationLevel == 4)
+            {
+                hr2Panel.Style.Add("display", "block");
+            }
 
         }
 
@@ -76,6 +94,7 @@ namespace HR_Leave
         {
             Context.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
         }
+
     }
 
 }
