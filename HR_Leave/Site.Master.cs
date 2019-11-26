@@ -44,6 +44,21 @@ namespace HR_Leave
             }
 
             Page.PreLoad += master_Page_PreLoad;
+
+
+            Auth auth = new Auth();
+            // store employee's email in Session
+            if (Session["emp_email"] == null)
+                Session["emp_email"] = auth.getCurrentUserActiveDirectoryEmail();
+
+            // store employee's id in Session
+            if (Session["emp_id"] == null && Session["emp_email"] != null)
+                Session["emp_id"] = auth.getUserEmployeeId(Session["emp_email"].ToString());
+
+            // store employee's permissions in Session
+            if (Session["permissions"] == null && Session["emp_id"] != null)
+                Session["permissions"] = auth.getUserPermissions(Session["emp_id"].ToString());
+
         }
 
         protected void master_Page_PreLoad(object sender, EventArgs e)
@@ -67,30 +82,23 @@ namespace HR_Leave
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            // auth levels
-            // 1 - Employee
-            // 2 - Supervisor
-            // 3 - HR 1
-            // 4 - HR 2
+            List<string> permissions = (List<string>)Session["permissions"];
 
-            Auth auth = new Auth();
-
-            Session["permissions"] = auth.getUserPermissions();
-
-            int authorizationLevel = 1;
-            if (authorizationLevel == 2)
+            if(permissions != null)
             {
-                supervisorPanel.Style.Add("display", "block");
+                if (permissions.Contains("sup_permissions"))
+                {
+                    supervisorPanel.Style.Add("display", "block");
+                }
+                if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
+                {
+                    hr1_hr2Panel.Style.Add("display", "block");
+                }
+                if (permissions.Contains("hr3_permissions"))
+                {
+                    hr3Panel.Style.Add("display", "block");
+                }
             }
-            else if (authorizationLevel == 3)
-            {
-                hr1Panel.Style.Add("display", "block");
-            }
-            else if (authorizationLevel == 4)
-            {
-                hr2Panel.Style.Add("display", "block");
-            }
-
         }
 
         protected void Unnamed_LoggingOut(object sender, LoginCancelEventArgs e)

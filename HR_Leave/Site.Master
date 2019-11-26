@@ -1,5 +1,4 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="HR_Leave.SiteMaster" %>
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -80,7 +79,7 @@
                     </li>
                     <asp:Panel ID="supervisorPanel" runat="server">
                         <li>
-                            <a href="#supervisorSubmenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
+                            <a id="supervisorDropdownParent" href="#supervisorSubmenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
                                 <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="Supervisor Actions">
                                     <i class="fa fa-eye navbar-link-icon"></i>
                                     <span class="navbar-link-text">Supervisor Actions</span>
@@ -110,10 +109,10 @@
                             </ul>
                         </li>
                     </asp:Panel>
-                    <asp:Panel ID="hr1Panel" runat="server">
+                    <asp:Panel ID="hr1_hr2Panel" runat="server">
                         <li>
-                            <a href="#hr1Submenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
-                                <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="HR 1 Actions">
+                            <a id="hr1_hr2DropdownParent" href="#hr1_hr2Submenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
+                                <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="HR Actions">
                                     <i class="fa fa-eye navbar-link-icon"></i>
                                     <span class="navbar-link-text">HR 1 Actions</span>
                                     <span class="dropup-arrow">&#9650;</span>
@@ -121,7 +120,7 @@
                                 </span>
                                 
                             </a>
-                            <ul class="collapse list-unstyled submenu" id="hr1Submenu">
+                            <ul class="collapse list-unstyled submenu" id="hr1_hr2Submenu">
                                 <li>
                                     <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
                                         <i class="fa fa-users navbar-link-icon"></i>
@@ -143,7 +142,7 @@
                             </ul>
                         </li>
                     </asp:Panel>
-                    <asp:Panel ID="hr2Panel" runat="server">
+                    <asp:Panel ID="hr3Panel" runat="server">
                         <li>
                             <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
                                 <i class="fa fa-users navbar-link-icon"></i>
@@ -273,13 +272,14 @@
                 }
             });
 
-            $('.dropdown-parent').click(function () {
-                if ($('.dropup-arrow').is(':visible')) {
-                    $('.dropdown-arrow').css('display', 'inline-block');
-                    $('.dropup-arrow').css('display', 'none');
-                } else if ($('.dropup-arrow').is(':hidden')) {
-                    $('.dropdown-arrow').css('display', 'none');
-                    $('.dropup-arrow').css('display', 'inline-block');
+            $('.dropdown-parent').click(function (e) {
+                var dropdownParentId = this.id;
+                if ($("#" + dropdownParentId + " span span.dropup-arrow").is(':visible')) {
+                    $("#" + dropdownParentId + " span span.dropdown-arrow").css('display', 'inline-block');
+                    $("#" + dropdownParentId + " span span.dropup-arrow").css('display', 'none');
+                } else if ($("#" + dropdownParentId + " span span.dropup-arrow").is(':hidden')) {
+                    $("#" + dropdownParentId + " span span.dropdown-arrow").css('display', 'none');
+                    $("#" + dropdownParentId + " span span.dropup-arrow").css('display', 'inline-block');
                 }
             });
 

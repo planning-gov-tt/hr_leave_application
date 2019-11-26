@@ -7,12 +7,16 @@ using System.Web.UI.WebControls;
 
 namespace HR_Leave
 {
-    public partial class _Default : Page
+    public partial class supervisorSelect : System.Web.UI.UserControl
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["permissions"] == null)
-                Response.Redirect("~/403AccessDenied.aspx");
+
+        }
+
+        protected void TextBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

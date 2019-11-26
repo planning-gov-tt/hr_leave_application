@@ -22,22 +22,22 @@ namespace HR_Leave {
         protected global::System.Web.UI.WebControls.Panel supervisorPanel;
         
         /// <summary>
-        /// hr1Panel control.
+        /// hr1_hr2Panel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel hr1Panel;
+        protected global::System.Web.UI.WebControls.Panel hr1_hr2Panel;
         
         /// <summary>
-        /// hr2Panel control.
+        /// hr3Panel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel hr2Panel;
+        protected global::System.Web.UI.WebControls.Panel hr3Panel;
         
         /// <summary>
         /// MainContent control.

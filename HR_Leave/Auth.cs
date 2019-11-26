@@ -9,17 +9,17 @@ namespace HR_Leave
 {
     public class Auth
     {
-        protected string getCurrentUserActiveDirectoryEmail()
+        public string getCurrentUserActiveDirectoryEmail()
         {
             return UserPrincipal.Current.EmailAddress;
         }
 
-        protected string getUserEmployeeId()
+        public string getUserEmployeeId(string email)
         {
             string result = "-1";
             string sql = $@"select [employee_id] 
                            from [HRLeaveTestDb].[dbo].employee
-                           where [email] = '{this.getCurrentUserActiveDirectoryEmail()}'";
+                           where [email] = '{email}'";
 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
             {
@@ -43,12 +43,12 @@ namespace HR_Leave
             return result;
         }
 
-        public List<string> getUserPermissions()
+        public List<string> getUserPermissions(string id)
         {
-            string userEmpId = this.getUserEmployeeId();
+            string userEmpId = id;
 
             List<string> permissions = new List<string>();
-            string sql = $@"select [permission_id]
+            string sql = $@"select distinct [permission_id]
                             from [HRLeaveTestDb].[dbo].[employeerole] er
                             left join [HRLeaveTestDb].[dbo].[rolepermission] rp
                             on er.role_id = rp.role_id
@@ -69,7 +69,8 @@ namespace HR_Leave
                 }
             }
 
-            return permissions;
+            return permissions.Count > 0 ? permissions: null;
+            //return null;
         }
     }
 }

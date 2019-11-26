@@ -160,6 +160,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="403AccessDenied.aspx" />
     <Content Include="Employee\About.aspx" />
     <Content Include="Employee\ApplyForLeave.aspx" />
     <Content Include="Assets\mopd_logo.jpg" />
@@ -210,8 +211,11 @@
     <Content Include="Site.Master" />
     <Content Include="Styles\MasterStyleSheet.css" />
     <Content Include="Employee\UnderstandingLeave.aspx" />
+    <Content Include="supervisorSelect.ascx" />
     <Content Include="ViewSwitcher.ascx" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Bundle.config" />
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
@@ -225,6 +229,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="403AccessDenied.aspx.cs">
+      <DependentUpon>403AccessDenied.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="403AccessDenied.aspx.designer.cs">
+      <DependentUpon>403AccessDenied.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Auth.cs" />
     <Compile Include="Employee\ApplyForLeave.aspx.cs">
       <DependentUpon>ApplyForLeave.aspx</DependentUpon>
@@ -298,6 +309,13 @@
     </Compile>
     <Compile Include="Employee\UnderstandingLeave.aspx.designer.cs">
       <DependentUpon>UnderstandingLeave.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="supervisorSelect.ascx.cs">
+      <DependentUpon>supervisorSelect.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="supervisorSelect.ascx.designer.cs">
+      <DependentUpon>supervisorSelect.ascx</DependentUpon>
     </Compile>
     <Compile Include="ViewSwitcher.ascx.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>

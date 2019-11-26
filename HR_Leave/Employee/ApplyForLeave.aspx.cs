@@ -11,7 +11,8 @@ namespace HR_Leave
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            if (Session["permissions"] == null)
+                Response.Redirect("~/403AccessDenied.aspx");
         }
     }
 }
