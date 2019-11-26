@@ -64,7 +64,10 @@ INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name
 ('3', '3', 'PLANNING\ Christopher Sahadeo', 'Christopher', 'Sahadeo', 'christopher.sahadeo@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
 ('4', '4', 'PLANNING\ Dale Cudjoe', 'Dale', 'Cudjoe', 'dale.cudjoe@planning.gov.tt', 15, 5, 0, 14, 2, 0, 0),
 ('5', '5', 'PLANNING\ Nandani Ramsaran', 'Nandani', 'Ramsaran', 'nandani.ramsaran@planning.gov.tt', 10, 5, 0, 14, 2, 0, 0),
-('6', '6', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'melanie.noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50);
+('6', '6', 'PLANNING\ Nandani Ramsaran')
+('83612', '83612', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'melanie.noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- Director
+('01548', '01548', 'PLANNING\ Nazmoon Khan', 'Nazmoon', 'Khan', 'Nazmoon.Khan@planning.gov.tt', 30, 0, 5, 14, 2, 0, 30);
+Charmaine Carmichael
 
 
 INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
@@ -73,7 +76,7 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 ('3', 'emp'),
 ('4', 'sup'),
 ('5', 'emp'),
-('6', 'hr1');
+('83612', 'hr1');
 
 
 INSERT INTO [dbo].[assignment] ([supervisee_id], [supervisor_id]) VALUES
