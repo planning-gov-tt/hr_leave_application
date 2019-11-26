@@ -99,7 +99,8 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 ('No Pay'),
 ('Bereavement'),
 ('Maternity'),
-('Pre-retirement');
+('Pre-retirement'),
+('Leave Renewal');
 
 
 SET IDENTITY_INSERT [dbo].[leavetransaction] ON;
