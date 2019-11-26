@@ -13,12 +13,12 @@ namespace HR_Leave {
     public partial class MainGridView {
         
         /// <summary>
-        /// MainGridView control.
+        /// GridView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView MainGridView;
+        protected global::System.Web.UI.WebControls.GridView GridView;
     }
 }
