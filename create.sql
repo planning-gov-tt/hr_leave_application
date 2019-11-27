@@ -1,5 +1,5 @@
--- USE [HRLeave]; -- chris local db
-USE [HRLeaveTestDb]; -- dbserver
+USE [HRLeave]; -- chris local db
+-- USE [HRLeaveTestDb]; -- dbserver
 GO
 
 
@@ -83,7 +83,7 @@ CREATE TABLE [dbo].[assignment] (
 
 
 CREATE TABLE [dbo].[transactionstate] (
-  [state_id] NVARCHAR (20) PRIMARY KEY
+  [status_id] NVARCHAR (30) PRIMARY KEY
 );
 
 
@@ -100,10 +100,15 @@ CREATE TABLE [dbo].[leavetransaction] (
   [leave_type] NVARCHAR (20) NOT NULL,
   [start_date] DATE NOT NULL,
   [end_date] DATE NOT NULL,
+
   [supervisor_id] NVARCHAR (10) NOT NULL,
+  [supervisor_edit_date] DATETIME,
+
   [hr_manager_id] NVARCHAR (10), -- can be null if the HR 1 has not yet approved
-  [state] NVARCHAR (20) NOT NULL,
-  [message] NVARCHAR (120),
+  [hr_manager_edit_date] DATETIME,
+
+  [status] NVARCHAR (30) NOT NULL,
+  [comments] NVARCHAR (120),
   [file_path] NVARCHAR (30),
 
   FOREIGN KEY ([employee_id])
@@ -115,8 +120,8 @@ CREATE TABLE [dbo].[leavetransaction] (
     REFERENCES [dbo].[employee] ([employee_id]),
   FOREIGN KEY ([hr_manager_id])
     REFERENCES [dbo].[employee] ([employee_id]),
-  FOREIGN KEY ([state])
-    REFERENCES [dbo].[transactionstate] ([state_id])
+  FOREIGN KEY ([status])
+    REFERENCES [dbo].[transactionstate] ([status_id])
     ON UPDATE CASCADE
 );
 -- create update trigger for modified: https://stackoverflow.com/questions/22594567/sql-server-on-update-set-current-timestamp/22594779
