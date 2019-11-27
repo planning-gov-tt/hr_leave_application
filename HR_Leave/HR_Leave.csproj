@@ -190,7 +190,7 @@
     <Content Include="Employee\Help.aspx" />
     <Content Include="Employee\MyAccount.aspx" />
     <Content Include="Employee\Notifications.aspx" />
-    <Content Include="GridViewTest.aspx" />
+    <Content Include="GridViewTest\GridViewTest.aspx" />
     <Content Include="MainGridView.ascx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -389,11 +389,11 @@
     <Compile Include="Employee\Help.aspx.designer.cs">
       <DependentUpon>Help.aspx</DependentUpon>
     </Compile>
-    <Compile Include="GridViewTest.aspx.cs">
+    <Compile Include="GridViewTest\GridViewTest.aspx.cs">
       <DependentUpon>GridViewTest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="GridViewTest.aspx.designer.cs">
+    <Compile Include="GridViewTest\GridViewTest.aspx.designer.cs">
       <DependentUpon>GridViewTest.aspx</DependentUpon>
     </Compile>
     <Compile Include="MainGridView.ascx.cs">
@@ -451,7 +451,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="GridView\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
