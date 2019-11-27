@@ -452,7 +452,7 @@
 									"font": "Arial;13;1",
 									"left": 592,
 									"top": 1373,
-									"width": 243.560546875,
+									"width": 271.71875,
 									"height": 13,
 									"text": "Leave Transaction"
 								},
@@ -478,7 +478,7 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1396,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -493,7 +493,7 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1411,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -508,7 +508,7 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1426,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -523,7 +523,7 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1441,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -538,7 +538,7 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1456,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -553,7 +553,7 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1471,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -568,7 +568,22 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1486,
-											"width": 233.560546875,
+											"width": 261.71875,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFurQu9+a1bSAc=",
+											"_parent": {
+												"$ref": "AAAAAAFt+auOnm7UNEM="
+											},
+											"model": {
+												"$ref": "AAAAAAFurQu9oa1Yq/g="
+											},
+											"font": "Arial;13;0",
+											"left": 597,
+											"top": 1501,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -582,8 +597,23 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1501,
-											"width": 233.560546875,
+											"top": 1516,
+											"width": 261.71875,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFurRSpB61onao=",
+											"_parent": {
+												"$ref": "AAAAAAFt+auOnm7UNEM="
+											},
+											"model": {
+												"$ref": "AAAAAAFurRSoya1lqUY="
+											},
+											"font": "Arial;13;0",
+											"left": 597,
+											"top": 1531,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -597,8 +627,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1516,
-											"width": 233.560546875,
+											"top": 1546,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -612,8 +642,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1531,
-											"width": 233.560546875,
+											"top": 1561,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -627,23 +657,23 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1546,
-											"width": 233.560546875,
+											"top": 1576,
+											"width": 261.71875,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 592,
 									"top": 1391,
-									"width": 243.560546875,
-									"height": 173
+									"width": 271.71875,
+									"height": 203
 								}
 							],
 							"font": "Arial;13;0",
 							"left": 592,
 							"top": 1368,
-							"width": 243.560546875,
-							"height": 211,
+							"width": 271.71875,
+							"height": 226,
 							"nameLabel": {
 								"$ref": "AAAAAAFt+auOnm7T1aw="
 							},
@@ -1725,9 +1755,9 @@
 							"font": "Arial;13;0",
 							"left": 912,
 							"top": 1640,
-							"width": 177,
+							"width": 169,
 							"height": 121,
-							"text": "States:\nSubmitted (Qualified Y/N?)\nRequest to change dates\nSupervisor Approved\nSupervisor Denied\nHR Approved\nHR Denied\n"
+							"text": "Status:\nPending\nDate Change Requested\nRecommended\nNot Recommended\nApproved\nNot Approved\n"
 						},
 						{
 							"_type": "UMLNoteLinkView",
@@ -1772,7 +1802,7 @@
 								"$ref": "AAAAAAFt+auOnm7SBAs="
 							},
 							"lineStyle": 1,
-							"points": "591:1463;521:1457"
+							"points": "591:1466;521:1458"
 						},
 						{
 							"_type": "ERDEntityView",
@@ -2277,7 +2307,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 745,
-									"top": 1598,
+									"top": 1605,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -2311,7 +2341,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 745,
-									"top": 1597,
+									"top": 1612,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 30,
@@ -2328,7 +2358,7 @@
 								"$ref": "AAAAAAFuZZogKAFBx5Q="
 							},
 							"lineStyle": 2,
-							"points": "760:1632;760:1578",
+							"points": "760:1632;760:1593",
 							"nameLabel": {
 								"$ref": "AAAAAAFuZZsFvQGcwDw="
 							},
@@ -2426,7 +2456,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 641,
-									"top": 1602,
+									"top": 1609,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -2460,7 +2490,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 641,
-									"top": 1597,
+									"top": 1612,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 30,
@@ -2477,7 +2507,7 @@
 								"$ref": "AAAAAAFuZZ9dRwHNKPo="
 							},
 							"lineStyle": 2,
-							"points": "656:1640;656:1578",
+							"points": "656:1640;656:1593",
 							"nameLabel": {
 								"$ref": "AAAAAAFuZZ+tdQHovTQ="
 							},
@@ -4011,7 +4041,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
 							},
-							"name": "Event Id",
+							"name": "Transaction Id",
 							"length": 0,
 							"primaryKey": true
 						},
@@ -4085,6 +4115,15 @@
 						},
 						{
 							"_type": "ERDColumn",
+							"_id": "AAAAAAFurQu9oa1Yq/g=",
+							"_parent": {
+								"$ref": "AAAAAAFt+auOnm7QoiE="
+							},
+							"name": "Supervisor Edit Date",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
 							"_id": "AAAAAAFt+bMIQW/j348=",
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
@@ -4100,11 +4139,20 @@
 						},
 						{
 							"_type": "ERDColumn",
+							"_id": "AAAAAAFurRSoya1lqUY=",
+							"_parent": {
+								"$ref": "AAAAAAFt+auOnm7QoiE="
+							},
+							"name": "HR Manager Edit Date",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
 							"_id": "AAAAAAFt+c8OHLMCfVk=",
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
 							},
-							"name": "State",
+							"name": "Status",
 							"documentation": "In Progress\nSupervisor Approved\nSupervisor Denied\nHR Approved\nHR Denied\nPS Approved\nPS Denied",
 							"length": 0,
 							"foreignKey": true,
@@ -4118,7 +4166,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
 							},
-							"name": "Message Body",
+							"name": "Comments",
 							"length": 0
 						},
 						{
