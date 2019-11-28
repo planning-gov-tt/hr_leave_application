@@ -109,7 +109,7 @@ CREATE TABLE [dbo].[leavetransaction] (
 
   [status] NVARCHAR (30) NOT NULL,
   [comments] NVARCHAR (120),
-  [file_path] NVARCHAR (30),
+  [file_path] NVARCHAR (50),
 
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id]),

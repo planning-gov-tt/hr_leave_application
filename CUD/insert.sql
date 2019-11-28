@@ -176,7 +176,10 @@ INSERT INTO [dbo].[leavetransaction] ([transaction_id], [created_at], [employee_
 (2, '20191208 12:00:00 PM', '3', 'Sick', '20191201', '20191207', '115245', '20191208 12:10:00 PM', NULL, NULL, 'Recommended', 'Good Standing', '2/20191201_doctor_note.pdf'),
 
 -- emp applies for vacation leave to sup, to hr, approved
-(3, '20191101 9:54:00 AM', '184164', 'Vacation', '20191201', '20191210', '123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved', 'Good', NULL);
+(3, '20191101 9:54:00 AM', '184164', 'Vacation', '20191201', '20191210', '123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved', 'Good', NULL),
+
+-- same employee applies for sick leave to sup, recommended
+(4, '20191110 9:54:00 AM', '184164', 'Sick', '20191109', '20191109', '123337', '20191111 10:05:12 AM', NULL, NULL, 'Recommended', NULL, '184164/20191110_doctor_note.pdf') ;
 
 SET IDENTITY_INSERT [dbo].[leavetransaction] OFF;
 
