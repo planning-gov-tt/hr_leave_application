@@ -11,7 +11,10 @@ namespace HR_Leave
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            // spoofing authenticated user id
+            Session["emp_id"] = "83612";
+            Session["first_name"] = "Melanie";
+            Session["last_name"] = "Noel";
         }
     }
 }

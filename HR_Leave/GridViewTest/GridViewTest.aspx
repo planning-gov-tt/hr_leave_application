@@ -4,16 +4,26 @@
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+ 
 
-    <h1>This is the main GridView</h1>
-
+    <h1>GridView Demo</h1>
+    <center><%:Session["first_name"]%> <%: Session["last_name"]%></center>
     <br /><br />
 
     <center>
-        <TWebControl:GridViewWebControl ID ="GridViewWebControl1" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
 
+        <h2>Employee View</h2>
+        <TWebControl:GridViewWebControl ID ="GridViewWebControlEmp" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
+        <br /><br />
+        
+        <h2>Supervisor View</h2>
+        <TWebControl:GridViewWebControl ID ="GridViewWebControlSup" gridViewType="sup" runat="server"></TWebControl:GridViewWebControl>
+        <br /><br />
 
-         <%--<TWebControl:GridViewWebControl ID ="GridViewWebControl2" runat="server"></TWebControl:GridViewWebControl>--%>
+        <h2>HR View</h2>
+        <TWebControl:GridViewWebControl ID ="GridViewWebControlHr" gridViewType="hr" runat="server"></TWebControl:GridViewWebControl>
+        <br /><br />
+         
     </center>
         
 

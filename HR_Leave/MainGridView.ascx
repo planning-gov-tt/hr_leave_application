@@ -18,10 +18,13 @@
 
         <asp:BoundField HeaderText="Date Submitted" DataField="date_submitted" />
         <asp:BoundField HeaderText="Supervisor" DataField="supervisor_name" />
+        <asp:BoundField HeaderText="Employee" DataField="employee_name" />
         <asp:BoundField HeaderText="Leave Type" DataField="leave_type" />
         <asp:BoundField HeaderText="Start Date" DataField="start_date" />
         <asp:BoundField HeaderText="End Date" DataField="end_date" />
         <asp:BoundField HeaderText="Status" DataField="status" />
+        <%--comments--%>
+
 
     </Columns>
 </asp:GridView>

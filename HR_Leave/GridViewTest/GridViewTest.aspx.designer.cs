@@ -13,12 +13,30 @@ namespace HR_Leave {
     public partial class GridViewTest {
         
         /// <summary>
-        /// GridViewWebControl1 control.
+        /// GridViewWebControlEmp control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::HR_Leave.MainGridView GridViewWebControl1;
+        protected global::HR_Leave.MainGridView GridViewWebControlEmp;
+        
+        /// <summary>
+        /// GridViewWebControlSup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::HR_Leave.MainGridView GridViewWebControlSup;
+        
+        /// <summary>
+        /// GridViewWebControlHr control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::HR_Leave.MainGridView GridViewWebControlHr;
     }
 }
