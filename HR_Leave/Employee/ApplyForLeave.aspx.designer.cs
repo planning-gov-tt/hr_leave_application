@@ -76,6 +76,60 @@ namespace HR_Leave {
         protected global::System.Web.UI.HtmlControls.HtmlTextArea txtComments;
         
         /// <summary>
+        /// dateComparisonValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel dateComparisonValidationMsgPanel;
+        
+        /// <summary>
+        /// dateComparisonValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl dateComparisonValidationMsg;
+        
+        /// <summary>
+        /// invalidStartDateValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidStartDateValidationMsgPanel;
+        
+        /// <summary>
+        /// invalidStartDateValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidStartDateValidationMsg;
+        
+        /// <summary>
+        /// invalidEndDateValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidEndDateValidationMsgPanel;
+        
+        /// <summary>
+        /// invalidEndDateValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidEndDateValidationMsg;
+        
+        /// <summary>
         /// validationMsgPanel control.
         /// </summary>
         /// <remarks>

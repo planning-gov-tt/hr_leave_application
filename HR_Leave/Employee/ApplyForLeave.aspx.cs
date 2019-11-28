@@ -19,13 +19,48 @@ namespace HR_Leave
 
         protected Boolean validateDates(string startDate, string endDate)
         {
+
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            dateComparisonValidationMsgPanel.Style.Add("display", "none");
+
+
+            DateTime start, end;
+            start = end = DateTime.MinValue;
+            Boolean isValidated = true;
+
             // validate dates
-            DateTime start = Convert.ToDateTime(startDate);
-            DateTime end = Convert.ToDateTime(endDate);
+            try
+            {
+                start = Convert.ToDateTime(startDate);
+            }
+            catch(FormatException fe)
+            {
+                invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+                isValidated = false;
+            }
+            try
+            {
+                end = Convert.ToDateTime(endDate);
+            }
+            catch(FormatException fe)
+            {
+                invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
+                isValidated = false;
+            }
 
-            int value = DateTime.Compare(start, end);
+            if (isValidated)
+            {
+                if (DateTime.Compare(start, end) > 0)
+                {
+                    dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
+                    return false;
+                }
+                else
+                    return true;
+            }
 
-            return value <= 0;
+            return false;
         }
 
         protected void submitLeaveApplication_ServerClick(object sender, EventArgs e)
@@ -85,6 +120,10 @@ namespace HR_Leave
                                 int rowsAffected = command.ExecuteNonQuery();
                                 if (rowsAffected > 0)
                                 {
+                                    validationMsgPanel.Style.Add("display", "none");
+                                    dateComparisonValidationMsgPanel.Style.Add("display", "none");
+                                    invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+                                    invalidEndDateValidationMsgPanel.Style.Add("display", "none");
                                     submitButtonPanel.Style.Add("display", "none");
 
                                     successMsg.InnerText = "Application successfully submitted";
@@ -98,11 +137,7 @@ namespace HR_Leave
                     validationMsgPanel.Style.Add("display", "inline-block");
                 }
 
-            } else
-            {
-                validationMsg.InnerText = "Start date cannot be before end date";
-                validationMsgPanel.Style.Add("display", "inline-block");
-            }
+            } 
         }
 
         protected void refreshForm(object sender, EventArgs e)

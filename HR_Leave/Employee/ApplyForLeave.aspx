@@ -72,19 +72,34 @@
                 </PieChartValues>
              </ajaxToolkit:PieChart>--%>
         </div>
-        <asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none" role="alert">
-            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-            <span id="validationMsg" runat="server"></span>
-        </asp:Panel>
-        <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" style="display:none" role="alert">
-            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-            <span id="successMsg" runat="server"></span>
-            <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" style="display:inline; margin-left:10px" OnClick="refreshForm" />
-        </asp:Panel>
-        <asp:Panel ID="submitButtonPanel" runat="server" CssClass="row form-group">
-            <asp:Button ID="cancelBtn" runat="server" Text="Cancel" style="margin-right:35px;" CssClass="btn btn-danger" OnClick="refreshForm"/>
-            <button type="submit" class="btn btn-success" runat="server" onserverclick="submitLeaveApplication_ServerClick">Submit</button>
-        </asp:Panel>
+
+        <div class="row">
+            <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="dateComparisonValidationMsg" runat="server">Start date must be a date preceding the end date</span>
+            </asp:Panel>
+            <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; margin:0px 5px;" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
+            </asp:Panel>
+            <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none;margin:0px 5px;" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
+            </asp:Panel>
+            <asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; width:500px;" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="validationMsg" runat="server">End date is not valid</span>
+            </asp:Panel>
+            <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" style="display:none" role="alert">
+                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                <span id="successMsg" runat="server"></span>
+                <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" style="display:inline; margin-left:10px" OnClick="refreshForm" />
+            </asp:Panel>
+            <asp:Panel ID="submitButtonPanel" runat="server" CssClass="row form-group">
+                <asp:Button ID="cancelBtn" runat="server" Text="Cancel" style="margin-right:35px;" CssClass="btn btn-danger" OnClick="refreshForm"/>
+                <button type="submit" class="btn btn-success" runat="server" onserverclick="submitLeaveApplication_ServerClick">Submit</button>
+            </asp:Panel>
+        </div>
     </div>
     
 
