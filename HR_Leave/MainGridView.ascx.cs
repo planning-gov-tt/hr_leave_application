@@ -20,6 +20,23 @@ namespace HR_Leave
             //Console.WriteLine(gridViewType);
             //Page.DataBind();
 
+            // spoofing authenticated user id
+            Session["employee_id"] = 
+
+            //3 types of gridviews possible
+            if(this.gridViewType == "emp")
+            {
+                // show all transactions submitted by employee_id
+            }
+            else if(this.gridViewType == "sup")
+            {
+                // show all transactions submitted TO employee_id (sup) for recommedation
+            }
+            else // hr
+            {
+                // show all 
+            }
+
 
 
             if (!IsPostBack)

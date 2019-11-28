@@ -7,7 +7,6 @@
 <asp:GridView ID="GridView" 
     AutoGenerateColumns="false"  
     DataKeyNames="transaction_id, employee_id, supervisor_id, hr_manager_id" 
-    CssClass="table table-condensed table-hover" Width="50%"
     runat="server">
     <Columns>
                         

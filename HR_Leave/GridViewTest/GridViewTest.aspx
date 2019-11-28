@@ -7,10 +7,14 @@
 
     <h1>This is the main GridView</h1>
 
-    <TWebControl:GridViewWebControl ID ="GridViewWebControl1" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
+    <br /><br />
+
+    <center>
+        <TWebControl:GridViewWebControl ID ="GridViewWebControl1" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
 
 
-    <%--<TWebControl:GridViewWebControl ID ="GridViewWebControl2" runat="server"></TWebControl:GridViewWebControl>--%>
-
+         <%--<TWebControl:GridViewWebControl ID ="GridViewWebControl2" runat="server"></TWebControl:GridViewWebControl>--%>
+    </center>
+        
 
 </asp:Content>
