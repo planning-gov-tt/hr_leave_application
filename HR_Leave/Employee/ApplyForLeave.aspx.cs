@@ -63,7 +63,7 @@ namespace HR_Leave
             return false;
         }
 
-        protected void submitLeaveApplication_ServerClick(object sender, EventArgs e)
+        protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
             /* data to be submitted
              * 1. Employee id
@@ -108,29 +108,29 @@ namespace HR_Leave
                             );
                     ";
 
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            connection.Open();
-                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            if(comments != null)
+                                command.Parameters.AddWithValue("@Comments", comments);
+                            else
+                                command.Parameters.AddWithValue("@Comments", DBNull.Value);
+                            int rowsAffected = command.ExecuteNonQuery();
+                            if (rowsAffected > 0)
                             {
-                                if(comments != null)
-                                    command.Parameters.AddWithValue("@Comments", comments);
-                                else
-                                    command.Parameters.AddWithValue("@Comments", DBNull.Value);
-                                int rowsAffected = command.ExecuteNonQuery();
-                                if (rowsAffected > 0)
-                                {
-                                    validationMsgPanel.Style.Add("display", "none");
-                                    dateComparisonValidationMsgPanel.Style.Add("display", "none");
-                                    invalidStartDateValidationMsgPanel.Style.Add("display", "none");
-                                    invalidEndDateValidationMsgPanel.Style.Add("display", "none");
-                                    submitButtonPanel.Style.Add("display", "none");
+                                validationMsgPanel.Style.Add("display", "none");
+                                dateComparisonValidationMsgPanel.Style.Add("display", "none");
+                                invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+                                invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+                                submitButtonPanel.Style.Add("display", "none");
 
-                                    successMsg.InnerText = "Application successfully submitted";
-                                    successMsgPanel.Style.Add("display", "inline-block");
-                                }
+                                successMsg.InnerText = "Application successfully submitted";
+                                successMsgPanel.Style.Add("display", "inline-block");
                             }
                         }
+                    }
                 } catch(Exception ex)
                 {
                     validationMsg.InnerText = ex.Message;
