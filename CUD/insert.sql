@@ -1,5 +1,5 @@
--- USE [HRLeave]; -- chris local db
-USE [HRLeaveTestDb]; -- dbserver
+--USE [HRLeave]; -- chris local db
+ USE [HRLeaveTestDb]; -- dbserver
 GO
 
 
@@ -179,7 +179,17 @@ INSERT INTO [dbo].[leavetransaction] ([transaction_id], [created_at], [employee_
 (3, '20191101 9:54:00 AM', '184164', 'Vacation', '20191201', '20191210', '123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved', 'Good', NULL),
 
 -- same employee applies for sick leave to sup, recommended
-(4, '20191110 9:54:00 AM', '184164', 'Sick', '20191109', '20191109', '123337', '20191111 10:05:12 AM', NULL, NULL, 'Recommended', NULL, '184164/20191110_doctor_note.pdf') ;
+(4, '20191110 9:54:00 AM', '184164', 'Sick', '20191109', '20191109', '123337', '20191111 10:05:12 AM', NULL, NULL, 'Recommended', NULL, '184164/20191110_doctor_note.pdf'),
+
+-- setup for demo
+-- hr director applies to PS for vacation leave
+(5, '20191112 9:54:00 AM', '83612', 'Vacation', '20191212', '20200101', '07525', NULL, NULL, NULL, 'Pending', NULL, NULL),
+
+-- hr director applies to PS for sick leave
+(6, '20191125 12:54:00 PM', '83612', 'Sick', '20191123', '20191124', '07525', NULL, NULL, NULL, 'Pending', NULL, NULL),
+
+-- HRO3 applies to HR Director for sick leave (sup)
+(7, '20191125 12:54:00 PM', '11948', 'Sick', '20191123', '20191124', '83612', NULL, NULL, NULL, 'Pending', NULL, NULL);
 
 SET IDENTITY_INSERT [dbo].[leavetransaction] OFF;
 

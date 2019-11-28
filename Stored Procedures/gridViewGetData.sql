@@ -1,8 +1,8 @@
--- USE [HRLeave]; -- chris local db
-USE [HRLeaveTestDb]; -- dbserver
+--USE [HRLeave]; -- chris local db
+ USE [HRLeaveTestDb]; -- dbserver
 GO
 
-CREATE PROCEDURE [gridViewGetData] @gridViewType NVARCHAR (5)
+CREATE PROCEDURE gridViewGetData @gridViewType NVARCHAR (5), @currentEmployeeId NVARCHAR (10)
 AS
 BEGIN
   SELECT
@@ -31,5 +31,14 @@ BEGIN
     [dbo].[leavetransaction] lt 
     INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
     INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
-    LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id;
+    LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
+  WHERE (
+	((@gridViewType = 'emp') AND (@currentEmployeeId = e.employee_id))
+	
+	OR
+	((@gridViewType = 'sup') AND (@currentEmployeeId = supervisor_id))
+
+	OR -- hr
+	((@gridViewType = 'hr') AND (status IN ('Recommended', 'Approved', 'Not Approved')))
+  );	
 END;  
