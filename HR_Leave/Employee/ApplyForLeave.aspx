@@ -96,7 +96,7 @@
                 <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" style="display:inline; margin-left:10px" OnClick="refreshForm" />
             </asp:Panel>
             <asp:Panel ID="submitButtonPanel" runat="server" CssClass="row form-group">
-                <asp:Button ID="cancelBtn" runat="server" Text="Cancel" style="margin-right:35px;" CssClass="btn btn-danger" OnClick="refreshForm"/>
+                <asp:Button ID="cancelBtn" runat="server" Text="Cancel" style="margin-right:35px;" CssClass="btn btn-danger" OnClick="refreshForm" CausesValidation="False"/>
                 <button type="submit" class="btn btn-success" runat="server" onserverclick="submitLeaveApplication_ServerClick">Submit</button>
             </asp:Panel>
         </div>
