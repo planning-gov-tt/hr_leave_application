@@ -86,6 +86,10 @@
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
             </asp:Panel>
+            <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none;margin:0px 5px;" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="invalidVacationStartDateMsg" runat="server">You must request vacation leave at least a month before</span>
+            </asp:Panel>
             <asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; width:500px;" role="alert">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 <span id="validationMsg" runat="server">End date is not valid</span>

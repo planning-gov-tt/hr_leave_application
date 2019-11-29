@@ -11,7 +11,7 @@
     MaxLength="0" 
     OnSelectedIndexChanged="ComboBox1_SelectedIndexChanged">
 </ajaxToolkit:ComboBox>
-<asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="Data Source=dbserver;Initial Catalog=HRLeaveTestDb;Integrated Security=True" ProviderName="System.Data.SqlClient" SelectCommand="select e.employee_id, e.first_name + ' ' + e.last_name as 'Supervisor Name'
+<asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="select e.employee_id, e.first_name + ' ' + e.last_name as 'Supervisor Name'
 from [HRLeaveTestDb].[dbo].[employee] e
 left join [HRLeaveTestDb].[dbo].[employeerole] er
 on e.employee_id = er.employee_id

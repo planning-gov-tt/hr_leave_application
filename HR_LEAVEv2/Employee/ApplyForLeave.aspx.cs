@@ -33,7 +33,7 @@ namespace HR_LEAVEv2.Employee
             start = end = DateTime.MinValue;
             Boolean isValidated = true;
 
-            // validate dates
+            // validate start date is a proper date
             try
             {
                 start = Convert.ToDateTime(startDate);
@@ -43,6 +43,8 @@ namespace HR_LEAVEv2.Employee
                 invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
+
+            // validate end date is a proper date
             try
             {
                 end = Convert.ToDateTime(endDate);
@@ -55,13 +57,28 @@ namespace HR_LEAVEv2.Employee
 
             if (isValidated)
             {
+
+                // compare dates to ensure end date is not before start date
                 if (DateTime.Compare(start, end) > 0)
                 {
                     dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
-                    return false;
+                    isValidated = false;
                 }
-                else
-                    return true;
+
+                //if leave type is vacation: ensure start date is at least one month from today
+                if (typeOfLeave.SelectedValue.Equals("Vacation"))
+                {
+                    DateTime firstDateVacationCanBeTaken = DateTime.Today.AddMonths(1);
+
+                    if(DateTime.Compare(start, firstDateVacationCanBeTaken) < 0)
+                    {
+                        invalidVacationStartDateMsgPanel.Style.Add("display", "inline-block");
+                        isValidated = false;
+                    }
+                }
+
+
+                return isValidated;
             }
 
             return false;
