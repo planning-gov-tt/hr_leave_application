@@ -11,7 +11,7 @@ namespace HR_LEAVEv2
 {
 
 
-    public partial class Contact
+    public partial class AccessDenied
     {
     }
 }

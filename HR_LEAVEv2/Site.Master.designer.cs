@@ -7,22 +7,38 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HR_LEAVEv2
-{
-
-
-    public partial class SiteMaster
-    {
-
+namespace HR_LEAVEv2 {
+    
+    
+    public partial class SiteMaster {
+        
         /// <summary>
-        /// HeadContent control.
+        /// supervisorPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder HeadContent;
-
+        protected global::System.Web.UI.WebControls.Panel supervisorPanel;
+        
+        /// <summary>
+        /// hr1_hr2Panel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel hr1_hr2Panel;
+        
+        /// <summary>
+        /// hr3Panel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel hr3Panel;
+        
         /// <summary>
         /// MainContent control.
         /// </summary>

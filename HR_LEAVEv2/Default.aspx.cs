@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2
 {
@@ -11,7 +8,24 @@ namespace HR_LEAVEv2
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            //if(Session["permissions"] != null)
+            //{
+            //    List<string> permissions = (List<string>)Session["permissions"];
+            //    foreach(string permission in permissions)
+            //    {
+            //        Response.Write("permissions: "+ permission + "<br/>");
+            //    }
+            //} else
+            //    Response.Write("null permission <br/>");
 
+            //if (Session["emp_email"] != null)
+            //    Response.Write("email:" + Session["emp_email"].ToString() + "<br/>");
+            //else
+            //    Response.Write("null email");
+            //if (Session["emp_id"] != null)
+            //    Response.Write("emp_id: "+Session["emp_id"].ToString() + "<br/>");
+            //else
+            //    Response.Write("null id");
         }
     }
 }
