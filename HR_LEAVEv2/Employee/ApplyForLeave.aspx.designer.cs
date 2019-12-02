@@ -31,6 +31,15 @@ namespace HR_LEAVEv2.Employee {
         protected global::AjaxControlToolkit.CalendarExtender CalendarExtender1;
         
         /// <summary>
+        /// fromCalendarRequiredValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator fromCalendarRequiredValidator;
+        
+        /// <summary>
         /// txtTo control.
         /// </summary>
         /// <remarks>
@@ -49,6 +58,15 @@ namespace HR_LEAVEv2.Employee {
         protected global::AjaxControlToolkit.CalendarExtender CalendarExtender2;
         
         /// <summary>
+        /// toCalendarRequiredValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator toCalendarRequiredValidator;
+        
+        /// <summary>
         /// typeOfLeave control.
         /// </summary>
         /// <remarks>
@@ -56,6 +74,15 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList typeOfLeave;
+        
+        /// <summary>
+        /// typeOfLeaveRequiredValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator typeOfLeaveRequiredValidator;
         
         /// <summary>
         /// supervisor_select control.
@@ -67,6 +94,15 @@ namespace HR_LEAVEv2.Employee {
         protected global::HR_LEAVEv2.UserControls.supervisorSelect supervisor_select;
         
         /// <summary>
+        /// FileUpload1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.FileUpload FileUpload1;
+        
+        /// <summary>
         /// txtComments control.
         /// </summary>
         /// <remarks>
@@ -74,24 +110,6 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlTextArea txtComments;
-        
-        /// <summary>
-        /// dateComparisonValidationMsgPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel dateComparisonValidationMsgPanel;
-        
-        /// <summary>
-        /// dateComparisonValidationMsg control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl dateComparisonValidationMsg;
         
         /// <summary>
         /// invalidStartDateValidationMsgPanel control.
@@ -112,6 +130,24 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidStartDateValidationMsg;
         
         /// <summary>
+        /// startDateBeforeTodayValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel startDateBeforeTodayValidationMsgPanel;
+        
+        /// <summary>
+        /// startDateBeforeTodayValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl startDateBeforeTodayValidationMsg;
+        
+        /// <summary>
         /// invalidEndDateValidationMsgPanel control.
         /// </summary>
         /// <remarks>
@@ -128,6 +164,24 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidEndDateValidationMsg;
+        
+        /// <summary>
+        /// dateComparisonValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel dateComparisonValidationMsgPanel;
+        
+        /// <summary>
+        /// dateComparisonValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl dateComparisonValidationMsg;
         
         /// <summary>
         /// invalidVacationStartDateMsgPanel control.

@@ -11,9 +11,5 @@
     MaxLength="0" 
     OnSelectedIndexChanged="ComboBox1_SelectedIndexChanged">
 </ajaxToolkit:ComboBox>
-<asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="select e.employee_id, e.first_name + ' ' + e.last_name as 'Supervisor Name'
-from [HRLeaveTestDb].[dbo].[employee] e
-left join [HRLeaveTestDb].[dbo].[employeerole] er
-on e.employee_id = er.employee_id
-where er.role_id = 'sup';"></asp:SqlDataSource>
-<asp:RequiredFieldValidator runat="server" ControlToValidate="ComboBox1" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
+<asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient"></asp:SqlDataSource>
+<asp:RequiredFieldValidator ID="comboBoxRequiredValidator" runat="server" ControlToValidate="ComboBox1" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>

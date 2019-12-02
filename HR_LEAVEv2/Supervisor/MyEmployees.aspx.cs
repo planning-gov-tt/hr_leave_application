@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -11,7 +13,6 @@ namespace HR_LEAVEv2.Supervisor
     public partial class MyEmployees : System.Web.UI.Page
     {
 
-        DataTable dt;
         protected void Page_Load(object sender, EventArgs e)
         {
             List<string> permissions = (List<string>)Session["permissions"];
@@ -20,30 +21,43 @@ namespace HR_LEAVEv2.Supervisor
 
             if (!IsPostBack)
             {
-                BindListView();
+                bindListView();
             }
         }
 
-        protected void BindListView()
+        protected void bindListView()
         {
-            dt = new DataTable();
-            dt.Columns.Add("Id", typeof(int));
-            dt.Columns.Add("Name", typeof(string));
-            dt.Columns.Add("Mobile", typeof(string));
-            dt.Columns.Add("College", typeof(string));
-            dt.Rows.Add(1, "Rahul", "8505012345", "MITRC");
-            dt.Rows.Add(2, "Pankaj", "8505012346", "MITRC");
-            dt.Rows.Add(3, "Sandeep", "8505012347", "MITRC");
-            dt.Rows.Add(4, "Sanjeev", "8505012348", "MITRC");
-            dt.Rows.Add(5, "Neeraj", "8505012349", "MITRC");
-            dt.AcceptChanges();
-            ListView1.DataSource = dt;
-            ListView1.DataBind();
-        }
+            try
+            {
+                string sql = $@"
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
+                        FROM [HRLeaveTestDb].[dbo].[employee] e
+                        JOIN [HRLeaveTestDb].[dbo].assignment a
+                        ON e.employee_id = a.supervisee_id
+                        WHERE a.supervisor_id = {Session["emp_id"].ToString()};
+                    ";
 
-        protected void searchBox_TextChanged(object sender, EventArgs e)
-        {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataAdapter ad = new SqlDataAdapter(command);
 
+                        DataTable dt = new DataTable();
+                        ad.Fill(dt);
+                        if (dt.Rows.Count > 0)
+                        {
+                            ListView1.DataSource = dt;
+                            ListView1.DataBind();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         protected void ListView1_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
@@ -51,7 +65,22 @@ namespace HR_LEAVEv2.Supervisor
             // set current page startindex,max rows and rebind to false  
             DataPager1.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
             // Rebind the ListView1  
-            BindListView();
+            bindListView();
+        }
+
+        protected void searchForEmployee(string searchStr)
+        {
+
+        }
+
+        protected void searchBtn_Click(object sender, EventArgs e)
+        {
+            searchForEmployee(searchTxtbox.Text);
+        }
+
+        protected void searchTxtbox_TextChanged(object sender, EventArgs e)
+        {
+            searchForEmployee(searchTxtbox.Text);
         }
     }
 }

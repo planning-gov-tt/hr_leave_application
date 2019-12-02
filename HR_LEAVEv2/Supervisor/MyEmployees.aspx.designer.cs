@@ -13,13 +13,22 @@ namespace HR_LEAVEv2.Supervisor {
     public partial class MyEmployees {
         
         /// <summary>
-        /// filterEmpSearchBy control.
+        /// searchTxtbox control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList filterEmpSearchBy;
+        protected global::System.Web.UI.WebControls.TextBox searchTxtbox;
+        
+        /// <summary>
+        /// searchBtn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton searchBtn;
         
         /// <summary>
         /// ListView1 control.
