@@ -59,12 +59,12 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 
 
 INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [pre_retirement]) VALUES 
-('1', '1', 'PLANNING\ Tristan Sankar', 'Tristan', 'Sankar', 'tristan.sankar@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
-('2', '2', 'PLANNING\ Clint Ramoutar', 'Clint', 'Ramoutar', 'clint.ramoutar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
-('3', '3', 'PLANNING\ Christopher Sahadeo', 'Christopher', 'Sahadeo', 'christopher.sahadeo@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
-('4', '4', 'PLANNING\ Dale Cudjoe', 'Dale', 'Cudjoe', 'dale.cudjoe@planning.gov.tt', 15, 5, 0, 14, 2, 0, 0),
-('5', '5', 'PLANNING\ Nandani Ramsaran', 'Nandani', 'Ramsaran', 'nandani.ramsaran@planning.gov.tt', 10, 5, 0, 14, 2, 0, 0),
-('6', '6', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'melanie.noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50);
+('1', '1', 'PLANNING\ Tristan Sankar', 'Tristan', 'Sankar', 'Tristan.Sankar@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
+('2', '2', 'PLANNING\ Clint Ramoutar', 'Clint', 'Ramoutar', 'Clint.Ramoutar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
+('3', '3', 'PLANNING\ Christopher Sahadeo', 'Christopher', 'Sahadeo', 'Christopher.Sahadeo@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
+('4', '4', 'PLANNING\ Dale Cudjoe', 'Dale', 'Cudjoe', 'Dale.Cudjoe@planning.gov.tt', 15, 5, 0, 14, 2, 0, 0),
+('5', '5', 'PLANNING\ Nandani Ramsaran', 'Nandani', 'Ramsaran', 'Nandani.Ramsaran@planning.gov.tt', 10, 5, 0, 14, 2, 0, 0),
+('6', '6', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'Melanie.Noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50);
 
 
 INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
