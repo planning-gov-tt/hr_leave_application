@@ -1,4 +1,4 @@
--- USE [HRLeave]; -- chris local db
+--USE [HRLeave]; -- chris local db
 USE [HRLeaveTestDb]; -- dbserver
 GO
 
