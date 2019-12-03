@@ -88,8 +88,7 @@
                                 </span>
                             </div>
                             <div>
-<%--                                <asp:Button ID="showEmpDetailsBtn" runat="server" Text="Employee Details" CssClass="btn btn-primary" data-toggle="modal" data-target="#empDetailsModal" />--%>
-                                <button type="button" id="showEmpDetailsBtn" class="btn btn-primary" data-toggle="modal" data-target="#empDetailsModal" >Employee Details</button>
+                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal" >Employee Details</button>
                             </div>
                         </div>
                     </td>  
@@ -115,7 +114,7 @@
                                 </span>
                             </div> 
                             <div>
-                                <asp:Button ID="showEmpDetailsBtn" runat="server" Text="Employee Details" CssClass="btn btn-primary" data-toggle="modal" data-target="#empDetailsModal"/>
+                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal" >Employee Details</button>
                             </div>
                         </div>
                     </td>  
@@ -153,15 +152,49 @@
               <div class="modal-dialog" role="document" style="width:65%;">
                 <div class="modal-content">
                   <div class="modal-header text-center">
-                    <h2 class="modal-title" id="empDetailsTitle" style="display:inline; width:150px;"><asp:Panel ID="Panel3" runat="server"></asp:Panel></h2>
+                    <h2 class="modal-title" id="empDetailsTitle" style="display:inline; width:150px;">
+                        <span id="empNameDetails"></span>
+                    </h2>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
                   <div class="modal-body text-center">
-                      <asp:Panel ID="empIdPanel" runat="server"></asp:Panel>
-                      <asp:Panel ID="ihrisIdPanel" runat="server"></asp:Panel>
-                      <asp:Panel ID="emailPanel" runat="server"></asp:Panel>
+                      <div>
+                         <h4 style="display:inline">Employee ID:</h4>
+                         <span id="empIdDetails"></span>
+                      </div>
+
+                      <div>
+                         <h4 style="display:inline">IHRIS ID:</h4>
+                         <span id="ihrisIdDetails"></span>
+                      </div>
+
+                      <div>
+                         <h4 style="display:inline">Email:</h4>
+                         <span id="emailDetails"></span>
+                      </div>
+                      <hr style="width:45%;"/>
+                      <h3>Leave Balances</h3>
+                      <div>
+                         <h4 style="display:inline">Vacation Leave Balance:</h4>
+                         <span id="vacationDetails"></span>
+                      </div>
+
+                      <div>
+                         <h4 style="display:inline">Personal Leave Balance:</h4>
+                         <span id="personalDetails"></span>
+                      </div>
+
+                      <div>
+                         <h4 style="display:inline">Casual Leave Balance:</h4>
+                         <span id="casualDetails"></span>
+                      </div>
+
+                      <div>
+                         <h4 style="display:inline">Sick Leave Balance:</h4>
+                         <span id="sickDetails"></span>
+                      </div>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -174,9 +207,34 @@
     </div>
 
     <script>
-        $('#showEmpDetailsBtn').click(function () {
+        $('.show-details-btn').click(function () {
             
+            $.ajax({
+                type: "POST",
+                url:  '<%= ResolveUrl("MyEmployees.aspx/getEmpDetails") %>',
+                contentType: "application/json; charset=utf-8",
+                data: "{'emp_id':'" + $(this).attr("emp_id") +"'}",
+                dataType: "json",
+                success: function (data) {
+                    populateModal(JSON.parse(data.d));
+                },
+                error: function (result) {
+                    alert('Unable to load data: ' + result.responseText);
+                }
+            });
         })
+
+        function populateModal(data) {
+            //populate modal
+            $('#empNameDetails').text(data.name);
+            $('#empIdDetails').text(data.emp_id);
+            $('#ihrisIdDetails').text(data.ihris_id);
+            $('#emailDetails').text(data.email);
+            $('#vacationDetails').text(data.vacation);
+            $('#personalDetails').text(data.personal);
+            $('#casualDetails').text(data.casual);
+            $('#sickDetails').text(data.sick);
+        }
     </script>
     
   
