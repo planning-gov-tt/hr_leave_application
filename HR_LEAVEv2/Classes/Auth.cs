@@ -11,26 +11,6 @@ namespace HR_LEAVEv2
 {
     public class Auth
     {
-        //public string getProperty(SearchResult searchResult, string PropertyName)
-        //{
-        //    if (searchResult.Properties.Contains(PropertyName))
-        //    {
-        //        return searchResult.Properties[PropertyName][0].ToString();
-        //    }
-        //    else
-        //    {
-        //        return string.Empty;
-        //    }
-        //}
-        //protected string activeDirectorySearch()
-        //{
-        //    DirectoryEntry entry = new DirectoryEntry("LDAP://planning.gov.tt");
-        //    DirectorySearcher dSearch = new DirectorySearcher(entry);
-        //    dSearch.Filter = "(&(objectCategory=person)(objectClass=user))";
-        //    SearchResult = dSearch.FindOne();
-        //    this.getProperty(sResultSet, "mail")
-
-        //}
 
         public string activeDirectorySearch()
         {
@@ -47,10 +27,10 @@ namespace HR_LEAVEv2
             return null;
         }
 
-        public string getCurrentUserActiveDirectoryEmail()
-        {
-            return UserPrincipal.Current.EmailAddress;
-        }
+        //public string getCurrentUserActiveDirectoryEmail()
+        //{
+        //    return UserPrincipal.Current.EmailAddress;
+        //}
 
         public string getUserEmployeeId(string email)
         {
@@ -58,7 +38,7 @@ namespace HR_LEAVEv2
                 return "-1";
             string result = "-1";
             string sql = $@"select [employee_id] 
-                           from [HRLeaveTestDb].[dbo].employee
+                           from [dbo].employee
                            where [email] = '{email}'";
             try
             {
@@ -91,8 +71,8 @@ namespace HR_LEAVEv2
 
             List<string> permissions = new List<string>();
             string sql = $@"select distinct [permission_id]
-                            from [HRLeaveTestDb].[dbo].[employeerole] er
-                            left join [HRLeaveTestDb].[dbo].[rolepermission] rp
+                            from [dbo].[employeerole] er
+                            left join [dbo].[rolepermission] rp
                             on er.role_id = rp.role_id
                             where [employee_id]= {userEmpId}";
 

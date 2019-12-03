@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.UserControls
 {
@@ -18,23 +20,9 @@ namespace HR_LEAVEv2.UserControls
                 {
                     if (permissions.Contains("sup_permissions"))
                     {
-                        SqlDataSource1.SelectCommand = $@"
-                        select e.employee_id, e.first_name + ' ' + e.last_name as 'Supervisor Name'
-                        from[HRLeaveTestDb].[dbo].[employee] e
-                        left join[HRLeaveTestDb].[dbo].[employeerole] er
-                        on e.employee_id = er.employee_id
-                        where er.role_id = 'sup' and e.employee_id != {Session["emp_id"].ToString()}; ";
+                        SqlDataSource1.SelectParameters.Clear();
+                        SqlDataSource1.SelectParameters.Add("supervisorId", Session["emp_id"].ToString());
                     }
-                    else
-                    {
-                        SqlDataSource1.SelectCommand = $@"
-                        select e.employee_id, e.first_name + ' ' + e.last_name as 'Supervisor Name'
-                        from[HRLeaveTestDb].[dbo].[employee] e
-                        left join[HRLeaveTestDb].[dbo].[employeerole] er
-                        on e.employee_id = er.employee_id
-                        where er.role_id = 'sup';";
-                    }
-
                 }
             }
             
