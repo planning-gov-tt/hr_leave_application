@@ -1,14 +1,27 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web.Services;
 using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.Supervisor
 {
     public partial class MyEmployees : System.Web.UI.Page
     {
+        class EmpDetails
+        {
+            public string emp_id { get; set; }
+            public string ihris_id { get; set; }
+            public string name { get; set; }
+            public string email { get; set; }
+            public string vacation { get; set; }
+            public string personal { get; set; }
+            public string casual { get; set; }
+            public string sick { get; set; }
+        };
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -113,40 +126,53 @@ namespace HR_LEAVEv2.Supervisor
             searchForEmployee(searchTxtbox.Text);
         }
 
-        //protected void showEmpDetailsBtn_Click(object sender, EventArgs e)
-        //{
-        //    // populate modal
-        //    //try
-        //    //{
-        //    //    string sql = $@"
-        //    //            SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'name', e.email
-        //    //            FROM [dbo].[employee] e
-        //    //            WHERE e.employee_id = {detailsBtn.Attributes["emp_id".ToString()]};
-        //    //        ";
+        [WebMethod]
+        public static string getEmpDetails(string emp_id) 
+        {
+            EmpDetails empDetails = null;
+            try
+            {
+                string sql = $@"
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'name', e.email, e.vacation, e.personal, e.casual, e.sick
+                        FROM [dbo].[employee] e
+                        WHERE e.employee_id = {emp_id};
+                    ";
 
-        //    //    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-        //    //    {
-        //    //        connection.Open();
-        //    //        using (SqlCommand command = new SqlCommand(sql, connection))
-        //    //        {
-        //    //            using (SqlDataReader reader = command.ExecuteReader())
-        //    //            {
-        //    //                while (reader.Read())
-        //    //                {
-        //    //                    Label txtLabel = new Label();
-        //    //                    txtLabel.Text = reader["employee_id"].ToString();
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                empDetails = new EmpDetails {
+                                    emp_id = reader["employee_id"].ToString(),
+                                    ihris_id = reader["ihris_id"].ToString(),
+                                    name = reader["name"].ToString(),
+                                    email = reader["email"].ToString(),
+                                    vacation = reader["vacation"].ToString(),
+                                    personal = reader["personal"].ToString(),
+                                    casual = reader["casual"].ToString(),
+                                    sick = reader["sick"].ToString()
 
-        //    //                    empIdPanel.Controls.Add(txtLabel);
-        //    //                }
-        //    //            }
-        //    //        }
-        //    //    }
-        //    //}
-        //    //catch (Exception ex)
-        //    //{
-        //    //    Console.WriteLine(ex.Message);
-        //    //}
-        //}
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return "{}";
+            }
+
+            if (empDetails != null)
+                return JsonConvert.SerializeObject(empDetails);
+            return "{}";
+        }
+
 
     }
 }
