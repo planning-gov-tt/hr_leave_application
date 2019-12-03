@@ -13,8 +13,6 @@
         #applyForLeaveContainer div.row{
             margin-top:50px;
         }
-
-
         
     </style>
     <h1><%: Title %></h1>
@@ -25,14 +23,14 @@
                 <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="fromCalendar" class="fa fa-calendar fa-lg"></i>
                 <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
-                <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
+                <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
             </div>
             <div style="display:inline-block;">
                 <label for="txtTo" style="font-size:1.5em">To:</label>
                 <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="toCalendar" class="fa fa-calendar fa-lg"></i>
                 <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" />
-                <asp:RequiredFieldValidator runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
+                <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
             </div>
         </div>
         <div class="row form-group" >
@@ -45,7 +43,7 @@
                 <asp:ListItem Value="Maternity"></asp:ListItem>
                 <asp:ListItem Value="Bereavement"></asp:ListItem>
             </asp:DropDownList>
-            <asp:RequiredFieldValidator runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
+            <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
         </div>
 
         <div class="row form-group">
@@ -53,8 +51,8 @@
             <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server" />
         </div>
 
-        <div class="row" style="background-color:lightblue;">
-            File upload goes here
+        <div class="row form-group">
+            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" style="margin:auto; display:inline-block" />
         </div>
 
         <div class="row form-group">
@@ -73,18 +71,26 @@
              </ajaxToolkit:PieChart>--%>
         </div>
 
-        <div class="row">
-            <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none" role="alert">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                <span id="dateComparisonValidationMsg" runat="server">Start date must be a date preceding the end date</span>
-            </asp:Panel>
+        <div class="row" id="validationRow">
             <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; margin:0px 5px;" role="alert">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
             </asp:Panel>
+            <asp:Panel ID="startDateBeforeTodayValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; margin:0px 5px;" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="startDateBeforeTodayValidationMsg" runat="server">Start date cannot be before today</span>
+            </asp:Panel>
             <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none;margin:0px 5px;" role="alert">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
+            </asp:Panel>
+            <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; margin:0px 5px;" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
+            </asp:Panel>
+            <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none;margin:0px 5px;" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="invalidVacationStartDateMsg" runat="server">You must request vacation leave at least a month before the start date</span>
             </asp:Panel>
             <asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; width:500px;" role="alert">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -92,7 +98,7 @@
             </asp:Panel>
             <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" style="display:none" role="alert">
                 <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                <span id="successMsg" runat="server"></span>
+                <span id="successMsg" runat="server">Application successfully submitted</span>
                 <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" style="display:inline; margin-left:10px" OnClick="refreshForm" />
             </asp:Panel>
             <asp:Panel ID="submitButtonPanel" runat="server" CssClass="row form-group">

@@ -15,9 +15,7 @@ namespace HR_LEAVEv2.Employee
             if (this.IsPostBack)
             {
                 if (ViewState["supervisor_id"] != null && ViewState["supervisor_id"].ToString() != "-1")
-                {
                     supervisor_select.selectedSupId = ViewState["supervisor_id"].ToString();
-                }
             }
         }
 
@@ -33,7 +31,7 @@ namespace HR_LEAVEv2.Employee
             start = end = DateTime.MinValue;
             Boolean isValidated = true;
 
-            // validate dates
+            // validate start date is a date
             try
             {
                 start = Convert.ToDateTime(startDate);
@@ -43,6 +41,8 @@ namespace HR_LEAVEv2.Employee
                 invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
+
+            // validate end date is a date
             try
             {
                 end = Convert.ToDateTime(endDate);
@@ -55,13 +55,36 @@ namespace HR_LEAVEv2.Employee
 
             if (isValidated)
             {
+                //ensure start date is not a day before today
+                if (DateTime.Compare(start, DateTime.Today) < 0)
+                {
+                    invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+                    startDateBeforeTodayValidationMsgPanel.Style.Add("display", "inline-block");
+                    isValidated = false;
+                }
+
+                // compare dates to ensure end date is not before start date
                 if (DateTime.Compare(start, end) > 0)
                 {
+                    invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
                     dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
-                    return false;
+                    isValidated = false;
                 }
-                else
-                    return true;
+
+                //if leave type is vacation: ensure start date is at least one month from today
+                if (typeOfLeave.SelectedValue.Equals("Vacation"))
+                {
+                    DateTime firstDateVacationCanBeTaken = DateTime.Today.AddMonths(1);
+
+                    if(DateTime.Compare(start, firstDateVacationCanBeTaken) < 0)
+                    {
+                        invalidVacationStartDateMsgPanel.Style.Add("display", "inline-block");
+                        isValidated = false;
+                    }
+                }
+
+
+                return isValidated;
             }
 
             return false;
@@ -69,6 +92,13 @@ namespace HR_LEAVEv2.Employee
 
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
+            validationMsgPanel.Style.Add("display", "none");
+            dateComparisonValidationMsgPanel.Style.Add("display", "none");
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            invalidVacationStartDateMsgPanel.Style.Add("display", "none");
+
             /* data to be submitted
              * 1. Employee id
              * 2. Leave type
@@ -126,15 +156,10 @@ namespace HR_LEAVEv2.Employee
                             int rowsAffected = command.ExecuteNonQuery();
                             if (rowsAffected > 0)
                             {
-                                validationMsgPanel.Style.Add("display", "none");
-                                dateComparisonValidationMsgPanel.Style.Add("display", "none");
-                                invalidStartDateValidationMsgPanel.Style.Add("display", "none");
-                                invalidEndDateValidationMsgPanel.Style.Add("display", "none");
                                 submitButtonPanel.Style.Add("display", "none");
-
-                                successMsg.InnerText = "Application successfully submitted";
                                 successMsgPanel.Style.Add("display", "inline-block");
                             }
+                                
                         }
                     }
                 }

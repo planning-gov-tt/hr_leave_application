@@ -7,36 +7,45 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HR_LEAVEv2.UserControls {
+namespace HR_LEAVEv2.Supervisor {
     
     
-    public partial class supervisorSelect {
+    public partial class MyEmployees {
         
         /// <summary>
-        /// ComboBox1 control.
+        /// searchTxtbox control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::AjaxControlToolkit.ComboBox ComboBox1;
+        protected global::System.Web.UI.WebControls.TextBox searchTxtbox;
         
         /// <summary>
-        /// SqlDataSource1 control.
+        /// searchBtn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.SqlDataSource SqlDataSource1;
+        protected global::System.Web.UI.WebControls.LinkButton searchBtn;
         
         /// <summary>
-        /// comboBoxRequiredValidator control.
+        /// ListView1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator comboBoxRequiredValidator;
+        protected global::System.Web.UI.WebControls.ListView ListView1;
+        
+        /// <summary>
+        /// DataPager1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DataPager DataPager1;
     }
 }

@@ -92,7 +92,7 @@
                             </a>
                             <ul class="collapse list-unstyled submenu" id="supervisorSubmenu">
                                 <li>
-                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="My Employees">
+                                    <a href="<%= ResolveClientUrl("~/Supervisor/MyEmployees.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="My Employees">
                                         <i class="fa fa-users navbar-link-icon"></i>
                                         <span class="navbar-link-text">My Employees</span>
                                     </a>
