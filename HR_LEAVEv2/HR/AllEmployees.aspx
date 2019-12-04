@@ -1,6 +1,4 @@
-﻿<%@ Page Title="My Employees" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="MyEmployees.aspx.cs" Inherits="HR_LEAVEv2.Supervisor.MyEmployees" %>
-<%@ Register assembly="AjaxControlToolkit" namespace="AjaxControlToolkit" tagprefix="ajaxToolkit" %>
-
+﻿<%@ Page Title="All Employees" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="AllEmployees.aspx.cs" Inherits="HR_LEAVEv2.HR.AllEmployees" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
         .custom-no-dp-header-icon{
@@ -10,7 +8,7 @@
     </style>
 
     <h1><%: Title %></h1>
-    <div class="container-fluid">
+      <div class="container-fluid">
         <div class="container" style="width:65%;">
             <div class="row" style="margin-top:25px;">
                 <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group" style="width:510px;margin:auto;">
@@ -38,7 +36,7 @@
         <div class="container" style="width:100%; margin-top:55px;">
             <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" style="height:85%;" >  
                 <EmptyDataTemplate>
-                    <div class="alert alert-info text-center" role="alert" style=" width: 30%; margin:auto">
+                    <div class="alert alert-info text-center" role="alert" style=" width: 30%; margin:auto ">
                         <i class="fa fa-info-circle"></i>
                         No data on employees available
                     </div>
@@ -159,14 +157,14 @@
                          <h4 style="display:inline">Email:</h4>
                          <span id="emailDetails"></span>
                       </div>
-                      <%--<div>
+                      <div>
                          <h4 style="display:inline">Employee Type:</h4>
                          <span id="empTypeDetails"></span>
                       </div>
                       <div>
                          <h4 style="display:inline">Employee Position:</h4>
                          <span id="empPositionDetails"></span>
-                      </div>--%>
+                      </div>
                       <hr style="width:45%;"/>
                       <h3>Leave Balances</h3>
                       <div>
@@ -204,7 +202,7 @@
             
             $.ajax({
                 type: "POST",
-                url:  '<%= ResolveUrl("MyEmployees.aspx/getEmpDetails") %>',
+                url:  '<%= ResolveUrl("AllEmployees.aspx/getEmpDetails") %>',
                 contentType: "application/json; charset=utf-8",
                 data: "{'emp_id':'" + $(this).attr("emp_id") +"'}",
                 dataType: "json",
@@ -227,10 +225,9 @@
             $('#personalDetails').text(data.personal);
             $('#casualDetails').text(data.casual);
             $('#sickDetails').text(data.sick);
-            //$('#empTypeDetails').text(data.employment_type);
-            //$('#empPositionDetails').text(data.position);
+            $('#empTypeDetails').text(data.employment_type);
+            $('#empPositionDetails').text(data.position);
         }
     </script>
     
-  
 </asp:Content>

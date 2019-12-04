@@ -62,7 +62,7 @@
 
          <div class="row" style="background-color:lightblue;">
             Leave Balance goes here
-<%--            <ajaxToolkit:PieChart ID="PieChart1" runat="server" ChartHeight="250px" ChartTitle="Test Pie" ChartWidth="250px" Height="250px" Width="250px" BorderWidth="250px" ForeColor="White" >
+        <%--    <ajaxToolkit:PieChart ID="PieChart1" runat="server" ChartHeight="250px" ChartTitle="Test Pie" ChartWidth="250px" Height="250px" Width="250px" BorderWidth="250px" ForeColor="White" >
                 <PieChartValues>
                     <ajaxToolkit:PieChartValue Category="C1" Data="20" PieChartValueColor="red" PieChartValueStrokeColor="" />
                     <ajaxToolkit:PieChartValue Category="C2" Data="35" PieChartValueColor="blue" PieChartValueStrokeColor="" />

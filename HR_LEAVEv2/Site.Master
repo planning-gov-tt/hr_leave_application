@@ -10,6 +10,8 @@
 
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/bundles/modernizr") %>
+
+        <link href="Styles/MasterStyleSheet.css" rel="stylesheet" type="text/css"/>
     </asp:PlaceHolder>
 
     <link href="Content/bootstrap.css" rel="stylesheet" type="text/css" />
@@ -117,7 +119,7 @@
                             <a id="hr1_hr2DropdownParent" href="#hr1_hr2Submenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
                                 <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="HR Actions">
                                     <i class="fa fa-eye navbar-link-icon"></i>
-                                    <span class="navbar-link-text">HR 1 Actions</span>
+                                    <span class="navbar-link-text">HR Actions</span>
                                     <span class="dropup-arrow">&#9650;</span>
                                     <span class="dropdown-arrow">&#9660;</span>
                                 </span>
@@ -125,7 +127,7 @@
                             </a>
                             <ul class="collapse list-unstyled submenu" id="hr1_hr2Submenu">
                                 <li>
-                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
+                                    <a href="<%= ResolveClientUrl("~/HR/AllEmployees.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
                                         <i class="fa fa-users navbar-link-icon"></i>
                                         <span class="navbar-link-text">All Employees</span>
                                     </a>
