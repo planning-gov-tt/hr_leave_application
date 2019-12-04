@@ -13,8 +13,8 @@ INSERT INTO [dbo].[permission] ([permission_id]) VALUES
 ('approve_sick'),
 ('approve_casual'),
 ('approve_vacation'),
-('approve_contract'),
-('approve_public_officer'),
+('contract_permissions'),
+('public_officer_permissions'),
 ('assign_role');
 
 
@@ -54,9 +54,9 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 ('hr1', 'approve_vacation'),
 ('hr1', 'assign_role'),
 
-('hr_contract', 'approve_contract'),
+('hr_contract', 'contract_permissions'),
 
-('hr_public_officer', 'approve_public_officer');
+('hr_public_officer', 'public_officer_permissions');
 
 
 INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [pre_retirement]) VALUES 
@@ -108,9 +108,11 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 ('11948', 'hr_contract'),
 
 ('01511', 'hr3'),
+('01511', 'hr_contract'),
 
 ('13888', 'hr3'),
 ('13888', 'sup'),
+('13888', 'hr_public_officer'),
 
 ('87465', 'emp'),
 
@@ -226,7 +228,7 @@ SET IDENTITY_INSERT [dbo].[employeeposition] ON;
 
 INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start_date], [expected_end_date], [actual_end_date], [employment_type], [dept_id]) VALUES
 (1, '1', 5, '20190927', '20200927', NULL, 'Contract', 1),
-(2, '3', 5, '20190927', '20200927', NULL, 'Contract', 1),
+(2, '3', 5, '20190927', '20200927', NULL, 'Public Service', 1),
 
 -- multiple periods of employment for one person
 (3, '115245', 6, '20101005', '20131005', NULL, 'Contract', 1),
