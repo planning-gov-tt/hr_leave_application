@@ -11,17 +11,19 @@
       <div class="container-fluid">
         <div class="container" style="width:65%;">
             <div class="row" style="margin-top:25px;">
-                <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group" style="width:510px;margin:auto;">
-                    <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control"  placeholder="Search Employee" aria-label="Search Employee" aria-describedby="basic-addon2" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
-                    <div class="input-group-addon">
-                        <asp:LinkButton ID="searchBtn" runat="server" OnClick="searchBtn_Click">
-                            <span class="input-group-text" id="basic-addon2">
-                                <i class="fa fa-search"></i>
-                            </span>
-                        </asp:LinkButton>
-                    </div>
-                </asp:Panel>
-                
+                    <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group col-lg-9" style="width:510px; margin-left:25%;">
+                        <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control"  placeholder="Search Employee" aria-label="Search Employee" aria-describedby="basic-addon2" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
+                        <div class="input-group-addon">
+                            <asp:LinkButton ID="searchBtn" runat="server" OnClick="searchBtn_Click">
+                                <span class="input-group-text" id="basic-addon2">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </asp:LinkButton>
+                        </div>
+                    </asp:Panel>    
+                <div class="col-lg-3">
+                    <asp:Button ID="newEmployeeBtn" runat="server" Text="New Employee" CssClass="btn btn-primary" OnClick="newEmployeeBtn_Click"/>
+                </div>
                 <%--<div class="col-lg-4">
                     <label for="filterEmpSearchBy" style="font-size:1.0em">Filter by:</label>
                     <asp:DropDownList ID="filterEmpSearchBy" runat="server" CssClass="form-control" Width="150px" style="display:inline;" >

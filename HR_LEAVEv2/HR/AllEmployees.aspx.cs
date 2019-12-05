@@ -231,5 +231,10 @@ namespace HR_LEAVEv2.HR
                 return JsonConvert.SerializeObject(empDetails);
             return "{}";
         }
+
+        protected void newEmployeeBtn_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/HR/EmployeeDetails.aspx?view=create");
+        }
     }
 }
