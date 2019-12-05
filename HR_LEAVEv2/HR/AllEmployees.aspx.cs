@@ -4,13 +4,17 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
 using System.Web.Services;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace HR_LEAVEv2.Supervisor
+namespace HR_LEAVEv2.HR
 {
-    public partial class MyEmployees : System.Web.UI.Page
+    public partial class AllEmployees : System.Web.UI.Page
     {
+        List<string> permissions = null;
         class EmpDetails
         {
             public string emp_id { get; set; }
@@ -22,14 +26,14 @@ namespace HR_LEAVEv2.Supervisor
             public string casual { get; set; }
             public string sick { get; set; }
 
-            //public string employment_type { get; set; }
-            //public string position { get; set; }
+            public string employment_type { get; set; }
+            public string position { get; set; }
         };
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            List<string> permissions = (List<string>)Session["permissions"];
-            if (permissions == null || !permissions.Contains("sup_permissions"))
+            permissions = (List<string>)Session["permissions"];
+            if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions" ) || permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)
@@ -42,13 +46,36 @@ namespace HR_LEAVEv2.Supervisor
         {
             try
             {
-                string sql = $@"
+                string sql;
+
+                if (permissions.Contains("hr1_permissions"))
+                {
+                    // HR 1
+                    sql = $@"
                         SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
                         FROM [dbo].[employee] e
-                        JOIN [dbo].assignment a
-                        ON e.employee_id = a.supervisee_id
-                        WHERE a.supervisor_id = {Session["emp_id"].ToString()};
+                        LEFT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date;
                     ";
+                }
+                else
+                {
+                    string emp_type = string.Empty;
+                    // HR 1 and HR 2
+                    if (permissions.Contains("contract_permissions"))
+                        emp_type = "Contract";
+                    else if (permissions.Contains("public_officer_permissions"))
+                        emp_type = "Public Service";
+
+                    sql = $@"
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
+                        FROM [dbo].[employee] e
+                        LEFT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date;
+                    ";
+                }
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
@@ -62,7 +89,6 @@ namespace HR_LEAVEv2.Supervisor
 
                         ListView1.DataSource = dt;
                         ListView1.DataBind();
-
                     }
                 }
             }
@@ -84,15 +110,42 @@ namespace HR_LEAVEv2.Supervisor
         {
             try
             {
-                string sql = $@"
+
+                string sql;
+
+                if (permissions.Contains("hr1_permissions"))
+                {
+                    // HR 1
+                    sql = $@"
                         SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
                         FROM [dbo].[employee] e
-                        JOIN [dbo].assignment a
-                        ON e.employee_id = a.supervisee_id
-                        WHERE a.supervisor_id = {Session["emp_id"].ToString()}
+                        LEFT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date 
+                            AND
+                         ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString) ); 
+                    ";
+                }
+                else
+                {
+                    string emp_type = string.Empty;
+                    // HR 1 and HR 2
+                    if (permissions.Contains("contract_permissions"))
+                        emp_type = "Contract";
+                    else if (permissions.Contains("public_officer_permissions"))
+                        emp_type = "Public Service";
+
+                    sql = $@"
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
+                        FROM [dbo].[employee] e
+                        LEFT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date
                             AND
                         ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString) ); 
+
                     ";
+                }
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
@@ -131,20 +184,14 @@ namespace HR_LEAVEv2.Supervisor
             EmpDetails empDetails = null;
             try
             {
-                //string sql = $@"
-                //        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, p.pos_name
-                //        FROM [dbo].[employee] e
-                //        RIGHT JOIN [dbo].employeeposition ep
-                //        ON e.employee_id = ep.employee_id
-
-                //        INNER JOIN [dbo].position p
-                //        ON ep.position_id = p.pos_id
-                //        WHERE e.employee_id = {emp_id};
-                //    ";
-
                 string sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, p.pos_name
                         FROM [dbo].[employee] e
+                        RIGHT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+
+                        INNER JOIN [dbo].position p
+                        ON ep.position_id = p.pos_id
                         WHERE e.employee_id = {emp_id};
                     ";
 
@@ -167,8 +214,8 @@ namespace HR_LEAVEv2.Supervisor
                                     personal = reader["personal"].ToString(),
                                     casual = reader["casual"].ToString(),
                                     sick = reader["sick"].ToString(),
-                                    //employment_type = reader["employment_type"].ToString(),
-                                    //position = reader["pos_name"].ToString()
+                                    employment_type = reader["employment_type"].ToString(),
+                                    position = reader["pos_name"].ToString()
                                 };
                             }
                         }
