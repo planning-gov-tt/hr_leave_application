@@ -1,4 +1,6 @@
 ﻿<%@ Page Title="Employee Details" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="EmployeeDetails.aspx.cs" Inherits="HR_LEAVEv2.HR.EmployeeDetails" %>
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <h1><%: Title %></h1>
     <div class="container-fluid">
@@ -7,7 +9,8 @@
                 <h3>IDs and Email</h3>
                 <div class="form-group text-left">
                     <label for="employeeIdInput">Employee ID</label>
-                    <input class="form-control" id="employeeIdInput" aria-describedby="emailHelp" placeholder="Enter employee ID">
+<%--                    <asp:TextBox ID="employeeIdInput" runat="server"></asp:TextBox>--%>
+                    <input class="form-control" runat="server" id="employeeIdInput" aria-describedby="emailHelp" placeholder="Enter employee ID">
     <%--                <small id="emailHelp" class="form-text text-muted">Press tab to move between inputs in the form</small>--%>
                 </div>
                 <div class="form-group text-left">
@@ -97,7 +100,80 @@
                 </Columns>
             </asp:GridView>
             <div class="btn-group" role="group" aria-label="Basic example" style="margin-top:10px; margin-left:35%;">
-                <button type="button" class="btn btn-primary">Add</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addEmpRecordModal">Add</button>
+            </div>
+        </div>
+    </div>
+
+     <%--Modal--%>
+
+    <div class="modal fade" id="addEmpRecordModal" tabindex="-1" role="dialog" aria-labelledby="addEmpRecordTitle" aria-hidden="true" style="margin-top: 7%;">
+        <div class="modal-dialog" role="document" style="width: 55%;">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h2 class="modal-title" id="addEmpRecordTitle" style="display: inline; width: 150px;">
+                        Add Record
+                    </h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="container" style="width:80%; height:95%">
+                        <div class="form-group" style="margin-top:25px;">
+                             <label for="empTypeList">Employment Type</label>
+                            <asp:DropDownList ID="empTypeList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource3" DataTextField="type_id" style="display:inline-block;"></asp:DropDownList>
+                            <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [type_id] FROM [employmenttype] ORDER BY [type_id]"></asp:SqlDataSource>
+                        </div>
+                        <div class="form-group" style="margin-top:45px;">
+                            <label for="deptList">Department</label>
+                            <asp:DropDownList ID="deptList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource2" DataValueField="dept_id" DataTextField="dept_name" style="display:inline-block; margin-right:15%;"></asp:DropDownList>
+                            <asp:SqlDataSource ID="SqlDataSource2" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [dept_id], [dept_name] FROM [department] ORDER BY [dept_name]"></asp:SqlDataSource>
+
+                            <label for="positionList" >Position</label>
+                            <asp:DropDownList ID="positionList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource1" DataValueField="pos_id" DataTextField="pos_name" style="display:inline-block"></asp:DropDownList>
+                            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [pos_id], [pos_name] FROM [position] ORDER BY [pos_name]"></asp:SqlDataSource>
+                        </div>
+                        <div class="form-group text-center" style="margin-top:45px;">
+                            <span style="margin-right:15%;">
+                                <label for="txtStartDate">Start date</label>
+                                <asp:TextBox ID="txtStartDate" ClientID="txtStartDate" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
+                                <i id="startDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
+                                <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtStartDate" PopupButtonID="startDateCalendar" runat="server"></ajaxToolkit:CalendarExtender>
+                                <asp:RequiredFieldValidator ID="startDateRequiredValidator" runat="server" ControlToValidate="txtStartDate" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
+                            </span>
+
+                            <span>
+                                <label for="txtEndDate">End date</label>
+                                <asp:TextBox ID="txtEndDate" ClientID="txtEndDate" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
+                                <i id="endDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
+                                <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtEndDate" PopupButtonID="endDateCalendar" runat="server"></ajaxToolkit:CalendarExtender>
+                                <asp:RequiredFieldValidator ID="endDateRequiredValidator" runat="server" ControlToValidate="txtEndDate" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
+                            </span>
+                        </div>
+
+                        <div id="validationDiv">
+                             <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; margin:0px 5px;" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
+                            </asp:Panel>
+                            <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none;margin:0px 5px;" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
+                            </asp:Panel>
+                            <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; margin:0px 5px;" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
+                            </asp:Panel>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center" style="margin-bottom:45px; margin-top:25px;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-right:35px;">Cancel</button>
+                    <button type="submit" id="addEmpRecordSubmitBtn" class="btn btn-success">Submit</button>
+<%--                    <asp:Button ID="addEmpRecordSubmitBtn" runat="server" Text="Submit" CssClass="btn btn-success"/>--%>
+                </div>
             </div>
         </div>
     </div>
@@ -112,6 +188,11 @@
                 $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
             }
         });
+
+        //$('#addEmpRecordSubmitBtn').click(function () {
+        //    alert($('#txtStartDate').val() + " to " + $('#txtEndDate').val());
+        //});
+
 
     </script>
 </asp:Content>

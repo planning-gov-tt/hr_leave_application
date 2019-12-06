@@ -5,10 +5,6 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
-        #fromCalendar, #toCalendar{
-            cursor:pointer;
-            font-size: 1.3em;
-        }
 
         #applyForLeaveContainer div.row{
             margin-top:50px;
@@ -21,14 +17,14 @@
             <div style="display:inline-block; margin-right:15%;">
                 <label for="txtFrom" style="font-size:1.5em">From:</label>
                 <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
-                <i id="fromCalendar" class="fa fa-calendar fa-lg"></i>
+                <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
                 <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
                 <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
             </div>
             <div style="display:inline-block;">
                 <label for="txtTo" style="font-size:1.5em">To:</label>
                 <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
-                <i id="toCalendar" class="fa fa-calendar fa-lg"></i>
+                <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
                 <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" />
                 <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
             </div>

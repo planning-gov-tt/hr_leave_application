@@ -9,6 +9,7 @@ namespace HR_LEAVEv2.HR
 {
     public partial class EmployeeDetails : System.Web.UI.Page
     {
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -31,7 +32,7 @@ namespace HR_LEAVEv2.HR
                     LEFT JOIN [dbo].department d
                     ON ep.dept_id = d.dept_id
 
-                    WHERE ep.employee_id = {Session["emp_id"].ToString()};
+                    WHERE ep.employee_id = {employeeIdInput.Value};
                 ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
