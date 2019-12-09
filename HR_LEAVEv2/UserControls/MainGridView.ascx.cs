@@ -24,6 +24,9 @@ namespace HR_LEAVEv2.UserControls
 
         private List<string> permissions;
 
+        //SQL date formatting
+        //    FORMAT(getdate(), 'dd-MM-yy') as date
+
         // general select
         private string select = @"
             SELECT
@@ -34,8 +37,8 @@ namespace HR_LEAVEv2.UserControls
                 LEFT(e.first_name, 1) + '. ' + e.last_name AS employee_name,
 
                 lt.leave_type leave_type,
-                lt.start_date start_date,
-                lt.end_date end_date,
+                FORMAT(lt.start_date, 'MM/dd/yy') start_date,
+                FORMAT(lt.end_date, 'MM/dd/yy') end_date,
 
                 s.employee_id supervisor_id,
                 LEFT(s.first_name, 1) + '. ' + s.last_name AS supervisor_name,
@@ -289,9 +292,79 @@ namespace HR_LEAVEv2.UserControls
 
         }
 
+        // helper function to get column index by name
+        int GetColumnIndexByName(GridViewRow row, string columnName)
+        {
+            int columnIndex = 0;
+            foreach (DataControlFieldCell cell in row.Cells)
+            {
+                if (cell.ContainingField is BoundField)
+                    if (((BoundField)cell.ContainingField).DataField.Equals(columnName))
+                        break;
+                columnIndex++; // keep adding 1 while we don't have the correct name
+            }
+            return columnIndex;
+        }
+
         protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            //e.Row.Cells[e.Row.Cells.Count - 1].Style.Add("BORDER", "0px");
+            int buttonColumnIndex = e.Row.Cells.Count - 1;
+
+            // remove border on last column
+            e.Row.Cells[buttonColumnIndex].Style.Add("BORDER", "0px");
+
+
+            // if employee view OR hr view
+            if (gridViewType == "emp" || gridViewType == "hr")
+            {
+                // get start date
+                DateTime startDate = new DateTime();
+                if (e.Row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
+                {
+                    int index = GetColumnIndexByName(e.Row, "start_date");
+                    startDate = DateTime.Parse(e.Row.Cells[index].Text);
+                }
+                
+                // if leave time has started then you cannot apply for a date change
+                if (DateTime.Now > startDate)
+                {
+                    // hide button for just this row
+                    e.Row.Cells[e.Row.Cells.Count - 1].Visible = false;
+                }
+            }
+
+            // if supervisor view
+            else if (gridViewType == "sup")
+            {
+                
+                e.Row.Cells[buttonColumnIndex].Visible = true;
+
+                // get leave status for that row
+                string leaveStatus = null;
+                if(e.Row.RowType == DataControlRowType.DataRow)
+                {
+                    int statusIndex = GetColumnIndexByName(e.Row, "status");
+                    leaveStatus = e.Row.Cells[statusIndex].Text.ToString();
+                }
+                
+                // only show buttons if HR have not Approved or Not Approved the leave
+                // else do not show buttons
+                if (leaveStatus == "Approved" || leaveStatus == "Not Approved")
+                {
+                    e.Row.Cells[buttonColumnIndex].Visible = false;
+                }
+            }
+        }
+
+        protected void GridView_Sorting(object sender, GridViewSortEventArgs e)
+        {
+           
+        }
+
+        protected void GridView_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            this.GridView.PageIndex = e.NewPageIndex;
+            this.BindGridView();
         }
     }
 }

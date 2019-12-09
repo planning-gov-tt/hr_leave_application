@@ -3,13 +3,24 @@
 
 <div>
 
-    <center>
+    <center>    
+
+        <%--Paging also triggers the OnRowCommand fn--%>
+<%--           "          --%>
 
         <asp:GridView ID="GridView" 
-            CssClass="table"          
-            AutoGenerateColumns="false" OnRowCommand="GridView_RowCommand" OnRowDataBound="GridView_RowDataBound"
-            DataKeyNames="transaction_id, employee_id, supervisor_id, hr_manager_id"
+            BorderStyle="None" 
+ CssClass="table"
+            GridLines="Horizontal"
+            AutoGenerateColumns="false" 
+            OnRowCommand="GridView_RowCommand" 
+            OnRowDataBound="GridView_RowDataBound"
+            DataKeyNames="transaction_id, employee_id, supervisor_id, hr_manager_id" 
+            
+            
+         
             runat="server">
+
             <Columns>                       
 
                 <asp:BoundField HeaderText="Date Submitted" DataField="date_submitted" />
@@ -22,7 +33,7 @@
                 <%--comments--%>
 
                 <%--action buttons--%>
-                <asp:TemplateField  HeaderText="Action">
+                <asp:TemplateField  HeaderText="">
                     <ItemTemplate>   
 
                         <%--employee buttons--%>
