@@ -263,6 +263,15 @@ namespace HR_LEAVEv2.UserControls
                 {
                     // update status to recommended
                     status = "Approved";
+
+                    // TODO: Subtract Leave from balance
+                }
+                // TODO: undo
+                else if (commandName == "undo")
+                {
+                    // reset status to Recommended
+                    // Add leave back to balance
+
                 }
                 // if hr view then update status, hr_id, hr_edit_date
                 sqlCommand.CommandText = $@"
@@ -306,13 +315,25 @@ namespace HR_LEAVEv2.UserControls
             return columnIndex;
         }
 
+        // changing button view - row by row
         protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             int buttonColumnIndex = e.Row.Cells.Count - 1;
+            int undoColumnIndex = buttonColumnIndex - 1;
+
+            // init all undos to invisible
+            e.Row.Cells[undoColumnIndex].Visible = false;
 
             // remove border on last column
             e.Row.Cells[buttonColumnIndex].Style.Add("BORDER", "0px");
 
+            // get leave status for that row
+            string leaveStatus = null;
+            if(e.Row.RowType == DataControlRowType.DataRow)
+            {
+                int statusIndex = GetColumnIndexByName(e.Row, "status");
+                leaveStatus = e.Row.Cells[statusIndex].Text.ToString();
+            }
 
             // if employee view OR hr view
             if (gridViewType == "emp" || gridViewType == "hr")
@@ -324,6 +345,10 @@ namespace HR_LEAVEv2.UserControls
                     int index = GetColumnIndexByName(e.Row, "start_date");
                     startDate = DateTime.Parse(e.Row.Cells[index].Text);
                 }
+
+                // FIXME:
+                // If Sick (only situation where you apply for leave AFTER) - then show change and UNDO buttons for 1 Week following the application date
+                // Else - remove buttons once Current Date > Start Date
                 
                 // if leave time has started then you cannot apply for a date change
                 if (DateTime.Now > startDate)
@@ -331,21 +356,25 @@ namespace HR_LEAVEv2.UserControls
                     // hide button for just this row
                     e.Row.Cells[e.Row.Cells.Count - 1].Visible = false;
                 }
+                else if(gridViewType == "hr" && leaveStatus == "Approved") // leave not started and you are hr AND you approved someone's leave 
+                {
+                    // then show undo for that row only 
+                    e.Row.Cells[e.Row.Cells.Count - 2].Visible = true;
+
+                    // remove border on undo column
+                    e.Row.Cells[undoColumnIndex].Style.Add("BORDER", "0px");
+
+                    // and hide Approve/Not Approve
+                    e.Row.Cells[e.Row.Cells.Count - 1].Visible = false;
+                    // TODO: figure out how to show undo only
+                }               
+
             }
 
             // if supervisor view
             else if (gridViewType == "sup")
-            {
-                
+            {                
                 e.Row.Cells[buttonColumnIndex].Visible = true;
-
-                // get leave status for that row
-                string leaveStatus = null;
-                if(e.Row.RowType == DataControlRowType.DataRow)
-                {
-                    int statusIndex = GetColumnIndexByName(e.Row, "status");
-                    leaveStatus = e.Row.Cells[statusIndex].Text.ToString();
-                }
                 
                 // only show buttons if HR have not Approved or Not Approved the leave
                 // else do not show buttons

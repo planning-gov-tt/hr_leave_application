@@ -1,7 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MainGridView.ascx.cs" Inherits="HR_LEAVEv2.UserControls.MainGridView" %>
 
 
-<div>
+<div class="container">
 
     <center>    
 
@@ -32,6 +32,18 @@
                 <asp:BoundField HeaderText="Status" DataField="status" />
                 <%--comments--%>
 
+                <%--undo button only--%>
+                <asp:TemplateField  HeaderText="">
+                    <ItemTemplate>   
+                        <asp:Button ID="btnUndo" class="btn btn-warning" Visible=<%# btnHrVisible %> runat="server"
+                            CommandName="undo"
+                            CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                            Text="⮌"
+                            ToolTip="Undo Approve" />                             
+                    </ItemTemplate>
+                </asp:TemplateField>
+                
+                                
                 <%--action buttons--%>
                 <asp:TemplateField  HeaderText="">
                     <ItemTemplate>   
@@ -65,7 +77,7 @@
                             CommandName="approved"
                             CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
                             Text="✔"
-                            ToolTip="Approved" />
+                            ToolTip="Approved" />                                          
 
                     </ItemTemplate>
                 </asp:TemplateField>
