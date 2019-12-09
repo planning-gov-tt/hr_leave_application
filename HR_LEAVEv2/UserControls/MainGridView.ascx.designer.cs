@@ -7,18 +7,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HR_LEAVEv2.Employee {
+namespace HR_LEAVEv2.UserControls {
     
     
-    public partial class MyAccount {
+    public partial class MainGridView {
         
         /// <summary>
-        /// GridViewWebControlEmp control.
+        /// GridView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::HR_LEAVEv2.UserControls.MainGridView GridViewWebControlEmp;
+        protected global::System.Web.UI.WebControls.GridView GridView;
     }
 }
