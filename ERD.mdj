@@ -452,7 +452,7 @@
 									"font": "Arial;13;1",
 									"left": 592,
 									"top": 1373,
-									"width": 243.560546875,
+									"width": 271.71875,
 									"height": 13,
 									"text": "Leave Transaction"
 								},
@@ -478,7 +478,7 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1396,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -493,22 +493,7 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1411,
-											"width": 233.560546875,
-											"height": 13
-										},
-										{
-											"_type": "ERDColumnView",
-											"_id": "AAAAAAFuZZ2KxQG713M=",
-											"_parent": {
-												"$ref": "AAAAAAFt+auOnm7UNEM="
-											},
-											"model": {
-												"$ref": "AAAAAAFuZZ2KfgG4N54="
-											},
-											"font": "Arial;13;0",
-											"left": 597,
-											"top": 1426,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -522,8 +507,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1441,
-											"width": 233.560546875,
+											"top": 1426,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -537,8 +522,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1456,
-											"width": 233.560546875,
+											"top": 1441,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -552,8 +537,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1471,
-											"width": 233.560546875,
+											"top": 1456,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -567,8 +552,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1486,
-											"width": 233.560546875,
+											"top": 1471,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -582,8 +567,23 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
+											"top": 1486,
+											"width": 261.71875,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFurQu9+a1bSAc=",
+											"_parent": {
+												"$ref": "AAAAAAFt+auOnm7UNEM="
+											},
+											"model": {
+												"$ref": "AAAAAAFurQu9oa1Yq/g="
+											},
+											"font": "Arial;13;0",
+											"left": 597,
 											"top": 1501,
-											"width": 233.560546875,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -598,7 +598,22 @@
 											"font": "Arial;13;0",
 											"left": 597,
 											"top": 1516,
-											"width": 233.560546875,
+											"width": 261.71875,
+											"height": 13
+										},
+										{
+											"_type": "ERDColumnView",
+											"_id": "AAAAAAFurRSpB61onao=",
+											"_parent": {
+												"$ref": "AAAAAAFt+auOnm7UNEM="
+											},
+											"model": {
+												"$ref": "AAAAAAFurRSoya1lqUY="
+											},
+											"font": "Arial;13;0",
+											"left": 597,
+											"top": 1531,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -612,8 +627,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1531,
-											"width": 233.560546875,
+											"top": 1546,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -627,8 +642,8 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1546,
-											"width": 233.560546875,
+											"top": 1561,
+											"width": 261.71875,
 											"height": 13
 										},
 										{
@@ -642,23 +657,23 @@
 											},
 											"font": "Arial;13;0",
 											"left": 597,
-											"top": 1561,
-											"width": 233.560546875,
+											"top": 1576,
+											"width": 261.71875,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 592,
 									"top": 1391,
-									"width": 243.560546875,
-									"height": 188
+									"width": 271.71875,
+									"height": 203
 								}
 							],
 							"font": "Arial;13;0",
 							"left": 592,
 							"top": 1368,
-							"width": 243.560546875,
-							"height": 211,
+							"width": 271.71875,
+							"height": 226,
 							"nameLabel": {
 								"$ref": "AAAAAAFt+auOnm7T1aw="
 							},
@@ -880,7 +895,7 @@
 									},
 									"visible": false,
 									"font": "Arial;13;0",
-									"left": 767,
+									"left": 719,
 									"top": 1254,
 									"height": 13,
 									"alpha": 1.5707963267948966,
@@ -897,7 +912,7 @@
 										"$ref": "AAAAAAFt+cZBYnA73UQ="
 									},
 									"font": "Arial;13;0",
-									"left": 767,
+									"left": 719,
 									"top": 1173,
 									"height": 13,
 									"alpha": 0.5235987755982988,
@@ -914,7 +929,7 @@
 										"$ref": "AAAAAAFt+cZBYnA73UQ="
 									},
 									"font": "Arial;13;0",
-									"left": 767,
+									"left": 719,
 									"top": 1336,
 									"height": 13,
 									"alpha": -0.5235987755982988,
@@ -932,7 +947,7 @@
 								"$ref": "AAAAAAFt+ar4IG6o4JY="
 							},
 							"lineStyle": 2,
-							"points": "752:1154;752:1368",
+							"points": "704:1154;704:1368",
 							"nameLabel": {
 								"$ref": "AAAAAAFt+cZBYnA8uK8="
 							},
@@ -1740,9 +1755,9 @@
 							"font": "Arial;13;0",
 							"left": 912,
 							"top": 1640,
-							"width": 177,
+							"width": 169,
 							"height": 121,
-							"text": "States:\nSubmitted (Qualified Y/N?)\nRequest to change dates\nSupervisor Approved\nSupervisor Denied\nHR Approved\nHR Denied\n"
+							"text": "Status:\nPending\nDate Change Requested\nRecommended\nNot Recommended\nApproved\nNot Approved\n"
 						},
 						{
 							"_type": "UMLNoteLinkView",
@@ -1787,7 +1802,7 @@
 								"$ref": "AAAAAAFt+auOnm7SBAs="
 							},
 							"lineStyle": 1,
-							"points": "591:1463;521:1457"
+							"points": "591:1466;521:1458"
 						},
 						{
 							"_type": "ERDEntityView",
@@ -1963,8 +1978,8 @@
 							"left": 408,
 							"top": 1632,
 							"width": 121,
-							"height": 137,
-							"text": "Leave Types:\nSick\nPersonal/Casual\nVacation\nNo Pay\nBereavement\nMaternity\nPre-retirement"
+							"height": 145,
+							"text": "Leave Types:\nSick\nPersonal/Casual\nVacation\nNo Pay\nBereavement\nMaternity\nPre-retirement\nLeave Renewal"
 						},
 						{
 							"_type": "UMLNoteLinkView",
@@ -1980,7 +1995,7 @@
 								"$ref": "AAAAAAFuZZ9dRwHNKPo="
 							},
 							"lineStyle": 1,
-							"points": "567:1686;529:1691"
+							"points": "567:1687;529:1694"
 						},
 						{
 							"_type": "ERDEntityView",
@@ -2292,7 +2307,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 745,
-									"top": 1598,
+									"top": 1605,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -2326,7 +2341,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 745,
-									"top": 1597,
+									"top": 1612,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 30,
@@ -2343,7 +2358,7 @@
 								"$ref": "AAAAAAFuZZogKAFBx5Q="
 							},
 							"lineStyle": 2,
-							"points": "760:1632;760:1578",
+							"points": "760:1632;760:1593",
 							"nameLabel": {
 								"$ref": "AAAAAAFuZZsFvQGcwDw="
 							},
@@ -2441,7 +2456,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 641,
-									"top": 1602,
+									"top": 1609,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -2475,7 +2490,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 641,
-									"top": 1597,
+									"top": 1612,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 30,
@@ -2492,7 +2507,7 @@
 								"$ref": "AAAAAAFuZZ9dRwHNKPo="
 							},
 							"lineStyle": 2,
-							"points": "656:1640;656:1578",
+							"points": "656:1640;656:1593",
 							"nameLabel": {
 								"$ref": "AAAAAAFuZZ+tdQHovTQ="
 							},
@@ -3365,6 +3380,87 @@
 							"headNameLabel": {
 								"$ref": "AAAAAAFufq+oOZOYBVw="
 							}
+						},
+						{
+							"_type": "ERDRelationshipView",
+							"_id": "AAAAAAFuqIxhG6chOaE=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ardZm6ip4I="
+							},
+							"model": {
+								"$ref": "AAAAAAFuqIxhGacdLo0="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFuqIxhG6cidTw=",
+									"_parent": {
+										"$ref": "AAAAAAFuqIxhG6chOaE="
+									},
+									"visible": false,
+									"font": "Arial;13;0",
+									"left": 767,
+									"top": 1254,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFuqIxhG6chOaE="
+									},
+									"edgePosition": 1
+								},
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFuqIxhG6cjLgo=",
+									"_parent": {
+										"$ref": "AAAAAAFuqIxhG6chOaE="
+									},
+									"font": "Arial;13;0",
+									"left": 767,
+									"top": 1173,
+									"height": 13,
+									"alpha": 0.5235987755982988,
+									"distance": 30,
+									"hostEdge": {
+										"$ref": "AAAAAAFuqIxhG6chOaE="
+									},
+									"edgePosition": 2
+								},
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFuqIxhG6ckIpE=",
+									"_parent": {
+										"$ref": "AAAAAAFuqIxhG6chOaE="
+									},
+									"font": "Arial;13;0",
+									"left": 767,
+									"top": 1336,
+									"height": 13,
+									"alpha": -0.5235987755982988,
+									"distance": 30,
+									"hostEdge": {
+										"$ref": "AAAAAAFuqIxhG6chOaE="
+									}
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFt+auOnm7SBAs="
+							},
+							"tail": {
+								"$ref": "AAAAAAFt+ar4IG6o4JY="
+							},
+							"lineStyle": 2,
+							"points": "752:1154;752:1368",
+							"nameLabel": {
+								"$ref": "AAAAAAFuqIxhG6cidTw="
+							},
+							"tailNameLabel": {
+								"$ref": "AAAAAAFuqIxhG6cjLgo="
+							},
+							"headNameLabel": {
+								"$ref": "AAAAAAFuqIxhG6ckIpE="
+							}
 						}
 					]
 				},
@@ -3623,6 +3719,34 @@
 								},
 								"reference": {
 									"$ref": "AAAAAAFufpsVgJLQJ6s="
+								},
+								"cardinality": "0..*"
+							}
+						},
+						{
+							"_type": "ERDRelationship",
+							"_id": "AAAAAAFuqIxhGacdLo0=",
+							"_parent": {
+								"$ref": "AAAAAAFt+ar4H26mFR4="
+							},
+							"end1": {
+								"_type": "ERDRelationshipEnd",
+								"_id": "AAAAAAFuqIxhGaceRRQ=",
+								"_parent": {
+									"$ref": "AAAAAAFuqIxhGacdLo0="
+								},
+								"reference": {
+									"$ref": "AAAAAAFt+ar4H26mFR4="
+								}
+							},
+							"end2": {
+								"_type": "ERDRelationshipEnd",
+								"_id": "AAAAAAFuqIxhGacfrw8=",
+								"_parent": {
+									"$ref": "AAAAAAFuqIxhGacdLo0="
+								},
+								"reference": {
+									"$ref": "AAAAAAFt+auOnm7QoiE="
 								},
 								"cardinality": "0..*"
 							}
@@ -3917,7 +4041,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
 							},
-							"name": "Event Id",
+							"name": "Transaction Id",
 							"length": 0,
 							"primaryKey": true
 						},
@@ -3929,15 +4053,6 @@
 							},
 							"name": "Created At",
 							"type": "TIMESTAMP",
-							"length": 0
-						},
-						{
-							"_type": "ERDColumn",
-							"_id": "AAAAAAFuZZ2KfgG4N54=",
-							"_parent": {
-								"$ref": "AAAAAAFt+auOnm7QoiE="
-							},
-							"name": "Last Modified",
 							"length": 0
 						},
 						{
@@ -4000,6 +4115,15 @@
 						},
 						{
 							"_type": "ERDColumn",
+							"_id": "AAAAAAFurQu9oa1Yq/g=",
+							"_parent": {
+								"$ref": "AAAAAAFt+auOnm7QoiE="
+							},
+							"name": "Supervisor Edit Date",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
 							"_id": "AAAAAAFt+bMIQW/j348=",
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
@@ -4015,11 +4139,20 @@
 						},
 						{
 							"_type": "ERDColumn",
+							"_id": "AAAAAAFurRSoya1lqUY=",
+							"_parent": {
+								"$ref": "AAAAAAFt+auOnm7QoiE="
+							},
+							"name": "HR Manager Edit Date",
+							"length": 0
+						},
+						{
+							"_type": "ERDColumn",
 							"_id": "AAAAAAFt+c8OHLMCfVk=",
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
 							},
-							"name": "State",
+							"name": "Status",
 							"documentation": "In Progress\nSupervisor Approved\nSupervisor Denied\nHR Approved\nHR Denied\nPS Approved\nPS Denied",
 							"length": 0,
 							"foreignKey": true,
@@ -4033,7 +4166,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFt+auOnm7QoiE="
 							},
-							"name": "Message Body",
+							"name": "Comments",
 							"length": 0
 						},
 						{
