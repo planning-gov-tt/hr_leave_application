@@ -11,13 +11,12 @@ namespace HR_LEAVEv2
         {
             Auth auth = new Auth();
             // store employee's email in Session
-
+            
             if (Session["emp_email"] == null)
             {
-                //Session["emp_email"] = auth.activeDirectorySearch();
-                Session["emp_email"] = "melanie.noel@planning.gov.tt";
+                //Session["emp_email"] = auth.getEmailOfSignedInUserFromActiveDirectory();
+                Session["emp_email"] = "Nazmoon.Khan@planning.gov.tt";
             }
-
 
             // store employee's id in Session
             if (Session["emp_id"] == null && Session["emp_email"] != null)
