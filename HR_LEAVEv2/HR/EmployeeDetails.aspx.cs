@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.HR
@@ -13,7 +14,13 @@ namespace HR_LEAVEv2.HR
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!this.IsPostBack)
+            {
                 this.bindGridview();
+                ViewState["empTypeList_startIndex"] = empTypeList.SelectedIndex;
+                ViewState["deptList_startIndex"] = deptList.SelectedIndex;
+                ViewState["positionList_startIndex"] = positionList.SelectedIndex;
+            }
+                
         }
 
         protected Boolean validateDates(string startDate, string endDate)
@@ -126,10 +133,30 @@ namespace HR_LEAVEv2.HR
                 GridView1.DataBind();
 
             }
+            this.resetAddEmploymentRecordFormFields();
+        }
+
+        protected void resetAddEmploymentRecordFormFields()
+        {
+            txtStartDate.Text = String.Empty;
+            txtEndDate.Text = String.Empty;
+
+            if(ViewState["empTypeList_startIndex"] != null && ViewState["deptList_startIndex"] != null && ViewState["positionList_startIndex"] != null)
+            {
+                int empTypeList_index = (int)ViewState["empTypeList_startIndex"];
+                empTypeList.SelectedIndex = empTypeList_index;
+                int deptList_index = (int)ViewState["deptList_startIndex"];
+                deptList.SelectedIndex = deptList_index;
+                int positionList_index = (int)ViewState["positionList_startIndex"];
+                positionList.SelectedIndex = positionList_index;
+
+            }
         }
 
         protected void cancelNewRecordBtn_Click(object sender, EventArgs e)
         {
+            //reset fields
+            this.resetAddEmploymentRecordFormFields();
             addEmpRecordForm.Style.Add("display", "none");
             showFormBtn.Style.Add("display", "inline-block");
         }
@@ -164,58 +191,69 @@ namespace HR_LEAVEv2.HR
         protected void submitBtn_Click(object sender, EventArgs e)
         {
             fullFormErrorPanel.Style.Add("display", "none");
+            emailNotFoundErrorPanel.Style.Add("display", "none");
+            noEmploymentRecordEnteredErrorPanel.Style.Add("display", "none");
+            fullFormSubmitSuccessPanel.Style.Add("display", "none");
 
             // get data from every field and submit
 
             string emp_id, ihris_id, email, firstname, lastname, sick_leave, personal_leave, casual_leave, vacation_leave, bereavement_leave, maternity_leave, pre_retirement_leave;
             List<string> authorizations = new List<string>() { "emp" };
+            DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
 
             emp_id = employeeIdInput.Text;
             ihris_id = ihrisNumInput.Text;
             email = adEmailInput.Text;
 
+            
+
             // get first name, last name and username from active directory
             Auth auth = new Auth();
-            string[] name = auth.getUserInfoFromActiveDirectory(email).Split(' ');
-            firstname = name[0];
-            lastname = name[1];
+            string nameFromAd = auth.getUserInfoFromActiveDirectory(email);
 
-            string username = $"PLANNING\\ {firstname} {lastname}";
+            Boolean isInsertSuccessful = false;
 
-            // get data from checkboxes
-            if (supervisorCheck.Checked)
-                authorizations.Add("sup");
-            if (hr1Check.Checked)
-                authorizations.Add("hr1");
-            if (hr2Check.Checked)
-                authorizations.Add("hr2");
-            if (hr3Check.Checked)
-                authorizations.Add("hr3");
-            
-            if(hr2Check.Checked || hr3Check.Checked)
+            if (!String.IsNullOrEmpty(nameFromAd) && dt !=null )
             {
-                if (contractCheck.Checked)
-                    authorizations.Add("hr_contract");
-                if (publicServiceCheck.Checked)
-                    authorizations.Add("hr_public_officer");
-            }
+                // set first and last name
+                string[] name = nameFromAd.Split(' ');
+                firstname = name[0];
+                lastname = name[1];
 
-            // get data from leave 
-            sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
-            personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
-            casual_leave = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
-            vacation_leave = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
-            bereavement_leave = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
-            maternity_leave = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
-            pre_retirement_leave = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
+                //set username
+                string username = $"PLANNING\\ {firstname} {lastname}";
 
-            // insert all data except employment record data
-            // that is, insert all data that must be inserted into the employee table
+                // get data from checkboxes and set authorizations
+                if (supervisorCheck.Checked)
+                    authorizations.Add("sup");
+                if (hr1Check.Checked)
+                    authorizations.Add("hr1");
+                if (hr2Check.Checked)
+                    authorizations.Add("hr2");
+                if (hr3Check.Checked)
+                    authorizations.Add("hr3");
 
-            Boolean employeeInsert = false;
-            try
-            {
-                string sql = $@"
+                if (hr2Check.Checked || hr3Check.Checked)
+                {
+                    if (contractCheck.Checked)
+                        authorizations.Add("hr_contract");
+                    if (publicServiceCheck.Checked)
+                        authorizations.Add("hr_public_officer");
+                }
+
+                // get data from leave 
+                sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
+                personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
+                casual_leave = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
+                vacation_leave = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
+                bereavement_leave = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
+                maternity_leave = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
+                pre_retirement_leave = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
+
+                // insert all data 
+                try
+                {
+                    string sql = $@"
                         INSERT INTO [dbo].[employee]
                            ([employee_id]
                               ,[ihris_id]
@@ -247,116 +285,112 @@ namespace HR_LEAVEv2.HR
                             );
                     ";
 
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                     {
-                        command.Parameters.AddWithValue("@EmployeeId", emp_id);
-                        command.Parameters.AddWithValue("@IhrisId", ihris_id);
-                        command.Parameters.AddWithValue("@Username", username);
-                        command.Parameters.AddWithValue("@FirstName", firstname);
-                        command.Parameters.AddWithValue("@LastName", lastname);
-                        command.Parameters.AddWithValue("@Email", email);
-                        command.Parameters.AddWithValue("@Vacation", vacation_leave);
-                        command.Parameters.AddWithValue("@Personal", personal_leave);
-                        command.Parameters.AddWithValue("@Casual", casual_leave);
-                        command.Parameters.AddWithValue("@Sick", sick_leave);
-                        command.Parameters.AddWithValue("@Bereavement", bereavement_leave);
-                        command.Parameters.AddWithValue("@Maternity", maternity_leave);
-                        command.Parameters.AddWithValue("@PreRetirement", pre_retirement_leave);
-
-                        int rowsAffected = command.ExecuteNonQuery();
-                        if (rowsAffected > 0)
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            employeeInsert = true;
-                        }
+                            command.Parameters.AddWithValue("@EmployeeId", emp_id);
+                            command.Parameters.AddWithValue("@IhrisId", ihris_id);
+                            command.Parameters.AddWithValue("@Username", username);
+                            command.Parameters.AddWithValue("@FirstName", firstname);
+                            command.Parameters.AddWithValue("@LastName", lastname);
+                            command.Parameters.AddWithValue("@Email", email);
+                            command.Parameters.AddWithValue("@Vacation", vacation_leave);
+                            command.Parameters.AddWithValue("@Personal", personal_leave);
+                            command.Parameters.AddWithValue("@Casual", casual_leave);
+                            command.Parameters.AddWithValue("@Sick", sick_leave);
+                            command.Parameters.AddWithValue("@Bereavement", bereavement_leave);
+                            command.Parameters.AddWithValue("@Maternity", maternity_leave);
+                            command.Parameters.AddWithValue("@PreRetirement", pre_retirement_leave);
 
+                            int rowsAffected = command.ExecuteNonQuery();
+                            if (rowsAffected > 0)
+                            {
+                                isInsertSuccessful = true;
+                            }
+
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                // exception logic
-                fullFormErrorPanel.Style.Add("display", "inline-block");
-            }
-
-            if (employeeInsert)
-            {
-                // add roles to employee
-                Boolean rolesInsert = false;
-                foreach(string role in authorizations)
+                catch (Exception ex)
                 {
-                    try
+                    // exception logic
+                    isInsertSuccessful = false;
+                }
+
+                if (isInsertSuccessful)
+                {
+                    isInsertSuccessful = false;
+                    // add roles to employee
+                    foreach (string role in authorizations)
                     {
-                        string sql = $@"
-                        INSERT INTO [dbo].[employeerole]
-                           ([employee_id]
-                              ,[role_id])
-                        VALUES
-                           ( @EmployeeId
-                            ,@RoleId
-                            );
-                    ";
-
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        try
                         {
-                            connection.Open();
-                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            string sql = $@"
+                            INSERT INTO [dbo].[employeerole]
+                               ([employee_id]
+                                  ,[role_id])
+                            VALUES
+                               ( @EmployeeId
+                                ,@RoleId
+                                );
+                        ";
+
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                             {
-                                command.Parameters.AddWithValue("@EmployeeId", emp_id);
-                                command.Parameters.AddWithValue("@RoleId", role);
-
-                                int rowsAffected = command.ExecuteNonQuery();
-                                if (rowsAffected > 0)
+                                connection.Open();
+                                using (SqlCommand command = new SqlCommand(sql, connection))
                                 {
-                                    rolesInsert = true;
-                                }
+                                    command.Parameters.AddWithValue("@EmployeeId", emp_id);
+                                    command.Parameters.AddWithValue("@RoleId", role);
 
+                                    int rowsAffected = command.ExecuteNonQuery();
+                                    if (rowsAffected > 0)
+                                    {
+                                        isInsertSuccessful = true;
+                                    }
+
+                                }
                             }
                         }
+                        catch (Exception ex)
+                        {
+                            // exception logic
+                            isInsertSuccessful = false;
+                            break;
+                        }
                     }
-                    catch (Exception ex)
+                    if (isInsertSuccessful)
                     {
-                        // exception logic
-                        fullFormErrorPanel.Style.Add("display", "inline-block");
-                        rolesInsert = false;
-                        break;
-                    }
-                }
-                if (rolesInsert)
-                {
-                    //get data from gridview
-                    DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
-                    if (dt != null)
-                    {
+                        isInsertSuccessful = false;
+                        //get data from gridview
                         /**
-                         * gets data from datatable which is formatted in the folowing manner:
-                         * 
-                         * Columns : employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date
-                         * */
-                        Boolean empRecordInsert = false;
+                            * gets data from datatable which is formatted in the folowing manner:
+                            * 
+                            * Columns : employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date
+                            * */
                         foreach (DataRow dr in dt.Rows)
                         {
                             try
                             {
                                 string sql = $@"
-                                INSERT INTO [dbo].[employeeposition]
-                                   ([employee_id]
-                                      ,[position_id]
-                                      ,[start_date]
-                                      ,[expected_end_date]
-                                      ,[employment_type]
-                                      ,[dept_id])
-                                VALUES
-                                   ( @EmployeeId
-                                    ,@PositionId
-                                    ,@StartDate
-                                    ,@ExpectedEndDate
-                                    ,@EmploymentType
-                                    ,@DeptId
-                                    );
-                            ";
+                                    INSERT INTO [dbo].[employeeposition]
+                                        ([employee_id]
+                                            ,[position_id]
+                                            ,[start_date]
+                                            ,[expected_end_date]
+                                            ,[employment_type]
+                                            ,[dept_id])
+                                    VALUES
+                                        ( @EmployeeId
+                                        ,@PositionId
+                                        ,@StartDate
+                                        ,@ExpectedEndDate
+                                        ,@EmploymentType
+                                        ,@DeptId
+                                        );
+                                ";
 
                                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                                 {
@@ -373,7 +407,8 @@ namespace HR_LEAVEv2.HR
                                         int rowsAffected = command.ExecuteNonQuery();
                                         if (rowsAffected > 0)
                                         {
-                                            empRecordInsert = true;
+                                            isInsertSuccessful = true;
+                                            fullFormSubmitSuccessPanel.Style.Add("display", "inline-block");
                                         }
 
                                     }
@@ -382,22 +417,27 @@ namespace HR_LEAVEv2.HR
                             catch (Exception ex)
                             {
                                 // exception logic
-                                fullFormErrorPanel.Style.Add("display", "inline-block");
-                                empRecordInsert = false;
+                                isInsertSuccessful = false;
                             }
-                            if (empRecordInsert)
-                                fullFormSubmitSuccessPanel.Style.Add("display", "inline-block");
                         }
                     }
-                } else // error adding roles
-                {
-                    fullFormErrorPanel.Style.Add("display", "inline-block");
                 }
-            } else // error adding employee
+            }
+            else
             {
-                fullFormErrorPanel.Style.Add("display", "inline-block");
+                if (String.IsNullOrEmpty(nameFromAd))
+                    emailNotFoundErrorPanel.Style.Add("display", "inline-block");
+                if (dt == null)
+                    noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
+                isInsertSuccessful = false;
             }
 
+            if (!isInsertSuccessful)
+                fullFormErrorPanel.Style.Add("display", "inline-block");
+
+            //scroll to top of page
+            Page.MaintainScrollPositionOnPostBack = false;
+            this.empDetailsContainer.Focus();
         }
 
         protected void refreshForm(object sender, EventArgs e)
