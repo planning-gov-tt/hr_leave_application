@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -12,7 +13,33 @@ namespace HR_LEAVEv2
     public class Auth
     {
 
-        public string activeDirectorySearch()
+        public string getUserInfoFromActiveDirectory(string email)
+        {
+
+            string filter = string.Format("(proxyaddresses=SMTP:{0})", email);
+
+            using (DirectoryEntry gc = new DirectoryEntry("LDAP:"))
+            {
+                foreach (DirectoryEntry z in gc.Children)
+                {
+                    using (DirectoryEntry root = z)
+                    {
+                        using (DirectorySearcher searcher = new DirectorySearcher(root, filter, new string[] { "Name" }))
+                        {
+                            searcher.ReferralChasing = ReferralChasingOption.All;
+                            SearchResult result = searcher.FindOne();
+
+                            IEnumerator en=  result.Properties["name"].GetEnumerator();
+                            en.MoveNext();
+                            return en.Current != null ? en.Current.ToString() : null;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public string getEmailOfSignedInUserFromActiveDirectory()
         {
             // create domain context
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
@@ -26,11 +53,6 @@ namespace HR_LEAVEv2
             }
             return null;
         }
-
-        //public string getCurrentUserActiveDirectoryEmail()
-        //{
-        //    return UserPrincipal.Current.EmailAddress;
-        //}
 
         public string getUserEmployeeId(string email)
         {

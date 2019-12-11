@@ -149,7 +149,7 @@
                     </asp:Panel>
                     <asp:Panel ID="hr3Panel" runat="server">
                         <li>
-                            <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
+                            <a href="<%= ResolveClientUrl("~/HR/AllEmployees.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
                                 <i class="fa fa-users navbar-link-icon"></i>
                                 <span class="navbar-link-text">All Employees</span>
                             </a>
