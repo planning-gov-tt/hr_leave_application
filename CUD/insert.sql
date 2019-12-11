@@ -53,6 +53,8 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 ('hr1', 'crud_emp_info'),
 ('hr1', 'approve_vacation'),
 ('hr1', 'assign_role'),
+('hr1', 'contract_permissions'),
+('hr1', 'public_officer_permissions'),
 
 ('hr_contract', 'contract_permissions'),
 
@@ -82,6 +84,11 @@ INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name
 ('87465', '87465', 'PLANNING\ Kathy-Ann Williams', 'Kathy-Ann', 'Williams', 'Kathy-Ann.Williams@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0), -- HRO1
 ('09246', '09246', 'PLANNING\ Suzette Maraj', 'Suzette', 'Maraj', 'Suzette.Maraj@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0), -- AO2
 ('01548', '01548', 'PLANNING\ Nazmoon Khan', 'Nazmoon', 'Khan', 'Nazmoon.Khan@planning.gov.tt', 30, 0, 5, 14, 2, 0, 30), -- HRO3
+-- testing hard filter
+-- adding pauline under charmichael (hr2) as contract
+('38137', '38137', 'PLANNING\ Pauline Solozano', 'Pauline', 'Solozano', 'Pauline.Solozano@planning.gov.tt', 30, 0, 5, 14, 2, 0, 30), -- HRO3
+-- adding usha under nazmoon (hr2) as public servant
+('05356', '05356', 'PLANNING\ Usha Balkaran', 'Usha', 'Balkaran', 'Usha.Balkaran@planning.gov.tt', 30, 0, 5, 14, 2, 0, 30), -- HRO3
 
 -- PS
 ('07525', '07525', 'PLANNING\ Joanne Deoraj', 'Joanne', 'Deoraj', 'Joanne.Deoraj@planning.gov.tt', 50, 0, 5, 14, 2, 0, 0); -- PS
@@ -104,8 +111,14 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 -- HR
 ('83612', 'hr1'),
 
+-- hr2 can see and approve sick and casual ONLY
+-- can see and approve contract ONLY
 ('11948', 'hr2'),
 ('11948', 'hr_contract'),
+
+-- can see and approve public_services ONLY
+('01548', 'hr2'),
+('01548', 'hr_public_officer'),
 
 ('01511', 'hr3'),
 ('01511', 'hr_contract'),
@@ -118,10 +131,13 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 
 ('09246', 'sup'),
 
-('01548', 'hr2'),
-('01548', 'hr_public_officer'),
+('07525','hr1'),
 
-('07525','hr1');
+('38137','emp'),
+
+('05356','emp')
+
+;
 
 
 INSERT INTO [dbo].[assignment] ([supervisee_id], [supervisor_id]) VALUES
@@ -141,11 +157,15 @@ INSERT INTO [dbo].[assignment] ([supervisee_id], [supervisor_id]) VALUES
 ('13888', '01548'),
 ('87465', '13888'),
 ('09246', '87465'),
-('01548', '83612');
+('01548', '83612'),
+('38137', '11948'),
+('05356', '01548')
+;
 
 
 INSERT INTO [dbo].[transactionstate] ([status_id]) VALUES 
 ('Pending'),
+('Cancelled'),
 ('Date Change Requested'),
 ('Recommended'),
 ('Not Recommended'),
@@ -175,23 +195,36 @@ INSERT INTO [dbo].[leavetransaction] ([transaction_id], [created_at], [employee_
 (1, '20191208 10:00:00 AM', '1', 'Sick', '20191201', '20191207', '115245', NULL, NULL, NULL, 'Pending', NULL, '1/20191201_doctor_note.pdf'),
 
 -- emp applies for sick leave to sup, recommended
-(2, '20191208 12:00:00 PM', '3', 'Sick', '20191201', '20191207', '115245', '20191208 12:10:00 PM', NULL, NULL, 'Recommended', 'Good Standing', '2/20191201_doctor_note.pdf'),
+(2, '20191208 12:00:00 PM', '3', 'Sick', '20201201', '20201207', '115245', '20191208 12:10:00 PM', NULL, NULL, 'Recommended', 'Good Standing', '2/20191201_doctor_note.pdf'),
 
 -- emp applies for vacation leave to sup, to hr, approved
-(3, '20191101 9:54:00 AM', '184164', 'Vacation', '20191201', '20191210', '123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved', 'Good', NULL),
+(3, '20191101 9:54:00 AM', '184164', 'Vacation', '20201201', '20201210', '123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved', 'Good', NULL),
 
 -- same employee applies for sick leave to sup, recommended
 (4, '20191110 9:54:00 AM', '184164', 'Sick', '20191109', '20191109', '123337', '20191111 10:05:12 AM', NULL, NULL, 'Recommended', NULL, '184164/20191110_doctor_note.pdf'),
 
 -- setup for demo
--- hr director applies to PS for vacation leave
+-- hr director applies to PS for vacation leave - after approval should not see your own app in hr gridview
 (5, '20191112 9:54:00 AM', '83612', 'Vacation', '20191212', '20200101', '07525', NULL, NULL, NULL, 'Pending', NULL, NULL),
 
 -- hr director applies to PS for sick leave
-(6, '20191125 12:54:00 PM', '83612', 'Sick', '20191123', '20191124', '07525', NULL, NULL, NULL, 'Pending', NULL, NULL),
+(6, '20191125 12:54:00 PM', '83612', 'Sick', '20191123', '20191124', '07525', NULL, NULL, NULL, 'Recommended', NULL, NULL),
 
 -- HRO3 applies to HR Director for sick leave (sup)
-(7, '20191125 12:54:00 PM', '11948', 'Sick', '20191123', '20191124', '83612', NULL, NULL, NULL, 'Pending', NULL, NULL);
+(7, '20191125 12:54:00 PM', '11948', 'Sick', '20201123', '20201124', '83612', NULL, NULL, NULL, 'Pending', NULL, NULL),
+
+-- hr2
+-- can see and approve sick and casual ONLY
+-- can see and approve contract ONLY
+(8, '20191125 12:54:00 PM', '38137', 'Sick', '20191123', '20191124', '11948', NULL, NULL, NULL, 'Recommended', NULL, NULL),
+
+-- can see and approve public_services ONLY
+(9, '20191125 12:54:00 PM', '05356', 'Casual', '20191123', '20191124', '01548', NULL, NULL, NULL, 'Recommended', NULL, NULL)
+
+-- hr1
+-- can see and appprove all other types (vacation etc)
+;
+
 
 SET IDENTITY_INSERT [dbo].[leavetransaction] OFF;
 
@@ -214,7 +247,8 @@ INSERT INTO [dbo].[position] ([pos_id], [pos_name], [pos_description], [vacation
 (3, 'Database Specialist', NULL, 15),
 (4, 'Director', NULL, 25),
 (5, 'Associate Professional', NULL, 0),
-(6, 'System''s Specialist', NULL, 30);
+(6, 'System''s Specialist', NULL, 30),
+(7, 'HR Staff', NULL, 30);
 
 SET IDENTITY_INSERT [dbo].[position] OFF;
 
@@ -233,6 +267,11 @@ INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start
 -- multiple periods of employment for one person
 (3, '115245', 6, '20101005', '20131005', NULL, 'Contract', 1),
 (4, '115245', 6, '20131005', '20160927', NULL, 'Contract', 1),
-(5, '115245', 6, '20160927', '20191225', NULL, 'Contract', 1);
+(5, '115245', 6, '20160927', '20191225', NULL, 'Contract', 1),
+
+-- contract and public servant
+(7, '38137', 7, '20160927', '20191225', NULL, 'Contract', 2),
+(8, '05356', 7, '20160927', '20191225', NULL, 'Public Service', 2)
+;
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;
