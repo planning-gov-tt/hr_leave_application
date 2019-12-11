@@ -28,10 +28,12 @@ namespace HR_LEAVEv2
                         {
                             searcher.ReferralChasing = ReferralChasingOption.All;
                             SearchResult result = searcher.FindOne();
-
-                            IEnumerator en=  result.Properties["name"].GetEnumerator();
-                            en.MoveNext();
-                            return en.Current != null ? en.Current.ToString() : null;
+                            if(result != null)
+                            {
+                                IEnumerator en = result.Properties["name"].GetEnumerator();
+                                en.MoveNext();
+                                return en.Current != null ? en.Current.ToString() : null;
+                            }
                         }
                     }
                 }
