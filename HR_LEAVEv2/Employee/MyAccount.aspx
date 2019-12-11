@@ -30,7 +30,12 @@
               <h3>Summary</h3>
           </div>
           <div class="tab-pane fade" id="viewLeaveLogs" role="tabpanel" aria-labelledby="viewLeaveLogsTab">
-              <h3>Leave Logs</h3>
+              <h3>My Leave Logs</h3>
+
+              <div id="leaveLogContainer">
+                  <TWebControl:GridViewWebControl ID ="GridViewWebControlEmp" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
+              </div>
+
           </div>
           <div class="tab-pane fade" id="editInfo" role="tabpanel" aria-labelledby="editInfoTab">
               <h3>Edit Account</h3>
