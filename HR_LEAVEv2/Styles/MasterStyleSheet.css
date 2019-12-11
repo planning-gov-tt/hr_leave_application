@@ -181,3 +181,10 @@ a, a:active, a:focus{
 }
 
 /* end styles for cards */
+
+/* styles for calendar picker icon */
+.calendar-icon{
+    cursor:pointer;
+    font-size: 1.3em;
+}
+/* end styles for calendar picker icon */

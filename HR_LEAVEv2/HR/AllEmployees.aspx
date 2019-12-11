@@ -11,17 +11,19 @@
       <div class="container-fluid">
         <div class="container" style="width:65%;">
             <div class="row" style="margin-top:25px;">
-                <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group" style="width:510px;margin:auto;">
-                    <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control"  placeholder="Search Employee" aria-label="Search Employee" aria-describedby="basic-addon2" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
-                    <div class="input-group-addon">
-                        <asp:LinkButton ID="searchBtn" runat="server" OnClick="searchBtn_Click">
-                            <span class="input-group-text" id="basic-addon2">
-                                <i class="fa fa-search"></i>
-                            </span>
-                        </asp:LinkButton>
-                    </div>
-                </asp:Panel>
-                
+                    <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group col-lg-9" style="width:510px; margin-left:25%;">
+                        <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control"  placeholder="Search Employee" aria-label="Search Employee" aria-describedby="basic-addon2" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
+                        <div class="input-group-addon">
+                            <asp:LinkButton ID="searchBtn" runat="server" OnClick="searchBtn_Click">
+                                <span class="input-group-text" id="basic-addon2">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                            </asp:LinkButton>
+                        </div>
+                    </asp:Panel>    
+                <div class="col-lg-3">
+                    <asp:Button ID="newEmployeeBtn" runat="server" Text="New Employee" CssClass="btn btn-primary" OnClick="newEmployeeBtn_Click"/>
+                </div>
                 <%--<div class="col-lg-4">
                     <label for="filterEmpSearchBy" style="font-size:1.0em">Filter by:</label>
                     <asp:DropDownList ID="filterEmpSearchBy" runat="server" CssClass="form-control" Width="150px" style="display:inline;" >
@@ -130,68 +132,68 @@
 
             <%--Modal--%>
 
-            <div class="modal fade" id="empDetailsModal" tabindex="-1" role="dialog" aria-labelledby="empDetailsTitle" aria-hidden="true" style="margin-top:10%;">
-              <div class="modal-dialog" role="document" style="width:65%;">
-                <div class="modal-content">
-                  <div class="modal-header text-center">
-                    <h2 class="modal-title" id="empDetailsTitle" style="display:inline; width:150px;">
-                        <span id="empNameDetails"></span>
-                    </h2>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body text-center">
-                      <h3>Details</h3>
-                      <div>
-                         <h4 style="display:inline">Employee ID:</h4>
-                         <span id="empIdDetails"></span>
-                      </div>
+            <div class="modal fade" id="empDetailsModal" tabindex="-1" role="dialog" aria-labelledby="empDetailsTitle" aria-hidden="true" style="margin-top: 10%;">
+                <div class="modal-dialog" role="document" style="width: 65%;">
+                    <div class="modal-content">
+                        <div class="modal-header text-center">
+                            <h2 class="modal-title" id="empDetailsTitle" style="display: inline; width: 150px;">
+                                <span id="empNameDetails"></span>
+                            </h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <h3>Details</h3>
+                            <div>
+                                <h4 style="display: inline">Employee ID:</h4>
+                                <span id="empIdDetails"></span>
+                            </div>
 
-                      <div>
-                         <h4 style="display:inline">IHRIS ID:</h4>
-                         <span id="ihrisIdDetails"></span>
-                      </div>
+                            <div>
+                                <h4 style="display: inline">IHRIS ID:</h4>
+                                <span id="ihrisIdDetails"></span>
+                            </div>
 
-                      <div>
-                         <h4 style="display:inline">Email:</h4>
-                         <span id="emailDetails"></span>
-                      </div>
-                      <div>
-                         <h4 style="display:inline">Employee Type:</h4>
-                         <span id="empTypeDetails"></span>
-                      </div>
-                      <div>
-                         <h4 style="display:inline">Employee Position:</h4>
-                         <span id="empPositionDetails"></span>
-                      </div>
-                      <hr style="width:45%;"/>
-                      <h3>Leave Balances</h3>
-                      <div>
-                         <h4 style="display:inline">Vacation Leave Balance:</h4>
-                         <span id="vacationDetails"></span>
-                      </div>
+                            <div>
+                                <h4 style="display: inline">Email:</h4>
+                                <span id="emailDetails"></span>
+                            </div>
+                            <div>
+                                <h4 style="display: inline">Employee Type:</h4>
+                                <span id="empTypeDetails"></span>
+                            </div>
+                            <div>
+                                <h4 style="display: inline">Employee Position:</h4>
+                                <span id="empPositionDetails"></span>
+                            </div>
+                            <hr style="width: 45%;" />
+                            <h3>Leave Balances</h3>
+                            <div>
+                                <h4 style="display: inline">Vacation Leave Balance:</h4>
+                                <span id="vacationDetails"></span>
+                            </div>
 
-                      <div>
-                         <h4 style="display:inline">Personal Leave Balance:</h4>
-                         <span id="personalDetails"></span>
-                      </div>
+                            <div>
+                                <h4 style="display: inline">Personal Leave Balance:</h4>
+                                <span id="personalDetails"></span>
+                            </div>
 
-                      <div>
-                         <h4 style="display:inline">Casual Leave Balance:</h4>
-                         <span id="casualDetails"></span>
-                      </div>
+                            <div>
+                                <h4 style="display: inline">Casual Leave Balance:</h4>
+                                <span id="casualDetails"></span>
+                            </div>
 
-                      <div>
-                         <h4 style="display:inline">Sick Leave Balance:</h4>
-                         <span id="sickDetails"></span>
-                      </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  </div>
+                            <div>
+                                <h4 style="display: inline">Sick Leave Balance:</h4>
+                                <span id="sickDetails"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
 
         </div>

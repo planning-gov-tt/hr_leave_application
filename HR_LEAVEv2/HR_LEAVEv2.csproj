@@ -132,6 +132,7 @@
     <None Include="Properties\PublishProfiles\TristanSankar.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="HR\AllEmployees.aspx" />
+    <Content Include="HR\EmployeeDetails.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -251,6 +252,13 @@
     </Compile>
     <Compile Include="HR\AllEmployees.aspx.designer.cs">
       <DependentUpon>AllEmployees.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="HR\EmployeeDetails.aspx.cs">
+      <DependentUpon>EmployeeDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="HR\EmployeeDetails.aspx.designer.cs">
+      <DependentUpon>EmployeeDetails.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">

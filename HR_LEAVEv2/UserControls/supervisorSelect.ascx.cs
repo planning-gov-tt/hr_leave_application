@@ -8,6 +8,7 @@ namespace HR_LEAVEv2.UserControls
     public partial class supervisorSelect : System.Web.UI.UserControl
     {
         public string selectedSupId = "-1";
+        public string validationGroup { get; set; }
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -23,6 +24,10 @@ namespace HR_LEAVEv2.UserControls
                         SqlDataSource1.SelectParameters.Clear();
                         SqlDataSource1.SelectParameters.Add("supervisorId", Session["emp_id"].ToString());
                     }
+                }
+                if (!String.IsNullOrEmpty(validationGroup))
+                {
+                    comboBoxRequiredValidator.ValidationGroup = validationGroup;
                 }
             }
             
