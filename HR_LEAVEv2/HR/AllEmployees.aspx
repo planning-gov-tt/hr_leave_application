@@ -201,7 +201,16 @@
 
     <script>
         $('.show-details-btn').click(function () {
-            
+            $('#empNameDetails').text("");
+            $('#empIdDetails').text("");
+            $('#ihrisIdDetails').text("");
+            $('#emailDetails').text("");
+            $('#vacationDetails').text("");
+            $('#personalDetails').text("");
+            $('#casualDetails').text("");
+            $('#sickDetails').text("");
+            $('#empTypeDetails').text("");
+            $('#empPositionDetails').text("");
             $.ajax({
                 type: "POST",
                 url:  '<%= ResolveUrl("AllEmployees.aspx/getEmpDetails") %>',
