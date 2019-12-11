@@ -204,104 +204,6 @@ namespace HR_LEAVEv2.UserControls
             }
         }
 
-        protected void GridView_RowCommand(object sender, GridViewCommandEventArgs e)
-        {
-            SqlCommand sqlCommand = new SqlCommand();
-
-            // get command type
-            string commandName = e.CommandName;
-
-            // get row idnex in which button was clicked
-            int index = Convert.ToInt32(e.CommandArgument);
-            GridViewRow row = GridView.Rows[index];
-
-            // get transaciton_id associated with row
-            int transaction_id = Convert.ToInt32(GridView.DataKeys[index].Values["transaction_id"]);
-
-            string status = "";
-            if(gridViewType == "emp")
-            {
-                return;
-            }
-            else if (gridViewType == "sup")
-            {
-              
-
-                if (commandName == "notRecommended")
-                {
-                    // update status to NotRecommended
-                    status = "Not Recommended";
-                }
-                else if (commandName == "recommended")
-                {
-                    // update status to recommended
-                    status = "Recommended";
-                }
-
-                // if sup view then update status, sup_edit_date
-                sqlCommand.CommandText = $@"
-                    UPDATE 
-                        [dbo].[leavetransaction] 
-                    SET 
-                        [status]='{status}', 
-                        [supervisor_edit_date] = CURRENT_TIMESTAMP 
-                    WHERE 
-                        [transaction_id] = {transaction_id};
-                ";
-
-            }
-            else if (gridViewType == "hr")
-            {
-           
-
-                if (commandName == "notApproved")
-                {
-                    // update status to NotRecommended
-                    status = "Not Approved";
-                }
-                else if (commandName == "approved")
-                {
-                    // update status to recommended
-                    status = "Approved";
-
-                    // TODO: Subtract Leave from balance
-                }
-                // TODO: undo
-                else if (commandName == "undo")
-                {
-                    // reset status to Recommended
-                    // Add leave back to balance
-                    return;
-                }
-                // if hr view then update status, hr_id, hr_edit_date
-                sqlCommand.CommandText = $@"
-                    UPDATE 
-                        [dbo].[leavetransaction] 
-                    SET 
-                        [status]='{status}', 
-                        [hr_manager_id] = '{Session["emp_id"]}', 
-                        [hr_manager_edit_date] = CURRENT_TIMESTAMP 
-                    WHERE 
-                        [transaction_id] = {transaction_id}
-                ";
-            }
-            else
-            {
-                // if emp view then update start and end dates
-                return;
-            }
-
-            // execute update
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            {
-                sqlConnection.Open();
-                sqlCommand.Connection = sqlConnection;
-                sqlCommand.ExecuteNonQuery();
-                BindGridView();
-            }
-
-        }
-
         // helper function to get column index by name
         int GetColumnIndexByName(GridViewRow row, string columnName)
         {
@@ -319,73 +221,305 @@ namespace HR_LEAVEv2.UserControls
         // changing button view/visibility - row by row
         protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            int buttonColumnIndex = e.Row.Cells.Count - 1;
-            int undoColumnIndex = buttonColumnIndex - 1;
+            //int buttonColumnIndex = e.Row.Cells.Count - 1;
+            //int undoColumnIndex = buttonColumnIndex - 1;
 
             // init all undos to invisible
-            e.Row.Cells[undoColumnIndex].Visible = false;
+            // e.Row.Cells[undoColumnIndex].Visible = false;
 
             // remove border on last column
-            e.Row.Cells[buttonColumnIndex].Style.Add("BORDER", "0px");
+            // e.Row.Cells[buttonColumnIndex].Style.Add("BORDER", "0px");
+
+            // get start date
+            //DateTime startDate = new DateTime();
+            //if (e.Row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
+            //{
+            //    int index = GetColumnIndexByName(e.Row, "start_date");
+            //    startDate = DateTime.Parse(e.Row.Cells[index].Text);
+            //}
 
             // get leave status for that row
             string leaveStatus = null;
-            if(e.Row.RowType == DataControlRowType.DataRow)
+            if (e.Row.RowType == DataControlRowType.DataRow)
             {
                 int statusIndex = GetColumnIndexByName(e.Row, "status");
                 leaveStatus = e.Row.Cells[statusIndex].Text.ToString();
             }
 
-            // if employee view OR hr view
-            if (gridViewType == "emp" || gridViewType == "hr")
+            // if employee view
+            if (gridViewType == "emp")
             {
-                // get start date
-                DateTime startDate = new DateTime();
-                if (e.Row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
+                if (e.Row.RowType == DataControlRowType.DataRow)
                 {
-                    int index = GetColumnIndexByName(e.Row, "start_date");
-                    startDate = DateTime.Parse(e.Row.Cells[index].Text);
-                }
-                
-                // FIXME:
-                // If Sick (only situation where you apply for leave AFTER) - then show change and UNDO buttons for 1 Week following the application date
-                // Else - remove buttons once Current Date > Start Date
-                
-                // if leave time has started then you cannot apply for a date change
-                if (DateTime.Now > startDate)
-                {
-                    // hide button for just this row
-                    e.Row.Cells[e.Row.Cells.Count - 1].Visible = false;
-                }
-                else if(gridViewType == "hr" && leaveStatus == "Approved") // leave not started and you are hr AND you approved someone's leave 
-                {
-                    // then show undo for that row only 
-                    e.Row.Cells[e.Row.Cells.Count - 2].Visible = true;
+                    // get cancel leave request button 
+                    Button btnCancelLeave = (Button)e.Row.FindControl("btnCancelLeave");
 
-                    // remove border on undo column
-                    e.Row.Cells[undoColumnIndex].Style.Add("BORDER", "0px");
-
-                    // and hide Approve/Not Approve
-                    e.Row.Cells[e.Row.Cells.Count - 1].Visible = false;
-                    // TODO: figure out how to show undo only
-                }               
-
+                    // employees are only allowed to CANCEL requests if they are still pending
+                    // employees cannot edit leave requests
+                    if (leaveStatus == "Pending")
+                    {
+                        btnCancelLeave.Visible = true;
+                    }
+                    else
+                    {
+                        btnCancelLeave.Visible = false;
+                    }
+                }                
             }
 
             // if supervisor view
             else if (gridViewType == "sup")
-            {                
-                e.Row.Cells[buttonColumnIndex].Visible = true;
-                
-                // only show buttons if HR have not Approved or Not Approved the leave
-                // else do not show buttons
-                if (leaveStatus == "Approved" || leaveStatus == "Not Approved")
+            {
+                // setting template firel coumn to visible
+                // e.Row.Cells[buttonColumnIndex].Visible = true;
+
+                // get supervisor buttons
+
+                if (e.Row.RowType == DataControlRowType.DataRow)
                 {
-                    e.Row.Cells[buttonColumnIndex].Visible = false;
+                    Button btnNotRecommended = (Button)e.Row.FindControl("btnNotRecommended");
+                    Button btnRecommended = (Button)e.Row.FindControl("btnRecommended");
+
+                    // only show buttons if HR has not acted or pending
+                    // else do not show buttons
+                    if (leaveStatus == "Pending" || leaveStatus == "Recommended" || leaveStatus == "Not Recommended")
+                    {
+                        btnNotRecommended.Visible = btnRecommended.Visible = true;
+                    }
+                    else
+                    {
+                        btnNotRecommended.Visible = btnRecommended.Visible = false;
+                    }
                 }
+            }
+
+            // if employee view OR hr view
+            else if (gridViewType == "hr")
+            {
+                if (e.Row.RowType == DataControlRowType.DataRow)
+                {
+                    // get HR buttons
+                    Button btnNotApproved = (Button)e.Row.FindControl("btnNotApproved");
+                    Button btnApproved = (Button)e.Row.FindControl("btnApproved");
+                    Button btnEditLeaveRequest = (Button)e.Row.FindControl("btnEditLeaveRequest");
+                    Button btnUndoApprove = (Button)e.Row.FindControl("btnUndoApprove");
+
+                    // if recommended or not approved then show all buttons except undo
+                    if (leaveStatus == "Recommended" || leaveStatus == "Not Approved")
+                    {
+                        btnUndoApprove.Visible = false;
+                        btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = true;
+                    }
+
+                    // if approved then ONLY show undo button
+                    else if (leaveStatus == "Approved" )
+                    {
+                        btnUndoApprove.Visible = true;
+                        btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = false;
+                    }
+                }
+
             }
         }
 
+
+        protected void GridView_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            // Sql command object
+            SqlCommand sqlCommand = new SqlCommand();
+
+            // get command type
+            string commandName = e.CommandName;
+
+            // get row index in which button was clicked
+            int index = Convert.ToInt32(e.CommandArgument);
+            GridViewRow row = GridView.Rows[index];
+
+            // get transaciton_id associated with row
+            int transaction_id = Convert.ToInt32(GridView.DataKeys[index].Values["transaction_id"]);
+
+            string status = "";
+
+            string updateStatement = $@"
+                UPDATE 
+                    [dbo].[leavetransaction] 
+            ";
+
+            string whereStatement = $@"
+                WHERE 
+                    [transaction_id] = {transaction_id};
+            ";
+
+            string setStatement = "";
+
+            // if employee view
+            if(gridViewType == "emp")
+            {
+                // if cancel button clicked then set leave status to cancelled
+                if (commandName == "cancelLeave")
+                {
+                    status = "Cancelled";
+                    setStatement = $@"
+                        SET
+                            [status]='{status}' 
+                    ";
+
+                    //sqlCommand.CommandText = $@"
+                    //    UPDATE 
+                    //        [dbo].[leavetransaction] 
+                    //    SET 
+                    //        [status]='{status}'                             
+                    //    WHERE 
+                    //        [transaction_id] = {transaction_id};
+                    //";
+                }
+                sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
+            }
+            else if (gridViewType == "sup")
+            {             
+
+                if (commandName == "notRecommended")
+                {
+                    // update status to NotRecommended
+                    status = "Not Recommended";
+                }
+                else if (commandName == "recommended")
+                {
+                    // update status to recommended
+                    status = "Recommended";
+                }
+
+                // if sup view then update status, sup_edit_date
+                setStatement = $@"
+                    SET
+                        [status]='{status}',
+                        [supervisor_edit_date] = CURRENT_TIMESTAMP 
+                ";
+
+                //sqlCommand.CommandText = $@"
+                //    UPDATE 
+                //        [dbo].[leavetransaction] 
+                //    SET 
+                //        [status]='{status}', 
+                //        [supervisor_edit_date] = CURRENT_TIMESTAMP 
+                //    WHERE 
+                //        [transaction_id] = {transaction_id};
+                //";
+                sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
+            }
+            else if (gridViewType == "hr")
+            {          
+
+                if (commandName == "notApproved")
+                {
+                    // update status to NotApproved
+                    status = "Not Approved";
+                    setStatement = $@"
+                    SET
+                        [status]='{status}',
+                        [hr_manager_id] = '{Session["emp_id"]}', 
+                        [hr_manager_edit_date] = CURRENT_TIMESTAMP
+                    ";
+                    sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
+                }
+
+                else if (commandName == "editLeaveRequest")
+                {
+                    // redirect to apply for leave form and prepopulate...
+                    return;
+                }
+
+                else // approve (subtract) or undo (add)
+                {
+                    // get employee id start date and end dates, leave type from gridview row
+                    string employee_id = Convert.ToString(GridView.DataKeys[index].Values["employee_id"]);
+                    DateTime startDate = new DateTime();
+                    DateTime endDate = new DateTime();
+                    string leaveType = "";
+                    if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
+                    {
+                        int indexStartDate = GetColumnIndexByName(row, "start_date");
+                        startDate = DateTime.Parse(row.Cells[indexStartDate].Text);
+
+                        int indexEndDate = GetColumnIndexByName(row, "end_date");
+                        endDate = DateTime.Parse(row.Cells[indexEndDate].Text);
+
+                        int indexLeavetype = GetColumnIndexByName(row, "leave_type");
+                        leaveType = (row.Cells[indexLeavetype].Text).ToString();
+                    }
+
+                    // get difference
+                    int difference = (endDate - startDate).Days + 1;
+
+                    // check leave type to match with balance type
+                    Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
+                    leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
+                    leaveBalanceColumnName.Add("Casual", "[casual]");
+                    leaveBalanceColumnName.Add("Maternity", "[maternity]");
+                    leaveBalanceColumnName.Add("Personal", "[personal]");
+                    leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
+                    leaveBalanceColumnName.Add("Sick", "[sick]");
+                    leaveBalanceColumnName.Add("Vacation", "[vacation]");
+
+                    // TODO: check if in good standing (if employee has enough leave)
+                    // TODO: how does HR cater for this???
+                    string operation = "";
+                    if (commandName == "approved")
+                    {
+                        // update status to Approved
+                        status = "Approved";
+
+                        // Subtract Leave from balance
+                        operation = " - ";
+                    }
+
+                    // TODO: undo
+                    else if (commandName == "undoApprove")
+                    {
+                        // reset status to Recommended
+                        status = "Recommended";
+
+                        // Add leave back to balance
+                        operation = " + ";
+                    }
+                    string sql = $@"
+                        BEGIN TRANSACTION;
+
+                        -- updating the leave status
+                        UPDATE 
+                            [dbo].[leavetransaction]
+                        SET
+                            [status]='{status}', 
+                            [hr_manager_id] = '{Session["emp_id"]}', 
+                            [hr_manager_edit_date] = CURRENT_TIMESTAMP 
+                        WHERE 
+                            [transaction_id] = {transaction_id};
+
+                        -- updating employee leave balance
+                        UPDATE 
+                            [dbo].[employee]
+                        SET
+                            {leaveBalanceColumnName[leaveType]} = {leaveBalanceColumnName[leaveType]} {operation} {difference}
+                        WHERE
+                            [employee_id] = '{employee_id}'
+
+                        COMMIT;
+                    ";
+
+                    sqlCommand.CommandText = sql;
+                }
+            }
+
+            // execute sql
+            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+            {
+                sqlConnection.Open();
+                sqlCommand.Connection = sqlConnection;
+                sqlCommand.ExecuteNonQuery();
+                BindGridView();
+            }
+        }
+        
         protected void GridView_Sorting(object sender, GridViewSortEventArgs e)
         {
            

@@ -97,26 +97,15 @@
                 <asp:BoundField HeaderText="End Date" DataField="end_date" />
                 <asp:BoundField HeaderText="Status" DataField="status" />
                 <%--comments--%>
-
-                <%--undo button only--%>
-                <asp:TemplateField  HeaderText="">
-                    <ItemTemplate>   
-                        <asp:Button ID="btnUndo" class="btn btn-warning" Visible=<%# btnHrVisible %> runat="server"
-                            CommandName="undo"
-                            CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                            Text="⮌"
-                            ToolTip="Undo Approve" />                             
-                    </ItemTemplate>
-                </asp:TemplateField>
                 
                                 
                 <%--action buttons--%>
-                <asp:TemplateField  HeaderText="">
+                <asp:TemplateField  HeaderText="Action" Visible="true">
                     <ItemTemplate>   
 
                         <%--employee buttons--%>
                         <asp:Button ID="btnCancelLeave" class="btn btn-danger" Visible=<%# btnEmpVisible %> runat="server"
-                            CommandName="Cancel Leave Request"
+                            CommandName="cancelLeave"
                             CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
                             Text="🗑"
                             ToolTip="Cancel Leave Request" />
@@ -143,7 +132,17 @@
                             CommandName="approved"
                             CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
                             Text="✔"
-                            ToolTip="Approved" />                                          
+                            ToolTip="Approved" /> 
+                        <asp:Button ID="btnEditLeaveRequest" class="btn btn-primary" Visible=<%# btnHrVisible %> runat="server"
+                            CommandName="editLeaveRequest"
+                            CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                            Text="✎"
+                            ToolTip="Edit Leave Request" />                                                                  
+                        <asp:Button ID="btnUndoApprove" class="btn btn-warning" Visible=<%# btnHrVisible %> runat="server"
+                            CommandName="undoApprove"
+                            CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                            Text="⮌"
+                            ToolTip="Undo Approve" />  
 
                     </ItemTemplate>
                 </asp:TemplateField>
