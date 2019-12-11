@@ -2,6 +2,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
     <h1>My Employee Leave Applications</h1>
+    <br /><br />
     <TWebControl:GridViewWebControl ID ="GridViewWebControlSup" gridViewType="sup" runat="server"></TWebControl:GridViewWebControl>    
 
 </asp:Content>

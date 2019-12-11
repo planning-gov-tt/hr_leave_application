@@ -146,6 +146,7 @@ namespace HR_LEAVEv2.UserControls
                             e.employee_id != '{Session["emp_id"]}'
                     ";
 
+                    // FIXME: Change to filter and hardcoded
                     // check the type of leave someone can approve 
                     string leaveType = "('Personal', 'No Pay', 'Bereavement', 'Maternity', 'Pre-retirement'";
                     if (permissions.Contains("approve_sick"))
@@ -185,7 +186,6 @@ namespace HR_LEAVEv2.UserControls
                     //whereBindGridView += $@"
                     //    AND '{mostRecentEmploymentType}' IN {employementTypes}            
                     //";
-
 
                 }
 
@@ -271,7 +271,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     // reset status to Recommended
                     // Add leave back to balance
-
+                    return;
                 }
                 // if hr view then update status, hr_id, hr_edit_date
                 sqlCommand.CommandText = $@"
@@ -288,6 +288,7 @@ namespace HR_LEAVEv2.UserControls
             else
             {
                 // if emp view then update start and end dates
+                return;
             }
 
             // execute update
@@ -315,7 +316,7 @@ namespace HR_LEAVEv2.UserControls
             return columnIndex;
         }
 
-        // changing button view - row by row
+        // changing button view/visibility - row by row
         protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             int buttonColumnIndex = e.Row.Cells.Count - 1;
@@ -345,7 +346,7 @@ namespace HR_LEAVEv2.UserControls
                     int index = GetColumnIndexByName(e.Row, "start_date");
                     startDate = DateTime.Parse(e.Row.Cells[index].Text);
                 }
-
+                
                 // FIXME:
                 // If Sick (only situation where you apply for leave AFTER) - then show change and UNDO buttons for 1 Week following the application date
                 // Else - remove buttons once Current Date > Start Date
@@ -394,6 +395,21 @@ namespace HR_LEAVEv2.UserControls
         {
             this.GridView.PageIndex = e.NewPageIndex;
             this.BindGridView();
+        }
+
+        protected void ddlStatus_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnFilter_Click(object sender, EventArgs e)
+        {
+            return;
+        }
+
+        protected void ddlType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
