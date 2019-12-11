@@ -21,11 +21,13 @@ namespace HR_LEAVEv2.Employee
 
         protected Boolean validateDates(string startDate, string endDate)
         {
-
-            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
-            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            validationMsgPanel.Style.Add("display", "none");
             dateComparisonValidationMsgPanel.Style.Add("display", "none");
-
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            invalidVacationStartDateMsgPanel.Style.Add("display", "none");
+            invalidSickLeaveStartDate.Style.Add("display", "none");
 
             DateTime start, end;
             start = end = DateTime.MinValue;
@@ -55,8 +57,8 @@ namespace HR_LEAVEv2.Employee
 
             if (isValidated)
             {
-                //ensure start date is not a day before today
-                if (DateTime.Compare(start, DateTime.Today) < 0)
+                // ensure start date is not a day before today once not sick leave
+                if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, DateTime.Today) < 0)
                 {
                     invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                     startDateBeforeTodayValidationMsgPanel.Style.Add("display", "inline-block");
@@ -71,7 +73,7 @@ namespace HR_LEAVEv2.Employee
                     isValidated = false;
                 }
 
-                //if leave type is vacation: ensure start date is at least one month from today
+                // if leave type is vacation: ensure start date is at least one month from today
                 if (typeOfLeave.SelectedValue.Equals("Vacation"))
                 {
                     DateTime firstDateVacationCanBeTaken = DateTime.Today.AddMonths(1);
@@ -79,6 +81,16 @@ namespace HR_LEAVEv2.Employee
                     if(DateTime.Compare(start, firstDateVacationCanBeTaken) < 0)
                     {
                         invalidVacationStartDateMsgPanel.Style.Add("display", "inline-block");
+                        isValidated = false;
+                    }
+                }
+
+                // if type of leave is sick: ensure you can only apply for it retroactively
+                if (typeOfLeave.SelectedValue.Equals("Sick"))
+                {
+                    if (DateTime.Compare(start, DateTime.Today) > 0)
+                    {
+                        invalidSickLeaveStartDate.Style.Add("display", "inline-block");
                         isValidated = false;
                     }
                 }
@@ -92,12 +104,6 @@ namespace HR_LEAVEv2.Employee
 
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
-            validationMsgPanel.Style.Add("display", "none");
-            dateComparisonValidationMsgPanel.Style.Add("display", "none");
-            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
-            startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
-            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
-            invalidVacationStartDateMsgPanel.Style.Add("display", "none");
 
             /* data to be submitted
              * 1. Employee id

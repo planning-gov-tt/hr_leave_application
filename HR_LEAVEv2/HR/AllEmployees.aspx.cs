@@ -54,9 +54,7 @@ namespace HR_LEAVEv2.HR
                     sql = $@"
                         SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
                         FROM [dbo].[employee] e
-                        LEFT JOIN [dbo].employeeposition ep
-                        ON e.employee_id = ep.employee_id
-                        WHERE GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date;
+                        WHERE e.employee_id != {Session["emp_id"].ToString()}
                     ";
                 }
                 else

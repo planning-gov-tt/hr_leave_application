@@ -100,7 +100,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Applications">
+                                    <a href="<%= ResolveClientUrl("~/Supervisor/MyEmployeeLeaveApplications.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Applications">
                                         <i class="fa fa-inbox navbar-link-icon"></i>
                                         <span class="navbar-link-text">Leave Applications</span>
                                     </a>
@@ -133,7 +133,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Applications">
+                                    <a href="<%= ResolveClientUrl("~/HR/AllEmployeeLeaveApplications.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Applications">
                                         <i class="fa fa-inbox navbar-link-icon"></i>
                                         <span class="navbar-link-text">Leave Applications</span>
                                     </a>
