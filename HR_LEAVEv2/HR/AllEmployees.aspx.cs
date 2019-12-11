@@ -62,7 +62,7 @@ namespace HR_LEAVEv2.HR
                 else
                 {
                     string emp_type = string.Empty;
-                    // HR 1 and HR 2
+                    // HR 2 and HR 3
                     if (permissions.Contains("contract_permissions"))
                         emp_type = "Contract";
                     else if (permissions.Contains("public_officer_permissions"))

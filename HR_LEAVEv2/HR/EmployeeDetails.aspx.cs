@@ -168,7 +168,7 @@ namespace HR_LEAVEv2.HR
             // get data from every field and submit
 
             string emp_id, ihris_id, email, firstname, lastname, sick_leave, personal_leave, casual_leave, vacation_leave, bereavement_leave, maternity_leave, pre_retirement_leave;
-            List<string> authorizations = new List<string>();
+            List<string> authorizations = new List<string>() { "emp" };
 
             emp_id = employeeIdInput.Text;
             ihris_id = ihrisNumInput.Text;
@@ -385,12 +385,17 @@ namespace HR_LEAVEv2.HR
                                 fullFormErrorPanel.Style.Add("display", "inline-block");
                                 empRecordInsert = false;
                             }
+                            if (empRecordInsert)
+                                fullFormSubmitSuccessPanel.Style.Add("display", "inline-block");
                         }
-                        if(empRecordInsert)
-                            fullFormSubmitSuccessPanel.Style.Add("display", "inline-block");
-
                     }
+                } else // error adding roles
+                {
+                    fullFormErrorPanel.Style.Add("display", "inline-block");
                 }
+            } else // error adding employee
+            {
+                fullFormErrorPanel.Style.Add("display", "inline-block");
             }
 
         }

@@ -10,7 +10,6 @@ namespace HR_LEAVEv2
         protected void Page_Init(object sender, EventArgs e)
         {
             Auth auth = new Auth();
-            //string email = auth.activeDirectorySearch();
             // store employee's email in Session
             if (Session["emp_email"] == null) { }
             //Session["emp_email"] = auth.activeDirectorySearch();
