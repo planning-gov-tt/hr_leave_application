@@ -186,6 +186,13 @@
                         </button>
                     </div>
                 </nav>
+
+                <div id="userSelectContainer">
+                    <asp:DropDownList ID="ddlSelectUser" runat="server" AutoPostBack="true" OnSelectedIndexChanged="indexChanged">
+
+                    </asp:DropDownList>
+                </div>
+
                 <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                     <ContentTemplate>
                         <asp:ContentPlaceHolder ID="MainContent" runat="server">
