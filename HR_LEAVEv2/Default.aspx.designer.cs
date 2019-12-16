@@ -11,5 +11,14 @@ namespace HR_LEAVEv2 {
     
     
     public partial class _Default {
+        
+        /// <summary>
+        /// LeaveCountUserControl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::HR_LEAVEv2.UserControls.LeaveCountUserControlBS4 LeaveCountUserControl;
     }
 }
