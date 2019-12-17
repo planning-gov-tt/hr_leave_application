@@ -6,7 +6,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
 
-        #applyForLeaveContainer div.row{
+        #applyForLeaveContainer div.form-group{
             margin-top:50px;
         }
         
@@ -57,15 +57,8 @@
             <textarea runat="server" class="form-control" id="txtComments" rows="4" style="width:45%; margin:0 auto;"></textarea>
         </div>
 
-         <div class="row" style="background-color:lightblue;">
-            Leave Balance goes here
-        <%--    <ajaxToolkit:PieChart ID="PieChart1" runat="server" ChartHeight="250px" ChartTitle="Test Pie" ChartWidth="250px" Height="250px" Width="250px" BorderWidth="250px" ForeColor="White" >
-                <PieChartValues>
-                    <ajaxToolkit:PieChartValue Category="C1" Data="20" PieChartValueColor="red" PieChartValueStrokeColor="" />
-                    <ajaxToolkit:PieChartValue Category="C2" Data="35" PieChartValueColor="blue" PieChartValueStrokeColor="" />
-                    <ajaxToolkit:PieChartValue Category="C3" Data="40" PieChartValueColor="green" PieChartValueStrokeColor="" />
-                </PieChartValues>
-             </ajaxToolkit:PieChart>--%>
+         <div class="row">
+            <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
         </div>
 
         <div class="row" id="validationRow">
@@ -93,12 +86,12 @@
                     </asp:Panel>
                     <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span id="Span1" runat="server">You cannot request sick leave in advance</span>
+                        <span id="Span1" runat="server">Sick leave must already have beeen taken prior to today</span>
                     </asp:Panel>
-                    <asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
+                    <%--<asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="validationMsg" runat="server">End date is not valid</span>
-                    </asp:Panel>
+                    </asp:Panel>--%>
                     <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span id="successMsg" runat="server">Application successfully submitted</span>

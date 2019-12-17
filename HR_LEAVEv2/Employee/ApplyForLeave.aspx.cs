@@ -21,7 +21,7 @@ namespace HR_LEAVEv2.Employee
 
         protected Boolean validateDates(string startDate, string endDate)
         {
-            validationMsgPanel.Style.Add("display", "none");
+            // validationMsgPanel.Style.Add("display", "none");
             dateComparisonValidationMsgPanel.Style.Add("display", "none");
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");
             startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
@@ -88,7 +88,7 @@ namespace HR_LEAVEv2.Employee
                 // if type of leave is sick: ensure you can only apply for it retroactively
                 if (typeOfLeave.SelectedValue.Equals("Sick"))
                 {
-                    if (DateTime.Compare(start, DateTime.Today) > 0)
+                    if (DateTime.Compare(end, DateTime.Today) > 0)
                     {
                         invalidSickLeaveStartDate.Style.Add("display", "inline-block");
                         isValidated = false;
@@ -171,8 +171,9 @@ namespace HR_LEAVEv2.Employee
                 }
                 catch (Exception ex)
                 {
-                    validationMsg.InnerText = ex.Message;
-                    validationMsgPanel.Style.Add("display", "inline-block");
+                    //validationMsg.InnerText = ex.Message;
+                    //validationMsgPanel.Style.Add("display", "inline-block");
+                    Response.Write(ex.Message.ToString());
                 }
 
             }
