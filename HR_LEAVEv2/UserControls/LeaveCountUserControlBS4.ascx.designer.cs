@@ -11,32 +11,5 @@ namespace HR_LEAVEv2.UserControls {
     
     
     public partial class LeaveCountUserControlBS4 {
-        
-        /// <summary>
-        /// h2Sick control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl h2Sick;
-        
-        /// <summary>
-        /// h2Vacation control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl h2Vacation;
-        
-        /// <summary>
-        /// h2Personal control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl h2Personal;
     }
 }

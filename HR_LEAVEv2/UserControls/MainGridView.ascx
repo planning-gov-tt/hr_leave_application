@@ -1,8 +1,9 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MainGridView.ascx.cs" Inherits="HR_LEAVEv2.UserControls.MainGridView" %>
 
-<%--
-    <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
+
+<%--
 <div id="filterContainer" class="container">
     <form>
         <div class="row">            
@@ -70,7 +71,21 @@
      --%>
 
 
+
 <div id="gridViewContainer" class="container">
+
+    <%--if grid view is empty--%>
+    <div class="row" id="validationRow">
+        <asp:UpdatePanel ID="UpdatePanelEmptyGridView" runat="server">
+            <ContentTemplate>
+                <asp:Panel ID="emptyGridViewMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="validationMsg" runat="server">No leave data available</span>
+                </asp:Panel>
+            </ContentTemplate>
+        </asp:UpdatePanel>
+    </div>
+
     <center>    
 
         <%-- FIXME: Paging also triggers the OnRowCommand fn--%>

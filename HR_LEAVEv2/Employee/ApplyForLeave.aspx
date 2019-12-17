@@ -56,9 +56,15 @@
             <label for="txtComments" style="font-size:1.5em">Comments</label>
             <textarea runat="server" class="form-control" id="txtComments" rows="4" style="width:45%; margin:0 auto;"></textarea>
         </div>
-
-         <div class="row">
-            <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
+        <div class="row form-group" style="margin:auto">
+            <asp:UpdatePanel ID="UpdatePanelLeaveCount" runat="server">
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="LeaveCountUserControl" />
+                </Triggers>
+                <ContentTemplate>
+                     <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
+                </ContentTemplate>
+            </asp:UpdatePanel>
         </div>
 
         <div class="row" id="validationRow">

@@ -15,7 +15,7 @@ namespace HR_LEAVEv2.Employee
             if (this.IsPostBack)
             {
                 if (ViewState["supervisor_id"] != null && ViewState["supervisor_id"].ToString() != "-1")
-                    supervisor_select.selectedSupId = ViewState["supervisor_id"].ToString();
+                    supervisor_select.selectedSupId = ViewState["supervisor_id"].ToString();               
             }
         }
 
