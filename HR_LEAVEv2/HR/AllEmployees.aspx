@@ -192,6 +192,8 @@
     </div>
 
     <script>
+        //Sys.WebForms.PageRequestManager.getInstance()
+
         $('.show-details-btn').click(function () {
             $('#empNameDetails').text("");
             $('#empIdDetails').text("");

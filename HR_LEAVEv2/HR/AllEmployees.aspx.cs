@@ -115,12 +115,11 @@ namespace HR_LEAVEv2.HR
                 {
                     // HR 1
                     sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
+                        SELECT DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
                         FROM [dbo].[employee] e
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
-                        WHERE GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date 
-                            AND
+                        WHERE
                          ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString) ); 
                     ";
                 }
@@ -134,12 +133,11 @@ namespace HR_LEAVEv2.HR
                         emp_type = "Public Service";
 
                     sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
+                        SELECT DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
                         FROM [dbo].[employee] e
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
-                        WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date
-                            AND
+                        WHERE ep.employment_type='{emp_type}' AND 
                         ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString) ); 
 
                     ";

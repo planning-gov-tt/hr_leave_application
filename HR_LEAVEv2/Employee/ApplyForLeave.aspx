@@ -6,7 +6,7 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
 
-        #applyForLeaveContainer div.row{
+        #applyForLeaveContainer div.form-group{
             margin-top:50px;
         }
         
@@ -56,7 +56,6 @@
             <label for="txtComments" style="font-size:1.5em">Comments</label>
             <textarea runat="server" class="form-control" id="txtComments" rows="4" style="width:45%; margin:0 auto;"></textarea>
         </div>
-
         <div class="row form-group" style="margin:auto">
             <asp:UpdatePanel ID="UpdatePanelLeaveCount" runat="server">
                 <Triggers>
@@ -93,12 +92,12 @@
                     </asp:Panel>
                     <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span id="Span1" runat="server">You cannot request sick leave in advance</span>
+                        <span id="Span1" runat="server">Sick leave must already have beeen taken prior to today</span>
                     </asp:Panel>
-                    <asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
+                    <%--<asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="validationMsg" runat="server">End date is not valid</span>
-                    </asp:Panel>
+                    </asp:Panel>--%>
                     <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span id="successMsg" runat="server">Application successfully submitted</span>
