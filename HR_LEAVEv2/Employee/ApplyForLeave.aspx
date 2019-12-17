@@ -56,7 +56,7 @@
             <label for="txtComments" style="font-size:1.5em">Comments</label>
             <textarea runat="server" class="form-control" id="txtComments" rows="4" style="width:45%; margin:0 auto;"></textarea>
         </div>
-        <div class="row form-group" style="margin:auto">
+        <div class="row">
             <asp:UpdatePanel ID="UpdatePanelLeaveCount" runat="server">
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="LeaveCountUserControl" />
@@ -67,7 +67,7 @@
             </asp:UpdatePanel>
         </div>
 
-        <div class="row" id="validationRow">
+        <div class="row" id="validationRow" style="margin-top:25px;">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
                     <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
