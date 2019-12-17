@@ -201,6 +201,13 @@ namespace HR_LEAVEv2.UserControls
 
                 GridView.DataSource = dataSet;
                 GridView.DataBind();
+
+                // if gridview is empty then show message update panel
+                emptyGridViewMsgPanel.Style.Add("display", "none");
+                if (GridView.Rows.Count == 0)
+                {
+                    emptyGridViewMsgPanel.Style.Add("display", "inline-block");
+                }
             }
         }
 
