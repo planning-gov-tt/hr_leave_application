@@ -37,7 +37,15 @@
     }
 </style>
 
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
+
+
 <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+
+
+
+
 <div class="container">
     <div class="row">
         <br />
@@ -55,7 +63,7 @@
         <div class="col-sm-4">
             <div class="counter">
                 <i class="fa fa-plus-square fa-2x"></i>
-                <h2 id="h2Sick" class="timer count-title count-number" data-to="" data-speed="600" runat="server"></h2>
+                <h2 id="h2Sick" class="timer count-title count-number" data-to="<%= ViewState["sick"]%>" data-speed="600" ><%= ViewState["sick"]%></h2>
                 <p class="count-text ">Sick</p>
             </div>
         </div>
@@ -64,7 +72,7 @@
         <div class="col-sm-4">
             <div class="counter">
                 <i class="fa fa-plane fa-2x"></i>
-                <h2 id="h2Vacation" class="timer count-title count-number" data-to="" data-speed="600" runat="server"></h2>
+                <h2 id="h2Vacation" class="timer count-title count-number" data-to="<%= ViewState["vacation"]%>" data-speed="600" ><%= ViewState["vacation"]%></h2>
                 <p class="count-text ">Vacation</p>
             </div>
         </div>
@@ -73,7 +81,7 @@
         <div class="col-sm-4">
             <div class="counter">
                 <i class="fa fa-user fa-2x"></i>
-                <h2 id="h2Personal" class="timer count-title count-number" data-to="" data-speed="600" runat="server"></h2>
+                <h2 id="h2Personal" class="timer count-title count-number" data-to="<%= ViewState["personal"]%>" data-speed="600" ><%= ViewState["personal"]%></h2>
                 <p class="count-text ">Personal</p>
             </div>
         </div>
@@ -88,6 +96,8 @@
 
     </div>
 </div>
+
+ 
 
 <script>
     (function ($) {
@@ -189,3 +199,4 @@
         }
     });
 </script>
+

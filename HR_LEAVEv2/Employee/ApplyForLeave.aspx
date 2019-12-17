@@ -57,15 +57,15 @@
             <textarea runat="server" class="form-control" id="txtComments" rows="4" style="width:45%; margin:0 auto;"></textarea>
         </div>
 
-         <div class="row" style="background-color:lightblue;">
-            Leave Balance goes here
-        <%--    <ajaxToolkit:PieChart ID="PieChart1" runat="server" ChartHeight="250px" ChartTitle="Test Pie" ChartWidth="250px" Height="250px" Width="250px" BorderWidth="250px" ForeColor="White" >
-                <PieChartValues>
-                    <ajaxToolkit:PieChartValue Category="C1" Data="20" PieChartValueColor="red" PieChartValueStrokeColor="" />
-                    <ajaxToolkit:PieChartValue Category="C2" Data="35" PieChartValueColor="blue" PieChartValueStrokeColor="" />
-                    <ajaxToolkit:PieChartValue Category="C3" Data="40" PieChartValueColor="green" PieChartValueStrokeColor="" />
-                </PieChartValues>
-             </ajaxToolkit:PieChart>--%>
+        <div class="row form-group" style="margin:auto">
+            <asp:UpdatePanel ID="UpdatePanelLeaveCount" runat="server">
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="LeaveCountUserControl" />
+                </Triggers>
+                <ContentTemplate>
+                     <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
+                </ContentTemplate>
+            </asp:UpdatePanel>
         </div>
 
         <div class="row" id="validationRow">

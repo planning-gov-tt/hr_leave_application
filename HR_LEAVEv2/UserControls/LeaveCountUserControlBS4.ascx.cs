@@ -14,7 +14,7 @@ namespace HR_LEAVEv2.UserControls
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
+            if (!Page.IsPostBack)
             {
                 string CS = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
                 using (SqlConnection con = new SqlConnection(CS))
@@ -34,9 +34,12 @@ namespace HR_LEAVEv2.UserControls
 
                     if (rdr.Read())
                     {
-                        h2Sick.Attributes["data-to"] = rdr["sick"].ToString();
-                        h2Vacation.Attributes["data-to"] = rdr["vacation"].ToString();
-                        h2Personal.Attributes["data-to"] = rdr["personal"].ToString();
+                        //h2Sick.Attributes["data-to"] = rdr["sick"].ToString();
+                        //h2Vacation.Attributes["data-to"] = rdr["vacation"].ToString();
+                        //h2Personal.Attributes["data-to"] = rdr["personal"].ToString();
+                        ViewState["sick"] = rdr["sick"].ToString();
+                        ViewState["vacation"] = rdr["vacation"].ToString();
+                        ViewState["personal"] = rdr["personal"].ToString();
                     }
                 }
             }
