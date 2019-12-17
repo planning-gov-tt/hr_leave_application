@@ -28,6 +28,7 @@
         <div class="row tab-content" id="myTabContent">
           <div class="tab-pane fade active in" id="summary" role="tabpanel" aria-labelledby="summaryTab">
               <h3>Summary</h3>
+              <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
           </div>
           <div class="tab-pane fade" id="viewLeaveLogs" role="tabpanel" aria-labelledby="viewLeaveLogsTab">
               <h3>My Leave Logs</h3>
