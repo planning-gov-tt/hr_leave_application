@@ -34,14 +34,14 @@ namespace HR_LEAVEv2.UserControls
                 lt.created_at date_submitted,		
                               
                 e.employee_id employee_id,
-                LEFT(e.first_name, 1) + '. ' + e.last_name AS employee_name,
+                e.last_name + ', ' + LEFT(e.first_name, 1) + '.' AS employee_name,
 
                 lt.leave_type leave_type,
                 FORMAT(lt.start_date, 'MM/dd/yy') start_date,
                 FORMAT(lt.end_date, 'MM/dd/yy') end_date,
 
                 s.employee_id supervisor_id,
-                LEFT(s.first_name, 1) + '. ' + s.last_name AS supervisor_name,
+                s.last_name + ', ' + LEFT(s.first_name, 1) + '.' AS supervisor_name,
                 lt.supervisor_edit_date supervisor_edit_date,
 
                 hr.employee_id hr_manager_id,
@@ -64,9 +64,23 @@ namespace HR_LEAVEv2.UserControls
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
 
+        // a simple toggle
+        private string SortDirection
+        {
+            get { return ViewState["SortDirection"] != null ? ViewState["SortDirection"].ToString() : "ASC"; } // default to ASC if VS is null
+            set { ViewState["SortDirection"] = value; }
+        }
+
+        // persistent sort expression for after the custom button commands run
+        private string SortExpression
+        {
+            get { return ViewState["SortExpression"] != null ? ViewState["SortExpression"].ToString() : null; } // could be null - null if no previous sort specified
+            set { ViewState["SortExpression"] = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            
+
             btnEmpVisible = btnSupVisible = btnHrVisible = false;
             permissions = (List<string>)Session["permissions"];
 
@@ -101,7 +115,11 @@ namespace HR_LEAVEv2.UserControls
 
             if (!IsPostBack)
             {
-                BindGridView();
+                // default sort on date submitted DESC
+                this.SortExpression = "date_submitted";
+                this.SortDirection = "DESC";                
+
+                this.BindGridView();
             }
         }
 
@@ -114,13 +132,10 @@ namespace HR_LEAVEv2.UserControls
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
 
-                sqlConnection.Open();
-                DataSet dataSet = new DataSet();
-
                 string whereBindGridView = "";
 
                 // emp gridview
-                if(gridViewType == "emp")
+                if (gridViewType == "emp")
                 {
                     whereBindGridView = $@"
                         WHERE
@@ -129,7 +144,7 @@ namespace HR_LEAVEv2.UserControls
                 }
 
                 // sup gridview
-                else if(gridViewType == "sup")
+                else if (gridViewType == "sup")
                 {
                     whereBindGridView = $@"
                         WHERE
@@ -138,7 +153,7 @@ namespace HR_LEAVEv2.UserControls
                 }
 
                 // hr gridview (most complex)
-                else if(gridViewType == "hr")
+                else if (gridViewType == "hr")
                 {
                     whereBindGridView = $@"
                         WHERE
@@ -193,16 +208,32 @@ namespace HR_LEAVEv2.UserControls
 
                 // TODO filter where (dropdown)
 
-                string sql = select + from + whereBindGridView;
-                SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
-                                
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand);
-                sqlDataAdapter.Fill(dataSet);
 
-                GridView.DataSource = dataSet;
+                string sql = select + from + whereBindGridView;
+
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand);
+                //DataSet dataSet = new DataSet();
+                DataTable dataTable = new DataTable(); // using data table vs data set to facilitate sorting
+                sqlDataAdapter.Fill(dataTable);
+
+                // if sorting specified
+                if (SortExpression != null)
+                {
+                    DataView dataView = dataTable.AsDataView();
+                    dataView.Sort = this.SortExpression + " " + this.SortDirection;
+                    this.GridView.DataSource = dataView;
+                }
+                else // if no sorting
+                {
+                    GridView.DataSource = dataTable;
+                }
+
+                // bind
                 GridView.DataBind();
 
-                // if gridview is empty then show message update panel
+                // assume GV is not empty...if gridview is empty then show message update panel
                 emptyGridViewMsgPanel.Style.Add("display", "none");
                 if (GridView.Rows.Count == 0)
                 {
@@ -271,7 +302,7 @@ namespace HR_LEAVEv2.UserControls
                     {
                         btnCancelLeave.Visible = false;
                     }
-                }                
+                }
             }
 
             // if supervisor view
@@ -319,20 +350,26 @@ namespace HR_LEAVEv2.UserControls
                     }
 
                     // if approved then ONLY show undo button
-                    else if (leaveStatus == "Approved" )
+                    else if (leaveStatus == "Approved")
                     {
                         btnUndoApprove.Visible = true;
                         btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = false;
                     }
                 }
-
             }
         }
 
 
         protected void GridView_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            // Sql command object
+            // if unwanted command triggers this function then do nothing
+            if (e.CommandName == "Sort" || e.CommandName == "Page")
+            {
+                return;
+            }
+
+            // if the command is a custom button command 
+            // Sql command object created here will changed based on the command type
             SqlCommand sqlCommand = new SqlCommand();
 
             // get command type
@@ -360,7 +397,7 @@ namespace HR_LEAVEv2.UserControls
             string setStatement = "";
 
             // if employee view
-            if(gridViewType == "emp")
+            if (gridViewType == "emp")
             {
                 // if cancel button clicked then set leave status to cancelled
                 if (commandName == "cancelLeave")
@@ -383,7 +420,7 @@ namespace HR_LEAVEv2.UserControls
                 sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
             }
             else if (gridViewType == "sup")
-            {             
+            {
 
                 if (commandName == "notRecommended")
                 {
@@ -415,7 +452,7 @@ namespace HR_LEAVEv2.UserControls
                 sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
             }
             else if (gridViewType == "hr")
-            {          
+            {
 
                 if (commandName == "notApproved")
                 {
@@ -523,13 +560,18 @@ namespace HR_LEAVEv2.UserControls
                 sqlConnection.Open();
                 sqlCommand.Connection = sqlConnection;
                 sqlCommand.ExecuteNonQuery();
-                BindGridView();
+                BindGridView(); // preserve the sort direction in the viewstate
             }
         }
-        
+
         protected void GridView_Sorting(object sender, GridViewSortEventArgs e)
         {
-           
+            this.SortExpression = e.SortExpression; // set new sort expression
+            this.SortDirection = this.SortDirection == "ASC" ? "DESC" : "ASC"; // toggle ASC/DESC
+
+            // TODO: add/remove/change arrow direction in column to denote which sort the column is on
+
+            this.BindGridView();
         }
 
         protected void GridView_PageIndexChanging(object sender, GridViewPageEventArgs e)
@@ -543,14 +585,14 @@ namespace HR_LEAVEv2.UserControls
 
         }
 
+        protected void ddlType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
         protected void btnFilter_Click(object sender, EventArgs e)
         {
             return;
         }
 
-        protected void ddlType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }

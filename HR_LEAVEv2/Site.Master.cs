@@ -20,7 +20,7 @@ namespace HR_LEAVEv2
             if (Session["emp_email"] == null)
             {
                 //Session["emp_email"] = auth.getEmailOfSignedInUserFromActiveDirectory();
-                Session["emp_email"] = "christopher.sahadeo@planning.gov.tt";
+                Session["emp_email"] = "melanie.noel@planning.gov.tt";
             }
 
             // store employee's id in Session
