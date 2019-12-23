@@ -1,4 +1,4 @@
-﻿<%@ Page Title="My Account" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="MyAccount.aspx.cs" Inherits="HR_LEAVEv2.Employee.MyAccount" %>
+﻿<%@ Page Title="My Account" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="MyAccount.aspx.cs" Inherits="HR_LEAVEv2.Employee.MyAccount" EnableEventValidation="false" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
         #myTabs{

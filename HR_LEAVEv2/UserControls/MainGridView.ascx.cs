@@ -64,10 +64,11 @@ namespace HR_LEAVEv2.UserControls
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
 
+        // VARIABLES TO CHANGE VIEWSTATE VARIABLES //
         // a simple toggle
         private string SortDirection
         {
-            get { return ViewState["SortDirection"] != null ? ViewState["SortDirection"].ToString() : "ASC"; } // default to ASC if VS is null
+            get { return ViewState["SortDirection"] != null ? ViewState["SortDirection"].ToString() : "ASC"; } // default to ASC if ViewState is null
             set { ViewState["SortDirection"] = value; }
         }
 
@@ -78,11 +79,68 @@ namespace HR_LEAVEv2.UserControls
             set { ViewState["SortExpression"] = value; }
         }
 
+        // filter sql where clause variables
+        private string SubmittedFrom
+        {
+            get { return ViewState["SubmittedFrom"] != null ? ViewState["SubmittedFrom"].ToString() : null; } 
+            set { ViewState["SubmittedFrom"] = value; }
+        }
+
+        private string SubmittedTo
+        {
+            get { return ViewState["SubmittedTo"] != null ? ViewState["SubmittedTo"].ToString() : null; }
+            set { ViewState["SubmittedTo"] = value; }
+        }
+
+        private string StartDate
+        {
+            get { return ViewState["StartDate"] != null ? ViewState["StartDate"].ToString() : null; }
+            set { ViewState["StartDate"] = value; }
+        }
+
+        private string EndDate
+        {
+            get { return ViewState["EndDate"] != null ? ViewState["EndDate"].ToString() : null; }
+            set { ViewState["EndDate"] = value; }
+        }
+
+        private string SupervisorName_ID
+        {
+            get { return ViewState["SupervisorName_ID"] != null ? ViewState["SupervisorName_ID"].ToString() : null; }
+            set { ViewState["SupervisorName_ID"] = value; }
+        }
+
+        private string EmployeeName_ID
+        {
+            get { return ViewState["EmployeeName_ID"] != null ? ViewState["EmployeeName_ID"].ToString() : null; }
+            set { ViewState["EmployeeName_ID"] = value; }
+        }
+
+        private string LeaveType
+        {
+            get { return ViewState["LeaveType"] != null ? ViewState["LeaveType"].ToString() : null; }
+            set { ViewState["LeaveType"] = value; }
+        }
+
+        private string Status
+        {
+            get { return ViewState["Status"] != null ? ViewState["Status"].ToString() : null; }
+            set { ViewState["Status"] = value; }
+        }
+
+        private string Qualified
+        {
+            get { return ViewState["Qualified"] != null ? ViewState["Qualified"].ToString() : null; }
+            set { ViewState["Qualified"] = value; }
+        }
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
             btnEmpVisible = btnSupVisible = btnHrVisible = false;
             permissions = (List<string>)Session["permissions"];
+
 
             // 3 types of gridviews perspectives possible
             if (this.gridViewType == "emp")
@@ -92,6 +150,7 @@ namespace HR_LEAVEv2.UserControls
                 // hide employee column
                 btnEmpVisible = true;
                 GridView.Columns[2].Visible = false;
+                divTbEmployee.Visible = false;
             }
             else if (this.gridViewType == "sup")
             {
@@ -101,8 +160,8 @@ namespace HR_LEAVEv2.UserControls
 
                 // Hide Supervisor Columnn
                 GridView.Columns[1].Visible = false;
-
                 btnSupVisible = true;
+                divTbSupervisor.Visible = false;
             }
             else // hr
             {
@@ -131,7 +190,8 @@ namespace HR_LEAVEv2.UserControls
         {
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
-
+                SqlCommand sqlCommand = new SqlCommand();
+                
                 string whereBindGridView = "";
 
                 // emp gridview
@@ -202,17 +262,85 @@ namespace HR_LEAVEv2.UserControls
                     //    AND '{mostRecentEmploymentType}' IN {employementTypes}            
                     //";
 
+                }// end hr if
+
+
+                //*************************************** FILTER ***************************************//
+                // add sql parameters in command for user entered values that did not have validation
+                string whereFilterGridView = "";
+                if (!string.IsNullOrEmpty(SubmittedFrom))
+                {
+                    whereFilterGridView += $@"
+                        AND lt.created_at >= '{SubmittedFrom}'
+                    ";
                 }
+                if (!string.IsNullOrEmpty(SubmittedTo))
+                {
+                    whereFilterGridView += $@"
+                        AND lt.created_at <= '{SubmittedTo}'
+                    ";
+                }
+                if (!string.IsNullOrEmpty(StartDate))
+                {
+                    whereFilterGridView += $@"
+                        AND start_date >= '{StartDate}'
+                    ";
+                }
+                if (!string.IsNullOrEmpty(EndDate))
+                {
+                    whereFilterGridView += $@"
+                        AND end_date <= '{EndDate}'
+                    ";
+                }
+                if (!string.IsNullOrEmpty(SupervisorName_ID))
+                {
+                    whereFilterGridView += $@"
+                        AND (
+                            (s.first_name LIKE @SupervisorName_ID) OR
+                            (s.last_name LIKE @SupervisorName_ID) OR
+                            (s.employee_id LIKE @SupervisorName_ID) OR
+                            (s.email LIKE @SupervisorName_ID)
+                        ) 
+                    ";
+                    sqlCommand.Parameters.AddWithValue("@SupervisorName_ID", SupervisorName_ID);
+                }
+                if (!string.IsNullOrEmpty(EmployeeName_ID))
+                {
+                    whereFilterGridView += $@"
+                        AND (
+                            (e.first_name LIKE @EmployeeName_ID) OR
+                            (e.last_name LIKE @EmployeeName_ID) OR
+                            (e.employee_id LIKE @EmployeeName_ID) OR
+                            (e.email LIKE @EmployeeName_ID)
+                        ) 
+                    ";
+                    sqlCommand.Parameters.AddWithValue("@EmployeeName_ID", EmployeeName_ID);
+                }
+                if (!string.IsNullOrEmpty(LeaveType))
+                {
+                    whereFilterGridView += $@"
+                        AND leave_type = '{LeaveType}'
+                    ";
+                }
+                if (!string.IsNullOrEmpty(Status))
+                {
+                    whereFilterGridView += $@"
+                        AND status = '{Status}'
+                    ";
+                }
+                // don't have the qualified field implemented yet
+                //if (!string.IsNullOrEmpty(Qualified))
+                //{
+                //    whereFilterGridView += $@"
+                //        AND qualified = {Qualified}
+                //    ";
+                //}
 
-                // TODO search where
-
-                // TODO filter where (dropdown)
-
-
-                string sql = select + from + whereBindGridView;
+                string sql = select + from + whereBindGridView + whereFilterGridView;
+                sqlCommand.CommandText = sql;
+                sqlCommand.Connection = sqlConnection;
 
                 sqlConnection.Open();
-                SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
                 SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand);
                 //DataSet dataSet = new DataSet();
                 DataTable dataTable = new DataTable(); // using data table vs data set to facilitate sorting
@@ -259,23 +387,6 @@ namespace HR_LEAVEv2.UserControls
         // changing button view/visibility - row by row
         protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            //int buttonColumnIndex = e.Row.Cells.Count - 1;
-            //int undoColumnIndex = buttonColumnIndex - 1;
-
-            // init all undos to invisible
-            // e.Row.Cells[undoColumnIndex].Visible = false;
-
-            // remove border on last column
-            // e.Row.Cells[buttonColumnIndex].Style.Add("BORDER", "0px");
-
-            // get start date
-            //DateTime startDate = new DateTime();
-            //if (e.Row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
-            //{
-            //    int index = GetColumnIndexByName(e.Row, "start_date");
-            //    startDate = DateTime.Parse(e.Row.Cells[index].Text);
-            //}
-
             // get leave status for that row
             string leaveStatus = null;
             if (e.Row.RowType == DataControlRowType.DataRow)
@@ -407,15 +518,6 @@ namespace HR_LEAVEv2.UserControls
                         SET
                             [status]='{status}' 
                     ";
-
-                    //sqlCommand.CommandText = $@"
-                    //    UPDATE 
-                    //        [dbo].[leavetransaction] 
-                    //    SET 
-                    //        [status]='{status}'                             
-                    //    WHERE 
-                    //        [transaction_id] = {transaction_id};
-                    //";
                 }
                 sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
             }
@@ -440,15 +542,6 @@ namespace HR_LEAVEv2.UserControls
                         [supervisor_edit_date] = CURRENT_TIMESTAMP 
                 ";
 
-                //sqlCommand.CommandText = $@"
-                //    UPDATE 
-                //        [dbo].[leavetransaction] 
-                //    SET 
-                //        [status]='{status}', 
-                //        [supervisor_edit_date] = CURRENT_TIMESTAMP 
-                //    WHERE 
-                //        [transaction_id] = {transaction_id};
-                //";
                 sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
             }
             else if (gridViewType == "hr")
@@ -505,8 +598,9 @@ namespace HR_LEAVEv2.UserControls
                     leaveBalanceColumnName.Add("Sick", "[sick]");
                     leaveBalanceColumnName.Add("Vacation", "[vacation]");
 
-                    // TODO: check if in good standing (if employee has enough leave)
-                    // TODO: how does HR cater for this???
+                    // TODO: check if in good standing AKA Qualified (if employee has enough leave)
+
+                    // approved => subtract leave from balance
                     string operation = "";
                     if (commandName == "approved")
                     {
@@ -517,7 +611,7 @@ namespace HR_LEAVEv2.UserControls
                         operation = " - ";
                     }
 
-                    // TODO: undo
+                    // undo => add leave back
                     else if (commandName == "undoApprove")
                     {
                         // reset status to Recommended
@@ -526,6 +620,7 @@ namespace HR_LEAVEv2.UserControls
                         // Add leave back to balance
                         operation = " + ";
                     }
+
                     string sql = $@"
                         BEGIN TRANSACTION;
 
@@ -580,18 +675,51 @@ namespace HR_LEAVEv2.UserControls
             this.BindGridView();
         }
 
-        protected void ddlStatus_SelectedIndexChanged(object sender, EventArgs e)
+        protected Boolean validateDate(string date)
         {
-
+            // if not null or empty then validate
+            if (!string.IsNullOrEmpty(date))
+            {
+                return true;
+            }
+            else
+            {
+                return true;
+            }           
         }
 
-        protected void ddlType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
         protected void btnFilter_Click(object sender, EventArgs e)
         {
-            return;
+            // check all textboxes/drop down lists and set the respective varibles 
+            // these variables are then used in the
+
+            // reset all values to null throughout??
+
+            // check if control exists first?? (because some may be hidden)
+
+            // FIXME: hacky code - fix with validation
+            //SubmittedFrom = Convert.ToDateTime(tbSubmittedFrom.Text.ToString()).ToString();            
+            //SubmittedTo = Convert.ToDateTime(tbSubmittedTo.Text.ToString()).ToString(); 
+
+            SubmittedFrom = tbSubmittedFrom.Text.ToString();
+            SubmittedTo = tbSubmittedTo.Text.ToString();
+
+
+            StartDate = tbStartDate.Text.ToString();
+            EndDate = tbEndDate.Text.ToString();
+
+            // validate all dates
+
+            // display appropriate message in the notification panel
+
+            SupervisorName_ID = tbSupervisor.Text.ToString();
+            EmployeeName_ID = tbEmployee.Text.ToString();
+
+            LeaveType = ddlType.SelectedValue.ToString();
+            Status = ddlStatus.SelectedValue.ToString();
+            Qualified = ddlQualified.SelectedValue.ToString();
+
+            this.BindGridView();
         }
 
     }
