@@ -180,6 +180,7 @@
                                 <h4 style="display: inline">Sick Leave Balance:</h4>
                                 <span id="sickDetails"></span>
                             </div>
+                            <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -192,33 +193,34 @@
     </div>
 
     <script>
-        //Sys.WebForms.PageRequestManager.getInstance()
-
-        $('.show-details-btn').click(function () {
-            $('#empNameDetails').text("");
-            $('#empIdDetails').text("");
-            $('#ihrisIdDetails').text("");
-            $('#emailDetails').text("");
-            $('#vacationDetails').text("");
-            $('#personalDetails').text("");
-            $('#casualDetails').text("");
-            $('#sickDetails').text("");
-            $('#empTypeDetails').text("");
-            $('#empPositionDetails').text("");
-            $.ajax({
-                type: "POST",
-                url:  '<%= ResolveUrl("AllEmployees.aspx/getEmpDetails") %>',
-                contentType: "application/json; charset=utf-8",
-                data: "{'emp_id':'" + $(this).attr("emp_id") +"'}",
-                dataType: "json",
-                success: function (data) {
-                    populateModal(JSON.parse(data.d));
-                },
-                error: function (result) {
-                    alert('Unable to load data: ' + result.responseText);
-                }
+        Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
+            $('.show-details-btn').click(function () {
+                $('#empNameDetails').text("");
+                $('#empIdDetails').text("");
+                $('#ihrisIdDetails').text("");
+                $('#emailDetails').text("");
+                $('#vacationDetails').text("");
+                $('#personalDetails').text("");
+                $('#casualDetails').text("");
+                $('#sickDetails').text("");
+                $('#empTypeDetails').text("");
+                $('#empPositionDetails').text("");
+                $.ajax({
+                    type: "POST",
+                    url: '<%= ResolveUrl("AllEmployees.aspx/getEmpDetails") %>',
+                    contentType: "application/json; charset=utf-8",
+                    data: "{'emp_id':'" + $(this).attr("emp_id") + "'}",
+                    dataType: "json",
+                    success: function (data) {
+                        populateModal(JSON.parse(data.d));
+                    },
+                    error: function (result) {
+                        alert('Unable to load data: ' + result.responseText);
+                    }
+                });
             });
-        })
+
+        });
 
         function populateModal(data) {
             //populate modal
