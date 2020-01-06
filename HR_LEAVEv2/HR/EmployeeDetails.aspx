@@ -36,7 +36,7 @@
             </asp:UpdatePanel>
         </div>
         <div class="container" style="width: 50%;">
-            <div class="row text-center" style="background-color: #e0e0eb; margin-top: 15px; padding-bottom:15px;">
+            <div class="row text-center" style="background-color: #e0e0eb; margin-top: 15px; padding-bottom: 15px;">
 
                 <h3>IDs and Email</h3>
                 <div class="form-group text-left" style="width: 75%; margin: 0 auto; padding-bottom: 15px;">
@@ -111,7 +111,7 @@
                 </div>
             </div>
         </div>
-        <div class="container text-center" style="width: 50%; background-color: #e0e0eb; margin-top: 5px; padding-bottom:15px;">
+        <div class="container text-center" style="width: 50%; background-color: #e0e0eb; margin-top: 5px; padding-bottom: 15px;">
             <h3>Leave Balances</h3>
             <div class="form-group text-left">
                 <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator4" runat="server" ControlToValidate="personalLeaveInput" ErrorMessage="Please enter valid personal leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
@@ -276,84 +276,9 @@
         </div>
     </div>
 
-     <%--Modal--%>
-
-   <%-- <div class="modal fade" id="addEmpRecordModal" tabindex="-1" role="dialog" aria-labelledby="addEmpRecordTitle" aria-hidden="true" style="margin-top: 7%;">
-        <div class="modal-dialog" role="document" style="width: 55%;">
-            <div class="modal-content">
-                <div class="modal-header text-center">
-                    <h2 class="modal-title" id="addEmpRecordTitle" style="display: inline; width: 150px;">
-                        Add Record
-                    </h2>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="container" style="width:80%; height:95%">
-                        <div class="form-group" style="margin-top:25px;">
-                             <label for="empTypeList">Employment Type</label>
-                            <asp:DropDownList ID="empTypeList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource3" DataTextField="type_id" style="display:inline-block;"></asp:DropDownList>
-                            <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [type_id] FROM [employmenttype] ORDER BY [type_id]"></asp:SqlDataSource>
-                        </div>
-                        <div class="form-group" style="margin-top:45px;">
-                            <label for="deptList">Department</label>
-                            <asp:DropDownList ID="deptList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource2" DataValueField="dept_id" DataTextField="dept_name" style="display:inline-block; margin-right:15%;"></asp:DropDownList>
-                            <asp:SqlDataSource ID="SqlDataSource2" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [dept_id], [dept_name] FROM [department] ORDER BY [dept_name]"></asp:SqlDataSource>
-
-                            <label for="positionList" >Position</label>
-                            <asp:DropDownList ID="positionList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource1" DataValueField="pos_id" DataTextField="pos_name" style="display:inline-block"></asp:DropDownList>
-                            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [pos_id], [pos_name] FROM [position] ORDER BY [pos_name]"></asp:SqlDataSource>
-                        </div>
-                        <div class="form-group text-center" style="margin-top:45px;">
-                            <span style="margin-right:15%;">
-                                <label for="txtStartDate">Start date</label>
-                                <asp:TextBox ID="txtStartDate" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
-                                <i id="startDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                                <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtStartDate" PopupButtonID="startDateCalendar" runat="server"></ajaxToolkit:CalendarExtender>
-                                <asp:RequiredFieldValidator ID="startDateRequiredValidator" runat="server" ControlToValidate="txtStartDate" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
-                            </span>
-
-                            <span>
-                                <label for="txtEndDate">End date</label>
-                                <asp:TextBox ID="txtEndDate" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
-                                <i id="endDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                                <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtEndDate" PopupButtonID="endDateCalendar" runat="server"></ajaxToolkit:CalendarExtender>
-                                <asp:RequiredFieldValidator ID="endDateRequiredValidator" runat="server" ControlToValidate="txtEndDate" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
-                            </span>
-                        </div>
-
-                        <div id="validationDiv" style="margin-top:25px;">
-                             <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; margin:0px 5px;" role="alert">
-                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
-                            </asp:Panel>
-                            <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none;margin:0px 5px;" role="alert">
-                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
-                            </asp:Panel>
-                            <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" style="display:none; margin:0px 5px;" role="alert">
-                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
-                            </asp:Panel>
-                            <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" style="display:none" role="alert">
-                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                                <span id="successMsg" runat="server">Record successfully added</span>
-                            </asp:Panel>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-center" style="margin-bottom:45px;">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-right:35px;">Cancel</button>
-                    <button type="submit" id="addEmpRecordSubmitBtn" class="btn btn-success">Submit</button>
-                </div>
-            </div>
-        </div>
-    </div>--%>
-
     <script>
         $('#authLevelDiv input[type="checkbox"]').click(function (e) {
-            // show section to choose whether cupervising contract or public service when creating HR 2,3 employee
+            // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
             if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
                 $('#furtherDetailsForHrDiv').css("display", "block");
             }
@@ -362,83 +287,5 @@
                 $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
             }
         });
-
-        function testClick() {
-            alert("test");
-        }
-
-       <%-- $('#addEmpRecordSubmitBtn').click(function (e) {
-            // validate dates when adding new employment record
-
-            $("#<%= invalidStartDateValidationMsgPanel.ClientID %>").css("display", "none");
-            $("#<%= invalidEndDateValidationMsgPanel.ClientID %>").css("display", "none");
-            $("#<%= dateComparisonValidationMsgPanel.ClientID %>").css("display", "none");
-            $("#<%= successMsgPanel.ClientID %>").css("display", "none");
-            e.preventDefault();
-            var startDate = $("#<%= txtStartDate.ClientID %>").val();
-            var endDate = $("#<%= txtEndDate.ClientID %>").val();
-            var datesToValidate = {
-                'startDate': startDate,
-                'endDate': endDate
-            };
-
-            $.ajax({
-                type: "POST",
-                url:  '<%= ResolveUrl("EmployeeDetails.aspx/validateDates") %>',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify({ 'datesToValidate': JSON.stringify(datesToValidate) }),
-                dataType: "json",
-                success: function (data) {
-                    var validationIds = data.d.toString().split(';');
-                    //change display of relevant validation messages
-                    validationIds.forEach(function (validationMsgId) {
-                        var id = "";
-                        if (validationMsgId == "invalidStartDateValidationMsgPanel")
-                            id = "#<%= invalidStartDateValidationMsgPanel.ClientID %>";
-                        if (validationMsgId == "invalidEndDateValidationMsgPanel")
-                             id = "#<%= invalidEndDateValidationMsgPanel.ClientID %>";
-                        if (validationMsgId == "dateComparisonValidationMsgPanel")
-                             id = "#<%= dateComparisonValidationMsgPanel.ClientID %>";
-                        if (validationMsgId == "successMsgPanel")
-                            id = "#<%= successMsgPanel.ClientID %>";
-                        $(id).css("display", "inline-block");
-                    });
-
-                    if (validationIds[0] == "successMsgPanel") {
-
-                        var newEmploymentRecord = {
-                            'emp_id': $("#<%= employeeIdInput.ClientID %>").val(),
-                            'empType': $("#<%= empTypeList.ClientID %> option:selected").val() ,
-                            'dept': $("#<%= deptList.ClientID %> option:selected").val() ,
-                            'position': $("#<%= positionList.ClientID %> option:selected").val() ,
-                            'startDate': $("#<%= txtStartDate.ClientID %>").val(),
-                            'expectedEndDate': $("#<%= txtEndDate.ClientID %>").val()
-                        }
-
-                        alert(JSON.stringify(newEmploymentRecord));
-
-                        var row = $("#<%= GridView1.ClientID %> tr:last-child").clone(true);
-                        $("#<%= GridView1.ClientID %> tr").not($("#<%= GridView1.ClientID %> tr:first-child")).remove();
-
-                        $("td", row).eq(0).html(newEmploymentRecord.emp_id);
-                        $("td", row).eq(1).html(newEmploymentRecord.empType);
-                        $("td", row).eq(2).html(newEmploymentRecord.dept);
-                        $("td", row).eq(3).html(newEmploymentRecord.position);
-                        $("td", row).eq(4).html(newEmploymentRecord.startDate);
-                        $("td", row).eq(5).html(newEmploymentRecord.expectedEndDate);
-
-                        $("#<%= GridView1.ClientID %>").append(row);
-
-                    }
-
-                },
-                error: function (result) {
-                    alert('Unable to load data: ' + result.responseText);
-                }
-            });
-
-        });--%>
-
-
     </script>
 </asp:Content>

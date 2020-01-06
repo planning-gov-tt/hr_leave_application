@@ -218,8 +218,7 @@
             var isActive = storage.getItem("isActive");
             if (isActive != null) {
                 $('#sidebar').css('transition', 'none');
-                isActive = isActive.toString().localeCompare("true");
-                if (isActive == 0) {
+                if (isActive.toString().localeCompare("true") == 0) {
                     $('#sidebar').addClass("active");
 
                     //enable tooltips
@@ -240,13 +239,14 @@
             }
 
             $('#sidebarCollapse').click(function () {
+                // sidebar has class of active when collapsed
                 $('#sidebar').toggleClass('active');
                 $('#sidebar').css('transition', 'all 0.2s');
 
                 storage.setItem("isActive", $('#sidebar').hasClass("active"));
                 
                 if ($('#sidebar').hasClass('active')) {
-                    // sidebar collapse
+                    // sidebar collapsed
 
                     //enable tooltips
                     $(".tooltipped").tooltip('enable');
@@ -267,7 +267,7 @@
                     });
 
                 } else {
-                    // sidebar expand
+                    // sidebar expanded
 
 
                     $(".tooltipped").tooltip('disable');
@@ -289,6 +289,7 @@
                 }
             });
 
+            // change the respective arrow to up or down based on user interaction
             $('.dropdown-parent').click(function (e) {
                 var dropdownParentId = this.id;
                 if ($("#" + dropdownParentId + " span span.dropup-arrow").is(':visible')) {

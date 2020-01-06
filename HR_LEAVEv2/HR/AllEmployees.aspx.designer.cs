@@ -65,14 +65,5 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DataPager DataPager1;
-        
-        /// <summary>
-        /// LeaveCountUserControl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::HR_LEAVEv2.UserControls.LeaveCountUserControlBS4 LeaveCountUserControl;
     }
 }

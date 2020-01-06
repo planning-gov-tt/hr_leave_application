@@ -12,43 +12,52 @@
     </style>
     <h1><%: Title %></h1>
     <div id="myAccountContainer" class="container-fluid text-center">
+        <%--Tab labels--%>
         <div class="row" id="myTabs">
-            <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist" style="width:70%; margin:auto;">
-              <li class="nav-item active" id="summaryItem">
-                <a class="nav-link active" id="summaryTab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
-              </li>
-              <li class="nav-item" id="viewLeaveLogsItem">
-                <a class="nav-link" id="viewLeaveLogsTab" data-toggle="tab" href="#viewLeaveLogs" role="tab" aria-controls="viewLeaveLogs" aria-selected="false">View Leave Logs</a>
-              </li>
-              <li class="nav-item" id="editInfoItem">
-                <a class="nav-link" id="editInfoTab" data-toggle="tab" href="#editInfo" role="tab" aria-controls="editInfo" aria-selected="false">Edit Account Info</a>
-              </li>
+            <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist" style="width: 70%; margin: auto;">
+                <li class="nav-item active" id="summaryItem">
+                    <a class="nav-link active" id="summaryTab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="true">Summary</a>
+                </li>
+                <li class="nav-item" id="viewLeaveLogsItem">
+                    <a class="nav-link" id="viewLeaveLogsTab" data-toggle="tab" href="#viewLeaveLogs" role="tab" aria-controls="viewLeaveLogs" aria-selected="false">View Leave Logs</a>
+                </li>
+                <li class="nav-item" id="editInfoItem">
+                    <a class="nav-link" id="editInfoTab" data-toggle="tab" href="#editInfo" role="tab" aria-controls="editInfo" aria-selected="false">Edit Account Info</a>
+                </li>
             </ul>
         </div>
+        <%-- Tab content --%>
         <div class="row tab-content" id="myTabContent">
-          <div class="tab-pane fade active in" id="summary" role="tabpanel" aria-labelledby="summaryTab">
-              <h3>Summary</h3>
-              <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
-          </div>
-          <div class="tab-pane fade" id="viewLeaveLogs" role="tabpanel" aria-labelledby="viewLeaveLogsTab">
-              <h3>My Leave Logs</h3>
+            <div class="tab-pane fade active in" id="summary" role="tabpanel" aria-labelledby="summaryTab">
+                <h3>Summary</h3>
+                <TWebControl:LeaveCountUserControlBS4 ID="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
+            </div>
+            <div class="tab-pane fade" id="viewLeaveLogs" role="tabpanel" aria-labelledby="viewLeaveLogsTab">
+                <h3>My Leave Logs</h3>
 
-              <div id="leaveLogContainer">
-                  <TWebControl:GridViewWebControl ID ="GridViewWebControlEmp" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
-              </div>
-
-          </div>
-          <div class="tab-pane fade" id="editInfo" role="tabpanel" aria-labelledby="editInfoTab">
-              <h3>Edit Account</h3>
-          </div>
+                <div id="leaveLogContainer">
+                    <TWebControl:GridViewWebControl ID="GridViewWebControlEmp" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="editInfo" role="tabpanel" aria-labelledby="editInfoTab">
+                <h3>Edit Account</h3>
+            </div>
         </div>
     </div>
 
     <script>
 
+        /** 
+        * When filtering data in the Gridview in the 'My Leave Logs' tab, a partial postback occurs (the gridview
+        * must be updated). This would reset the current tab to the first tab, Summary, when the postback occurs.
+        *
+        * The following function is run when the page load occurs to reset the tab to the last active tab. Session storage is used to store the id of the last active tab.
+        * Furthermore, any future code which triggers a postback will also benefit from this code.
+        */
         Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
-            var lastActiveItem = sessionStorage.getItem("lastActiveItemId");
-            var lastActiveItemContent = sessionStorage.getItem("lastActiveItemContentId");
+            var storage = sessionStorage;
+            var lastActiveItem = storage.getItem("lastActiveItemId");
+            var lastActiveItemContent = storage.getItem("lastActiveItemContentId");
             if (lastActiveItem != null && lastActiveItemContent != null) {
                 // remove active class from item tab
                 $('.nav-item').removeClass('active');
@@ -64,12 +73,14 @@
             }
         });
 
+        // store the current tab id in session storage
         $('.nav-item').click(function () {
             var itemId = $(this).attr('id').toString();
             var contentId = itemId.replace('Item', '');
 
-            sessionStorage.setItem('lastActiveItemId', itemId);
-            sessionStorage.setItem('lastActiveItemContentId', contentId);
+            var storage = sessionStorage;
+            storage.setItem('lastActiveItemId', itemId);
+            storage.setItem('lastActiveItemContentId', contentId);
         });
 
     </script>
