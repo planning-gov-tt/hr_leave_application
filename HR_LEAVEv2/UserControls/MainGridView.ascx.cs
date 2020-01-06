@@ -690,7 +690,7 @@ namespace HR_LEAVEv2.UserControls
 
         protected void btnFilter_Click(object sender, EventArgs e)
         {
-            // check all textboxes/drop down lists and set the respective varibles 
+            // check all textboxes/drop down lists and set the respective variables 
             // these variables are then used in the
 
             // reset all values to null throughout??

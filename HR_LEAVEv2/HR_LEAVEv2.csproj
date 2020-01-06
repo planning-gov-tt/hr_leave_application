@@ -131,7 +131,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <None Include="Properties\PublishProfiles\TristanSankar.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="GridViewTest\GridViewTest.aspx" />
     <Content Include="HR\AllEmployeeLeaveApplications.aspx" />
     <Content Include="HR\AllEmployees.aspx" />
     <Content Include="HR\EmployeeDetails.aspx" />
@@ -171,7 +170,6 @@
     <Content Include="Styles\MasterStyleSheet.css" />
     <Content Include="Supervisor\MyEmployeeLeaveApplications.aspx" />
     <Content Include="Supervisor\MyEmployees.aspx" />
-    <Content Include="UserControls\LeaveCountUserControl.ascx" />
     <Content Include="UserControls\LeaveCountUserControlBS4.ascx" />
     <Content Include="UserControls\MainGridView.ascx" />
     <Content Include="UserControls\supervisorSelect.ascx" />
@@ -254,13 +252,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="GridViewTest\GridViewTest.aspx.cs">
-      <DependentUpon>GridViewTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="GridViewTest\GridViewTest.aspx.designer.cs">
-      <DependentUpon>GridViewTest.aspx</DependentUpon>
-    </Compile>
     <Compile Include="HR\AllEmployeeLeaveApplications.aspx.cs">
       <DependentUpon>AllEmployeeLeaveApplications.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -310,13 +301,6 @@
     </Compile>
     <Compile Include="Supervisor\MyEmployees.aspx.designer.cs">
       <DependentUpon>MyEmployees.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\LeaveCountUserControl.ascx.cs">
-      <DependentUpon>LeaveCountUserControl.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="UserControls\LeaveCountUserControl.ascx.designer.cs">
-      <DependentUpon>LeaveCountUserControl.ascx</DependentUpon>
     </Compile>
     <Compile Include="UserControls\LeaveCountUserControlBS4.ascx.cs">
       <DependentUpon>LeaveCountUserControlBS4.ascx</DependentUpon>

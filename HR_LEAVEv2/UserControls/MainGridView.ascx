@@ -6,78 +6,76 @@
 
 <%--filter fields--%>
 <div id="filterContainer" class="container" style="padding-bottom: 30px">
-    <form>
-        <div class="row" style="text-align:right">
-            <div class="col-xs-3 form-group">
-                <%--<label for="tbSubmittedFrom">Submitted From:</label>--%>
-                <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted From" ></asp:TextBox>
-                <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg"></i>
-                <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server"></ajaxToolkit:CalendarExtender>
-            </div>
-            <div class="col-xs-3 form-group">
-                <%--<label for="tbSubmittedTo">Submitted To:</label>--%>
-                <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
-                <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg"></i>
-                <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" />
-            </div>
-            <div class="col-xs-3 form-group">
-                <%--<label for="txtFrom">Start Date:</label>--%>
-                <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
-                <i id="fromCalendar" class="fa fa-calendar fa-lg"></i>
-                <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
-            </div>
-            <div class="col-xs-3 form-group">
-                <%--<label for="txtTo">End Date:</label>--%>
-                <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
-                <i id="toCalendar" class="fa fa-calendar fa-lg"></i>
-                <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" />
-            </div>
+    <div class="row" style="text-align: right">
+        <div class="col-xs-3 form-group">
+            <%--<label for="tbSubmittedFrom">Submitted From:</label>--%>
+            <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
+            <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg"></i>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server"></ajaxToolkit:CalendarExtender>
         </div>
-        <div id="divTbSupervisor" class="row" runat="server">
-            <div class="col-sm-12 form-group"  style="text-align:center">
-                <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control" placeholder="Supervisor Name/ID" Style="text-align:center"></asp:TextBox>
-            </div>
-        </div>                
-        <div id="divTbEmployee" class="row" runat="server">
-            <div class="col-sm-12 form-group" style="text-align:center">
-                <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control" placeholder="Employee Name/ID" Style="text-align:center"></asp:TextBox>
-            </div>
+        <div class="col-xs-3 form-group">
+            <%--<label for="tbSubmittedTo">Submitted To:</label>--%>
+            <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
+            <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg"></i>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" />
         </div>
-        <%--FIXME: make this list pull from the database--%>
-        <div class="row">
-            <div class="col-sm-4">
-                <asp:DropDownList CssClass="form-control" runat="server" ID="ddlType">
-                    <asp:ListItem Text="Leave Types (All)" Value=""></asp:ListItem>
-                    <asp:ListItem Text="Sick" Value="Sick"></asp:ListItem>
-                    <asp:ListItem Text="Vacation" Value="Vacation"></asp:ListItem>
-                    <asp:ListItem Text="Personal" Value="Personal"></asp:ListItem>
-                    <asp:ListItem Text="Casual" Value="Casual"></asp:ListItem>
-                    <asp:ListItem Text="Bereavement" Value="Bereavement"></asp:ListItem>
-                    <asp:ListItem Text="Leave Renewal" Value="Leave Renewal"></asp:ListItem>
-                    <asp:ListItem Text="Maternity" Value="Maternity"></asp:ListItem>
-                    <asp:ListItem Text="No Pay" Value="No Pay"></asp:ListItem>
-                </asp:DropDownList>
-            </div>
-            <div class="col-sm-4">
-                <asp:DropDownList CssClass="form-control" runat="server" ID="ddlStatus">
-                    <asp:ListItem Text="Status (All)" Value=""></asp:ListItem>
-                    <asp:ListItem Text="Pending" Value="Pending"></asp:ListItem>
-                    <asp:ListItem Text="Recommended" Value="Recommended"></asp:ListItem>
-                    <asp:ListItem Text="Not Recommended" Value="Not Recommended"></asp:ListItem>
-                    <asp:ListItem Text="Approved" Value="Approved"></asp:ListItem>
-                    <asp:ListItem Text="Not Approved" Value="Not Approved"></asp:ListItem>
-                    <asp:ListItem Text="Date Change Requested" Value="Date Change Requested"></asp:ListItem>
-                </asp:DropDownList>
-            </div>
-            <div class="col-sm-4">
-                <asp:DropDownList CssClass="form-control" runat="server" ID="ddlQualified">
-                    <asp:ListItem Text="Qualified (All)" Value=""></asp:ListItem>
-                    <asp:ListItem Text="Yes" Value="Yes"></asp:ListItem>
-                    <asp:ListItem Text="No" Value="No"></asp:ListItem>                    
-                </asp:DropDownList>
-            </div>
+        <div class="col-xs-3 form-group">
+            <%--<label for="txtFrom">Start Date:</label>--%>
+            <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
+            <i id="fromCalendar" class="fa fa-calendar fa-lg"></i>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
         </div>
-    </form>
+        <div class="col-xs-3 form-group">
+            <%--<label for="txtTo">End Date:</label>--%>
+            <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
+            <i id="toCalendar" class="fa fa-calendar fa-lg"></i>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" />
+        </div>
+    </div>
+    <div id="divTbSupervisor" class="row" runat="server">
+        <div class="col-sm-12 form-group" style="text-align: center">
+            <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control" placeholder="Supervisor Name/ID" Style="text-align: center"></asp:TextBox>
+        </div>
+    </div>
+    <div id="divTbEmployee" class="row" runat="server">
+        <div class="col-sm-12 form-group" style="text-align: center">
+            <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control" placeholder="Employee Name/ID" Style="text-align: center"></asp:TextBox>
+        </div>
+    </div>
+    <%--FIXME: make this list pull from the database--%>
+    <div class="row">
+        <div class="col-sm-4">
+            <asp:DropDownList CssClass="form-control" runat="server" ID="ddlType">
+                <asp:ListItem Text="Leave Types (All)" Value=""></asp:ListItem>
+                <asp:ListItem Text="Sick" Value="Sick"></asp:ListItem>
+                <asp:ListItem Text="Vacation" Value="Vacation"></asp:ListItem>
+                <asp:ListItem Text="Personal" Value="Personal"></asp:ListItem>
+                <asp:ListItem Text="Casual" Value="Casual"></asp:ListItem>
+                <asp:ListItem Text="Bereavement" Value="Bereavement"></asp:ListItem>
+                <asp:ListItem Text="Leave Renewal" Value="Leave Renewal"></asp:ListItem>
+                <asp:ListItem Text="Maternity" Value="Maternity"></asp:ListItem>
+                <asp:ListItem Text="No Pay" Value="No Pay"></asp:ListItem>
+            </asp:DropDownList>
+        </div>
+        <div class="col-sm-4">
+            <asp:DropDownList CssClass="form-control" runat="server" ID="ddlStatus">
+                <asp:ListItem Text="Status (All)" Value=""></asp:ListItem>
+                <asp:ListItem Text="Pending" Value="Pending"></asp:ListItem>
+                <asp:ListItem Text="Recommended" Value="Recommended"></asp:ListItem>
+                <asp:ListItem Text="Not Recommended" Value="Not Recommended"></asp:ListItem>
+                <asp:ListItem Text="Approved" Value="Approved"></asp:ListItem>
+                <asp:ListItem Text="Not Approved" Value="Not Approved"></asp:ListItem>
+                <asp:ListItem Text="Date Change Requested" Value="Date Change Requested"></asp:ListItem>
+            </asp:DropDownList>
+        </div>
+        <div class="col-sm-4">
+            <asp:DropDownList CssClass="form-control" runat="server" ID="ddlQualified">
+                <asp:ListItem Text="Qualified (All)" Value=""></asp:ListItem>
+                <asp:ListItem Text="Yes" Value="Yes"></asp:ListItem>
+                <asp:ListItem Text="No" Value="No"></asp:ListItem>
+            </asp:DropDownList>
+        </div>
+    </div>
 </div>
 
 <%--button--%>
