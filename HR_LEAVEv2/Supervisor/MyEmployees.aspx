@@ -16,7 +16,7 @@
     <h1><%: Title %></h1>
     <div class="container-fluid">
         <div class="container" style="width: 65%;">
-            <div class="row" style="margin-top: 25px;">
+            <div class="row text-center" style="margin-top: 25px;">
                 <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group" Style="width: 510px; margin: 0 auto;">
                     <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control" placeholder="Search Employee" aria-label="Search Employee" aria-describedby="basic-addon2" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
                     <div class="input-group-addon">
@@ -27,6 +27,10 @@
                         </asp:LinkButton>
                     </div>
                 </asp:Panel>
+                <button id="clearSearchBtn" class="btn btn-primary" style="display:none; margin-top:15px;">
+                    <i class="fa fa-times"></i>
+                    Clear Search
+                </button>
             </div>
         </div>
         <div class="container" style="width: 100%; margin-top: 55px;">
@@ -174,7 +178,7 @@
 
                             <div id="errorPanel" class="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                <span>Employee Type and Position info could not be loaded</span>
+                                <span>Employment Type and employee position info could not be loaded</span>
                             </div>
 
                             <hr style="width: 45%;" />
@@ -238,6 +242,20 @@
                         alert('Unable to load data: ' + result.responseText);
                     }
                 });
+            });
+
+            if ($('#<%= searchTxtbox.ClientID %>').val() != "")
+                $('#clearSearchBtn').show();
+            else
+                $('#clearSearchBtn').hide();
+
+            $('#<%= searchTxtbox.ClientID %>').one('keypress', function () {
+                $('#clearSearchBtn').show();
+            });
+
+            $('#clearSearchBtn').click(function () {
+                $('#<%= searchTxtbox.ClientID %>').val("");
+                $(this).hide();
             });
         });
 

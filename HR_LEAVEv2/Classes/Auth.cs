@@ -47,7 +47,7 @@ namespace HR_LEAVEv2
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
 
             // find the user
-            UserPrincipal user = UserPrincipal.FindByIdentity(ctx, WindowsIdentity.GetCurrent().Name);
+            UserPrincipal user = UserPrincipal.FindByIdentity(ctx, HttpContext.Current.Request.LogonUserIdentity.Name);
 
             if (user != null)
             {

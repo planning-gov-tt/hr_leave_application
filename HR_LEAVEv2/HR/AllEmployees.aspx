@@ -21,6 +21,10 @@
                         </asp:LinkButton>
                     </div>
                 </asp:Panel>
+                <button id="clearSearchBtn" class="btn btn-primary" style="display:none; margin-top:15px; margin-right:5px;">
+                    <i class="fa fa-times"></i>
+                    Clear Search
+                </button>
                 <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-primary" OnClick="newEmployeeBtn_Click" Style="margin-top: 15px">
                     <i class="fa fa-plus"></i>
                     Add new Employee
@@ -79,21 +83,21 @@
                         <div class="custom-card" style="margin-left: 20px; margin-right: 20px; position: relative;">
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
                             <h3 style="margin-top: 10px;">
-                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h3>
+                                <asp:Label runat="server" ID="Label2" Text='<%#Eval("Name") %>'></asp:Label></h3>
                             <div class="custom-card-body">
                                 <span>
                                     <h5 style="display: inline;">Employee ID:</h5>
-                                    <asp:Label runat="server" ID="emp_idLabel" Text='<%#Eval("employee_id") %>'></asp:Label>
+                                    <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>'></asp:Label>
                                     <br />
                                 </span>
                                 <span>
                                     <h5 style="display: inline;">IHRIS ID:</h5>
-                                    <asp:Label runat="server" ID="ihris_idLabel" Text='<%#Eval("ihris_id") %>'></asp:Label>
+                                    <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>'></asp:Label>
                                     <br />
                                 </span>
                                 <span>
                                     <h5 style="margin-bottom: 5px;">Email:</h5>
-                                    <asp:Label runat="server" ID="Label1" Text='<%#Eval("email") %>'></asp:Label>
+                                    <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>'></asp:Label>
                                     <br />
                                 </span>
                             </div>
@@ -172,7 +176,7 @@
 
                             <div id="errorPanel" class="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                <span>Employee Type and Position info could not be loaded</span>
+                                <span>Employment Type and employee position info could not be loaded</span>
                             </div>
 
                             <hr style="width: 45%;" />
@@ -240,6 +244,20 @@
                 });
             });
 
+            if ($('#<%= searchTxtbox.ClientID %>').val() != "")
+                $('#clearSearchBtn').show();
+            else
+                $('#clearSearchBtn').hide();
+
+            $('#<%= searchTxtbox.ClientID %>').on('keypress', function () {
+                $('#clearSearchBtn').show();
+            });
+
+            $('#clearSearchBtn').click(function () {
+                $('#<%= searchTxtbox.ClientID %>').val("");
+                $(this).hide();
+            });
+           
         });
 
         function populateModal(data) {
@@ -264,6 +282,7 @@
             }
 
         }
+        
     </script>
 
 </asp:Content>
