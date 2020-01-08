@@ -63,11 +63,11 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 
 INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [pre_retirement]) VALUES 
 -- IT
-('1', '1', 'PLANNING\ Tristan Sankar', 'Tristan', 'Sankar', 'tristan.sankar@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
-('115245', '115245', 'PLANNING\ Clint Ramoutar', 'Clint', 'Ramoutar', 'clint.ramoutar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
-('3', '3', 'PLANNING\ Christopher Sahadeo', 'Christopher', 'Sahadeo', 'christopher.sahadeo@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
-('184164', '184164', 'PLANNING\ Dale Cudjoe', 'Dale', 'Cudjoe', 'dale.cudjoe@planning.gov.tt', 15, 5, 0, 14, 2, 0, 0),
-('157778', '157778', 'PLANNING\ Nandani Ramsaran', 'Nandani', 'Ramsaran', 'nandani.ramsaran@planning.gov.tt', 10, 5, 0, 14, 2, 0, 0),
+('1', '1', 'PLANNING\ Tristan Sankar', 'Tristan', 'Sankar', 'Tristan.Sankar@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
+('115245', '115245', 'PLANNING\ Clint Ramoutar', 'Clint', 'Ramoutar', 'Clint.Ramoutar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
+('3', '3', 'PLANNING\ Christopher Sahadeo', 'Christopher', 'Sahadeo', 'Christopher.Sahadeo@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
+('184164', '184164', 'PLANNING\ Dale Cudjoe', 'Dale', 'Cudjoe', 'Dale.Cudjoe@planning.gov.tt', 15, 5, 0, 14, 2, 0, 0),
+('157778', '157778', 'PLANNING\ Nandani Ramsaran', 'Nandani', 'Ramsaran', 'Nandani.Ramsaran@planning.gov.tt', 10, 5, 0, 14, 2, 0, 0),
 ('161720', '161720', 'PLANNING\ Rishi Jaimungalsingh', 'Rishi', 'Jaimungalsingh', 'Rishi.Jaimungalsingh@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
 ('159118', '159118', 'PLANNING\ Carlisle McKay', 'Carlisle', 'McKay', 'Carlisle.McKay@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
 ('15067', '15067', 'PLANNING\ Rohini Singh', 'Rohini', 'Singh', 'Rohini.Singh@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
@@ -77,7 +77,7 @@ INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name
 -- Deneyse
 
 -- HR
-('83612', '83612', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'melanie.noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- Director
+('83612', '83612', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'Melanie.Noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- Director
 ('11948', '11948', 'PLANNING\ Charmaine Carmichael', 'Charmaine', 'Carmichael', 'Charmaine.Carmichael@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- HRO3
 ('01511', '01511', 'PLANNING\ Christine Bowen', 'Christine', 'Bowen', 'Christine.Bowen@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- HRO2
 ('13888', '13888', 'PLANNING\ Sharline Bharath-Jaggernauth', 'Sharline', 'Bharath-Jaggernauth', 'Sharline.Bharath-Jaggernauth@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0), -- HRO2
@@ -182,7 +182,8 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 ('Bereavement'),
 ('Maternity'),
 ('Pre-retirement'),
-('Leave Renewal');
+('Leave Renewal'),
+('Compensatory');
 
 
 SET IDENTITY_INSERT [dbo].[leavetransaction] ON;
