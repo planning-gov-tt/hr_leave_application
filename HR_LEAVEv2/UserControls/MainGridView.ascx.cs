@@ -490,7 +490,7 @@ namespace HR_LEAVEv2.UserControls
             int index = Convert.ToInt32(e.CommandArgument);
             GridViewRow row = GridView.Rows[index];
 
-            // get transaciton_id associated with row
+            // get transaction_id associated with row
             int transaction_id = Convert.ToInt32(GridView.DataKeys[index].Values["transaction_id"]);
 
             string status = "";
@@ -675,17 +675,67 @@ namespace HR_LEAVEv2.UserControls
             this.BindGridView();
         }
 
-        protected Boolean validateDate(string date)
+        protected Boolean validateDates(string startDate, string endDate, int type)
         {
-            // if not null or empty then validate
-            if (!string.IsNullOrEmpty(date))
+            // type 0: submitted from, submitted to
+            // type 1: start date, end date
+
+            DateTime start, end;
+            start = end = DateTime.MinValue;
+            Boolean isValidated = true;
+
+            // validate start date is a date
+            try
             {
-                return true;
+                if (!String.IsNullOrEmpty(startDate))
+                    start = Convert.ToDateTime(startDate);
             }
-            else
+            catch (FormatException fe)
             {
-                return true;
-            }           
+                if (type == 0)
+                    invalidSubmittedFromDate.Style.Add("display", "inline-block");
+                else 
+                    invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+                isValidated = false;
+            }
+
+            // validate end date is a date
+            try
+            {
+                if (!String.IsNullOrEmpty(endDate))
+                    end = Convert.ToDateTime(endDate);
+            }
+            catch (FormatException fe)
+            {
+                if (type == 0)
+                    invalidSubmittedToDate.Style.Add("display", "inline-block");
+                else
+                    invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block"); isValidated = false;
+            }
+
+            if (isValidated)
+            {
+
+                // compare dates to ensure end date is not before start date
+                if (DateTime.Compare(start, end) > 0)
+                {
+                    if (type == 0)
+                    {
+                        invalidSubmittedToDate.Style.Add("display", "inline-block");
+                        submittedDateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
+                    }
+                    else{
+                        invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
+                        appliedForDateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
+                    }
+
+                    isValidated = false;
+                }
+
+                return isValidated;
+            }
+
+            return false;
         }
 
         protected void btnFilter_Click(object sender, EventArgs e)
@@ -709,17 +759,29 @@ namespace HR_LEAVEv2.UserControls
             EndDate = tbEndDate.Text.ToString();
 
             // validate all dates
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            appliedForDateComparisonValidationMsgPanel.Style.Add("display", "none");
+            invalidSubmittedFromDate.Style.Add("display", "none");
+            invalidSubmittedToDate.Style.Add("display", "none");
+            submittedDateComparisonValidationMsgPanel.Style.Add("display", "none");
 
-            // display appropriate message in the notification panel
+            bool areSubmitDatesValidated = false, areAppliedDatesValidated = false;
+            areSubmitDatesValidated = validateDates(SubmittedFrom, SubmittedTo, 0);
+            areAppliedDatesValidated = validateDates(StartDate, EndDate, 1);
+            if (areSubmitDatesValidated && areAppliedDatesValidated)
+            {
+                // display appropriate message in the notification panel
 
-            SupervisorName_ID = tbSupervisor.Text.ToString();
-            EmployeeName_ID = tbEmployee.Text.ToString();
+                SupervisorName_ID = tbSupervisor.Text.ToString();
+                EmployeeName_ID = tbEmployee.Text.ToString();
 
-            LeaveType = ddlType.SelectedValue.ToString();
-            Status = ddlStatus.SelectedValue.ToString();
-            Qualified = ddlQualified.SelectedValue.ToString();
+                LeaveType = ddlType.SelectedValue.ToString();
+                Status = ddlStatus.SelectedValue.ToString();
+                Qualified = ddlQualified.SelectedValue.ToString();
 
-            this.BindGridView();
+                this.BindGridView();
+            }
         }
 
     }

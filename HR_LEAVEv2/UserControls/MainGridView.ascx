@@ -3,43 +3,44 @@
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
+<style>
+    #gridViewContainer th{
+        text-align:center;
+    }
+</style>
 
 <%--filter fields--%>
 <div id="filterContainer" class="container" style="padding-bottom: 30px">
     <div class="row" style="text-align: right">
         <div class="col-xs-3 form-group">
-            <%--<label for="tbSubmittedFrom">Submitted From:</label>--%>
             <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
-            <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg"></i>
+            <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
-            <%--<label for="tbSubmittedTo">Submitted To:</label>--%>
             <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
-            <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg"></i>
+            <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" />
         </div>
         <div class="col-xs-3 form-group">
-            <%--<label for="txtFrom">Start Date:</label>--%>
             <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
-            <i id="fromCalendar" class="fa fa-calendar fa-lg"></i>
+            <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
-            <%--<label for="txtTo">End Date:</label>--%>
             <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
-            <i id="toCalendar" class="fa fa-calendar fa-lg"></i>
+            <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" />
         </div>
     </div>
     <div id="divTbSupervisor" class="row" runat="server">
         <div class="col-sm-12 form-group" style="text-align: center">
-            <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control" placeholder="Supervisor Name/ID" Style="text-align: center"></asp:TextBox>
+            <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control" placeholder="Supervisor Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
     <div id="divTbEmployee" class="row" runat="server">
         <div class="col-sm-12 form-group" style="text-align: center">
-            <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control" placeholder="Employee Name/ID" Style="text-align: center"></asp:TextBox>
+            <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control" placeholder="Employee Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
     <%--FIXME: make this list pull from the database--%>
@@ -79,7 +80,7 @@
 </div>
 
 <%--button--%>
-<div class="container" style="padding-bottom: 30px; text-align:center">
+<div class="container" style="padding-bottom: 12px; text-align:center">
      <asp:Button CssClass="btn btn-primary" Text="Filter" ID="btnFilter" runat="server" OnClick="btnFilter_Click" />
 </div>
 
@@ -88,13 +89,37 @@
 <div id="gridViewContainer" class="container">
 
     <%--if grid view is empty then show notification panel--%>
-    <div class="row text-center" id="validationRow">
-        <asp:UpdatePanel ID="UpdatePanelEmptyGridView" runat="server">
+    <div class="row text-center" id="validationRow" style="margin-bottom:25px;">
+        <asp:UpdatePanel ID="UpdatePanelMsgs" runat="server">
             <ContentTemplate>
-                <asp:Panel ID="emptyGridViewMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
+                <asp:Panel ID="emptyGridViewMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="validationMsg" runat="server">No leave data available</span>
                 </asp:Panel>
+                <asp:Panel ID="invalidSubmittedFromDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidSubmittedFromDateMsg" runat="server">Submitted from date is not valid</span>
+                </asp:Panel>
+                <asp:Panel ID="invalidSubmittedToDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidSubmittedToDateMsg" runat="server">Submitted to date is not valid</span>
+                </asp:Panel>
+                <asp:Panel ID="submittedDateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="submittedDateComparisonValidationMsg" runat="server">Submitted to date cannot precede submitted from</span>
+                </asp:Panel>
+                <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
+                </asp:Panel>
+                <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
+                </asp:Panel>
+                <asp:Panel ID="appliedForDateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
+                </asp:Panel>               
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>

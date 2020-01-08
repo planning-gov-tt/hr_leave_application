@@ -157,13 +157,13 @@ namespace HR_LEAVEv2.UserControls {
         protected global::System.Web.UI.WebControls.Button btnFilter;
         
         /// <summary>
-        /// UpdatePanelEmptyGridView control.
+        /// UpdatePanelMsgs control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanelEmptyGridView;
+        protected global::System.Web.UI.UpdatePanel UpdatePanelMsgs;
         
         /// <summary>
         /// emptyGridViewMsgPanel control.
@@ -182,6 +182,114 @@ namespace HR_LEAVEv2.UserControls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl validationMsg;
+        
+        /// <summary>
+        /// invalidSubmittedFromDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidSubmittedFromDate;
+        
+        /// <summary>
+        /// invalidSubmittedFromDateMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidSubmittedFromDateMsg;
+        
+        /// <summary>
+        /// invalidSubmittedToDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidSubmittedToDate;
+        
+        /// <summary>
+        /// invalidSubmittedToDateMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidSubmittedToDateMsg;
+        
+        /// <summary>
+        /// submittedDateComparisonValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel submittedDateComparisonValidationMsgPanel;
+        
+        /// <summary>
+        /// submittedDateComparisonValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl submittedDateComparisonValidationMsg;
+        
+        /// <summary>
+        /// invalidStartDateValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidStartDateValidationMsgPanel;
+        
+        /// <summary>
+        /// invalidStartDateValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidStartDateValidationMsg;
+        
+        /// <summary>
+        /// invalidEndDateValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidEndDateValidationMsgPanel;
+        
+        /// <summary>
+        /// invalidEndDateValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidEndDateValidationMsg;
+        
+        /// <summary>
+        /// appliedForDateComparisonValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel appliedForDateComparisonValidationMsgPanel;
+        
+        /// <summary>
+        /// dateComparisonValidationMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl dateComparisonValidationMsg;
         
         /// <summary>
         /// GridView control.
