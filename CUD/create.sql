@@ -108,7 +108,9 @@ CREATE TABLE [dbo].[leavetransaction] (
   [hr_manager_edit_date] DATETIME,
 
   [status] NVARCHAR (30) NOT NULL,
-  [comments] NVARCHAR (120),
+  [emp_comment] NVARCHAR (120),
+  [sup_comment] NVARCHAR (120),
+  [hr_comment] NVARCHAR (120),
   [file_path] NVARCHAR (50),
 
   FOREIGN KEY ([employee_id])
