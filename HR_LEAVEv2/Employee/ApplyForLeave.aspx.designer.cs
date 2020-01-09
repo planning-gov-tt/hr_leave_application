@@ -13,6 +13,33 @@ namespace HR_LEAVEv2.Employee {
     public partial class ApplyForLeave {
         
         /// <summary>
+        /// applyModeTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel applyModeTitle;
+        
+        /// <summary>
+        /// viewModeTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel viewModeTitle;
+        
+        /// <summary>
+        /// editModeTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel editModeTitle;
+        
+        /// <summary>
         /// txtFrom control.
         /// </summary>
         /// <remarks>
@@ -22,13 +49,13 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.TextBox txtFrom;
         
         /// <summary>
-        /// CalendarExtender1 control.
+        /// fromCalendarExtender control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::AjaxControlToolkit.CalendarExtender CalendarExtender1;
+        protected global::AjaxControlToolkit.CalendarExtender fromCalendarExtender;
         
         /// <summary>
         /// fromCalendarRequiredValidator control.
@@ -49,13 +76,13 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.TextBox txtTo;
         
         /// <summary>
-        /// CalendarExtender2 control.
+        /// toCalendarExtender control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::AjaxControlToolkit.CalendarExtender CalendarExtender2;
+        protected global::AjaxControlToolkit.CalendarExtender toCalendarExtender;
         
         /// <summary>
         /// toCalendarRequiredValidator control.
@@ -65,6 +92,15 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator toCalendarRequiredValidator;
+        
+        /// <summary>
+        /// typeOfLeaveDropdownPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel typeOfLeaveDropdownPanel;
         
         /// <summary>
         /// typeOfLeave control.
@@ -85,6 +121,33 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator typeOfLeaveRequiredValidator;
         
         /// <summary>
+        /// typeOfLeavePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel typeOfLeavePanel;
+        
+        /// <summary>
+        /// typeOfLeaveTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox typeOfLeaveTxt;
+        
+        /// <summary>
+        /// supervisorSelectUserControlPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel supervisorSelectUserControlPanel;
+        
+        /// <summary>
         /// supervisor_select control.
         /// </summary>
         /// <remarks>
@@ -92,6 +155,33 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::HR_LEAVEv2.UserControls.supervisorSelect supervisor_select;
+        
+        /// <summary>
+        /// supervisorPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel supervisorPanel;
+        
+        /// <summary>
+        /// supervisorNameTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox supervisorNameTxt;
+        
+        /// <summary>
+        /// fileUploadPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel fileUploadPanel;
         
         /// <summary>
         /// FileUpload1 control.
@@ -103,16 +193,69 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.FileUpload FileUpload1;
         
         /// <summary>
-        /// txtComments control.
+        /// empCommentsPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTextArea txtComments;
+        protected global::System.Web.UI.WebControls.Panel empCommentsPanel;
         
         /// <summary>
-
+        /// empCommentsTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTextArea empCommentsTxt;
+        
+        /// <summary>
+        /// supCommentsPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel supCommentsPanel;
+        
+        /// <summary>
+        /// supCommentsTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTextArea supCommentsTxt;
+        
+        /// <summary>
+        /// hrCommentsPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel hrCommentsPanel;
+        
+        /// <summary>
+        /// hrCommentsTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTextArea hrCommentsTxt;
+        
+        /// <summary>
+        /// leaveCountPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel leaveCountPanel;
+        
+        /// <summary>
         /// UpdatePanelLeaveCount control.
         /// </summary>
         /// <remarks>

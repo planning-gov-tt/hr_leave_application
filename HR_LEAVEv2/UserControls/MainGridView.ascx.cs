@@ -49,7 +49,6 @@ namespace HR_LEAVEv2.UserControls
                 lt.hr_manager_edit_date hr_manager_edit_date,
     
                 lt.status status,
-                lt.comments comments,
                 lt.file_path file_path              
             ";
 
@@ -401,7 +400,7 @@ namespace HR_LEAVEv2.UserControls
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
                     // get cancel leave request button 
-                    Button btnCancelLeave = (Button)e.Row.FindControl("btnCancelLeave");
+                    LinkButton btnCancelLeave = (LinkButton)e.Row.FindControl("btnCancelLeave");
 
                     // employees are only allowed to CANCEL requests if they are still pending
                     // employees cannot edit leave requests
@@ -426,8 +425,8 @@ namespace HR_LEAVEv2.UserControls
 
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
-                    Button btnNotRecommended = (Button)e.Row.FindControl("btnNotRecommended");
-                    Button btnRecommended = (Button)e.Row.FindControl("btnRecommended");
+                    LinkButton btnNotRecommended = (LinkButton)e.Row.FindControl("btnNotRecommended");
+                    LinkButton btnRecommended = (LinkButton)e.Row.FindControl("btnRecommended");
 
                     // only show buttons if HR has not acted or pending
                     // else do not show buttons
@@ -448,10 +447,10 @@ namespace HR_LEAVEv2.UserControls
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
                     // get HR buttons
-                    Button btnNotApproved = (Button)e.Row.FindControl("btnNotApproved");
-                    Button btnApproved = (Button)e.Row.FindControl("btnApproved");
-                    Button btnEditLeaveRequest = (Button)e.Row.FindControl("btnEditLeaveRequest");
-                    Button btnUndoApprove = (Button)e.Row.FindControl("btnUndoApprove");
+                    LinkButton btnNotApproved = (LinkButton)e.Row.FindControl("btnNotApproved");
+                    LinkButton btnApproved = (LinkButton)e.Row.FindControl("btnApproved");
+                    LinkButton btnEditLeaveRequest = (LinkButton)e.Row.FindControl("btnEditLeaveRequest");
+                    LinkButton btnUndoApprove = (LinkButton)e.Row.FindControl("btnUndoApprove");
 
                     // if recommended or not approved then show all buttons except undo
                     if (leaveStatus == "Recommended" || leaveStatus == "Not Approved")
@@ -506,6 +505,9 @@ namespace HR_LEAVEv2.UserControls
             ";
 
             string setStatement = "";
+
+            if (commandName == "details")
+                Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=view&leaveId=" + transaction_id);
 
             // if employee view
             if (gridViewType == "emp")
@@ -677,6 +679,8 @@ namespace HR_LEAVEv2.UserControls
 
         protected Boolean validateDates(string startDate, string endDate, int type)
         {
+            if (String.IsNullOrEmpty(startDate) && String.IsNullOrEmpty(endDate))
+                return true;
             // type 0: submitted from, submitted to
             // type 1: start date, end date
 
@@ -689,6 +693,9 @@ namespace HR_LEAVEv2.UserControls
             {
                 if (!String.IsNullOrEmpty(startDate))
                     start = Convert.ToDateTime(startDate);
+                else
+                    throw new FormatException();
+
             }
             catch (FormatException fe)
             {
@@ -704,13 +711,16 @@ namespace HR_LEAVEv2.UserControls
             {
                 if (!String.IsNullOrEmpty(endDate))
                     end = Convert.ToDateTime(endDate);
+                else
+                    throw new FormatException();
             }
             catch (FormatException fe)
             {
                 if (type == 0)
                     invalidSubmittedToDate.Style.Add("display", "inline-block");
                 else
-                    invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block"); isValidated = false;
+                    invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
+                isValidated = false;
             }
 
             if (isValidated)
@@ -731,11 +741,8 @@ namespace HR_LEAVEv2.UserControls
 
                     isValidated = false;
                 }
-
-                return isValidated;
             }
-
-            return false;
+            return isValidated;
         }
 
         protected void btnFilter_Click(object sender, EventArgs e)
@@ -747,13 +754,8 @@ namespace HR_LEAVEv2.UserControls
 
             // check if control exists first?? (because some may be hidden)
 
-            // FIXME: hacky code - fix with validation
-            //SubmittedFrom = Convert.ToDateTime(tbSubmittedFrom.Text.ToString()).ToString();            
-            //SubmittedTo = Convert.ToDateTime(tbSubmittedTo.Text.ToString()).ToString(); 
-
             SubmittedFrom = tbSubmittedFrom.Text.ToString();
             SubmittedTo = tbSubmittedTo.Text.ToString();
-
 
             StartDate = tbStartDate.Text.ToString();
             EndDate = tbEndDate.Text.ToString();
@@ -784,5 +786,41 @@ namespace HR_LEAVEv2.UserControls
             }
         }
 
+        protected void clearFilterBtn_Click(object sender, EventArgs e)
+        {
+            // clear all filters 
+            SubmittedFrom = String.Empty;
+            tbSubmittedFrom.Text = String.Empty;
+            SubmittedTo = String.Empty;
+            tbSubmittedTo.Text = String.Empty;
+
+
+            StartDate = String.Empty;
+            tbStartDate.Text = String.Empty;
+            EndDate = String.Empty;
+            tbEndDate.Text = String.Empty;
+
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            appliedForDateComparisonValidationMsgPanel.Style.Add("display", "none");
+            invalidSubmittedFromDate.Style.Add("display", "none");
+            invalidSubmittedToDate.Style.Add("display", "none");
+            submittedDateComparisonValidationMsgPanel.Style.Add("display", "none");
+
+            SupervisorName_ID = String.Empty;
+            tbSupervisor.Text = String.Empty;
+            EmployeeName_ID = String.Empty;
+            tbEmployee.Text = String.Empty;
+
+            LeaveType = String.Empty;
+            ddlType.SelectedIndex = 0;
+            Status = String.Empty;
+            ddlStatus.SelectedIndex = 0;
+            Qualified = String.Empty;
+            ddlQualified.SelectedIndex = 0;
+
+
+            this.BindGridView();
+        }
     }
 }

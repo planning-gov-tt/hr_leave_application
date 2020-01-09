@@ -11,61 +11,92 @@
         }
         
     </style>
-    <h1><%: Title %></h1>
+    <asp:Panel ID="applyModeTitle" runat="server">
+        <h1><%: Title %></h1>
+    </asp:Panel>
+    <asp:Panel ID="viewModeTitle" runat="server">
+        <h1>View Leave Application</h1>
+    </asp:Panel>
+    <asp:Panel ID="editModeTitle" runat="server">
+        <h1>Edit Leave Application</h1>
+    </asp:Panel>
     <div id="applyForLeaveContainer" class="container-fluid text-center">
         <div class="row form-group" >
             <div style="display:inline-block; margin-right:15%;">
                 <label for="txtFrom" style="font-size:1.5em">From:</label>
                 <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
+                <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
                 <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
             <div style="display:inline-block;">
                 <label for="txtTo" style="font-size:1.5em">To:</label>
                 <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" />
+                <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" />
                 <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"  ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
         </div>
         <div class="row form-group" >
             <label for="typeOfLeave" style="font-size:1.5em">Type:</label>
-            <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" style="display:inline;">
-                <asp:ListItem Value=""></asp:ListItem>
-                <asp:ListItem Value="Sick"></asp:ListItem>
-                <asp:ListItem Value="Personal"></asp:ListItem>
-                <asp:ListItem Value="Vacation"></asp:ListItem>
-                <asp:ListItem Value="Maternity"></asp:ListItem>
-                <asp:ListItem Value="Pre-retirement"></asp:ListItem>
-                <asp:ListItem Value="Bereavement"></asp:ListItem>
-            </asp:DropDownList>
-            <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
+            <asp:Panel ID="typeOfLeaveDropdownPanel" runat="server">
+                <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Style="display: inline;">
+                    <asp:ListItem Value=""></asp:ListItem>
+                    <asp:ListItem Value="Sick"></asp:ListItem>
+                    <asp:ListItem Value="Personal"></asp:ListItem>
+                    <asp:ListItem Value="Vacation"></asp:ListItem>
+                    <asp:ListItem Value="Maternity"></asp:ListItem>
+                    <asp:ListItem Value="Pre-retirement"></asp:ListItem>
+                    <asp:ListItem Value="Bereavement"></asp:ListItem>
+                </asp:DropDownList>
+                <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
+            </asp:Panel>
+            <asp:Panel ID="typeOfLeavePanel" runat="server">
+                <asp:TextBox ID="typeOfLeaveTxt" runat="server" Style="text-align:center;"></asp:TextBox> 
+            </asp:Panel>
         </div>
 
         <div class="row form-group">
             <label for="supervisor_select" style="font-size:1.5em">Supervisor:</label>
-            <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server" validationGroup="applyForLeave"/>
+            <asp:Panel ID="supervisorSelectUserControlPanel" runat="server">
+                <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server" validationGroup="applyForLeave"/>
+            </asp:Panel>
+            <asp:Panel ID="supervisorPanel" runat="server">
+                <asp:TextBox ID="supervisorNameTxt" runat="server" Style="text-align:center;"></asp:TextBox>
+            </asp:Panel>
+            
         </div>
 
-        <div class="row form-group">
+        <asp:Panel ID="fileUploadPanel" runat="server" CssClass="row form-group">
             <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" style="margin:auto; display:inline-block" />
-        </div>
+        </asp:Panel>
 
-        <div class="row form-group">
-            <label for="txtComments" style="font-size:1.5em">Comments</label>
-            <textarea runat="server" class="form-control" id="txtComments" rows="4" style="width:45%; margin:0 auto;"></textarea>
-        </div>
-        <div class="row">
+        <asp:Panel ID="empCommentsPanel" runat="server" CssClass="row form-group">
+            <label for="empCommentsTxt" style="font-size:1.5em">Employee Comments</label>
+            <textarea runat="server" class="form-control" id="empCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+        </asp:Panel>
+
+        <asp:Panel ID="supCommentsPanel" runat="server" CssClass="row form-group">
+            <label for="supCommentsTxt" style="font-size:1.5em">Supervisor Comments</label>
+            <textarea runat="server" class="form-control" id="supCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+        </asp:Panel>
+
+        <asp:Panel ID="hrCommentsPanel" runat="server" CssClass="row form-group">
+            <label for="hrCommentsTxt" style="font-size:1.5em">HR Comments</label>
+            <textarea runat="server" class="form-control" id="hrCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+        </asp:Panel>
+
+        
+        <asp:Panel ID="leaveCountPanel" runat="server" CssClass="row">
             <asp:UpdatePanel ID="UpdatePanelLeaveCount" runat="server">
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="LeaveCountUserControl" />
                 </Triggers>
                 <ContentTemplate>
-                     <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
+                    <TWebControl:LeaveCountUserControlBS4 ID="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
                 </ContentTemplate>
             </asp:UpdatePanel>
-        </div>
+        </asp:Panel>
 
         <div class="row" id="validationRow" style="margin-top:25px;">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">

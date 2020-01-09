@@ -4,9 +4,10 @@
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
 <style>
-    #gridViewContainer th{
+    #gridViewContainer th, td{
         text-align:center;
     }
+
 </style>
 
 <%--filter fields--%>
@@ -43,20 +44,12 @@
             <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control" placeholder="Employee Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
-    <%--FIXME: make this list pull from the database--%>
     <div class="row">
         <div class="col-sm-4">
-            <asp:DropDownList CssClass="form-control" runat="server" ID="ddlType">
+            <asp:DropDownList CssClass="form-control" runat="server" ID="ddlType" DataSourceID="SqlDataSource1" DataTextField="type_id" DataValueField="type_id" AppendDataBoundItems="true">
                 <asp:ListItem Text="Leave Types (All)" Value=""></asp:ListItem>
-                <asp:ListItem Text="Sick" Value="Sick"></asp:ListItem>
-                <asp:ListItem Text="Vacation" Value="Vacation"></asp:ListItem>
-                <asp:ListItem Text="Personal" Value="Personal"></asp:ListItem>
-                <asp:ListItem Text="Casual" Value="Casual"></asp:ListItem>
-                <asp:ListItem Text="Bereavement" Value="Bereavement"></asp:ListItem>
-                <asp:ListItem Text="Leave Renewal" Value="Leave Renewal"></asp:ListItem>
-                <asp:ListItem Text="Maternity" Value="Maternity"></asp:ListItem>
-                <asp:ListItem Text="No Pay" Value="No Pay"></asp:ListItem>
             </asp:DropDownList>
+            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" SelectCommand="SELECT [type_id] FROM [leavetype] ORDER BY [type_id] DESC"></asp:SqlDataSource>
         </div>
         <div class="col-sm-4">
             <asp:DropDownList CssClass="form-control" runat="server" ID="ddlStatus">
@@ -80,8 +73,15 @@
 </div>
 
 <%--button--%>
-<div class="container" style="padding-bottom: 12px; text-align:center">
-     <asp:Button CssClass="btn btn-primary" Text="Filter" ID="btnFilter" runat="server" OnClick="btnFilter_Click" />
+<div class="container" style="padding-bottom: 12px; text-align: center">
+    <asp:LinkButton ID="clearFilterBtn" runat="server" CssClass="btn btn-primary" Style="margin-left: 5px;" OnClick="clearFilterBtn_Click">
+         <i class="fa fa-times"></i>
+         Clear Filter
+    </asp:LinkButton>
+    <asp:LinkButton ID="filterBtn" runat="server" OnClick="btnFilter_Click" CssClass="btn btn-primary">
+         <i class="fa fa-filter" aria-hidden="true"></i>
+         Filter
+    </asp:LinkButton>
 </div>
 
 
@@ -130,7 +130,7 @@
         BorderStyle="None" CssClass="table" GridLines="Horizontal"
         AutoGenerateColumns="false"
         AllowSorting="true" OnSorting="GridView_Sorting"
-        AllowPaging="true" PageSize="3" OnPageIndexChanging="GridView_PageIndexChanging"
+        AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView_PageIndexChanging"
         OnRowCommand="GridView_RowCommand"
         OnRowDataBound="GridView_RowDataBound"
         DataKeyNames="transaction_id, employee_id, supervisor_id, hr_manager_id"
@@ -151,50 +151,66 @@
             <%--action buttons--%>
             <asp:TemplateField HeaderText="Action" Visible="true">
                 <ItemTemplate>
+                    <%--details button--%>
+                    <asp:LinkButton ID="btnDetails" runat="server" CssClass="btn btn-primary" 
+                        CommandName="details" 
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" 
+                        ToolTip="Open Details">
+                        <i class="fa fa-external-link" aria-hidden="true"></i>
+                    </asp:LinkButton>
 
                     <%--employee buttons--%>
-                    <asp:Button ID="btnCancelLeave" class="btn btn-danger" Visible="<%# btnEmpVisible %>" runat="server"
+                    <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger" Visible="<%# btnEmpVisible %>" runat="server"
                         CommandName="cancelLeave"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        Text="🗑"
-                        ToolTip="Cancel Leave Request" />
+                        ToolTip="Cancel Leave Request" >
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </asp:LinkButton>
 
-                    <%--TODO: add details buttons (which redirects to and populates the "Apply for leave" page)--%>
 
                     <%--supervisor buttons--%>
-                    <asp:Button ID="btnNotRecommended" class="btn btn-danger" Visible="<%# btnSupVisible %>" runat="server"
+                    <asp:LinkButton ID="btnNotRecommended" CssClass="btn btn-danger" Visible="<%# btnSupVisible %>" runat="server"
                         CommandName="notRecommended"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        Text="✘"
-                        ToolTip="Not Recommneded" />
-                    <asp:Button ID="btnRecommended" class="btn btn-success" Visible="<%# btnSupVisible %>" runat="server"
+                        ToolTip="Not Recommended">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </asp:LinkButton>
+
+                    <asp:LinkButton ID="btnRecommended" CssClass="btn btn-success" Visible="<%# btnSupVisible %>" runat="server"
                         CommandName="recommended"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        Text="✔"
-                        ToolTip="Recommended" />
+                        ToolTip="Recommended">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </asp:LinkButton>
 
                     <%--hr buttons--%>
-                    <asp:Button ID="btnNotApproved" class="btn btn-danger" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnNotApproved" CssClass="btn btn-danger" Visible="<%# btnHrVisible %>" runat="server"
                         CommandName="notApproved"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        Text="✘"
-                        ToolTip="Not Approved" />
-                    <asp:Button ID="btnApproved" class="btn btn-success" Visible="<%# btnHrVisible %>" runat="server"
+                        ToolTip="Not Approved">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </asp:LinkButton>
+
+                    <asp:LinkButton ID="btnApproved" CssClass="btn btn-success" Visible="<%# btnHrVisible %>" runat="server"
                         CommandName="approved"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        Text="✔"
-                        ToolTip="Approved" />
-                    <asp:Button ID="btnEditLeaveRequest" class="btn btn-primary" Visible="<%# btnHrVisible %>" runat="server"
+                        ToolTip="Approved">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </asp:LinkButton>
+
+                    <asp:LinkButton ID="btnEditLeaveRequest" CssClass="btn btn-primary" Visible="<%# btnHrVisible %>" runat="server"
                         CommandName="editLeaveRequest"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        Text="✎"
-                        ToolTip="Edit Leave Request" />
-                    <asp:Button ID="btnUndoApprove" class="btn btn-warning" Visible="<%# btnHrVisible %>" runat="server"
+                        ToolTip="Edit Leave Request" >
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                    </asp:LinkButton>
+
+                    <asp:LinkButton ID="btnUndoApprove" CssClass="btn btn-warning" Visible="<%# btnHrVisible %>" runat="server"
                         CommandName="undoApprove"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        Text="⮌"
-                        ToolTip="Undo Approve" />
-
+                        ToolTip="Undo Approve" >
+                        <i class="fa fa-undo" aria-hidden="true"></i>
+                    </asp:LinkButton>
                 </ItemTemplate>
             </asp:TemplateField>
 
