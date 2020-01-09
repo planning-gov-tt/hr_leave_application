@@ -8,7 +8,7 @@ namespace HR_LEAVEv2.Employee
 {
     public partial class ApplyForLeave : System.Web.UI.Page
     {
-
+        // this class is used to store the loaded data from the db in the process of populating fields on the page when accessing this page from 'view' mode
         private class LeaveTransactionDetails
         {
             public string empId { get; set; }
@@ -53,10 +53,20 @@ namespace HR_LEAVEv2.Employee
         {
 
             LeaveTransactionDetails ltDetails = null;
-            //string empId =null, startDate=null, endDate=null, typeOfLeave=null, supName=null, empComment=null, supComment=null, hrComment=null;
-            // get info and populate form controls
+ 
+            // get info for relevant leave application based on passed leaveId and populate form controls
             try
             {
+                /**
+                 * This sql query gets various info necessary for repopulation of the fields as well as for the authorization process.
+                 * for the authorization process: 
+                 *      lt.employee_id: used to check whether the current employee trying to access the page is the same as the employee who made the application
+                 *      lt.supervisor_id: used to check whether the supervisor trying to access the page is the supervisor who recommended the application
+                 *      ep.employment_type: used to check whether the hr2 trying to access the page manages the relevant employment type of the employee who made the application (contract or public service)
+                 *      
+                 * for the repopulation:
+                 *      all the other variables are used to repopulate some control on the page
+                 * */
                 string sql = $@"
                         SELECT lt.employee_id, ep.employment_type , FORMAT(lt.start_date, 'MM/dd/yy') start_date, FORMAT(lt.end_date, 'MM/dd/yy') end_date,lt.leave_type,lt.supervisor_id, e.first_name + ' ' + e.last_name as 'supervisor_name', lt.emp_comment, lt.sup_comment, lt.hr_comment
                         FROM [dbo].[leavetransaction] lt
@@ -106,6 +116,7 @@ namespace HR_LEAVEv2.Employee
                             // Supervisor
                             if (permissions.Contains("sup_permissions") && !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
                             {
+                                // supervisor can only view if they were the one who the application was submitted to
                                 if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.supId)
                                     Response.Redirect("~/AccessDenied.aspx");
                             }
@@ -116,6 +127,7 @@ namespace HR_LEAVEv2.Employee
                             {
                                 if (!String.IsNullOrEmpty(ltDetails.empType))
                                 {
+                                    // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
                                     if (
                                         (ltDetails.empType=="Contract" && !permissions.Contains("contract_permissions")) 
                                         ||
@@ -126,6 +138,7 @@ namespace HR_LEAVEv2.Employee
                             }
 
                             // HR 3
+                            // HR 3 should not have access to leave application data
                             if(permissions.Contains("hr3_permissions"))
                                 Response.Redirect("~/AccessDenied.aspx");
 
