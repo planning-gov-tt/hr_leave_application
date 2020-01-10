@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Text;
 
 namespace HR_LEAVEv2.UserControls
 {
@@ -35,6 +32,7 @@ namespace HR_LEAVEv2.UserControls
                               
                 e.employee_id employee_id,
                 e.last_name + ', ' + LEFT(e.first_name, 1) + '.' AS employee_name,
+                ep.employment_type employment_type,
 
                 lt.leave_type leave_type,
                 FORMAT(lt.start_date, 'MM/dd/yy') start_date,
@@ -59,6 +57,7 @@ namespace HR_LEAVEv2.UserControls
                 INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
                 INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
                 LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
+                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date
             ";
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -247,19 +246,23 @@ namespace HR_LEAVEv2.UserControls
                     // get employment type for most recent employee contract
                     //string mostRecentEmploymentType = GetMostRecentEmploymentType(Session["emp_id"].ToString());
 
-                    //string employementTypes = "(";
-                    //if (permissions.Contains("contract_permissions"))
-                    //{
-                    //    employementTypes += ", 'Contract'";
-                    //}
-                    //if (permissions.Contains("public_officer_permissions"))
-                    //{
-                    //    employementTypes += ", 'Public Service'";
-                    //}
-                    //employementTypes += ")";
-                    //whereBindGridView += $@"
-                    //    AND '{mostRecentEmploymentType}' IN {employementTypes}            
-                    //";
+                    string employmentTypes = "(";
+                    bool hasContract = false;
+                    if (permissions.Contains("contract_permissions"))
+                    {
+                        employmentTypes += "'Contract'";
+                        hasContract = true;
+                    }
+                    if (permissions.Contains("public_officer_permissions"))
+                    {
+                        if (hasContract)
+                            employmentTypes += ",";
+                        employmentTypes += "'Public Service'";
+                    }
+                    employmentTypes += ")";
+                    whereBindGridView += $@"
+                        AND employment_type IN {employmentTypes}            
+                    ";
 
                 }// end hr if
 
@@ -507,7 +510,7 @@ namespace HR_LEAVEv2.UserControls
             string setStatement = "";
 
             if (commandName == "details")
-                Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=view&leaveId=" + transaction_id);
+                Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=view&leaveId=" + transaction_id + "&returnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
 
             // if employee view
             if (gridViewType == "emp")

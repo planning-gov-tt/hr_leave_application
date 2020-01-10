@@ -13,6 +13,15 @@ namespace HR_LEAVEv2.Employee {
     public partial class ApplyForLeave {
         
         /// <summary>
+        /// returnToPreviousBtn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton returnToPreviousBtn;
+        
+        /// <summary>
         /// applyModeTitle control.
         /// </summary>
         /// <remarks>
@@ -38,6 +47,60 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel editModeTitle;
+        
+        /// <summary>
+        /// empNamePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel empNamePanel;
+        
+        /// <summary>
+        /// empNameHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl empNameHeader;
+        
+        /// <summary>
+        /// submittedOnPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel submittedOnPanel;
+        
+        /// <summary>
+        /// submittedOnTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label submittedOnTxt;
+        
+        /// <summary>
+        /// statusPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel statusPanel;
+        
+        /// <summary>
+        /// statusTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox statusTxt;
         
         /// <summary>
         /// txtFrom control.

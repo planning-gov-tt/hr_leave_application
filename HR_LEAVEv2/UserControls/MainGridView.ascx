@@ -152,63 +152,55 @@
             <asp:TemplateField HeaderText="Action" Visible="true">
                 <ItemTemplate>
                     <%--details button--%>
-                    <asp:LinkButton ID="btnDetails" runat="server" CssClass="btn btn-primary" 
+                    <asp:LinkButton ID="btnDetails" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Open Details"
                         CommandName="details" 
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>" 
-                        ToolTip="Open Details">
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-external-link" aria-hidden="true"></i>
                     </asp:LinkButton>
 
                     <%--employee buttons--%>
-                    <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger" Visible="<%# btnEmpVisible %>" runat="server"
+                    <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Cancel Leave Request" Visible="<%# btnEmpVisible %>" runat="server"
                         CommandName="cancelLeave"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        ToolTip="Cancel Leave Request" >
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-trash-o" aria-hidden="true"></i>
                     </asp:LinkButton>
 
 
                     <%--supervisor buttons--%>
-                    <asp:LinkButton ID="btnNotRecommended" CssClass="btn btn-danger" Visible="<%# btnSupVisible %>" runat="server"
+                    <asp:LinkButton ID="btnNotRecommended" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Not Recommended" Visible="<%# btnSupVisible %>" runat="server"
                         CommandName="notRecommended"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        ToolTip="Not Recommended">
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-times" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnRecommended" CssClass="btn btn-success" Visible="<%# btnSupVisible %>" runat="server"
+                    <asp:LinkButton ID="btnRecommended" CssClass="btn btn-success content-tooltipped" data-toggle="tooltip" data-placement="top" title="Recommended" Visible="<%# btnSupVisible %>" runat="server"
                         CommandName="recommended"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        ToolTip="Recommended">
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-check" aria-hidden="true"></i>
                     </asp:LinkButton>
 
                     <%--hr buttons--%>
-                    <asp:LinkButton ID="btnNotApproved" CssClass="btn btn-danger" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnNotApproved" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Not Approved" Visible="<%# btnHrVisible %>" runat="server"
                         CommandName="notApproved"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        ToolTip="Not Approved">
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-times" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnApproved" CssClass="btn btn-success" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnApproved" CssClass="btn btn-success content-tooltipped" data-toggle="tooltip" data-placement="top" title="Approved" Visible="<%# btnHrVisible %>" runat="server"
                         CommandName="approved"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        ToolTip="Approved">
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-check" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnEditLeaveRequest" CssClass="btn btn-primary" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnEditLeaveRequest" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request" Visible="<%# btnHrVisible %>" runat="server"
                         CommandName="editLeaveRequest"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        ToolTip="Edit Leave Request" >
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-pencil" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnUndoApprove" CssClass="btn btn-warning" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnUndoApprove" CssClass="btn btn-warning content-tooltipped" data-toggle="tooltip" data-placement="top" title="Undo Approve" Visible="<%# btnHrVisible %>" runat="server"
                         CommandName="undoApprove"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                        ToolTip="Undo Approve" >
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-undo" aria-hidden="true"></i>
                     </asp:LinkButton>
                 </ItemTemplate>
@@ -216,5 +208,4 @@
 
         </Columns>
     </asp:GridView>
-
 </div>

@@ -12,12 +12,15 @@ namespace HR_LEAVEv2.Employee
         private class LeaveTransactionDetails
         {
             public string empId { get; set; }
+            public string empName { get; set; }
             public string empType { get; set; }
             public string startDate { get; set; }
             public string endDate { get; set; }
             public string typeOfLeave { get; set; }
             public string supId { get; set; }
             public string supName { get; set; }
+            public string status { get; set; }
+            public string submittedOn { get; set; }
             public string empComment { get; set; }
             public string supComment { get; set; }
             public string hrComment { get; set; }
@@ -68,12 +71,27 @@ namespace HR_LEAVEv2.Employee
                  *      all the other variables are used to repopulate some control on the page
                  * */
                 string sql = $@"
-                        SELECT lt.employee_id, ep.employment_type , FORMAT(lt.start_date, 'MM/dd/yy') start_date, FORMAT(lt.end_date, 'MM/dd/yy') end_date,lt.leave_type,lt.supervisor_id, e.first_name + ' ' + e.last_name as 'supervisor_name', lt.emp_comment, lt.sup_comment, lt.hr_comment
+                        SELECT 
+                            lt.employee_id, 
+                            emp.first_name + ' ' + emp.last_name as 'employee_name', 
+                            ep.employment_type , 
+                            FORMAT(lt.start_date, 'MM/dd/yyyy') start_date, 
+                            FORMAT(lt.end_date, 'MM/dd/yyyy') end_date, 
+                            lt.leave_type, 
+                            lt.status, 
+                            FORMAT(lt.created_at, 'MM/dd/yyyy HH:mm tt') as submitted_on,
+                            lt.supervisor_id, 
+                            e.first_name + ' ' + e.last_name as 'supervisor_name', 
+                            lt.emp_comment, 
+                            lt.sup_comment, 
+                            lt.hr_comment
                         FROM [dbo].[leavetransaction] lt
                         JOIN [dbo].[employee] e
                         ON e.employee_id = lt.supervisor_id
                         LEFT JOIN [dbo].employeeposition ep
                         ON ep.employee_id = lt.employee_id
+                        JOIN  [dbo].[employee] emp
+                        ON emp.employee_id = lt.employee_id
                         WHERE lt.transaction_id = {leaveId};
                     ";
 
@@ -89,10 +107,13 @@ namespace HR_LEAVEv2.Employee
                                 ltDetails = new LeaveTransactionDetails
                                 {
                                     empId = reader["employee_id"].ToString(),
+                                    empName = reader["employee_name"].ToString(),
                                     empType = reader["employment_type"].ToString(),
                                     startDate = reader["start_date"].ToString(),
                                     endDate = reader["end_date"].ToString(),
                                     typeOfLeave = reader["leave_type"].ToString(),
+                                    status = reader["status"].ToString(),
+                                    submittedOn = reader["submitted_on"].ToString(),
                                     supId = reader["supervisor_id"].ToString(),
                                     supName = reader["supervisor_name"].ToString(),
                                     empComment = reader["emp_comment"].ToString(),
@@ -143,9 +164,12 @@ namespace HR_LEAVEv2.Employee
                                 Response.Redirect("~/AccessDenied.aspx");
 
                             //populate form
+                            empNameHeader.InnerText = ltDetails.empName;
                             txtFrom.Text = ltDetails.startDate;
                             txtTo.Text = ltDetails.endDate;
                             typeOfLeaveTxt.Text = ltDetails.typeOfLeave;
+                            statusTxt.Text = ltDetails.status;
+                            submittedOnTxt.Text = "Submitted on: " + ltDetails.submittedOn;
                             supervisorNameTxt.Text = ltDetails.supName;
                             empCommentsTxt.Value = ltDetails.empComment;
                             supCommentsTxt.Value = ltDetails.supComment;
@@ -161,11 +185,23 @@ namespace HR_LEAVEv2.Employee
                 Console.WriteLine(ex.Message);
             }
 
-            
+            //Return to previous
+            returnToPreviousBtn.Visible = true;
+
             //Title
             viewModeTitle.Visible = true;
             editModeTitle.Visible = false;
             applyModeTitle.Visible = false;
+
+            //Employee Name
+            empNamePanel.Visible = true;
+
+            //Submitted On
+            submittedOnPanel.Visible = true;
+
+            //Status
+            statusPanel.Visible = true;
+            statusTxt.Enabled = false;
 
             //File Upload
             fileUploadPanel.Visible = false;
@@ -208,10 +244,22 @@ namespace HR_LEAVEv2.Employee
 
         protected void adjustPageForApplyMode()
         {
+            //Return to previous
+            returnToPreviousBtn.Visible = false;
+
             //Title
             viewModeTitle.Visible = false;
             editModeTitle.Visible = false;
             applyModeTitle.Visible = true;
+
+            //Employee Name
+            empNamePanel.Visible = false;
+
+            //Submitted On
+            submittedOnPanel.Visible = false;
+
+            //Status
+            statusPanel.Visible = false;
 
             //File upload
             fileUploadPanel.Visible = true;
@@ -396,6 +444,11 @@ namespace HR_LEAVEv2.Employee
         protected void refreshForm(object sender, EventArgs e)
         {
             Response.Redirect("~/Employee/ApplyForLeave.aspx");
+        }
+
+        protected void returnToPreviousBtn_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Request.QueryString["returnUrl"]);
         }
     }
 }
