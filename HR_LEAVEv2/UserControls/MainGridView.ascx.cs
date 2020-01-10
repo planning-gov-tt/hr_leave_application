@@ -219,7 +219,6 @@ namespace HR_LEAVEv2.UserControls
                             e.employee_id != '{Session["emp_id"]}'
                     ";
 
-                    // FIXME: Change to filter and hardcoded
                     // check the type of leave someone can approve 
                     string leaveType = "('Personal', 'No Pay', 'Bereavement', 'Maternity', 'Pre-retirement'";
                     if (permissions.Contains("approve_sick"))
@@ -239,13 +238,7 @@ namespace HR_LEAVEv2.UserControls
                         AND leave_type IN {leaveType}
                     ";
 
-                    // TODO
                     // check if hr can see contracts, public_officers or both based on their permission pool
-
-                    // TODO query
-                    // get employment type for most recent employee contract
-                    //string mostRecentEmploymentType = GetMostRecentEmploymentType(Session["emp_id"].ToString());
-
                     string employmentTypes = "(";
                     bool hasContract = false;
                     if (permissions.Contains("contract_permissions"))
@@ -304,7 +297,7 @@ namespace HR_LEAVEv2.UserControls
                             (s.email LIKE @SupervisorName_ID)
                         ) 
                     ";
-                    sqlCommand.Parameters.AddWithValue("@SupervisorName_ID", SupervisorName_ID);
+                    sqlCommand.Parameters.AddWithValue("@SupervisorName_ID", "%" + SupervisorName_ID + "%");
                 }
                 if (!string.IsNullOrEmpty(EmployeeName_ID))
                 {
@@ -316,7 +309,7 @@ namespace HR_LEAVEv2.UserControls
                             (e.email LIKE @EmployeeName_ID)
                         ) 
                     ";
-                    sqlCommand.Parameters.AddWithValue("@EmployeeName_ID", EmployeeName_ID);
+                    sqlCommand.Parameters.AddWithValue("@EmployeeName_ID","%" + EmployeeName_ID + "%");
                 }
                 if (!string.IsNullOrEmpty(LeaveType))
                 {

@@ -82,6 +82,10 @@
          <i class="fa fa-filter" aria-hidden="true"></i>
          Filter
     </asp:LinkButton>
+    <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px;  cursor:pointer"  
+        data-toggle="tooltip" 
+        data-placement="right" 
+        title="Filter finds records which fulfill all the entered constraints"></i>
 </div>
 
 
