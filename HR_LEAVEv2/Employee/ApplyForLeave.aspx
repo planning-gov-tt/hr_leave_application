@@ -169,7 +169,7 @@
                     </asp:Panel>
                     <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span id="Span1" runat="server">Sick leave must already have beeen taken prior to today</span>
+                        <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
                     </asp:Panel>
                     <%--<asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
