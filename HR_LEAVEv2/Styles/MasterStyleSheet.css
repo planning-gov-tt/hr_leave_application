@@ -139,7 +139,7 @@ body {
     width:100%;
 }
 
-#content h1{
+#content h1, h2{
     text-align:center;
 }
 
@@ -160,7 +160,7 @@ body {
 /*end style role panels*/
 
 /* remove outline from all active links*/
-a, a:active, a:focus{
+a, a:active, a:focus, button, button:active, button:focus{
     outline:none;
     color:inherit;
 }

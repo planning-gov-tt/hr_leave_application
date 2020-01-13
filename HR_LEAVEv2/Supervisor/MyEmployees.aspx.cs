@@ -13,6 +13,7 @@ namespace HR_LEAVEv2.Supervisor
     {
         class EmpDetails
         {
+            public char isCompleteRecord { get; set; }
             public string emp_id { get; set; }
             public string ihris_id { get; set; }
             public string name { get; set; }
@@ -22,8 +23,8 @@ namespace HR_LEAVEv2.Supervisor
             public string casual { get; set; }
             public string sick { get; set; }
 
-            //public string employment_type { get; set; }
-            //public string position { get; set; }
+            public string employment_type { get; set; }
+            public string position { get; set; }
         };
 
         protected void Page_Load(object sender, EventArgs e)
@@ -128,23 +129,20 @@ namespace HR_LEAVEv2.Supervisor
         [WebMethod]
         public static string getEmpDetails(string emp_id)
         {
+            /* returns JSON object containing all the employee details. Returns data including Employee Position and Employee Employment type but if the data is not available
+             * then by default, only basic employee info is returned 
+            */
             EmpDetails empDetails = null;
             try
             {
-                //string sql = $@"
-                //        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, p.pos_name
-                //        FROM [dbo].[employee] e
-                //        RIGHT JOIN [dbo].employeeposition ep
-                //        ON e.employee_id = ep.employee_id
-
-                //        INNER JOIN [dbo].position p
-                //        ON ep.position_id = p.pos_id
-                //        WHERE e.employee_id = {emp_id};
-                //    ";
-
                 string sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, p.pos_name
                         FROM [dbo].[employee] e
+                        RIGHT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+
+                        INNER JOIN [dbo].position p
+                        ON ep.position_id = p.pos_id
                         WHERE e.employee_id = {emp_id};
                     ";
 
@@ -167,8 +165,9 @@ namespace HR_LEAVEv2.Supervisor
                                     personal = reader["personal"].ToString(),
                                     casual = reader["casual"].ToString(),
                                     sick = reader["sick"].ToString(),
-                                    //employment_type = reader["employment_type"].ToString(),
-                                    //position = reader["pos_name"].ToString()
+                                    employment_type = reader["employment_type"].ToString(),
+                                    position = reader["pos_name"].ToString(),
+                                    isCompleteRecord = '1'
                                 };
                             }
                         }
@@ -180,9 +179,51 @@ namespace HR_LEAVEv2.Supervisor
                 return "ERROR";
             }
 
-            if (empDetails != null)
-                return JsonConvert.SerializeObject(empDetails);
-            return "{}";
+            if (empDetails == null)
+            {
+                empDetails = null;
+                try
+                {
+                    string sql = $@"
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick
+                        FROM [dbo].[employee] e
+                        WHERE e.employee_id = {emp_id};
+                    ";
+
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    empDetails = new EmpDetails
+                                    {
+                                        emp_id = reader["employee_id"].ToString(),
+                                        ihris_id = reader["ihris_id"].ToString(),
+                                        name = reader["name"].ToString(),
+                                        email = reader["email"].ToString(),
+                                        vacation = reader["vacation"].ToString(),
+                                        personal = reader["personal"].ToString(),
+                                        casual = reader["casual"].ToString(),
+                                        sick = reader["sick"].ToString(),
+                                        isCompleteRecord = '0'
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return "ERROR";
+                }
+            }
+
+            return JsonConvert.SerializeObject(empDetails);
         }
+
     }
 }

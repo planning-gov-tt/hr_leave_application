@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using System.Web.Services;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.HR
@@ -17,6 +14,7 @@ namespace HR_LEAVEv2.HR
         List<string> permissions = null;
         class EmpDetails
         {
+            public char isCompleteRecord { get; set; }
             public string emp_id { get; set; }
             public string ihris_id { get; set; }
             public string name { get; set; }
@@ -126,7 +124,7 @@ namespace HR_LEAVEv2.HR
                 else
                 {
                     string emp_type = string.Empty;
-                    // HR 1 and HR 2
+                    // HR 2 and HR 3
                     if (permissions.Contains("contract_permissions"))
                         emp_type = "Contract";
                     else if (permissions.Contains("public_officer_permissions"))
@@ -177,6 +175,9 @@ namespace HR_LEAVEv2.HR
         [WebMethod]
         public static string getEmpDetails(string emp_id)
         {
+            /* returns JSON object containing all the employee details. Returns data including Employee Position and Employee Employment type but if the data is not available
+             * then by default, only basic employee info is returned 
+            */
             EmpDetails empDetails = null;
             try
             {
@@ -211,7 +212,8 @@ namespace HR_LEAVEv2.HR
                                     casual = reader["casual"].ToString(),
                                     sick = reader["sick"].ToString(),
                                     employment_type = reader["employment_type"].ToString(),
-                                    position = reader["pos_name"].ToString()
+                                    position = reader["pos_name"].ToString(),
+                                    isCompleteRecord = '1'   
                                 };
                             }
                         }
@@ -223,9 +225,50 @@ namespace HR_LEAVEv2.HR
                 return "ERROR";
             }
 
-            if (empDetails != null)
-                return JsonConvert.SerializeObject(empDetails);
-            return "{}";
+            if (empDetails == null)
+            {
+                empDetails = null;
+                try
+                {
+                    string sql = $@"
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick
+                        FROM [dbo].[employee] e
+                        WHERE e.employee_id = {emp_id};
+                    ";
+
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    empDetails = new EmpDetails
+                                    {
+                                        emp_id = reader["employee_id"].ToString(),
+                                        ihris_id = reader["ihris_id"].ToString(),
+                                        name = reader["name"].ToString(),
+                                        email = reader["email"].ToString(),
+                                        vacation = reader["vacation"].ToString(),
+                                        personal = reader["personal"].ToString(),
+                                        casual = reader["casual"].ToString(),
+                                        sick = reader["sick"].ToString(),
+                                        isCompleteRecord = '0'
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return "ERROR";
+                }
+            }
+
+            return JsonConvert.SerializeObject(empDetails);
         }
 
         protected void newEmployeeBtn_Click(object sender, EventArgs e)

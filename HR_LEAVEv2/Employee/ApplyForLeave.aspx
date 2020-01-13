@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Apply for Leave" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ApplyForLeave.aspx.cs" Inherits="HR_LEAVEv2.Employee.ApplyForLeave" %>
+﻿<%@ Page Title="Apply for Leave" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ApplyForLeave.aspx.cs" Inherits="HR_LEAVEv2.Employee.ApplyForLeave"  %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 <%@ Register Src="~/UserControls/supervisorSelect.ascx" TagName="SupervisorSelectUserControl" TagPrefix="TWebControl"%>
@@ -7,66 +7,143 @@
     <style>
 
         #applyForLeaveContainer div.form-group{
-            margin-top:50px;
+            margin-top:30px;
         }
-        
     </style>
-    <h1><%: Title %></h1>
+    
+    <%--View mode: Allows user to return to last page they were on before they clicked on a details button for a leave application--%>
+    <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to previous page" OnClick="returnToPreviousBtn_Click" Style="float: left;" ToolTip="">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+    </asp:LinkButton>
+
+    <%--apply mode--%>
+    <asp:Panel ID="applyModeTitle" runat="server">
+        <h1 style="margin: 0 auto;"><%: Title %></h1>
+    </asp:Panel>
+
+    <%--view mode--%>
+    <asp:Panel ID="viewModeTitle" runat="server">
+        <h1>View Leave Application</h1>
+    </asp:Panel>
+
+    <%--edit mode--%>
+    <asp:Panel ID="editModeTitle" runat="server">
+        <h1>Edit Leave Application</h1>
+    </asp:Panel>
+
+    <%--View mode, Edit mode: shows name of employee who submitted the leave application--%>
+    <asp:Panel ID="empNamePanel" runat="server">
+        <h2 id="empNameHeader" runat="server"></h2>
+    </asp:Panel>
     <div id="applyForLeaveContainer" class="container-fluid text-center">
+        <%--View mode: Shows date and time leave application was submitted--%>
+        <asp:Panel ID="submittedOnPanel" CssClass="row" runat="server">
+            <asp:Label ID="submittedOnTxt" runat="server"></asp:Label>
+        </asp:Panel>
+        <%--View mode: Shows status of leave application--%> 
+        <asp:Panel ID="statusPanel" CssClass="row form-group" runat="server">
+            <label for="statustxt" style="font-size:1.5em">Status:</label>
+            <asp:TextBox ID="statusTxt" runat="server" Style="display:block; margin:0 auto; text-align:center;"></asp:TextBox> 
+        </asp:Panel>
+
+        <%--View mode: Shows the start and end date of leave application--%>
+        <%--Apply mode: Allows user to enter start and end date of application--%>
         <div class="row form-group" >
+            <%--Start Date--%>
             <div style="display:inline-block; margin-right:15%;">
                 <label for="txtFrom" style="font-size:1.5em">From:</label>
                 <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
+                <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
                 <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
+            <%--End Date--%>
             <div style="display:inline-block;">
                 <label for="txtTo" style="font-size:1.5em">To:</label>
                 <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" />
+                <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" />
                 <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"  ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
         </div>
+
+        <%--View mode: Shows the type of leave applied for--%>
+        <%--Apply mode: Allows user to enter type of leave to apply for--%>
         <div class="row form-group" >
             <label for="typeOfLeave" style="font-size:1.5em">Type:</label>
-            <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" style="display:inline;">
-                <asp:ListItem Value=""></asp:ListItem>
-                <asp:ListItem Value="Sick"></asp:ListItem>
-                <asp:ListItem Value="Personal"></asp:ListItem>
-                <asp:ListItem Value="Vacation"></asp:ListItem>
-                <asp:ListItem Value="Maternity"></asp:ListItem>
-                <asp:ListItem Value="Pre-retirement"></asp:ListItem>
-                <asp:ListItem Value="Bereavement"></asp:ListItem>
-            </asp:DropDownList>
-            <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
+
+            <%--apply mode--%>
+            <asp:Panel ID="typeOfLeaveDropdownPanel" runat="server">
+                <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Style="display: inline;">
+                    <asp:ListItem Value=""></asp:ListItem>
+                    <asp:ListItem Value="Sick"></asp:ListItem>
+                    <asp:ListItem Value="Personal"></asp:ListItem>
+                    <asp:ListItem Value="Vacation"></asp:ListItem>
+                    <asp:ListItem Value="Maternity"></asp:ListItem>
+                    <asp:ListItem Value="Pre-retirement"></asp:ListItem>
+                    <asp:ListItem Value="Bereavement"></asp:ListItem>
+                </asp:DropDownList>
+                <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
+            </asp:Panel>
+
+            <%--view mode--%>
+            <asp:Panel ID="typeOfLeavePanel" runat="server">
+                <asp:TextBox ID="typeOfLeaveTxt" runat="server" Style="text-align:center;"></asp:TextBox> 
+            </asp:Panel>
         </div>
 
+        <%--View mode: Shows the supervisor the leave application was submitted to--%>
+        <%--Apply mode: Allows user to enter supervisor to send leave application to--%>
         <div class="row form-group">
             <label for="supervisor_select" style="font-size:1.5em">Supervisor:</label>
-            <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server" validationGroup="applyForLeave"/>
+            <%--apply mode--%>
+            <asp:Panel ID="supervisorSelectUserControlPanel" runat="server">
+                <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server" validationGroup="applyForLeave"/>
+            </asp:Panel>
+
+            <%--view mode--%>
+            <asp:Panel ID="supervisorPanel" runat="server">
+                <asp:TextBox ID="supervisorNameTxt" runat="server" Style="text-align:center;"></asp:TextBox>
+            </asp:Panel>
         </div>
 
-        <div class="row form-group">
+        <%--Apply mode: Allows user to upload docs--%>
+        <asp:Panel ID="fileUploadPanel" runat="server" CssClass="row form-group">
             <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" style="margin:auto; display:inline-block" />
-        </div>
+        </asp:Panel>
 
-        <div class="row form-group">
-            <label for="txtComments" style="font-size:1.5em">Comments</label>
-            <textarea runat="server" class="form-control" id="txtComments" rows="4" style="width:45%; margin:0 auto;"></textarea>
-        </div>
-        <div class="row">
+        <%--View mode: Shows the comments made by employee when submitting the leave application --%>
+        <%--Apply mode: Allows employee to enter comments to explain anything necessary as to why they need the leave etc.--%>
+        <asp:Panel ID="empCommentsPanel" runat="server" CssClass="row form-group">
+            <label for="empCommentsTxt" style="font-size:1.5em">Employee Comments</label>
+            <textarea runat="server" class="form-control" id="empCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+        </asp:Panel>
+
+        <%--View mode: Shows the comments made by supervisor as to why they recommended or did not recommend the leave application --%>
+        <asp:Panel ID="supCommentsPanel" runat="server" CssClass="row form-group">
+            <label for="supCommentsTxt" style="font-size:1.5em">Supervisor Comments</label>
+            <textarea runat="server" class="form-control" id="supCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+        </asp:Panel>
+
+        <%--View mode: Shows the comments made by hr as to why they approved or did not approve the leave application --%>
+        <asp:Panel ID="hrCommentsPanel" runat="server" CssClass="row form-group">
+            <label for="hrCommentsTxt" style="font-size:1.5em">HR Comments</label>
+            <textarea runat="server" class="form-control" id="hrCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+        </asp:Panel>
+
+        <%--Apply mode: Shows the current leave balance of employee --%>
+        <asp:Panel ID="leaveCountPanel" runat="server" CssClass="row">
             <asp:UpdatePanel ID="UpdatePanelLeaveCount" runat="server">
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="LeaveCountUserControl" />
                 </Triggers>
                 <ContentTemplate>
-                     <TWebControl:LeaveCountUserControlBS4 ID ="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
+                    <TWebControl:LeaveCountUserControlBS4 ID="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
                 </ContentTemplate>
             </asp:UpdatePanel>
-        </div>
+        </asp:Panel>
 
+        <%--Apply mode: Shows any necessary validation messages to user --%>
         <div class="row" id="validationRow" style="margin-top:25px;">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
@@ -92,7 +169,7 @@
                     </asp:Panel>
                     <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span id="Span1" runat="server">Sick leave must already have beeen taken prior to today</span>
+                        <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
                     </asp:Panel>
                     <%--<asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -111,8 +188,6 @@
             </asp:UpdatePanel>
         </div>
     </div>
-    
-
 </asp:Content>
 
 

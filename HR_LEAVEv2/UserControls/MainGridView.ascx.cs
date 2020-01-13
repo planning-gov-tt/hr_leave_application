@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Text;
 
 namespace HR_LEAVEv2.UserControls
 {
@@ -35,6 +32,7 @@ namespace HR_LEAVEv2.UserControls
                               
                 e.employee_id employee_id,
                 e.last_name + ', ' + LEFT(e.first_name, 1) + '.' AS employee_name,
+                ep.employment_type employment_type,
 
                 lt.leave_type leave_type,
                 FORMAT(lt.start_date, 'MM/dd/yy') start_date,
@@ -49,7 +47,6 @@ namespace HR_LEAVEv2.UserControls
                 lt.hr_manager_edit_date hr_manager_edit_date,
     
                 lt.status status,
-                lt.comments comments,
                 lt.file_path file_path              
             ";
 
@@ -60,14 +57,16 @@ namespace HR_LEAVEv2.UserControls
                 INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
                 INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
                 LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
+                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date
             ";
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
 
+        // VARIABLES TO CHANGE VIEWSTATE VARIABLES //
         // a simple toggle
         private string SortDirection
         {
-            get { return ViewState["SortDirection"] != null ? ViewState["SortDirection"].ToString() : "ASC"; } // default to ASC if VS is null
+            get { return ViewState["SortDirection"] != null ? ViewState["SortDirection"].ToString() : "ASC"; } // default to ASC if ViewState is null
             set { ViewState["SortDirection"] = value; }
         }
 
@@ -78,11 +77,68 @@ namespace HR_LEAVEv2.UserControls
             set { ViewState["SortExpression"] = value; }
         }
 
+        // filter sql where clause variables
+        private string SubmittedFrom
+        {
+            get { return ViewState["SubmittedFrom"] != null ? ViewState["SubmittedFrom"].ToString() : null; } 
+            set { ViewState["SubmittedFrom"] = value; }
+        }
+
+        private string SubmittedTo
+        {
+            get { return ViewState["SubmittedTo"] != null ? ViewState["SubmittedTo"].ToString() : null; }
+            set { ViewState["SubmittedTo"] = value; }
+        }
+
+        private string StartDate
+        {
+            get { return ViewState["StartDate"] != null ? ViewState["StartDate"].ToString() : null; }
+            set { ViewState["StartDate"] = value; }
+        }
+
+        private string EndDate
+        {
+            get { return ViewState["EndDate"] != null ? ViewState["EndDate"].ToString() : null; }
+            set { ViewState["EndDate"] = value; }
+        }
+
+        private string SupervisorName_ID
+        {
+            get { return ViewState["SupervisorName_ID"] != null ? ViewState["SupervisorName_ID"].ToString() : null; }
+            set { ViewState["SupervisorName_ID"] = value; }
+        }
+
+        private string EmployeeName_ID
+        {
+            get { return ViewState["EmployeeName_ID"] != null ? ViewState["EmployeeName_ID"].ToString() : null; }
+            set { ViewState["EmployeeName_ID"] = value; }
+        }
+
+        private string LeaveType
+        {
+            get { return ViewState["LeaveType"] != null ? ViewState["LeaveType"].ToString() : null; }
+            set { ViewState["LeaveType"] = value; }
+        }
+
+        private string Status
+        {
+            get { return ViewState["Status"] != null ? ViewState["Status"].ToString() : null; }
+            set { ViewState["Status"] = value; }
+        }
+
+        private string Qualified
+        {
+            get { return ViewState["Qualified"] != null ? ViewState["Qualified"].ToString() : null; }
+            set { ViewState["Qualified"] = value; }
+        }
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
             btnEmpVisible = btnSupVisible = btnHrVisible = false;
             permissions = (List<string>)Session["permissions"];
+
 
             // 3 types of gridviews perspectives possible
             if (this.gridViewType == "emp")
@@ -92,6 +148,7 @@ namespace HR_LEAVEv2.UserControls
                 // hide employee column
                 btnEmpVisible = true;
                 GridView.Columns[2].Visible = false;
+                divTbEmployee.Visible = false;
             }
             else if (this.gridViewType == "sup")
             {
@@ -101,8 +158,8 @@ namespace HR_LEAVEv2.UserControls
 
                 // Hide Supervisor Columnn
                 GridView.Columns[1].Visible = false;
-
                 btnSupVisible = true;
+                divTbSupervisor.Visible = false;
             }
             else // hr
             {
@@ -131,7 +188,8 @@ namespace HR_LEAVEv2.UserControls
         {
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
-
+                SqlCommand sqlCommand = new SqlCommand();
+                
                 string whereBindGridView = "";
 
                 // emp gridview
@@ -161,7 +219,6 @@ namespace HR_LEAVEv2.UserControls
                             e.employee_id != '{Session["emp_id"]}'
                     ";
 
-                    // FIXME: Change to filter and hardcoded
                     // check the type of leave someone can approve 
                     string leaveType = "('Personal', 'No Pay', 'Bereavement', 'Maternity', 'Pre-retirement'";
                     if (permissions.Contains("approve_sick"))
@@ -181,38 +238,104 @@ namespace HR_LEAVEv2.UserControls
                         AND leave_type IN {leaveType}
                     ";
 
-                    // TODO
                     // check if hr can see contracts, public_officers or both based on their permission pool
+                    string employmentTypes = "(";
+                    bool hasContract = false;
+                    if (permissions.Contains("contract_permissions"))
+                    {
+                        employmentTypes += "'Contract'";
+                        hasContract = true;
+                    }
+                    if (permissions.Contains("public_officer_permissions"))
+                    {
+                        if (hasContract)
+                            employmentTypes += ",";
+                        employmentTypes += "'Public Service'";
+                    }
+                    employmentTypes += ")";
+                    whereBindGridView += $@"
+                        AND employment_type IN {employmentTypes}            
+                    ";
 
-                    // TODO query
-                    // get employment type for most recent employee contract
-                    //string mostRecentEmploymentType = GetMostRecentEmploymentType(Session["emp_id"].ToString());
+                }// end hr if
 
-                    //string employementTypes = "(";
-                    //if (permissions.Contains("contract_permissions"))
-                    //{
-                    //    employementTypes += ", 'Contract'";
-                    //}
-                    //if (permissions.Contains("public_officer_permissions"))
-                    //{
-                    //    employementTypes += ", 'Public Service'";
-                    //}
-                    //employementTypes += ")";
-                    //whereBindGridView += $@"
-                    //    AND '{mostRecentEmploymentType}' IN {employementTypes}            
-                    //";
 
+                //*************************************** FILTER ***************************************//
+                // add sql parameters in command for user entered values that did not have validation
+                string whereFilterGridView = "";
+                if (!string.IsNullOrEmpty(SubmittedFrom))
+                {
+                    whereFilterGridView += $@"
+                        AND lt.created_at >= '{SubmittedFrom}'
+                    ";
                 }
+                if (!string.IsNullOrEmpty(SubmittedTo))
+                {
+                    whereFilterGridView += $@"
+                        AND lt.created_at <= '{SubmittedTo}'
+                    ";
+                }
+                if (!string.IsNullOrEmpty(StartDate))
+                {
+                    whereFilterGridView += $@"
+                        AND start_date >= '{StartDate}'
+                    ";
+                }
+                if (!string.IsNullOrEmpty(EndDate))
+                {
+                    whereFilterGridView += $@"
+                        AND end_date <= '{EndDate}'
+                    ";
+                }
+                if (!string.IsNullOrEmpty(SupervisorName_ID))
+                {
+                    whereFilterGridView += $@"
+                        AND (
+                            (s.first_name LIKE @SupervisorName_ID) OR
+                            (s.last_name LIKE @SupervisorName_ID) OR
+                            (s.employee_id LIKE @SupervisorName_ID) OR
+                            (s.email LIKE @SupervisorName_ID)
+                        ) 
+                    ";
+                    sqlCommand.Parameters.AddWithValue("@SupervisorName_ID", "%" + SupervisorName_ID + "%");
+                }
+                if (!string.IsNullOrEmpty(EmployeeName_ID))
+                {
+                    whereFilterGridView += $@"
+                        AND (
+                            (e.first_name LIKE @EmployeeName_ID) OR
+                            (e.last_name LIKE @EmployeeName_ID) OR
+                            (e.employee_id LIKE @EmployeeName_ID) OR
+                            (e.email LIKE @EmployeeName_ID)
+                        ) 
+                    ";
+                    sqlCommand.Parameters.AddWithValue("@EmployeeName_ID","%" + EmployeeName_ID + "%");
+                }
+                if (!string.IsNullOrEmpty(LeaveType))
+                {
+                    whereFilterGridView += $@"
+                        AND leave_type = '{LeaveType}'
+                    ";
+                }
+                if (!string.IsNullOrEmpty(Status))
+                {
+                    whereFilterGridView += $@"
+                        AND status = '{Status}'
+                    ";
+                }
+                // don't have the qualified field implemented yet
+                //if (!string.IsNullOrEmpty(Qualified))
+                //{
+                //    whereFilterGridView += $@"
+                //        AND qualified = {Qualified}
+                //    ";
+                //}
 
-                // TODO search where
-
-                // TODO filter where (dropdown)
-
-
-                string sql = select + from + whereBindGridView;
+                string sql = select + from + whereBindGridView + whereFilterGridView;
+                sqlCommand.CommandText = sql;
+                sqlCommand.Connection = sqlConnection;
 
                 sqlConnection.Open();
-                SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
                 SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(sqlCommand);
                 //DataSet dataSet = new DataSet();
                 DataTable dataTable = new DataTable(); // using data table vs data set to facilitate sorting
@@ -259,23 +382,6 @@ namespace HR_LEAVEv2.UserControls
         // changing button view/visibility - row by row
         protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            //int buttonColumnIndex = e.Row.Cells.Count - 1;
-            //int undoColumnIndex = buttonColumnIndex - 1;
-
-            // init all undos to invisible
-            // e.Row.Cells[undoColumnIndex].Visible = false;
-
-            // remove border on last column
-            // e.Row.Cells[buttonColumnIndex].Style.Add("BORDER", "0px");
-
-            // get start date
-            //DateTime startDate = new DateTime();
-            //if (e.Row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
-            //{
-            //    int index = GetColumnIndexByName(e.Row, "start_date");
-            //    startDate = DateTime.Parse(e.Row.Cells[index].Text);
-            //}
-
             // get leave status for that row
             string leaveStatus = null;
             if (e.Row.RowType == DataControlRowType.DataRow)
@@ -290,7 +396,7 @@ namespace HR_LEAVEv2.UserControls
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
                     // get cancel leave request button 
-                    Button btnCancelLeave = (Button)e.Row.FindControl("btnCancelLeave");
+                    LinkButton btnCancelLeave = (LinkButton)e.Row.FindControl("btnCancelLeave");
 
                     // employees are only allowed to CANCEL requests if they are still pending
                     // employees cannot edit leave requests
@@ -315,8 +421,8 @@ namespace HR_LEAVEv2.UserControls
 
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
-                    Button btnNotRecommended = (Button)e.Row.FindControl("btnNotRecommended");
-                    Button btnRecommended = (Button)e.Row.FindControl("btnRecommended");
+                    LinkButton btnNotRecommended = (LinkButton)e.Row.FindControl("btnNotRecommended");
+                    LinkButton btnRecommended = (LinkButton)e.Row.FindControl("btnRecommended");
 
                     // only show buttons if HR has not acted or pending
                     // else do not show buttons
@@ -337,10 +443,10 @@ namespace HR_LEAVEv2.UserControls
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
                     // get HR buttons
-                    Button btnNotApproved = (Button)e.Row.FindControl("btnNotApproved");
-                    Button btnApproved = (Button)e.Row.FindControl("btnApproved");
-                    Button btnEditLeaveRequest = (Button)e.Row.FindControl("btnEditLeaveRequest");
-                    Button btnUndoApprove = (Button)e.Row.FindControl("btnUndoApprove");
+                    LinkButton btnNotApproved = (LinkButton)e.Row.FindControl("btnNotApproved");
+                    LinkButton btnApproved = (LinkButton)e.Row.FindControl("btnApproved");
+                    LinkButton btnEditLeaveRequest = (LinkButton)e.Row.FindControl("btnEditLeaveRequest");
+                    LinkButton btnUndoApprove = (LinkButton)e.Row.FindControl("btnUndoApprove");
 
                     // if recommended or not approved then show all buttons except undo
                     if (leaveStatus == "Recommended" || leaveStatus == "Not Approved")
@@ -379,7 +485,7 @@ namespace HR_LEAVEv2.UserControls
             int index = Convert.ToInt32(e.CommandArgument);
             GridViewRow row = GridView.Rows[index];
 
-            // get transaciton_id associated with row
+            // get transaction_id associated with row
             int transaction_id = Convert.ToInt32(GridView.DataKeys[index].Values["transaction_id"]);
 
             string status = "";
@@ -396,6 +502,9 @@ namespace HR_LEAVEv2.UserControls
 
             string setStatement = "";
 
+            if (commandName == "details")
+                Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=view&leaveId=" + transaction_id + "&returnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
+
             // if employee view
             if (gridViewType == "emp")
             {
@@ -407,15 +516,6 @@ namespace HR_LEAVEv2.UserControls
                         SET
                             [status]='{status}' 
                     ";
-
-                    //sqlCommand.CommandText = $@"
-                    //    UPDATE 
-                    //        [dbo].[leavetransaction] 
-                    //    SET 
-                    //        [status]='{status}'                             
-                    //    WHERE 
-                    //        [transaction_id] = {transaction_id};
-                    //";
                 }
                 sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
             }
@@ -440,15 +540,6 @@ namespace HR_LEAVEv2.UserControls
                         [supervisor_edit_date] = CURRENT_TIMESTAMP 
                 ";
 
-                //sqlCommand.CommandText = $@"
-                //    UPDATE 
-                //        [dbo].[leavetransaction] 
-                //    SET 
-                //        [status]='{status}', 
-                //        [supervisor_edit_date] = CURRENT_TIMESTAMP 
-                //    WHERE 
-                //        [transaction_id] = {transaction_id};
-                //";
                 sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
             }
             else if (gridViewType == "hr")
@@ -505,8 +596,9 @@ namespace HR_LEAVEv2.UserControls
                     leaveBalanceColumnName.Add("Sick", "[sick]");
                     leaveBalanceColumnName.Add("Vacation", "[vacation]");
 
-                    // TODO: check if in good standing (if employee has enough leave)
-                    // TODO: how does HR cater for this???
+                    // TODO: check if in good standing AKA Qualified (if employee has enough leave)
+
+                    // approved => subtract leave from balance
                     string operation = "";
                     if (commandName == "approved")
                     {
@@ -517,7 +609,7 @@ namespace HR_LEAVEv2.UserControls
                         operation = " - ";
                     }
 
-                    // TODO: undo
+                    // undo => add leave back
                     else if (commandName == "undoApprove")
                     {
                         // reset status to Recommended
@@ -526,6 +618,7 @@ namespace HR_LEAVEv2.UserControls
                         // Add leave back to balance
                         operation = " + ";
                     }
+
                     string sql = $@"
                         BEGIN TRANSACTION;
 
@@ -580,19 +673,150 @@ namespace HR_LEAVEv2.UserControls
             this.BindGridView();
         }
 
-        protected void ddlStatus_SelectedIndexChanged(object sender, EventArgs e)
+        protected Boolean validateDates(string startDate, string endDate, int type)
         {
+            if (String.IsNullOrEmpty(startDate) && String.IsNullOrEmpty(endDate))
+                return true;
+            // type 0: submitted from, submitted to
+            // type 1: start date, end date
 
+            DateTime start, end;
+            start = end = DateTime.MinValue;
+            Boolean isValidated = true;
+
+            // validate start date is a date
+            try
+            {
+                if (!String.IsNullOrEmpty(startDate))
+                    start = Convert.ToDateTime(startDate);
+                else
+                    throw new FormatException();
+
+            }
+            catch (FormatException fe)
+            {
+                if (type == 0)
+                    invalidSubmittedFromDate.Style.Add("display", "inline-block");
+                else 
+                    invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+                isValidated = false;
+            }
+
+            // validate end date is a date
+            try
+            {
+                if (!String.IsNullOrEmpty(endDate))
+                    end = Convert.ToDateTime(endDate);
+                else
+                    throw new FormatException();
+            }
+            catch (FormatException fe)
+            {
+                if (type == 0)
+                    invalidSubmittedToDate.Style.Add("display", "inline-block");
+                else
+                    invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
+                isValidated = false;
+            }
+
+            if (isValidated)
+            {
+
+                // compare dates to ensure end date is not before start date
+                if (DateTime.Compare(start, end) > 0)
+                {
+                    if (type == 0)
+                    {
+                        invalidSubmittedToDate.Style.Add("display", "inline-block");
+                        submittedDateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
+                    }
+                    else{
+                        invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
+                        appliedForDateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
+                    }
+
+                    isValidated = false;
+                }
+            }
+            return isValidated;
         }
 
-        protected void ddlType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
         protected void btnFilter_Click(object sender, EventArgs e)
         {
-            return;
+            // check all textboxes/drop down lists and set the respective variables 
+            // these variables are then used in the
+
+            // reset all values to null throughout??
+
+            // check if control exists first?? (because some may be hidden)
+
+            SubmittedFrom = tbSubmittedFrom.Text.ToString();
+            SubmittedTo = tbSubmittedTo.Text.ToString();
+
+            StartDate = tbStartDate.Text.ToString();
+            EndDate = tbEndDate.Text.ToString();
+
+            // validate all dates
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            appliedForDateComparisonValidationMsgPanel.Style.Add("display", "none");
+            invalidSubmittedFromDate.Style.Add("display", "none");
+            invalidSubmittedToDate.Style.Add("display", "none");
+            submittedDateComparisonValidationMsgPanel.Style.Add("display", "none");
+
+            bool areSubmitDatesValidated = false, areAppliedDatesValidated = false;
+            areSubmitDatesValidated = validateDates(SubmittedFrom, SubmittedTo, 0);
+            areAppliedDatesValidated = validateDates(StartDate, EndDate, 1);
+            if (areSubmitDatesValidated && areAppliedDatesValidated)
+            {
+                // display appropriate message in the notification panel
+
+                SupervisorName_ID = tbSupervisor.Text.ToString();
+                EmployeeName_ID = tbEmployee.Text.ToString();
+
+                LeaveType = ddlType.SelectedValue.ToString();
+                Status = ddlStatus.SelectedValue.ToString();
+                Qualified = ddlQualified.SelectedValue.ToString();
+
+                this.BindGridView();
+            }
         }
 
+        protected void clearFilterBtn_Click(object sender, EventArgs e)
+        {
+            // clear all filters 
+            SubmittedFrom = String.Empty;
+            tbSubmittedFrom.Text = String.Empty;
+            SubmittedTo = String.Empty;
+            tbSubmittedTo.Text = String.Empty;
+
+
+            StartDate = String.Empty;
+            tbStartDate.Text = String.Empty;
+            EndDate = String.Empty;
+            tbEndDate.Text = String.Empty;
+
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            appliedForDateComparisonValidationMsgPanel.Style.Add("display", "none");
+            invalidSubmittedFromDate.Style.Add("display", "none");
+            invalidSubmittedToDate.Style.Add("display", "none");
+            submittedDateComparisonValidationMsgPanel.Style.Add("display", "none");
+
+            SupervisorName_ID = String.Empty;
+            tbSupervisor.Text = String.Empty;
+            EmployeeName_ID = String.Empty;
+            tbEmployee.Text = String.Empty;
+
+            LeaveType = String.Empty;
+            ddlType.SelectedIndex = 0;
+            Status = String.Empty;
+            ddlStatus.SelectedIndex = 0;
+            Qualified = String.Empty;
+            ddlQualified.SelectedIndex = 0;
+
+
+            this.BindGridView();
+        }
     }
 }

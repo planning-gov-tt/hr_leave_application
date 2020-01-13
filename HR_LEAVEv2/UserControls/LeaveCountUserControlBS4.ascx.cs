@@ -12,6 +12,7 @@ namespace HR_LEAVEv2.UserControls
 {
     public partial class LeaveCountUserControlBS4 : System.Web.UI.UserControl
     {
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!Page.IsPostBack)
@@ -43,7 +44,7 @@ namespace HR_LEAVEv2.UserControls
                     }
                 }
             }
-        
         }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 
@@ -7,16 +8,277 @@ namespace HR_LEAVEv2.Employee
 {
     public partial class ApplyForLeave : System.Web.UI.Page
     {
+        // this class is used to store the loaded data from the db in the process of populating fields on the page when accessing this page from 'view' mode
+        private class LeaveTransactionDetails
+        {
+            public string empId { get; set; }
+            public string empName { get; set; }
+            public string empType { get; set; }
+            public string startDate { get; set; }
+            public string endDate { get; set; }
+            public string typeOfLeave { get; set; }
+            public string supId { get; set; }
+            public string supName { get; set; }
+            public string status { get; set; }
+            public string submittedOn { get; set; }
+            public string empComment { get; set; }
+            public string supComment { get; set; }
+            public string hrComment { get; set; }
+        };
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["permissions"] == null)
-                Response.Redirect("~/AccessDenied.aspx");
-
-            if (this.IsPostBack)
+            if (!IsPostBack)
             {
+                if (Session["permissions"] == null)
+                    Response.Redirect("~/AccessDenied.aspx");
+
+                if (Request.QueryString.HasKeys())
+                {
+                    string mode = Request.QueryString["mode"];
+                    string leaveId = Request.QueryString["leaveId"];
+
+                    if(mode == "view")
+                        this.adjustPageForViewMode(leaveId);
+                } else
+                {
+                    // display normal leave application form
+                    this.adjustPageForApplyMode();
+                }        
+            } else
+            {
+                //isPostback
                 if (ViewState["supervisor_id"] != null && ViewState["supervisor_id"].ToString() != "-1")
                     supervisor_select.selectedSupId = ViewState["supervisor_id"].ToString();               
             }
+        }
+
+        protected void adjustPageForViewMode(string leaveId)
+        {
+
+            LeaveTransactionDetails ltDetails = null;
+ 
+            // get info for relevant leave application based on passed leaveId and populate form controls
+            try
+            {
+                /**
+                 * This sql query gets various info necessary for repopulation of the fields as well as for the authorization process.
+                 * for the authorization process: 
+                 *      lt.employee_id: used to check whether the current employee trying to access the page is the same as the employee who made the application
+                 *      lt.supervisor_id: used to check whether the supervisor trying to access the page is the supervisor who recommended the application
+                 *      ep.employment_type: used to check whether the hr2 trying to access the page manages the relevant employment type of the employee who made the application (contract or public service)
+                 *      
+                 * for the repopulation:
+                 *      all the other variables are used to repopulate some control on the page
+                 * */
+                string sql = $@"
+                        SELECT 
+                            lt.employee_id, 
+                            emp.first_name + ' ' + emp.last_name as 'employee_name', 
+                            ep.employment_type , 
+                            FORMAT(lt.start_date, 'MM/dd/yyyy') start_date, 
+                            FORMAT(lt.end_date, 'MM/dd/yyyy') end_date, 
+                            lt.leave_type, 
+                            lt.status, 
+                            FORMAT(lt.created_at, 'MM/dd/yyyy HH:mm tt') as submitted_on,
+                            lt.supervisor_id, 
+                            e.first_name + ' ' + e.last_name as 'supervisor_name', 
+                            lt.emp_comment, 
+                            lt.sup_comment, 
+                            lt.hr_comment
+                        FROM [dbo].[leavetransaction] lt
+                        JOIN [dbo].[employee] e
+                        ON e.employee_id = lt.supervisor_id
+                        LEFT JOIN [dbo].employeeposition ep
+                        ON ep.employee_id = lt.employee_id
+                        JOIN  [dbo].[employee] emp
+                        ON emp.employee_id = lt.employee_id
+                        WHERE lt.transaction_id = {leaveId};
+                    ";
+
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ltDetails = new LeaveTransactionDetails
+                                {
+                                    empId = reader["employee_id"].ToString(),
+                                    empName = reader["employee_name"].ToString(),
+                                    empType = reader["employment_type"].ToString(),
+                                    startDate = reader["start_date"].ToString(),
+                                    endDate = reader["end_date"].ToString(),
+                                    typeOfLeave = reader["leave_type"].ToString(),
+                                    status = reader["status"].ToString(),
+                                    submittedOn = reader["submitted_on"].ToString(),
+                                    supId = reader["supervisor_id"].ToString(),
+                                    supName = reader["supervisor_name"].ToString(),
+                                    empComment = reader["emp_comment"].ToString(),
+                                    supComment = reader["sup_comment"].ToString(),
+                                    hrComment = reader["hr_comment"].ToString()
+                                };
+                                
+                            }
+
+                            // check permissions of current user
+                            List<string> permissions = (List<string>)Session["permissions"];
+
+                            // Employee
+                            if(permissions.Contains("emp_permissions") && !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")) && !permissions.Contains("sup_permissions"))
+                            {
+                                // employee can only view their own leave applications
+                                if(Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.empId)
+                                    Response.Redirect("~/AccessDenied.aspx");
+
+                            }
+                            // Supervisor
+                            if (permissions.Contains("sup_permissions") && !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
+                            {
+                                // supervisor can only view if they were the one who the application was submitted to
+                                if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.supId)
+                                    Response.Redirect("~/AccessDenied.aspx");
+                            }
+                            // HR 1 can see everybody's data
+
+                            // HR 2
+                            if (permissions.Contains("hr2_permissions"))
+                            {
+                                if (!String.IsNullOrEmpty(ltDetails.empType))
+                                {
+                                    // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
+                                    if (
+                                        (ltDetails.empType=="Contract" && !permissions.Contains("contract_permissions")) 
+                                        ||
+                                        (ltDetails.empType == "Public Service" && !permissions.Contains("public_officer_permissions"))
+                                       )
+                                        Response.Redirect("~/AccessDenied.aspx");
+                                }
+                            }
+
+                            // HR 3
+                            // HR 3 should not have access to leave application data
+                            if(permissions.Contains("hr3_permissions"))
+                                Response.Redirect("~/AccessDenied.aspx");
+
+                            //populate form
+                            empNameHeader.InnerText = ltDetails.empName;
+                            txtFrom.Text = ltDetails.startDate;
+                            txtTo.Text = ltDetails.endDate;
+                            typeOfLeaveTxt.Text = ltDetails.typeOfLeave;
+                            statusTxt.Text = ltDetails.status;
+                            submittedOnTxt.Text = "Submitted on: " + ltDetails.submittedOn;
+                            supervisorNameTxt.Text = ltDetails.supName;
+                            empCommentsTxt.Value = ltDetails.empComment;
+                            supCommentsTxt.Value = ltDetails.supComment;
+                            hrCommentsTxt.Value = ltDetails.hrComment;
+
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            //Return to previous
+            returnToPreviousBtn.Visible = true;
+
+            //Title
+            viewModeTitle.Visible = true;
+            editModeTitle.Visible = false;
+            applyModeTitle.Visible = false;
+
+            //Employee Name
+            empNamePanel.Visible = true;
+
+            //Submitted On
+            submittedOnPanel.Visible = true;
+
+            //Status
+            statusPanel.Visible = true;
+            statusTxt.Enabled = false;
+
+            //File Upload
+            fileUploadPanel.Visible = false;
+
+            //Comments
+            empCommentsPanel.Visible = true;
+            supCommentsPanel.Visible = true;
+            hrCommentsPanel.Visible = true;
+
+            //Leave Count Panel
+            leaveCountPanel.Visible = false;
+
+            //Submit Button
+            submitButtonPanel.Visible = false;
+
+
+            // Start Date
+            txtFrom.Enabled = false;
+            fromCalendarExtender.Enabled = false;
+
+            // End Date
+            txtTo.Enabled = false;
+            toCalendarExtender.Enabled = false;
+
+            // Type of Leave
+            typeOfLeaveDropdownPanel.Visible = false;
+            typeOfLeavePanel.Visible = true;
+            typeOfLeaveTxt.Enabled = false;
+
+            //Supervisor Name
+            supervisorSelectUserControlPanel.Visible = false;
+            supervisorPanel.Visible = true;
+            supervisorNameTxt.Enabled = false;
+
+            //Comments
+            empCommentsTxt.Disabled = true;
+            supCommentsTxt.Disabled = true;
+            hrCommentsTxt.Disabled = true;
+        }
+
+        protected void adjustPageForApplyMode()
+        {
+            //Return to previous
+            returnToPreviousBtn.Visible = false;
+
+            //Title
+            viewModeTitle.Visible = false;
+            editModeTitle.Visible = false;
+            applyModeTitle.Visible = true;
+
+            //Employee Name
+            empNamePanel.Visible = false;
+
+            //Submitted On
+            submittedOnPanel.Visible = false;
+
+            //Status
+            statusPanel.Visible = false;
+
+            //File upload
+            fileUploadPanel.Visible = true;
+
+            //Type of Leave
+            typeOfLeavePanel.Visible = false;
+
+            //Supervisor Name
+            supervisorSelectUserControlPanel.Visible = true;
+            supervisorPanel.Visible = false;
+
+            //Comments
+            empCommentsPanel.Visible = true;
+            supCommentsPanel.Visible = false;
+            hrCommentsPanel.Visible = false;
+
+            //Submit Button
+            submitButtonPanel.Visible = true;
+
         }
 
         protected Boolean validateDates(string startDate, string endDate)
@@ -120,7 +382,7 @@ namespace HR_LEAVEv2.Employee
             startDate = txtFrom.Text.ToString();
             endDate = txtTo.Text.ToString();
             supId = supervisor_select.selectedSupId;
-            comments = txtComments.Value.Length > 0 ? txtComments.Value.ToString() : null;
+            comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null;
 
             ViewState["supervisor_id"] = supId;
 
@@ -138,7 +400,7 @@ namespace HR_LEAVEv2.Employee
                            ,[end_date]
                            ,[supervisor_id]
                            ,[status]
-                           ,[comments])
+                           ,[emp_comment])
                         VALUES
                            ( '{empId}'
                             ,'{leaveType}'
@@ -182,6 +444,11 @@ namespace HR_LEAVEv2.Employee
         protected void refreshForm(object sender, EventArgs e)
         {
             Response.Redirect("~/Employee/ApplyForLeave.aspx");
+        }
+
+        protected void returnToPreviousBtn_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(Request.QueryString["returnUrl"]);
         }
     }
 }
