@@ -266,13 +266,17 @@ INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start
 (2, '3', 5, '20190927', '20200927', NULL, 'Public Service', 1),
 
 -- multiple periods of employment for one person
-(3, '115245', 6, '20101005', '20131005', NULL, 'Contract', 1),
-(4, '115245', 6, '20131005', '20170927', NULL, 'Contract', 1),
-(5, '115245', 6, '20160927', '20201225', NULL, 'Contract', 1),
+(3, '115245', 6, '20101005', '20131005', '20131007', 'Contract', 1),
+(4, '115245', 6, '20131015', '20161015', '20161018', 'Contract', 1),
+(5, '115245', 6, '20171120', '20201120', NULL, 'Contract', 1),
 
 -- contract and public servant
 (7, '38137', 7, '20160927', '20201225', NULL, 'Contract', 2),
-(8, '05356', 7, '20160927', '20201225', NULL, 'Public Service', 2)
+(8, '05356', 7, '20160927', '20201225', NULL, 'Public Service', 2),
+
+--more seed data
+(9, '184164', 6, '20180927', '20210927', NULL, 'Contract', 1),
+(10, '11948', 7, '20191025', '20221025', NULL, 'Public Service', 2)
 ;
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;
