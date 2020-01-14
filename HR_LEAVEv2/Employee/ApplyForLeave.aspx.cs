@@ -8,8 +8,9 @@ namespace HR_LEAVEv2.Employee
 {
     public partial class ApplyForLeave : System.Web.UI.Page
     {
+
         // this class is used to store the loaded data from the db in the process of populating fields on the page when accessing this page from 'view' mode
-        private class LeaveTransactionDetails
+        protected class LeaveTransactionDetails
         {
             public string empId { get; set; }
             public string empName { get; set; }
@@ -37,8 +38,11 @@ namespace HR_LEAVEv2.Employee
                     string mode = Request.QueryString["mode"];
                     string leaveId = Request.QueryString["leaveId"];
 
-                    if(mode == "view")
-                        this.adjustPageForViewMode(leaveId);
+                    LeaveTransactionDetails ltDetails = populatePage(leaveId);
+                    if (mode == "view")
+                        this.adjustPageForViewMode();
+                    else if (mode == "edit")
+                        this.adjustPageForEditMode(ltDetails);
                 } else
                 {
                     // display normal leave application form
@@ -52,11 +56,10 @@ namespace HR_LEAVEv2.Employee
             }
         }
 
-        protected void adjustPageForViewMode(string leaveId)
+        protected LeaveTransactionDetails populatePage(string leaveId)
         {
-
             LeaveTransactionDetails ltDetails = null;
- 
+
             // get info for relevant leave application based on passed leaveId and populate form controls
             try
             {
@@ -120,17 +123,17 @@ namespace HR_LEAVEv2.Employee
                                     supComment = reader["sup_comment"].ToString(),
                                     hrComment = reader["hr_comment"].ToString()
                                 };
-                                
+
                             }
 
                             // check permissions of current user
                             List<string> permissions = (List<string>)Session["permissions"];
 
                             // Employee
-                            if(permissions.Contains("emp_permissions") && !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")) && !permissions.Contains("sup_permissions"))
+                            if (permissions.Contains("emp_permissions") && !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")) && !permissions.Contains("sup_permissions"))
                             {
                                 // employee can only view their own leave applications
-                                if(Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.empId)
+                                if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.empId)
                                     Response.Redirect("~/AccessDenied.aspx");
 
                             }
@@ -150,17 +153,32 @@ namespace HR_LEAVEv2.Employee
                                 {
                                     // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
                                     if (
-                                        (ltDetails.empType=="Contract" && !permissions.Contains("contract_permissions")) 
+                                        (
+                                            //check if hr can view applications from the relevant employment type 
+                                            (ltDetails.empType == "Contract" && !permissions.Contains("contract_permissions"))
+                                            ||
+                                            (ltDetails.empType == "Public Service" && !permissions.Contains("public_officer_permissions"))
+                                        )
+
                                         ||
-                                        (ltDetails.empType == "Public Service" && !permissions.Contains("public_officer_permissions"))
+
+                                        (
+                                            //check if hr can view applications of the relevant leave type
+                                            (ltDetails.typeOfLeave == "Sick" && !permissions.Contains("approve_sick"))
+                                            ||
+                                            (ltDetails.typeOfLeave == "Vacation" && !permissions.Contains("approve_vacation"))
+                                            ||
+                                            (ltDetails.typeOfLeave == "Casual" && !permissions.Contains("approve_casual"))
+                                        )
                                        )
                                         Response.Redirect("~/AccessDenied.aspx");
+
                                 }
                             }
 
                             // HR 3
                             // HR 3 should not have access to leave application data
-                            if(permissions.Contains("hr3_permissions"))
+                            if (permissions.Contains("hr3_permissions"))
                                 Response.Redirect("~/AccessDenied.aspx");
 
                             //populate form
@@ -187,11 +205,6 @@ namespace HR_LEAVEv2.Employee
 
             //Return to previous
             returnToPreviousBtn.Visible = true;
-
-            //Title
-            viewModeTitle.Visible = true;
-            editModeTitle.Visible = false;
-            applyModeTitle.Visible = false;
 
             //Employee Name
             empNamePanel.Visible = true;
@@ -240,6 +253,19 @@ namespace HR_LEAVEv2.Employee
             empCommentsTxt.Disabled = true;
             supCommentsTxt.Disabled = true;
             hrCommentsTxt.Disabled = true;
+
+            //comment edit
+            submitCommentsPanel.Visible = false;
+
+            return ltDetails;
+        }
+
+        protected void adjustPageForViewMode()
+        {
+            //Title
+            viewModeTitle.Visible = true;
+            editModeTitle.Visible = false;
+            applyModeTitle.Visible = false;
         }
 
         protected void adjustPageForApplyMode()
@@ -278,6 +304,28 @@ namespace HR_LEAVEv2.Employee
 
             //Submit Button
             submitButtonPanel.Visible = true;
+
+        }
+
+        protected void adjustPageForEditMode(LeaveTransactionDetails ltDetails)
+        {
+            //Title
+            viewModeTitle.Visible = false;
+            editModeTitle.Visible = true;
+            applyModeTitle.Visible = false;
+
+            //Comments
+
+            //if supervisor on leave application, then they can leave a comment
+            if(Session["emp_id"].ToString() == ltDetails.supId)
+                supCommentsTxt.Disabled = false;
+
+            List<string> permissions = (List<string>)Session["permissions"];
+
+            if(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
+                hrCommentsTxt.Disabled = false;
+
+            submitCommentsPanel.Visible = true;
 
         }
 
@@ -449,6 +497,79 @@ namespace HR_LEAVEv2.Employee
         protected void returnToPreviousBtn_Click(object sender, EventArgs e)
         {
             Response.Redirect(Request.QueryString["returnUrl"]);
+        }
+
+        protected void submitCommentsBtn_Click(object sender, EventArgs e)
+        {
+            string leaveId = Request.QueryString["leaveId"];
+            string supComment, hrComment;
+            supComment = hrComment = string.Empty;
+            if (supCommentsTxt.Disabled == false)
+                supComment = supCommentsTxt.InnerText;
+
+            if (hrCommentsTxt.Disabled == false)
+                hrComment = hrCommentsTxt.InnerText;
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                        BEGIN TRANSACTION [updateComments]
+                                            
+
+                        BEGIN TRY
+
+                            UPDATE [dbo].leavetransaction 
+                            SET sup_comment = @SupervisorComments
+                            WHERE transaction_id = {leaveId};
+
+                            UPDATE [dbo].leavetransaction 
+                            SET hr_comment = @HrComments
+                            WHERE transaction_id = {leaveId};
+
+                            COMMIT TRANSACTION [updateComments]
+
+                        END TRY
+
+                        BEGIN CATCH
+
+                            ROLLBACK TRANSACTION [updateComments]
+
+                        END CATCH  
+                       
+                    ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        if(supComment != string.Empty)
+                            command.Parameters.AddWithValue("@SupervisorComments", supComment);
+                        else
+                            command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
+
+                        if(hrComment != string.Empty)
+                            command.Parameters.AddWithValue("@HrComments", hrComment);
+                        else
+                            command.Parameters.AddWithValue("@HrComments", DBNull.Value);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            // show success message
+                            successfulSubmitCommentsMsgPanel.Visible = true;
+
+                            // hide submit button
+                            submitCommentsBtn.Visible = false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                Console.WriteLine(ex.Message.ToString());
+            }
+
         }
     }
 }

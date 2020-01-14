@@ -16,22 +16,22 @@
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
             <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
-            <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server"></ajaxToolkit:CalendarExtender>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
             <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
-            <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" />
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" Format="MM/dd/yyyy"/>
         </div>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
             <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-            <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
             <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-            <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" />
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" Format="MM/dd/yyyy"/>
         </div>
     </div>
     <div id="divTbSupervisor" class="row" runat="server">
@@ -196,7 +196,7 @@
                         <i class="fa fa-check" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnEditLeaveRequest" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnEditLeaveRequest" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request" Visible="<%# btnSupVisible || btnHrVisible %>" runat="server"
                         CommandName="editLeaveRequest"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-pencil" aria-hidden="true"></i>
