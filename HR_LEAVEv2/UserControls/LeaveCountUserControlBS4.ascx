@@ -29,6 +29,12 @@
         display: table;
         color: #4ad1e5;
     }
+
+    .count-block{
+        width:300px;
+        height:250px;
+        margin:0px 5px;
+    }
 </style>
 
 
@@ -36,8 +42,7 @@
 
 
 <div class="container">
-    <div class="row">
-        <br />
+    <div class="row" style="margin-bottom:20px; margin-top:10px;">
         <div class="col text-center">
             <h4 id="leaveCountHeader">Leave Remaining</h4>
         </div>
@@ -45,31 +50,42 @@
     <div class="row text-center">
 
         <%--sick--%>
-        <div class="col-sm-4">
+        <asp:Panel ID="sickPanel" runat="server" CssClass="col count-block" Style="display:inline-block;">
             <div class="counter">
                 <i class="fa fa-plus-square fa-2x"></i>
-                <h2 id="h2Sick" class="timer count-title count-number" data-to="<%= ViewState["sick"]%>" data-speed="600"><%= ViewState["sick"]%></h2>
+                <h2 id="h2Sick" class="count-title count-number"><%= ViewState["sick"]%></h2>
                 <p class="count-text ">Sick</p>
             </div>
-        </div>
+        </asp:Panel>
 
         <%--vacation--%>
-        <div class="col-sm-4">
+        <asp:Panel ID="vacationPanel" runat="server" CssClass="col count-block" Style="display:inline-block;">
             <div class="counter">
                 <i class="fa fa-plane fa-2x"></i>
-                <h2 id="h2Vacation" class="timer count-title count-number" data-to="<%= ViewState["vacation"]%>" data-speed="600"><%= ViewState["vacation"]%></h2>
+                <h2 id="h2Vacation" class="timer count-title count-number"><%= ViewState["vacation"]%></h2>
                 <p class="count-text ">Vacation</p>
             </div>
-        </div>
+        </asp:Panel>
 
         <%--personal--%>
-        <div class="col-sm-4">
+        <asp:Panel ID="personalPanel" runat="server" CssClass="col count-block" Style="display:inline-block;">
             <div class="counter">
                 <i class="fa fa-user fa-2x"></i>
-                <h2 id="h2Personal" class="timer count-title count-number" data-to="<%= ViewState["personal"]%>" data-speed="600"><%= ViewState["personal"]%></h2>
+                <h2 id="h2Personal" class="timer count-title count-number"><%= ViewState["personal"]%></h2>
                 <p class="count-text ">Personal</p>
             </div>
-        </div>
+        </asp:Panel>
+       
+            
+
+         <%--casual--%>
+        <asp:Panel ID="casualPanel" runat="server" CssClass="col count-block" Style="display:inline-block;">
+            <div class="counter">
+                <i class="fa fa-user fa-2x"></i>
+                <h2 id="h2Casual" class="timer count-title count-number"><%= ViewState["casual"]%></h2>
+                <p class="count-text ">Casual</p>
+            </div>
+        </asp:Panel>
     </div>
 </div>
 
