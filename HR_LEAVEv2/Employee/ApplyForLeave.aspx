@@ -54,7 +54,7 @@
                 <label for="txtFrom" style="font-size:1.5em">From:</label>
                 <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server"></ajaxToolkit:CalendarExtender>
+                <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
                 <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
             <%--End Date--%>
@@ -62,7 +62,7 @@
                 <label for="txtTo" style="font-size:1.5em">To:</label>
                 <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" />
+                <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" Format="MM/dd/yyyy"/>
                 <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"  ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
         </div>
@@ -171,10 +171,6 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
                     </asp:Panel>
-                    <%--<asp:Panel ID="validationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span id="validationMsg" runat="server">End date is not valid</span>
-                    </asp:Panel>--%>
                     <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span id="successMsg" runat="server">Application successfully submitted</span>
@@ -187,6 +183,14 @@
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
+        <asp:Panel ID="submitCommentsPanel" runat="server" CssClass="row" Style="margin-top:15px;">
+            <asp:Button ID="submitCommentsBtn" runat="server" Text="Submit comment(s)" CssClass="btn btn-success" OnClick="submitCommentsBtn_Click"/>
+            <asp:Panel ID="successfulSubmitCommentsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display:inline-block;" role="alert" Visible="false">
+                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                <span id="Span2" runat="server">Comments successfully added to application</span>
+            </asp:Panel>
+        </asp:Panel>
+
     </div>
 </asp:Content>
 

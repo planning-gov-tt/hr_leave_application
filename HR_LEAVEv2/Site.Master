@@ -213,9 +213,8 @@
         var storage = window.sessionStorage;
 
         $(document).ready(function () {
-            $(function () {
-                $(".content-tooltipped").tooltip('enable');
-            });
+            
+            $(".content-tooltipped").tooltip('enable');
 
             // maintain state of sidebar based on session storage
             var isActive = storage.getItem("isActive");

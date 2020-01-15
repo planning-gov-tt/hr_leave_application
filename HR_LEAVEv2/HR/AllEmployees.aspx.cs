@@ -69,7 +69,7 @@ namespace HR_LEAVEv2.HR
                         FROM [dbo].[employee] e
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
-                        WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date;
+                        WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND ep.actual_end_date IS NULL
                     ";
                 }
 

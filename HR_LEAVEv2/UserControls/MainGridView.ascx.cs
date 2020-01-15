@@ -57,7 +57,7 @@ namespace HR_LEAVEv2.UserControls
                 INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
                 INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
                 LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
-                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>=ep.start_date AND GETDATE()<=ep.expected_end_date
+                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>=ep.start_date AND ep.actual_end_date IS NULL
             ";
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -180,10 +180,6 @@ namespace HR_LEAVEv2.UserControls
             }
         }
 
-        // TODO
-        // get most recent employment type
-
-
         private void BindGridView()
         {
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
@@ -278,13 +274,13 @@ namespace HR_LEAVEv2.UserControls
                 if (!string.IsNullOrEmpty(StartDate))
                 {
                     whereFilterGridView += $@"
-                        AND start_date >= '{StartDate}'
+                        AND lt.start_date >= '{StartDate}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(EndDate))
                 {
                     whereFilterGridView += $@"
-                        AND end_date <= '{EndDate}'
+                        AND lt.end_date <= '{EndDate}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(SupervisorName_ID))
@@ -505,6 +501,11 @@ namespace HR_LEAVEv2.UserControls
             if (commandName == "details")
                 Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=view&leaveId=" + transaction_id + "&returnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
 
+            if (commandName == "editLeaveRequest")
+            {
+                // redirect to apply for leave form and prepopulate...
+                Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=edit&leaveId=" + transaction_id + "&returnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
+            }
             // if employee view
             if (gridViewType == "emp")
             {
@@ -557,13 +558,6 @@ namespace HR_LEAVEv2.UserControls
                     ";
                     sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
                 }
-
-                else if (commandName == "editLeaveRequest")
-                {
-                    // redirect to apply for leave form and prepopulate...
-                    return;
-                }
-
                 else // approve (subtract) or undo (add)
                 {
                     // get employee id start date and end dates, leave type from gridview row

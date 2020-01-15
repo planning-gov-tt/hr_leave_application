@@ -10,15 +10,16 @@ namespace HR_LEAVEv2.HR
 {
     public partial class EmployeeDetails : System.Web.UI.Page
     {
-
+        List<string> permissions = null;
         protected void Page_Load(object sender, EventArgs e)
         {
+            permissions = (List<string>)Session["permissions"];
+            if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
+                Response.Redirect("~/AccessDenied.aspx");
             if (!this.IsPostBack)
             {
+                ViewState["Gridview1_dataSource"] = null;
                 this.bindGridview();
-                ViewState["empTypeList_startIndex"] = empTypeList.SelectedIndex;
-                ViewState["deptList_startIndex"] = deptList.SelectedIndex;
-                ViewState["positionList_startIndex"] = positionList.SelectedIndex;
             }
                 
         }
@@ -46,32 +47,34 @@ namespace HR_LEAVEv2.HR
                 isValidated = false;
             }
 
-            // validate end date is a date
-            try
+            if (!String.IsNullOrEmpty(endDate))
             {
-                end = Convert.ToDateTime(endDate);
-            }
-            catch (FormatException fe)
-            {
-                invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
-                isValidated = false;
-            }
-
-            if (isValidated)
-            {
-
-                // compare dates to ensure end date is not before start date
-                if (DateTime.Compare(start, end) > 0)
+                // validate end date is a date
+                try
+                {
+                    end = Convert.ToDateTime(endDate);
+                }
+                catch (FormatException fe)
                 {
                     invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
-                    dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
                     isValidated = false;
                 }
 
-                return isValidated;
+                if (isValidated)
+                {
+
+                    // compare dates to ensure end date is not before start date
+                    if (DateTime.Compare(start, end) > 0)
+                    {
+                        invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
+                        dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
+                        isValidated = false;
+                    }
+                }
+
             }
 
-            return false;
+            return isValidated;
         }
 
      
@@ -104,9 +107,9 @@ namespace HR_LEAVEv2.HR
             Boolean isValidated = validateDates(startDate, endDate);
             if (isValidated)
             {
-                
-                DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
-                if (dt == null)
+
+                DataTable dt;
+                if (ViewState["Gridview1_dataSource"] == null)
                 {
                     dt = new DataTable();
                     dt.Columns.Add("employment_type", typeof(string));
@@ -116,41 +119,42 @@ namespace HR_LEAVEv2.HR
                     dt.Columns.Add("pos_name", typeof(string));
                     dt.Columns.Add("start_date", typeof(string));
                     dt.Columns.Add("expected_end_date", typeof(string));
+                } else
+                    dt = ViewState["Gridview1_dataSource"] as DataTable;
 
-                    if (GridView1.Rows.Count > 0)
+                DateTime expected_end_date = DateTime.MinValue;
+                if (String.IsNullOrEmpty(endDate))
+                {
+                    // no expected end date
+                    if (emp_type == "Contract")
                     {
-                        foreach (GridViewRow row in GridView1.Rows)
-                        {
-                            dt.Rows.Add(row.Cells[1].Text, row.Cells[2].Text, row.Cells[3].Text, row.Cells[4].Text, row.Cells[5].Text, row.Cells[6].Text, row.Cells[7].Text);
-                        }
+                        // if contract worker then add expected end date that is 3 years from start date
+                        expected_end_date = Convert.ToDateTime(startDate);
+                        expected_end_date = expected_end_date.AddYears(3);
                     }
                 }
-
-                dt.Rows.Add(emp_type, dept_id, dept_name, position_id, position_name, startDate, endDate);
+                else
+                    expected_end_date = Convert.ToDateTime(endDate);
+      
+                //employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date
+                dt.Rows.Add(emp_type, dept_id, dept_name, position_id, position_name, startDate, expected_end_date.ToString("MM/dd/yyyy"));
+    
                 ViewState["Gridview1_dataSource"] = dt;
 
                 GridView1.DataSource = dt;
                 GridView1.DataBind();
 
             }
-            this.resetAddEmploymentRecordFormFields();
+            //this.resetAddEmploymentRecordFormFields();
         }
 
         protected void resetAddEmploymentRecordFormFields()
         {
             txtStartDate.Text = String.Empty;
             txtEndDate.Text = String.Empty;
-
-            if(ViewState["empTypeList_startIndex"] != null && ViewState["deptList_startIndex"] != null && ViewState["positionList_startIndex"] != null)
-            {
-                int empTypeList_index = (int)ViewState["empTypeList_startIndex"];
-                empTypeList.SelectedIndex = empTypeList_index;
-                int deptList_index = (int)ViewState["deptList_startIndex"];
-                deptList.SelectedIndex = deptList_index;
-                int positionList_index = (int)ViewState["positionList_startIndex"];
-                positionList.SelectedIndex = positionList_index;
-
-            }
+            empTypeList.SelectedIndex = 0;
+            deptList.SelectedIndex = 0;
+            positionList.SelectedIndex = 0;
         }
 
         protected void cancelNewRecordBtn_Click(object sender, EventArgs e)
