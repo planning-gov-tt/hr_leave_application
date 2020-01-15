@@ -212,9 +212,11 @@
     <script type="text/javascript">
         var storage = window.sessionStorage;
 
-        $(document).ready(function () {
-            
+        Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             $(".content-tooltipped").tooltip('enable');
+        });
+
+        $(document).ready(function () {
 
             // maintain state of sidebar based on session storage
             var isActive = storage.getItem("isActive");
