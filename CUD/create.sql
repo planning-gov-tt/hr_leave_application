@@ -168,3 +168,13 @@ CREATE TABLE [dbo].[employeeposition] (
   FOREIGN KEY ([dept_id])
     REFERENCES [dbo].[department] (dept_id)
 );
+
+CREATE TABLE [dbo].[auditlog] (
+  [log_id] INT IDENTITY (1, 1) PRIMARY KEY,
+  [employee_id] NVARCHAR (10) NOT NULL,
+  [action] NVARCHAR (200) NOT NULL,
+  [created_at] DATETIME NOT NULL,
+
+  FOREIGN KEY ([employee_id])
+    REFERENCES [dbo].[employee] ([employee_id])
+);

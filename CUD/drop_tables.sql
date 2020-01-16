@@ -15,3 +15,4 @@ DROP TABLE [dbo].[employee];
 DROP TABLE [dbo].[rolepermission];
 DROP TABLE [dbo].[role];
 DROP TABLE [dbo].[permission];
+DROP TABLE [dbo].[auditlog];
