@@ -403,13 +403,10 @@ namespace HR_LEAVEv2.Employee
                         invalidSickLeaveStartDate.Style.Add("display", "inline-block");
                         isValidated = false;
                     }
-                }
-
-
-                return isValidated;
+                }   
             }
 
-            return false;
+            return isValidated;
         }
 
         protected void submitLeaveApplication_Click(object sender, EventArgs e)

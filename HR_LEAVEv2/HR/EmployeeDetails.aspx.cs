@@ -209,8 +209,6 @@ namespace HR_LEAVEv2.HR
             ihris_id = ihrisNumInput.Text;
             email = adEmailInput.Text;
 
-            
-
             // get first name, last name and username from active directory
             Auth auth = new Auth();
             string nameFromAd = auth.getUserInfoFromActiveDirectory(email);
@@ -226,6 +224,15 @@ namespace HR_LEAVEv2.HR
 
                 //set username
                 string username = $"PLANNING\\ {firstname} {lastname}";
+
+                // get data from leave 
+                sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
+                personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
+                casual_leave = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
+                vacation_leave = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
+                bereavement_leave = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
+                maternity_leave = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
+                pre_retirement_leave = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
 
                 // get data from checkboxes and set authorizations
                 if (supervisorCheck.Checked)
@@ -245,14 +252,6 @@ namespace HR_LEAVEv2.HR
                         authorizations.Add("hr_public_officer");
                 }
 
-                // get data from leave 
-                sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
-                personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
-                casual_leave = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
-                vacation_leave = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
-                bereavement_leave = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
-                maternity_leave = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
-                pre_retirement_leave = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
 
                 // insert all data 
                 try
@@ -426,6 +425,45 @@ namespace HR_LEAVEv2.HR
                         }
                     }
                 }
+
+                if (isInsertSuccessful)
+                {
+                    // add audit log
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
+                                    INSERT INTO [dbo].[auditlog]  ([employee_id],[action],[created_at])
+                                    VALUES ( @EmployeeId, @Action, @CreatedAt);
+                                ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+
+                                /*
+                                 * Add info about new employee created such as:
+                                 * Employee ID
+                                 * Leave balances: Vacation, Sick, Personal, Casual
+                                 * Permissions
+                                 * */
+                                string action = $"Created new Employee; ID= {emp_id}; Vacation:{vacation_leave}; Sick:{sick_leave}; Personal:{personal_leave}; Casual:{casual_leave}; Permissions: {String.Join(",", authorizations.ToArray())}";
+                                command.Parameters.AddWithValue("@Action", action);
+                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy hh:mm tt"));
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        Console.WriteLine(ex.Message.ToString());
+                    }
+                }
+                else
+                    fullFormErrorPanel.Style.Add("display", "inline-block");
+
             }
             else
             {
@@ -433,11 +471,7 @@ namespace HR_LEAVEv2.HR
                     emailNotFoundErrorPanel.Style.Add("display", "inline-block");
                 if (dt == null)
                     noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
-                isInsertSuccessful = false;
-            }
-
-            if (!isInsertSuccessful)
-                fullFormErrorPanel.Style.Add("display", "inline-block");
+            } 
 
             //scroll to top of page
             Page.MaintainScrollPositionOnPostBack = false;
