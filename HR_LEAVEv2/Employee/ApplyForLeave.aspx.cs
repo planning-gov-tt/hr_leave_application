@@ -305,6 +305,9 @@ namespace HR_LEAVEv2.Employee
             //Submit Button
             submitButtonPanel.Visible = true;
 
+            //Submit Comments 
+            submitCommentsPanel.Visible = false;
+
         }
 
         protected void adjustPageForEditMode(LeaveTransactionDetails ltDetails)
