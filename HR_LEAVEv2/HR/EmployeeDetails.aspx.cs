@@ -18,10 +18,59 @@ namespace HR_LEAVEv2.HR
                 Response.Redirect("~/AccessDenied.aspx");
             if (!this.IsPostBack)
             {
+                if(Request.QueryString.HasKeys())
+                {
+                    string mode = Request.QueryString["mode"];
+                    string empId = Request.QueryString["empId"];
+
+                    if (mode == "edit")
+                        this.adjustPageForEditMode();
+                    else
+                        this.adjustPageForCreateMode();
+                } 
                 ViewState["Gridview1_dataSource"] = null;
                 this.bindGridview();
             }
                 
+        }
+
+        protected void adjustPageForEditMode()
+        {
+            //title
+            editModeTitle.Visible = true;
+            createModeTitle.Visible = false;
+
+            //employee name
+            empNamePanel.Visible = true;
+
+            // validation 
+            validationRowPanel.Visible = false;
+
+            //basic info like id, ihris id, email
+            empBasicInfoPanel.Visible = false;
+
+            //submit
+            submitFullFormPanel.Visible = false;
+        }
+
+        protected void adjustPageForCreateMode()
+        {
+            //title
+            editModeTitle.Visible = false;
+            createModeTitle.Visible = true;
+
+            //employee name
+            empNamePanel.Visible = false;
+
+            // validation 
+            validationRowPanel.Visible = true;
+
+            //basic info like id, ihris id, email
+            empBasicInfoPanel.Visible = true;
+
+            //submit
+            submitFullFormPanel.Visible = true;
+
         }
 
         protected Boolean validateDates(string startDate, string endDate)
@@ -446,7 +495,12 @@ namespace HR_LEAVEv2.HR
 
         protected void refreshForm(object sender, EventArgs e)
         {
-            Response.Redirect("~/HR/EmployeeDetails?view=create");
+            string pathname = string.Empty;
+            if (String.IsNullOrEmpty(Request.QueryString["empId"]))
+                pathname = $"~/HR/EmployeeDetails?mode={ Request.QueryString["mode"]}";
+            else
+                pathname = $"~/HR/EmployeeDetails?mode={Request.QueryString["mode"]}&empId={Request.QueryString["empId"]}";
+            Response.Redirect(pathname);
         }
     }
 }

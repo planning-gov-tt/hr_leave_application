@@ -7,9 +7,24 @@
             text-align: center;
         }
     </style>
-    <h1><%: Title %></h1>
-    <div id="empDetailsContainer" runat="server" class="container-fluid">
-        <div class="row text-center" style="margin-top: 25px;">
+
+    <%--create mode--%>
+    <asp:Panel ID="createModeTitle" runat="server">
+        <h1>Create New Employee</h1>
+    </asp:Panel>
+
+    <%--edit mode--%>
+    <asp:Panel ID="editModeTitle" runat="server">
+        <h1>Edit Employee</h1>
+    </asp:Panel>
+
+   <%-- employee name--%>
+    <asp:Panel ID="empNamePanel" runat="server">
+        <h2 id="empNameHeader" runat="server"></h2>
+    </asp:Panel>
+
+    <div id="empDetailsContainer" runat="server" class="container-fluid text-center">
+        <asp:Panel ID="validationRowPanel" runat="server" CssClass="row text-center" Style="margin-top: 25px;">
             <asp:UpdatePanel ID="UpdatePanel2" runat="server">
                 <ContentTemplate>
                     <asp:Panel ID="fullFormSubmitSuccessPanel" runat="server" Style="display: none; margin: 0 5px;" role="alert">
@@ -36,57 +51,58 @@
                             <span id="Span4" runat="server">At least one Employment record must be entered</span>
                         </span>
                     </asp:Panel>
-                    <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-left: 10px;">
-                         <i class="fa fa-times" aria-hidden="true"></i>
-                         Clear Form
-                    </asp:LinkButton>
+                    
                 </ContentTemplate>
             </asp:UpdatePanel>
-        </div>
+        </asp:Panel>
+
+        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-left: 10px;  margin-bottom: 15px;">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                Clear Form
+        </asp:LinkButton>
 
         <%--Employee Information--%>
         <%--Employee ID, IHRIS ID, AD Email, Authorization Level--%>
-        <div class="container" style="width: 50%;">
-            <div class="row text-center" style="background-color: #e0e0eb; margin-top: 15px; padding-bottom: 15px;">
-
+        
+        <div class="container" style="width: 50%; margin-bottom: 5px;">
+            <asp:Panel ID="empBasicInfoPanel" runat="server" CssClass="row text-center" Style="background-color: #e0e0eb; padding-bottom: 15px; margin-bottom: 5px;">
                 <h3>IDs and Email</h3>
                 <div class="form-group text-left" style="width: 75%; margin: 0 auto; padding-bottom: 15px;">
-                    <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator1" runat="server" ControlToValidate="employeeIdInput" ErrorMessage="Please enter valid employee ID" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                    <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator11" runat="server" ControlToValidate="employeeIdInput" ErrorMessage="Please enter valid employee ID" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
                     </asp:RegularExpressionValidator>
-                    <asp:RequiredFieldValidator ValidationGroup="submitFullFormGroup" ID="RequiredFieldValidator1" runat="server" ControlToValidate="employeeIdInput" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" Style="float: right;"></asp:RequiredFieldValidator>
+                    <asp:RequiredFieldValidator ValidationGroup="submitFullFormGroup" ID="RequiredFieldValidator4" runat="server" ControlToValidate="employeeIdInput" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" Style="float: right;"></asp:RequiredFieldValidator>
                     <label for="employeeIdInput" style="display: block">Employee ID</label>
                     <asp:TextBox ID="employeeIdInput" runat="server" CssClass="form-control" placeholder="Enter employee ID" Style="display: inline-block"></asp:TextBox>
 
                 </div>
                 <div class="form-group text-left" style="width: 75%; margin: 0 auto; padding-bottom: 15px;">
-                    <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator2" runat="server" ControlToValidate="ihrisNumInput" ErrorMessage="Please enter valid IHRIS ID" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                    <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator12" runat="server" ControlToValidate="ihrisNumInput" ErrorMessage="Please enter valid IHRIS ID" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
                     </asp:RegularExpressionValidator>
-                    <asp:RequiredFieldValidator ValidationGroup="submitFullFormGroup" ID="RequiredFieldValidator2" runat="server" ControlToValidate="ihrisNumInput" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" Style="float: right;"></asp:RequiredFieldValidator>
+                    <asp:RequiredFieldValidator ValidationGroup="submitFullFormGroup" ID="RequiredFieldValidator5" runat="server" ControlToValidate="ihrisNumInput" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" Style="float: right;"></asp:RequiredFieldValidator>
                     <label for="ihrisNumInput" style="display: block">IHRIS ID</label>
                     <asp:TextBox ID="ihrisNumInput" runat="server" CssClass="form-control" placeholder="Enter IHRIS ID" Style="display: inline-block"></asp:TextBox>
                 </div>
                 <div class="form-group text-left" style="width: 75%; margin: 0 auto; padding-bottom: 15px;">
-                    <asp:RegularExpressionValidator ID="RegularExpressionValidator3" runat="server" ControlToValidate="adEmailInput" ErrorMessage="Please enter valid email" ForeColor="Red" 
-                         ValidationExpression="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@planning.gov.tt$" 
-                         Display="Dynamic" style="float:right;">  
-                    </asp:RegularExpressionValidator> 
-                    
-                    <asp:RequiredFieldValidator ValidationGroup="submitFullFormGroup" ID="RequiredFieldValidator3" runat="server" ControlToValidate="adEmailInput" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" Style="float: right;"></asp:RequiredFieldValidator>
+                    <asp:RegularExpressionValidator ID="RegularExpressionValidator13" runat="server" ControlToValidate="adEmailInput" ErrorMessage="Please enter valid email" ForeColor="Red"
+                        ValidationExpression="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@planning.gov.tt$"
+                        Display="Dynamic" Style="float: right;">  
+                    </asp:RegularExpressionValidator>
+
+                    <asp:RequiredFieldValidator ValidationGroup="submitFullFormGroup" ID="RequiredFieldValidator6" runat="server" ControlToValidate="adEmailInput" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" Style="float: right;"></asp:RequiredFieldValidator>
                     <label for="adEmailInput" style="display: block">
                         Active Directory Email
-                        <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor:pointer;"  
-                        data-toggle="tooltip" 
-                        data-placement="right" 
-                        title="This email is used to get employee's first name and last name from Active Directory"></i>
+                        <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer;"
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            title="This email is used to get employee's first name and last name from Active Directory"></i>
                     </label>
-                    
+
                     <asp:TextBox ID="adEmailInput" runat="server" CssClass="form-control" AutoCompleteType="Email" placeholder="Enter Active Directory email" Style="display: inline-block"></asp:TextBox>
-                    
                 </div>
-            </div>
+            </asp:Panel>
 
             <%--Authorization Level--%>
-            <div class="row text-center" style="background-color: #f0f0f5; margin-top: 5px;">
+            <div class="row text-center" style="background-color: #f0f0f5;">
                 <h3>Authorization Level
                     <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
                         data-toggle="tooltip"
@@ -120,7 +136,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row text-center" style="display: none; width: 80%; margin: 0 auto; margin-top: 5px; background-color: #f0f0f5" id="furtherDetailsForHrDiv">
+            <div class="row text-center" style="display: none; width: 80%; margin: 0 auto; margin-top:5px; background-color: #f0f0f5" id="furtherDetailsForHrDiv">
                 <h4 style="padding-top: 25px;">Type of employee dealt with</h4>
                 <div class="form-group">
                     <div class="form-check" id="contractCheckDiv">
@@ -140,7 +156,7 @@
         </div>
 
         <%--Leave Balances--%>
-        <div class="container text-center" style="width: 50%; background-color: #e0e0eb; margin-top: 5px; padding-bottom: 15px;">
+        <div class="container text-center" style="width: 50%; background-color: #e0e0eb;  margin-bottom: 5px; padding-bottom: 15px;">
             <h3>Leave Balances
                 <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
                     data-toggle="tooltip"
@@ -205,7 +221,7 @@
         </div>
 
         <%--Add new Employment Record--%>
-        <div id="addEmploymentRecordContainer" class="container text-center" style="background-color: #f0f0f5; margin-top: 5px; padding-bottom: 10px;">
+        <div id="addEmploymentRecordContainer" class="container text-center" style="background-color: #f0f0f5; padding-bottom: 10px;">
             <h3>Employment Record</h3>
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
@@ -333,7 +349,7 @@
             </asp:UpdatePanel>
         </div>
         <div id="submitFullFormPanel" runat="server" class="row text-center" style="margin-top: 50px;">
-            <asp:LinkButton type="submit" ID="submitBtn" CssClass="btn btn-success" runat="server" Text="Submit new employee" OnClick="submitBtn_Click" ValidationGroup="submitFullFormGroup">
+            <asp:LinkButton type="submit" ID="submitBtn" CssClass="btn btn-success" runat="server" OnClick="submitBtn_Click" ValidationGroup="submitFullFormGroup">
                 <i class="fa fa-send" aria-hidden="true"></i>
                 Submit new employee
             </asp:LinkButton>

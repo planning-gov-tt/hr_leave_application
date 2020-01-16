@@ -13,6 +13,42 @@ namespace HR_LEAVEv2.HR {
     public partial class EmployeeDetails {
         
         /// <summary>
+        /// createModeTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel createModeTitle;
+        
+        /// <summary>
+        /// editModeTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel editModeTitle;
+        
+        /// <summary>
+        /// empNamePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel empNamePanel;
+        
+        /// <summary>
+        /// empNameHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl empNameHeader;
+        
+        /// <summary>
         /// empDetailsContainer control.
         /// </summary>
         /// <remarks>
@@ -20,6 +56,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl empDetailsContainer;
+        
+        /// <summary>
+        /// validationRowPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel validationRowPanel;
         
         /// <summary>
         /// UpdatePanel2 control.
@@ -112,22 +157,31 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.LinkButton clearFormBtn;
         
         /// <summary>
-        /// RegularExpressionValidator1 control.
+        /// empBasicInfoPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator1;
+        protected global::System.Web.UI.WebControls.Panel empBasicInfoPanel;
         
         /// <summary>
-        /// RequiredFieldValidator1 control.
+        /// RegularExpressionValidator11 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator11;
+        
+        /// <summary>
+        /// RequiredFieldValidator4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator4;
         
         /// <summary>
         /// employeeIdInput control.
@@ -139,22 +193,22 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.TextBox employeeIdInput;
         
         /// <summary>
-        /// RegularExpressionValidator2 control.
+        /// RegularExpressionValidator12 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator2;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator12;
         
         /// <summary>
-        /// RequiredFieldValidator2 control.
+        /// RequiredFieldValidator5 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator2;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator5;
         
         /// <summary>
         /// ihrisNumInput control.
@@ -166,22 +220,22 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.TextBox ihrisNumInput;
         
         /// <summary>
-        /// RegularExpressionValidator3 control.
+        /// RegularExpressionValidator13 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator3;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator13;
         
         /// <summary>
-        /// RequiredFieldValidator3 control.
+        /// RequiredFieldValidator6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator3;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator6;
         
         /// <summary>
         /// adEmailInput control.
