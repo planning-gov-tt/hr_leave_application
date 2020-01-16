@@ -184,6 +184,12 @@ a, a:active, a:focus, button, button:active, button:focus{
     margin:5px 0px 15px 0px;
 }
 
+.custom-card-footer{
+    position: absolute; 
+    bottom: 20px; 
+    width:100%;
+}
+
 /* end styles for cards */
 
 /* styles for calendar picker icon */

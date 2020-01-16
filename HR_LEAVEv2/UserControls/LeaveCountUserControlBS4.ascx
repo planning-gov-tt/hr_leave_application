@@ -41,7 +41,7 @@
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
 
-<div class="container">
+<div class="container" style =" height:250px">
     <div class="row" style="margin-bottom:20px; margin-top:10px;">
         <div class="col text-center">
             <h4 id="leaveCountHeader">Leave Remaining</h4>
