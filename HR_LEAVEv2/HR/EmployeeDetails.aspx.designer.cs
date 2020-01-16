@@ -103,13 +103,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span4;
         
         /// <summary>
-        /// Button2 control.
+        /// clearFormBtn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button2;
+        protected global::System.Web.UI.WebControls.LinkButton clearFormBtn;
         
         /// <summary>
         /// RegularExpressionValidator1 control.
@@ -550,7 +550,7 @@ namespace HR_LEAVEv2.HR {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button cancelNewRecordBtn;
+        protected global::System.Web.UI.WebControls.LinkButton cancelNewRecordBtn;
         
         /// <summary>
         /// addNewRecordBtn control.
@@ -559,7 +559,7 @@ namespace HR_LEAVEv2.HR {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button addNewRecordBtn;
+        protected global::System.Web.UI.WebControls.LinkButton addNewRecordBtn;
         
         /// <summary>
         /// GridView1 control.
@@ -577,7 +577,7 @@ namespace HR_LEAVEv2.HR {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button showFormBtn;
+        protected global::System.Web.UI.WebControls.LinkButton showFormBtn;
         
         /// <summary>
         /// submitFullFormPanel control.
@@ -595,6 +595,6 @@ namespace HR_LEAVEv2.HR {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button submitBtn;
+        protected global::System.Web.UI.WebControls.LinkButton submitBtn;
     }
 }

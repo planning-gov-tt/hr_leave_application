@@ -177,15 +177,24 @@
                         <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />
                     </asp:Panel>
                     <asp:Panel ID="submitButtonPanel" runat="server" CssClass="row form-group">
-                        <asp:Button ID="cancelBtn" runat="server" Text="Cancel" Style="margin-right: 35px;" CssClass="btn btn-danger" OnClick="refreshForm" CausesValidation="False" />
-                        <asp:Button ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click" ValidationGroup="applyForLeave"/>
+                        <asp:LinkButton ID="cancelBtn" runat="server" Text="Cancel" Style="margin-right: 35px;" CssClass="btn btn-danger" OnClick="refreshForm" CausesValidation="False">
+                                 <i class="fa fa-times" aria-hidden="true"></i>
+                                 Cancel
+                        </asp:LinkButton>
+                        <asp:LinkButton ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click" ValidationGroup="applyForLeave">
+                                 <i class="fa fa-send" aria-hidden="true"></i>
+                                 Submit
+                        </asp:LinkButton>
                     </asp:Panel>
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
-        <asp:Panel ID="submitCommentsPanel" runat="server" CssClass="row" Style="margin-top:15px;">
-            <asp:Button ID="submitCommentsBtn" runat="server" Text="Submit comment(s)" CssClass="btn btn-success" OnClick="submitCommentsBtn_Click"/>
-            <asp:Panel ID="successfulSubmitCommentsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display:inline-block;" role="alert" Visible="false">
+        <asp:Panel ID="submitCommentsPanel" runat="server" CssClass="row" Style="margin-top: 15px;">
+            <asp:LinkButton ID="submitCommentsBtn" runat="server" Text="Submit comment(s)" CssClass="btn btn-success" OnClick="submitCommentsBtn_Click">
+                <i class="fa fa-send" aria-hidden="true"></i>
+                Submit comments
+            </asp:LinkButton>
+            <asp:Panel ID="successfulSubmitCommentsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
                 <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                 <span id="Span2" runat="server">Comments successfully added to application</span>
             </asp:Panel>

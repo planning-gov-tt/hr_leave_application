@@ -496,7 +496,7 @@ namespace HR_LEAVEv2.Employee {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button cancelBtn;
+        protected global::System.Web.UI.WebControls.LinkButton cancelBtn;
         
         /// <summary>
         /// submitBtn control.
@@ -505,7 +505,7 @@ namespace HR_LEAVEv2.Employee {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button submitBtn;
+        protected global::System.Web.UI.WebControls.LinkButton submitBtn;
         
         /// <summary>
         /// submitCommentsPanel control.
@@ -523,7 +523,7 @@ namespace HR_LEAVEv2.Employee {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button submitCommentsBtn;
+        protected global::System.Web.UI.WebControls.LinkButton submitCommentsBtn;
         
         /// <summary>
         /// successfulSubmitCommentsMsgPanel control.

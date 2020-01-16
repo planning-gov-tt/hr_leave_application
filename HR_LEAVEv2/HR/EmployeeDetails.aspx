@@ -36,7 +36,10 @@
                             <span id="Span4" runat="server">At least one Employment record must be entered</span>
                         </span>
                     </asp:Panel>
-                    <asp:Button ID="Button2" runat="server" CssClass="btn btn-primary" Text="Clear Form" Style="margin-left: 10px;" OnClick="refreshForm" />
+                    <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-left: 10px;">
+                         <i class="fa fa-times" aria-hidden="true"></i>
+                         Clear Form
+                    </asp:LinkButton>
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
@@ -258,8 +261,14 @@
                             </div>
                         </div>
                         <div class="text-center" style="margin-top: 35px; margin-bottom: 45px;">
-                            <asp:Button runat="server" ID="cancelNewRecordBtn" CssClass="btn btn-danger" Text="Cancel" CausesValidation="false" Style="margin-right: 35px;" OnClick="cancelNewRecordBtn_Click" />
-                            <asp:Button runat="server" ID="addNewRecordBtn" CssClass="btn btn-primary" Text="Add new Record" OnClick="addNewRecordBtn_Click" ValidationGroup="empRecord" />
+                            <asp:LinkButton runat="server" ID="cancelNewRecordBtn" CssClass="btn btn-danger" Text="Cancel" CausesValidation="false" Style="margin-right: 35px;" OnClick="cancelNewRecordBtn_Click" >
+                                 <i class="fa fa-times" aria-hidden="true"></i>
+                                 Cancel
+                            </asp:LinkButton>
+                            <asp:LinkButton runat="server" ID="addNewRecordBtn" CssClass="btn btn-primary" Text="Add new Record" OnClick="addNewRecordBtn_Click" ValidationGroup="empRecord">
+                                 <i class="fa fa-plus" aria-hidden="true"></i>
+                                 Add new record
+                            </asp:LinkButton>
                         </div>
 
                     </asp:Panel>
@@ -315,13 +324,19 @@
                     </asp:GridView>
 
                     <div class="btn-group" role="group" style="margin-top: 10px;">
-                        <asp:Button runat="server" ID="showFormBtn" class="btn btn-primary" Text="Add" OnClick="showFormBtn_Click" CausesValidation="false" />
+                        <asp:LinkButton runat="server" ID="showFormBtn" class="btn btn-primary" Text="Add" OnClick="showFormBtn_Click" CausesValidation="false">
+                                 <i class="fa fa-plus" aria-hidden="true"></i>
+                                 Add
+                        </asp:LinkButton>
                     </div>
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
         <div id="submitFullFormPanel" runat="server" class="row text-center" style="margin-top: 50px;">
-            <asp:Button type="submit" ID="submitBtn" CssClass="btn btn-success" runat="server" Text="Submit new employee" OnClick="submitBtn_Click" ValidationGroup="submitFullFormGroup" />
+            <asp:LinkButton type="submit" ID="submitBtn" CssClass="btn btn-success" runat="server" Text="Submit new employee" OnClick="submitBtn_Click" ValidationGroup="submitFullFormGroup">
+                <i class="fa fa-send" aria-hidden="true"></i>
+                Submit new employee
+            </asp:LinkButton>
         </div>
     </div>
 
