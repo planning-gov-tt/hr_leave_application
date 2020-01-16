@@ -76,10 +76,6 @@
                                     <i class="fa fa-address-card-o" aria-hidden="true"></i>
                                     Details
                                 </button>
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-danger">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                    Delete
-                                </button>
                             </div>
                         </div>
                     </td>
@@ -112,10 +108,6 @@
                                 <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
                                     <i class="fa fa-address-card-o" aria-hidden="true"></i>
                                     Details
-                                </button>
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-danger">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                    Delete
                                 </button>
                             </div>
                         </div>
