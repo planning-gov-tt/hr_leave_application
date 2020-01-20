@@ -12,7 +12,7 @@
     </style>
     
     <%--View mode: Allows user to return to last page they were on before they clicked on a details button for a leave application--%>
-    <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to previous page" OnClick="returnToPreviousBtn_Click" Style="float: left;" ToolTip="">
+    <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to previous page" OnClick="returnToPreviousBtn_Click">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
     </asp:LinkButton>
 

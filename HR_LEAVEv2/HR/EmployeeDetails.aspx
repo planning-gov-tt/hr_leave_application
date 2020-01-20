@@ -6,7 +6,17 @@
         #addEmploymentRecordContainer th, td {
             text-align: center;
         }
+
+        .emp-details-validation-msg{
+            display: none; 
+            margin: 0 5px;
+            margin-bottom:25px;
+        }
     </style>
+
+    <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to all employees" OnClick="returnToPreviousBtn_Click">
+        <i class="fa fa-arrow-left" aria-hidden="true"></i>
+    </asp:LinkButton>
 
     <%--create mode--%>
     <asp:Panel ID="createModeTitle" runat="server">
@@ -19,39 +29,78 @@
     </asp:Panel>
 
    <%-- employee name--%>
-    <asp:Panel ID="empNamePanel" runat="server">
-        <h2 id="empNameHeader" runat="server"></h2>
+    <asp:Panel ID="empNamePanel" runat="server" Style="text-align:center">
+        <h3 id="empNameHeader" runat="server"></h3>
     </asp:Panel>
 
     <div id="empDetailsContainer" runat="server" class="container-fluid text-center">
         <asp:Panel ID="validationRowPanel" runat="server" CssClass="row text-center" Style="margin-top: 25px;">
             <asp:UpdatePanel ID="UpdatePanel2" runat="server">
                 <ContentTemplate>
-                    <asp:Panel ID="fullFormSubmitSuccessPanel" runat="server" Style="display: none; margin: 0 5px;" role="alert">
+
+                    <asp:Panel ID="editFullSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-success">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span id="Span9" runat="server">Employee successfully edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="editRolesSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-success">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span id="Span5" runat="server">Employee roles successfully edited</span>
+                        </span>
+                    </asp:Panel>
+
+                     <asp:Panel ID="editLeaveSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-success">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span id="Span7" runat="server">Employee leave balances successfully edited</span>
+                        </span>
+                    </asp:Panel>
+
+                     <asp:Panel ID="editEmpRecordSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-success">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span id="Span8" runat="server">Employee employment records successfully edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="fullFormSubmitSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span id="Span1" runat="server">Employee successfully added</span>
                         </span>
                     </asp:Panel>
-                    <asp:Panel ID="fullFormErrorPanel" runat="server" Style="display: none; margin: 0 5px;" role="alert">
+
+                    <asp:Panel ID="editEmpErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span6" runat="server">Employee not edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="fullFormErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="Span2" runat="server">Employee not added</span>
                         </span>
                     </asp:Panel>
-                    <asp:Panel ID="emailNotFoundErrorPanel" runat="server" Style="display: none; margin: 0 5px;" role="alert">
+
+                    <asp:Panel ID="emailNotFoundErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="Span3" runat="server">Active Directory email not found</span>
                         </span>
                     </asp:Panel>
-                    <asp:Panel ID="noEmploymentRecordEnteredErrorPanel" runat="server" Style="display: none; margin: 0 5px;" role="alert">
+
+                    <asp:Panel ID="noEmploymentRecordEnteredErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="Span4" runat="server">At least one Employment record must be entered</span>
                         </span>
                     </asp:Panel>
-                    
+
                 </ContentTemplate>
             </asp:UpdatePanel>
         </asp:Panel>
@@ -102,57 +151,59 @@
             </asp:Panel>
 
             <%--Authorization Level--%>
-            <div class="row text-center" style="background-color: #f0f0f5;">
-                <h3>Authorization Level
+            <asp:Panel ID="authorizationLevelPanel" runat="server">
+                <div class="row text-center" style="background-color: #f0f0f5;">
+                    <h3>Authorization Level
                     <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
                         data-toggle="tooltip"
                         data-placement="right"
                         title="Click on any checkbox below to grant higher privileges to an employee"></i>
-                </h3>
-                <div class="form-group" id="authLevelDiv">
-                    <div class="form-check" id="supervisorCheckDiv">
-                        <label class="form-check-label" for="supervisorCheck">
-                            <asp:CheckBox ID="supervisorCheck" runat="server" CssClass="form-check-input" />
-                            <span>Supervisor</span>
-                        </label>
-                    </div>
-                    <div class="form-check" id="hr1CheckDiv">
-                        <label class="form-check-label" for="hr1Check">
-                            <asp:CheckBox ID="hr1Check" runat="server" CssClass="form-check-input" />
-                            <span>HR Level 1</span>
-                        </label>
-                    </div>
-                    <div class="form-check" id="hr2CheckDiv">
-                        <label class="form-check-label" for="hr2Check">
-                            <asp:CheckBox ID="hr2Check" runat="server" CssClass="form-check-input" />
-                            <span>HR Level 2</span>
-                        </label>
-                    </div>
-                    <div class="form-check" id="hr3CheckDiv">
-                        <label class="form-check-label" for="hr2Check">
-                            <asp:CheckBox ID="hr3Check" runat="server" CssClass="form-check-input" />
-                            <span>HR Level 3</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="row text-center" style="display: none; width: 80%; margin: 0 auto; margin-top:5px; background-color: #f0f0f5" id="furtherDetailsForHrDiv">
-                <h4 style="padding-top: 25px;">Type of employee dealt with</h4>
-                <div class="form-group">
-                    <div class="form-check" id="contractCheckDiv">
-                        <label class="form-check-label" for="contractCheck">
-                            <asp:CheckBox ID="contractCheck" runat="server" CssClass="form-check-input" />
-                            <span>Contract</span>
-                        </label>
-                    </div>
-                    <div class="form-check" id="publicServiceCheckDiv">
-                        <label class="form-check-label" for="publicServiceCheck">
-                            <asp:CheckBox ID="publicServiceCheck" runat="server" CssClass="form-check-input" />
-                            <span>Public Service</span>
-                        </label>
+                    </h3>
+                    <div class="form-group" id="authLevelDiv">
+                        <div class="form-check" id="supervisorCheckDiv">
+                            <label class="form-check-label" for="supervisorCheck">
+                                <asp:CheckBox ID="supervisorCheck" runat="server" CssClass="form-check-input" />
+                                <span>Supervisor</span>
+                            </label>
+                        </div>
+                        <div class="form-check" id="hr1CheckDiv">
+                            <label class="form-check-label" for="hr1Check">
+                                <asp:CheckBox ID="hr1Check" runat="server" CssClass="form-check-input" />
+                                <span>HR Level 1</span>
+                            </label>
+                        </div>
+                        <div class="form-check" id="hr2CheckDiv">
+                            <label class="form-check-label" for="hr2Check">
+                                <asp:CheckBox ID="hr2Check" runat="server" CssClass="form-check-input" />
+                                <span>HR Level 2</span>
+                            </label>
+                        </div>
+                        <div class="form-check" id="hr3CheckDiv">
+                            <label class="form-check-label" for="hr2Check">
+                                <asp:CheckBox ID="hr3Check" runat="server" CssClass="form-check-input" />
+                                <span>HR Level 3</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="row text-center" style="display: none; width: 80%; margin: 0 auto; margin-top: 5px; background-color: #f0f0f5" id="furtherDetailsForHrDiv">
+                    <h4 style="padding-top: 25px;">Type of employee dealt with</h4>
+                    <div class="form-group">
+                        <div class="form-check" id="contractCheckDiv">
+                            <label class="form-check-label" for="contractCheck">
+                                <asp:CheckBox ID="contractCheck" runat="server" CssClass="form-check-input" />
+                                <span>Contract</span>
+                            </label>
+                        </div>
+                        <div class="form-check" id="publicServiceCheckDiv">
+                            <label class="form-check-label" for="publicServiceCheck">
+                                <asp:CheckBox ID="publicServiceCheck" runat="server" CssClass="form-check-input" />
+                                <span>Public Service</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </asp:Panel>      
         </div>
 
         <%--Leave Balances--%>
@@ -225,7 +276,7 @@
             <h3>Employment Record</h3>
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
-                    <asp:Panel runat="server" ID="addEmpRecordForm" Style="display: none; width: 100%">
+                    <asp:Panel runat="server" ID="addEmpRecordForm" Style="display: inline-block; width: 100%">
                         <div class="container" style="width: 80%; height: 95%">
                             <div class="form-group" style="margin-top: 25px;">
                                 <label for="empTypeList">Employment Type</label>
@@ -257,7 +308,7 @@
                                     <asp:TextBox ID="txtEndDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
                                     <i id="endDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
                                     <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtEndDate" PopupButtonID="endDateCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
-                                    
+
                                 </span>
                             </div>
 
@@ -277,7 +328,7 @@
                             </div>
                         </div>
                         <div class="text-center" style="margin-top: 35px; margin-bottom: 45px;">
-                            <asp:LinkButton runat="server" ID="cancelNewRecordBtn" CssClass="btn btn-danger" Text="Cancel" CausesValidation="false" Style="margin-right: 35px;" OnClick="cancelNewRecordBtn_Click" >
+                            <asp:LinkButton runat="server" ID="cancelNewRecordBtn" CssClass="btn btn-danger" Text="Cancel" CausesValidation="false" Style="margin-right: 35px;" OnClick="cancelNewRecordBtn_Click">
                                  <i class="fa fa-times" aria-hidden="true"></i>
                                  Cancel
                             </asp:LinkButton>
@@ -289,11 +340,19 @@
 
                     </asp:Panel>
 
-                    <asp:GridView ID="GridView1" runat="server" BorderStyle="None" CssClass="table" GridLines="Horizontal"
-                        AutoGenerateColumns="false" Style="margin: 0 auto;" AutoGenerateDeleteButton="false"
-                        AllowPaging="true" PageSize="3" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowDeleting="GridView1_RowDeleting">
+                    <asp:GridView ID="GridView1" runat="server" BorderStyle="None" CssClass="table" GridLines="Horizontal" OnRowDataBound="GridView1_RowDataBound"
+                        AutoGenerateColumns="false" Style="margin: 0 auto;" AutoGenerateDeleteButton="false" AllowSorting="true"
+                        AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowDeleting="GridView1_RowDeleting">
                         <Columns>
-                            <asp:CommandField ShowDeleteButton="true" CausesValidation="false" />
+                            <asp:CommandField ShowDeleteButton="true" 
+                                DeleteText="<i class='btn btn-danger fa fa-trash-o content-tooltipped' data-toggle='tooltip' data-placement='left' title='Delete employment record' aria-hidden='true' ></i>" CausesValidation="false" />
+                            
+                            <asp:TemplateField HeaderText="Employment Record ID" Visible ="true">
+                                <ItemTemplate>
+                                    <asp:Label ID="recordIDLabel" runat="server" Text='<%# Bind("record_id") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
                             <asp:TemplateField HeaderText="Employment Type">
                                 <ItemTemplate>
                                     <asp:Label ID="Label1" runat="server" Text='<%# Bind("employment_type") %>'></asp:Label>
@@ -318,7 +377,7 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
 
-                            <asp:TemplateField HeaderText="Department">
+                            <asp:TemplateField HeaderText="Position">
                                 <ItemTemplate>
                                     <asp:Label ID="Label5" runat="server" Text='<%# Bind("pos_name") %>'></asp:Label>
                                 </ItemTemplate>
@@ -336,24 +395,38 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
 
+                            <asp:TemplateField HeaderText="isDeleted">
+                                <ItemTemplate>
+                                    <asp:Label ID="Label8" runat="server" Text='<%# Bind("isDeleted") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
                         </Columns>
                     </asp:GridView>
 
-                    <div class="btn-group" role="group" style="margin-top: 10px;">
+                    <asp:Panel ID="addEmpRecordBtn" runat="server" CssClass="btn-group" role="group" Style="margin-top: 10px;">
                         <asp:LinkButton runat="server" ID="showFormBtn" class="btn btn-primary" Text="Add" OnClick="showFormBtn_Click" CausesValidation="false">
                                  <i class="fa fa-plus" aria-hidden="true"></i>
                                  Add
                         </asp:LinkButton>
-                    </div>
+                    </asp:Panel>
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
-        <div id="submitFullFormPanel" runat="server" class="row text-center" style="margin-top: 50px;">
+
+        <asp:Panel ID="submitFullFormPanel" runat="server" CssCclass="row text-center" Style="margin-top: 50px;">
             <asp:LinkButton type="submit" ID="submitBtn" CssClass="btn btn-success" runat="server" OnClick="submitBtn_Click" ValidationGroup="submitFullFormGroup">
                 <i class="fa fa-send" aria-hidden="true"></i>
                 Submit new employee
             </asp:LinkButton>
-        </div>
+        </asp:Panel>
+
+        <asp:Panel ID="editFormPanel" runat="server" CssCclass="row text-center" Style="margin-top: 50px;">
+            <asp:LinkButton ID="editBtn" CssClass="btn btn-success" runat="server" ValidationGroup="submitFullFormGroup" OnClick="editBtn_Click">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+                Edit employee
+            </asp:LinkButton>
+        </asp:Panel>
     </div>
 
     <script>
