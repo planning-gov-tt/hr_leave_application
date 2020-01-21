@@ -11,11 +11,25 @@ namespace HR_LEAVEv2.HR
     public partial class EmployeeDetails : System.Web.UI.Page
     {
         List<string> permissions = null;
+        List<string> roles = null;
+        List<string> previousRoles = null;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             permissions = (List<string>)Session["permissions"];
+
+            // populate the roles array for use when auditing
+            roles = new List<string>();
+            if (permissions.Contains("hr1_permissions"))
+                roles.Add("hr1");
+            if (permissions.Contains("hr2_permissions"))
+                roles.Add("hr2");
+            if (permissions.Contains("hr3_permissions"))
+                roles.Add("hr3");
+
             if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
+
             if (!this.IsPostBack)
             {
                 ViewState["Gridview1_dataSource"] = null;
@@ -33,6 +47,10 @@ namespace HR_LEAVEv2.HR
                     else
                         this.adjustPageForCreateMode();
                 } 
+            } else
+            {
+                if(ViewState["previousRoles"] != null)
+                    this.previousRoles = (List<string>)ViewState["previousRoles"];
             }
                 
         }
@@ -265,12 +283,6 @@ namespace HR_LEAVEv2.HR
             // IDs, email and leave balances
             string emp_id, ihris_id, email, firstname, lastname, sick_leave, personal_leave, casual_leave, vacation_leave, bereavement_leave, maternity_leave, pre_retirement_leave;
 
-            // Roles
-            List<string> authorizations = new List<string>() { "emp" };
-
-            // Employment Records
-            DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
-
             emp_id = employeeIdInput.Text;
             ihris_id = ihrisNumInput.Text;
             email = adEmailInput.Text;
@@ -279,28 +291,53 @@ namespace HR_LEAVEv2.HR
             Auth auth = new Auth();
             string nameFromAd = auth.getUserInfoFromActiveDirectory(email);
 
+            // set first and last name
+            string[] name = nameFromAd.Split(' ');
+            firstname = name[0];
+            lastname = name[1];
+
+            //set username
+            string username = $"PLANNING\\ {firstname} {lastname}";
+
+            // get data from leave 
+            sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
+            personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
+            casual_leave = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
+            vacation_leave = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
+            bereavement_leave = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
+            maternity_leave = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
+            pre_retirement_leave = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
+
+            // Roles
+            List<string> authorizations = new List<string>() { "emp" };
+
+            // get data from checkboxes and set authorizations
+            if (supervisorCheck.Checked)
+                authorizations.Add("sup");
+            if (hr1Check.Checked)
+                authorizations.Add("hr1");
+            if (hr2Check.Checked)
+                authorizations.Add("hr2");
+            if (hr3Check.Checked)
+                authorizations.Add("hr3");
+
+            if (hr2Check.Checked || hr3Check.Checked)
+            {
+                if (contractCheck.Checked)
+                    authorizations.Add("hr_contract");
+                if (publicServiceCheck.Checked)
+                    authorizations.Add("hr_public_officer");
+            }
+
+            // Employment Records
+            DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+
             Boolean isInsertSuccessful = false;
 
             // name from AD must be populated because that means the user exists in AD
             // dt cannot be null because that means that no employment record is added
             if (!String.IsNullOrEmpty(nameFromAd) && dt !=null )
             {
-                // set first and last name
-                string[] name = nameFromAd.Split(' ');
-                firstname = name[0];
-                lastname = name[1];
-
-                //set username
-                string username = $"PLANNING\\ {firstname} {lastname}";
-
-                // get data from leave 
-                sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
-                personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
-                casual_leave = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
-                vacation_leave = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
-                bereavement_leave = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
-                maternity_leave = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
-                pre_retirement_leave = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
 
                 // Employee IDs, email, name, username and leave balances
                 try
@@ -374,24 +411,6 @@ namespace HR_LEAVEv2.HR
                 // Roles 
                 if (isInsertSuccessful)
                 {
-                    // get data from checkboxes and set authorizations
-                    if (supervisorCheck.Checked)
-                        authorizations.Add("sup");
-                    if (hr1Check.Checked)
-                        authorizations.Add("hr1");
-                    if (hr2Check.Checked)
-                        authorizations.Add("hr2");
-                    if (hr3Check.Checked)
-                        authorizations.Add("hr3");
-
-                    if (hr2Check.Checked || hr3Check.Checked)
-                    {
-                        if (contractCheck.Checked)
-                            authorizations.Add("hr_contract");
-                        if (publicServiceCheck.Checked)
-                            authorizations.Add("hr_public_officer");
-                    }
-
                     isInsertSuccessful = false;
                     // add roles to employee
                     foreach (string role in authorizations)
@@ -508,7 +527,50 @@ namespace HR_LEAVEv2.HR
                 isInsertSuccessful = false;
             }
 
-            if (!isInsertSuccessful)
+            if (isInsertSuccessful)
+            {
+                // add audit log
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([employee_id],[employee_name], [employee_roles], [action], [created_at])
+                                    VALUES ( 
+                                        @EmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @EmployeeId), 
+                                        @Roles,
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+
+                            /*
+                             * Add info about new employee created such as:
+                             * Employee ID
+                             * Leave balances: Vacation, Sick, Personal, Casual
+                             * Employee Roles
+                             * */
+                            string action = $"Created new Employee; ID= {emp_id}, Vacation:{vacation_leave}, Sick:{sick_leave}, Personal:{personal_leave}, Casual:{casual_leave}; Permissions: {String.Join(",", authorizations.ToArray())}";
+                            command.Parameters.AddWithValue("@Action", action);
+
+                            string roles = $"{String.Join(",", this.roles.ToArray())}";
+                            command.Parameters.AddWithValue("@Roles", roles);
+
+                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    Console.WriteLine(ex.Message.ToString());
+                }
+            } else
                 fullFormErrorPanel.Style.Add("display", "inline-block");
 
             //scroll to top of page
@@ -571,14 +633,39 @@ namespace HR_LEAVEv2.HR
                         {
                             while (reader.Read())
                             {
-                                supervisorCheck.Checked = reader["role_id"].ToString() == "sup";
-                                hr1Check.Checked = reader["role_id"].ToString() == "hr1";
-                                hr2Check.Checked = reader["role_id"].ToString() == "hr2";
-                                hr3Check.Checked = reader["role_id"].ToString() == "hr3";
+                                if (reader["role_id"].ToString() == "sup")
+                                    supervisorCheck.Checked = true;
 
-                                contractCheck.Checked = reader["role_id"].ToString() == "hr_contract";
-                                publicServiceCheck.Checked = reader["role_id"].ToString() == "hr_contract";
+                                if (reader["role_id"].ToString() == "hr1")
+                                    hr1Check.Checked = true;
+
+                                if (reader["role_id"].ToString() == "hr2")
+                                    hr2Check.Checked = true;
+
+                                if (reader["role_id"].ToString() == "hr3")
+                                    hr3Check.Checked = true;
+
+                                if (reader["role_id"].ToString() == "hr_contract")
+                                    contractCheck.Checked = true;
+
+                                if (reader["role_id"].ToString() == "hr_public_officer")
+                                    publicServiceCheck.Checked = true;
                             }
+                            this.previousRoles = new List<string>();
+                            if (supervisorCheck.Checked)
+                                this.previousRoles.Add("sup");
+                            if (hr1Check.Checked)
+                                this.previousRoles.Add("hr1");
+                            if (hr2Check.Checked)
+                                this.previousRoles.Add("hr2");
+                            if (hr3Check.Checked)
+                                this.previousRoles.Add("hr3");
+                            if (contractCheck.Checked)
+                                this.previousRoles.Add("hr_contract");
+                            if (publicServiceCheck.Checked)
+                                this.previousRoles.Add("hr_public_officer");
+
+                            ViewState["previousRoles"] = this.previousRoles;
                         }
                     }
                 }
@@ -743,6 +830,69 @@ namespace HR_LEAVEv2.HR
                     isRolesEditSuccessful = false;
                 }
 
+                // previous roles holds the employee's previous roles. The following code looks at the current roles being added and checks which roles previously there that are no longer there
+                // As such, the changedRoles list will contain the list of roles which were deleted
+                List<string> deletedRoles = new List<string>();
+                foreach (string role in this.previousRoles)
+                {
+                    if (!authorizations.Contains(role))
+                        deletedRoles.Add(role);
+                }
+                if(deletedRoles.Count > 0)
+                {
+                    // add audit log for deleting roles
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([employee_id],[employee_name], [employee_roles], [action], [created_at])
+                                    VALUES ( 
+                                        @EmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @EmployeeId), 
+                                        @Roles,
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+
+                                /*
+                                 * Add info about new employee created such as:
+                                 * Employee ID
+                                 * Roles deleted
+                                 * Employee Roles
+                                 * */
+
+
+                                string action = $"Edited roles for employee ID={empId}; Roles Deleted= {String.Join(",", deletedRoles.ToArray())}";
+                                command.Parameters.AddWithValue("@Action", action);
+
+                                string roles = $"{String.Join(",", this.roles.ToArray())}";
+                                command.Parameters.AddWithValue("@Roles", roles);
+
+                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        Console.WriteLine(ex.Message.ToString());
+                    }
+                }
+
+                // previous roles holds the employee's previous roles. The following code looks at the previous roles and checks which roles were added to this list
+                List<string> addedRoles = new List<string>();
+                foreach (string role in authorizations)
+                {
+                    if (!this.previousRoles.Contains(role))
+                        addedRoles.Add(role);
+                }
+
                 // add roles back to employee 
                 if (authorizations.Count > 0)
                 {
@@ -781,6 +931,51 @@ namespace HR_LEAVEv2.HR
                             break;
                         }
                     }
+
+                    if (addedRoles.Count > 0)
+                    {
+                        // add audit log for roles added
+                        try
+                        {
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                            {
+                                connection.Open();
+                                string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([employee_id],[employee_name], [employee_roles], [action], [created_at])
+                                    VALUES ( 
+                                        @EmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @EmployeeId), 
+                                        @Roles,
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                                using (SqlCommand command = new SqlCommand(sql, connection))
+                                {
+                                    command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+
+                                    /*
+                                     * Add info about new employee created such as:
+                                     * Employee ID
+                                     * Roles added
+                                     * Employee Roles
+                                     * */
+                                    string action = $"Edited roles for employee ID={empId}; Roles Added= {String.Join(",", addedRoles.ToArray())}";
+                                    command.Parameters.AddWithValue("@Action", action);
+
+                                    string roles = $"{String.Join(",", this.roles.ToArray())}";
+                                    command.Parameters.AddWithValue("@Roles", roles);
+
+                                    command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                                    command.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            //exception logic
+                            Console.WriteLine(ex.Message.ToString());
+                        }
+                    }
                 }
                 else
                     isRolesEditSuccessful = true;
@@ -791,6 +986,7 @@ namespace HR_LEAVEv2.HR
 
             if (isRolesEditSuccessful == true || !authorizationLevelPanel.Visible)
             {
+
                 // get data from leave 
                 sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
                 personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;

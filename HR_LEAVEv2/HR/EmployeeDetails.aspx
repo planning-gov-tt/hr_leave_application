@@ -455,6 +455,17 @@
     </div>
 
     <script>
+        Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
+            // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
+            if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
+                $('#furtherDetailsForHrDiv').css("display", "block");
+            }
+            else {
+                $('#furtherDetailsForHrDiv').css("display", "none");
+                $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
+            }
+        });
+
         $('#authLevelDiv input[type="checkbox"]').click(function (e) {
             // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
             if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
