@@ -38,6 +38,9 @@
             <asp:UpdatePanel ID="UpdatePanel2" runat="server">
                 <ContentTemplate>
 
+                    <%--SUCCESSES---------------------------------------------------------------------------------------------%>
+
+                    <%--General Successful edit of employee--%>
                     <asp:Panel ID="editFullSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
@@ -45,6 +48,7 @@
                         </span>
                     </asp:Panel>
 
+                    <%--Successful edit of employee roles--%>
                     <asp:Panel ID="editRolesSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
@@ -52,6 +56,7 @@
                         </span>
                     </asp:Panel>
 
+                    <%--Successful edit of employee leave balances--%>
                      <asp:Panel ID="editLeaveSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
@@ -59,6 +64,7 @@
                         </span>
                     </asp:Panel>
 
+                    <%--Successful edit of employee employment records--%>
                      <asp:Panel ID="editEmpRecordSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
@@ -66,6 +72,7 @@
                         </span>
                     </asp:Panel>
 
+                    <%--General Successful insert of new employee--%>
                     <asp:Panel ID="fullFormSubmitSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
@@ -73,6 +80,8 @@
                         </span>
                     </asp:Panel>
 
+                    <%--ERRORS---------------------------------------------------------------------------------------------------%>
+                    <%--General Error in editing employee--%>
                     <asp:Panel ID="editEmpErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -80,6 +89,47 @@
                         </span>
                     </asp:Panel>
 
+                    <%--Error in editing employee roles--%>
+                    <asp:Panel ID="editRolesErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span10" runat="server">Roles not edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Error in editing employee leave balances--%>
+                    <asp:Panel ID="editLeaveBalancesErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span11" runat="server">Leave Balances not edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Error in editing employee employment records--%>
+                    <asp:Panel ID="editEmpRecordErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span12" runat="server">Employment Record not edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Error in deleting employee employment records--%>
+                    <asp:Panel ID="deleteEmpRecordsErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span13" runat="server">Employment Record(s) not deleted</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Error in adding new employee employment records--%>
+                    <asp:Panel ID="addEmpRecordsErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span14" runat="server">Employment Record(s) not added</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--General Error in adding new employee--%>
                     <asp:Panel ID="fullFormErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -87,6 +137,7 @@
                         </span>
                     </asp:Panel>
 
+                    <%--Error in finding email in AD--%>
                     <asp:Panel ID="emailNotFoundErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -94,6 +145,7 @@
                         </span>
                     </asp:Panel>
 
+                    <%--Error: No employment records --%>
                     <asp:Panel ID="noEmploymentRecordEnteredErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -340,66 +392,39 @@
 
                     </asp:Panel>
 
-                    <asp:GridView ID="GridView1" runat="server" BorderStyle="None" CssClass="table" GridLines="Horizontal" OnRowDataBound="GridView1_RowDataBound"
+                    <asp:GridView ID="GridView1" runat="server" BorderStyle="None" CssClass="table" GridLines="Horizontal" OnRowDataBound="GridView1_RowDataBound" OnDataBound="GridView1_DataBound"
                         AutoGenerateColumns="false" Style="margin: 0 auto;" AutoGenerateDeleteButton="false" AllowSorting="true"
                         AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowDeleting="GridView1_RowDeleting">
                         <Columns>
                             <asp:CommandField ShowDeleteButton="true" 
                                 DeleteText="<i class='btn btn-danger fa fa-trash-o content-tooltipped' data-toggle='tooltip' data-placement='left' title='Delete employment record' aria-hidden='true' ></i>" CausesValidation="false" />
                             
-                            <asp:TemplateField HeaderText="Employment Record ID" Visible ="true">
-                                <ItemTemplate>
-                                    <asp:Label ID="recordIDLabel" runat="server" Text='<%# Bind("record_id") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 0: Employment record ID--%>
+                            <asp:BoundField HeaderText="Employment Record ID" DataField="record_id" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden"/>
 
-                            <asp:TemplateField HeaderText="Employment Type">
-                                <ItemTemplate>
-                                    <asp:Label ID="Label1" runat="server" Text='<%# Bind("employment_type") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 1: Employment Type--%>
+                            <asp:BoundField HeaderText="Employment Type" DataField="employment_type"/>
 
-                            <asp:TemplateField HeaderText="Department ID" Visible="false">
-                                <ItemTemplate>
-                                    <asp:Label ID="Label2" runat="server" Text='<%# Bind("dept_id") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 2: Department ID--%>
+                            <asp:BoundField HeaderText="Department ID" DataField="dept_id" Visible="false" />
 
-                            <asp:TemplateField HeaderText="Department">
-                                <ItemTemplate>
-                                    <asp:Label ID="Label3" runat="server" Text='<%# Bind("dept_name") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 3: Department--%>
+                            <asp:BoundField HeaderText="Department" DataField="dept_name" />
 
-                            <asp:TemplateField HeaderText="Position ID" Visible="false">
-                                <ItemTemplate>
-                                    <asp:Label ID="Label4" runat="server" Text='<%# Bind("pos_id") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 4: Position ID--%>
+                            <asp:BoundField HeaderText="Position ID" DataField="pos_id" Visible="false"/>
 
-                            <asp:TemplateField HeaderText="Position">
-                                <ItemTemplate>
-                                    <asp:Label ID="Label5" runat="server" Text='<%# Bind("pos_name") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 5: Position--%>
+                            <asp:BoundField HeaderText="Position" DataField="pos_name" />
 
-                            <asp:TemplateField HeaderText="Start">
-                                <ItemTemplate>
-                                    <asp:Label ID="Label6" runat="server" Text='<%# Bind("start_date") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 6: Start--%>
+                            <asp:BoundField HeaderText="Start" DataField="start_date"/>
 
-                            <asp:TemplateField HeaderText="Expected End Date">
-                                <ItemTemplate>
-                                    <asp:Label ID="Label7" runat="server" Text='<%# Bind("expected_end_date") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 7: Expected End Date--%>
+                            <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date"  />
 
-                            <asp:TemplateField HeaderText="isDeleted">
-                                <ItemTemplate>
-                                    <asp:Label ID="Label8" runat="server" Text='<%# Bind("isDeleted") %>'></asp:Label>
-                                </ItemTemplate>
-                            </asp:TemplateField>
+                            <%--Index 8: isDeleted--%>
+                            <asp:BoundField HeaderText="isDeleted" DataField="isDeleted" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden"/>
 
                         </Columns>
                     </asp:GridView>
