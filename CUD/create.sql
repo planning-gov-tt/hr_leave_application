@@ -172,6 +172,8 @@ CREATE TABLE [dbo].[employeeposition] (
 CREATE TABLE [dbo].[auditlog] (
   [log_id] INT IDENTITY (1, 1) PRIMARY KEY,
   [employee_id] NVARCHAR (10) NOT NULL,
+  [employee_name] NVARCHAR (60) NOT NULL,
+  [employee_roles] NVARCHAR (150) NOT NULL,
   [action] NVARCHAR (200) NOT NULL,
   [created_at] DATETIME NOT NULL,
 
