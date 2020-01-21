@@ -31,8 +31,8 @@
                 </asp:LinkButton>
             </div>
         </div>
-        <div class="container" style="width: 100%; margin-top: 55px;">
-            <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;">
+        <div class="container" style="margin-top: 55px;">
+            <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;" >
                 <EmptyDataTemplate>
                     <div class="alert alert-info text-center" role="alert" style="width: 30%; margin: auto">
                         <i class="fa fa-info-circle"></i>
@@ -71,8 +71,11 @@
                                     <br />
                                 </span>
                             </div>
-                            <div style="position: absolute; bottom: 20px; left: 25%;">
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">Employee Details</button>
+                            <div class="custom-card-footer">
+                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                    <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                                    Details
+                                </button>
                             </div>
                         </div>
                     </td>
@@ -101,8 +104,11 @@
                                     <br />
                                 </span>
                             </div>
-                            <div style="position: absolute; bottom: 20px; left: 25%;">
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">Employee Details</button>
+                            <div class="custom-card-footer">
+                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                    <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                                    Details
+                                </button>
                             </div>
                         </div>
                     </td>

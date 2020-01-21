@@ -118,28 +118,9 @@ namespace HR_LEAVEv2.UserControls
                                     try
                                     {
                                        string updateVacationSql = $@"
-                                            BEGIN TRANSACTION [updateVacation]
-                                            
-
-                                            BEGIN TRY
-
-                                                UPDATE [dbo].employee 
-                                                SET vacation = '{updatedVacation}'
-                                                WHERE employee_id = '{Session["emp_id"]}';
-
-                                                UPDATE [dbo].employee 
-                                                SET personal = '0'
-                                                WHERE employee_id = '{Session["emp_id"]}';
-
-                                                COMMIT TRANSACTION [updateVacation]
-
-                                              END TRY
-
-                                              BEGIN CATCH
-
-                                                  ROLLBACK TRANSACTION [updateVacation]
-
-                                              END CATCH  
+                                            UPDATE [dbo].employee 
+                                            SET vacation = '{updatedVacation}', personal = '0'
+                                            WHERE employee_id = '{Session["emp_id"]}';
                                         ";
                                         using (SqlCommand cmd = new SqlCommand(updateVacationSql, con))
                                         {

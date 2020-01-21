@@ -305,6 +305,9 @@ namespace HR_LEAVEv2.Employee
             //Submit Button
             submitButtonPanel.Visible = true;
 
+            //Submit Comments 
+            submitCommentsPanel.Visible = false;
+
         }
 
         protected void adjustPageForEditMode(LeaveTransactionDetails ltDetails)
@@ -513,29 +516,9 @@ namespace HR_LEAVEv2.Employee
                 {
                     connection.Open();
                     string sql = $@"
-                        BEGIN TRANSACTION [updateComments]
-                                            
-
-                        BEGIN TRY
-
-                            UPDATE [dbo].leavetransaction 
-                            SET sup_comment = @SupervisorComments
-                            WHERE transaction_id = {leaveId};
-
-                            UPDATE [dbo].leavetransaction 
-                            SET hr_comment = @HrComments
-                            WHERE transaction_id = {leaveId};
-
-                            COMMIT TRANSACTION [updateComments]
-
-                        END TRY
-
-                        BEGIN CATCH
-
-                            ROLLBACK TRANSACTION [updateComments]
-
-                        END CATCH  
-                       
+                        UPDATE [dbo].leavetransaction 
+                        SET sup_comment = @SupervisorComments, hr_comment = @HrComments
+                        WHERE transaction_id = {leaveId};
                     ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {

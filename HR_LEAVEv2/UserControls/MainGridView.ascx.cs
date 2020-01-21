@@ -211,7 +211,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     whereBindGridView = $@"
                         WHERE
-                            status IN ('Recommended', 'Approved', 'Not Approved') AND
+                            status IN ('Not Recommended', 'Recommended', 'Approved', 'Not Approved') AND
                             e.employee_id != '{Session["emp_id"]}'
                     ";
 
@@ -455,6 +455,11 @@ namespace HR_LEAVEv2.UserControls
                     else if (leaveStatus == "Approved")
                     {
                         btnUndoApprove.Visible = true;
+                        btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = false;
+                    }
+                    else if (leaveStatus == "Not Recommended")
+                    {
+                        btnUndoApprove.Visible = false;
                         btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = false;
                     }
                 }

@@ -144,7 +144,7 @@
         </asp:Panel>
 
         <%--Apply mode: Shows any necessary validation messages to user --%>
-        <div class="row" id="validationRow" style="margin-top:25px;">
+        <div class="row" id="validationRow">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
                     <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
