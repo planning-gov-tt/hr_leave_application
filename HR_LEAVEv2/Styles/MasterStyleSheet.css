@@ -198,3 +198,7 @@ a, a:active, a:focus, button, button:active, button:focus{
     font-size: 1.3em;
 }
 /* end styles for calendar picker icon */
+
+.hidden{
+    display:none;
+}

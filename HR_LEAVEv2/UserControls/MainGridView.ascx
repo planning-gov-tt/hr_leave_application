@@ -150,7 +150,6 @@
             <asp:BoundField HeaderText="Leave Type" DataField="leave_type" SortExpression="leave_type" />
             <%--<asp:BoundField HeaderText="Qualified" DataField="" SortExpression="" />--%>
             <asp:BoundField HeaderText="Status" DataField="status" SortExpression="status" />
-            <%--comments--%>
 
             <%--action buttons--%>
             <asp:TemplateField HeaderText="Action" Visible="true">

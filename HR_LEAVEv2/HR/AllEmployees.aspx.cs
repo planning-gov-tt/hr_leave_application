@@ -273,7 +273,7 @@ namespace HR_LEAVEv2.HR
 
         protected void newEmployeeBtn_Click(object sender, EventArgs e)
         {
-            Response.Redirect("~/HR/EmployeeDetails.aspx?view=create");
+            Response.Redirect("~/HR/EmployeeDetails.aspx?mode=create");
         }
     }
 }
