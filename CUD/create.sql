@@ -179,7 +179,5 @@ CREATE TABLE [dbo].[auditlog] (
   [created_at] DATETIME NOT NULL,
 
   FOREIGN KEY ([hr_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
-  FOREIGN KEY ([affected_employee_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
+    REFERENCES [dbo].[employee] ([employee_id])
 );
