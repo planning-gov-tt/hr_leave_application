@@ -202,7 +202,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     whereBindGridView = $@"
                         WHERE
-                            supervisor_id = '{Session["emp_id"]}';
+                            supervisor_id = '{Session["emp_id"]}'
                     ";
                 }
 

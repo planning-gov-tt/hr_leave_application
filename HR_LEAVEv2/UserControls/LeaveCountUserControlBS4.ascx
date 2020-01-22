@@ -52,7 +52,7 @@
         <%--sick--%>
         <asp:Panel ID="sickPanel" runat="server" CssClass="col count-block" Style="display:inline-block;">
             <div class="counter">
-                <i class="fa fa-plus-square fa-2x"></i>
+                <i class="fa fa-ambulance fa-2x"></i>
                 <h2 id="h2Sick" class="count-title count-number"><%= ViewState["sick"]%></h2>
                 <p class="count-text ">Sick</p>
             </div>

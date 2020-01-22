@@ -280,7 +280,7 @@ namespace HR_LEAVEv2.HR
             this.clearErrors();
 
             // IDs, email
-            string emp_id, ihris_id, email, firstname, lastname;
+            string emp_id, ihris_id, email, firstname, lastname, username;
 
             emp_id = employeeIdInput.Text;
             ihris_id = ihrisNumInput.Text;
@@ -289,14 +289,18 @@ namespace HR_LEAVEv2.HR
             // get first name, last name and username from active directory
             Auth auth = new Auth();
             string nameFromAd = auth.getUserInfoFromActiveDirectory(email);
+            firstname = lastname = username = string.Empty;
 
-            // set first and last name
-            string[] name = nameFromAd.Split(' ');
-            firstname = name[0];
-            lastname = name[1];
+            if (!String.IsNullOrEmpty(nameFromAd))
+            {
+                // set first and last name
+                string[] name = nameFromAd.Split(' ');
+                firstname = name[0];
+                lastname = name[1];
 
-            //set username
-            string username = $"PLANNING\\ {firstname} {lastname}";
+                //set username
+                username = $"PLANNING\\ {firstname} {lastname}";
+            }
 
             // Leave Balances 
             Dictionary<string, string> currentLeaveBalances = new Dictionary<string, string>();
@@ -334,7 +338,8 @@ namespace HR_LEAVEv2.HR
             // Employment Records
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
 
-            Boolean isInsertSuccessful = false;
+            Boolean isInsertSuccessful, isDuplicateIdentifier;
+            isInsertSuccessful = isDuplicateIdentifier = false;
 
             // name from AD must be populated because that means the user exists in AD
             // dt cannot be null because that means that no employment record is added
@@ -404,6 +409,8 @@ namespace HR_LEAVEv2.HR
                 catch (Exception ex)
                 {
                     // exception logic
+                    if (ex.Message.ToString().Contains("Violation of PRIMARY KEY constraint") || ex.Message.ToString().Contains("Cannot insert duplicate key in object 'dbo.employee'"))
+                        isDuplicateIdentifier = true;
                     isInsertSuccessful = false;
                 }
 
@@ -447,6 +454,8 @@ namespace HR_LEAVEv2.HR
                             break;
                         }
                     }
+
+                    // Employment Records
                     if (isInsertSuccessful)
                     {
                         isInsertSuccessful = false;
@@ -515,14 +524,6 @@ namespace HR_LEAVEv2.HR
                     }
                 }
             }
-            else
-            {
-                if (String.IsNullOrEmpty(nameFromAd))
-                    emailNotFoundErrorPanel.Style.Add("display", "inline-block");
-                if (dt == null)
-                    noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
-                isInsertSuccessful = false;
-            }
 
             if (isInsertSuccessful)
             {
@@ -565,8 +566,18 @@ namespace HR_LEAVEv2.HR
                     //exception logic
                     Console.WriteLine(ex.Message.ToString());
                 }
-            } else
+            }
+            else
+            {
                 fullFormErrorPanel.Style.Add("display", "inline-block");
+                if (String.IsNullOrEmpty(nameFromAd))
+                    emailNotFoundErrorPanel.Style.Add("display", "inline-block");
+                if (dt == null)
+                    noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
+                if(isDuplicateIdentifier)
+                    duplicateIdentifierPanel.Style.Add("display", "inline-block");
+            }
+                
 
             //scroll to top of page
             Page.MaintainScrollPositionOnPostBack = false;
@@ -601,6 +612,7 @@ namespace HR_LEAVEv2.HR
             addEmpRecordsErrorPanel.Style.Add("display", "none");
 
             fullFormErrorPanel.Style.Add("display", "none");
+            duplicateIdentifierPanel.Style.Add("display", "none");
             emailNotFoundErrorPanel.Style.Add("display", "none");
             noEmploymentRecordEnteredErrorPanel.Style.Add("display", "none");
             fullFormSubmitSuccessPanel.Style.Add("display", "none");

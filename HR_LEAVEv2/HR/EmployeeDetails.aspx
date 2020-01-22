@@ -40,6 +40,7 @@
 
                     <%--SUCCESSES---------------------------------------------------------------------------------------------%>
 
+                    <%--EDIT EMPLOYEE SUCCESSES-------------------------------------------------------------------------------%>
                     <%--General Successful edit of employee--%>
                     <asp:Panel ID="editFullSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
@@ -72,6 +73,8 @@
                         </span>
                     </asp:Panel>
 
+                    <%--ADD NEW EMPLOYEE SUCCESSES-------------------------------------------------------------------------------%>
+
                     <%--General Successful insert of new employee--%>
                     <asp:Panel ID="fullFormSubmitSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
@@ -81,6 +84,8 @@
                     </asp:Panel>
 
                     <%--ERRORS---------------------------------------------------------------------------------------------------%>
+
+                    <%--EDIT EMPLOYEE ERRORS-------------------------------------------------------------------------------%>
                     <%--General Error in editing employee--%>
                     <asp:Panel ID="editEmpErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
@@ -129,11 +134,21 @@
                         </span>
                     </asp:Panel>
 
+                    <%--ADD NEW EMPLOYEE ERRORS-------------------------------------------------------------------------------%>
+
                     <%--General Error in adding new employee--%>
                     <asp:Panel ID="fullFormErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="Span2" runat="server">Employee not added</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Duplicate primary key: new employee has same employee id as another in the db--%>
+                    <asp:Panel ID="duplicateIdentifierPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span15" runat="server">The entered employee ID already exists in database</span>
                         </span>
                     </asp:Panel>
 
@@ -300,7 +315,7 @@
 
             <%--Bereavement--%>
             <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator8" runat="server" ControlToValidate="bereavementLeaveInput" ErrorMessage="Please enter valid sick leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator8" runat="server" ControlToValidate="bereavementLeaveInput" ErrorMessage="Please enter valid bereavement leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
                 </asp:RegularExpressionValidator>
                 <label for="bereavementLeaveInput">Bereavement Leave</label>
                 <asp:TextBox CssClass="form-control" ID="bereavementLeaveInput" placeholder="Enter bereavement leave balance" runat="server"></asp:TextBox>
@@ -308,7 +323,7 @@
 
             <%--Maternity--%>
             <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator9" runat="server" ControlToValidate="maternityLeaveInput" ErrorMessage="Please enter valid sick leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator9" runat="server" ControlToValidate="maternityLeaveInput" ErrorMessage="Please enter valid maternity leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
                 </asp:RegularExpressionValidator>
                 <label for="maternityLeaveInput">Maternity Leave</label>
                 <asp:TextBox CssClass="form-control" ID="maternityLeaveInput" placeholder="Enter maternity leave balance" runat="server"></asp:TextBox>
@@ -316,7 +331,7 @@
 
             <%--Pre-Retirement--%>
             <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator10" runat="server" ControlToValidate="preRetirementLeaveInput" ErrorMessage="Please enter valid sick leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator10" runat="server" ControlToValidate="preRetirementLeaveInput" ErrorMessage="Please enter valid pre-retirement leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
                 </asp:RegularExpressionValidator>
                 <label for="preRetirementLeaveInput">Pre-retirement Leave</label>
                 <asp:TextBox CssClass="form-control" ID="preRetirementLeaveInput" placeholder="Enter pre-retirement leave balance" runat="server"></asp:TextBox>
@@ -464,17 +479,19 @@
                 $('#furtherDetailsForHrDiv').css("display", "none");
                 $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
             }
+
+            $('#authLevelDiv input[type="checkbox"]').click(function (e) {
+                // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
+                if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
+                    $('#furtherDetailsForHrDiv').css("display", "block");
+                }
+                else {
+                    $('#furtherDetailsForHrDiv').css("display", "none");
+                    $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
+                }
+            });
         });
 
-        $('#authLevelDiv input[type="checkbox"]').click(function (e) {
-            // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
-            if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
-                $('#furtherDetailsForHrDiv').css("display", "block");
-            }
-            else {
-                $('#furtherDetailsForHrDiv').css("display", "none");
-                $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
-            }
-        });
+        
     </script>
 </asp:Content>
