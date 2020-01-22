@@ -76,7 +76,7 @@
                     <asp:Panel ID="fullFormSubmitSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span1" runat="server">Employee successfully added</span>
+                            <span id="Span1" runat="server">Employee successfully created</span>
                         </span>
                     </asp:Panel>
 

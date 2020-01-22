@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -10,22 +11,18 @@ namespace HR_LEAVEv2.HR
 {
     public partial class EmployeeDetails : System.Web.UI.Page
     {
+        // used to check if user can view page 
         List<string> permissions = null;
-        List<string> roles = null;
+
+        // used to store the initial roles loaded when in edit mode. These are used to determine the edits made for auditing purposes
         List<string> previousRoles = null;
+
+        // used to store the initial leave balances loaded when in edit mode. These are used to determine the edits made for auditing purposes
+        Dictionary<string, string> previousLeaveBalances = null;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             permissions = (List<string>)Session["permissions"];
-
-            // populate the roles array for use when auditing
-            roles = new List<string>();
-            if (permissions.Contains("hr1_permissions"))
-                roles.Add("hr1");
-            if (permissions.Contains("hr2_permissions"))
-                roles.Add("hr2");
-            if (permissions.Contains("hr3_permissions"))
-                roles.Add("hr3");
 
             if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
@@ -51,6 +48,8 @@ namespace HR_LEAVEv2.HR
             {
                 if(ViewState["previousRoles"] != null)
                     this.previousRoles = (List<string>)ViewState["previousRoles"];
+                if (ViewState["previousLeaveBalances"] != null)
+                    this.previousLeaveBalances = (Dictionary<string, string>)ViewState["previousLeaveBalances"];
             }
                 
         }
@@ -280,8 +279,8 @@ namespace HR_LEAVEv2.HR
 
             this.clearErrors();
 
-            // IDs, email and leave balances
-            string emp_id, ihris_id, email, firstname, lastname, sick_leave, personal_leave, casual_leave, vacation_leave, bereavement_leave, maternity_leave, pre_retirement_leave;
+            // IDs, email
+            string emp_id, ihris_id, email, firstname, lastname;
 
             emp_id = employeeIdInput.Text;
             ihris_id = ihrisNumInput.Text;
@@ -299,14 +298,17 @@ namespace HR_LEAVEv2.HR
             //set username
             string username = $"PLANNING\\ {firstname} {lastname}";
 
+            // Leave Balances 
+            Dictionary<string, string> currentLeaveBalances = new Dictionary<string, string>();
+
             // get data from leave 
-            sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
-            personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
-            casual_leave = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
-            vacation_leave = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
-            bereavement_leave = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
-            maternity_leave = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
-            pre_retirement_leave = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
+            currentLeaveBalances["vacation"] = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
+            currentLeaveBalances["personal"] = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
+            currentLeaveBalances["casual"] = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
+            currentLeaveBalances["sick"] = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
+            currentLeaveBalances["bereavement"] = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
+            currentLeaveBalances["maternity"] = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
+            currentLeaveBalances["preRetirement"] = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
 
             // Roles
             List<string> authorizations = new List<string>() { "emp" };
@@ -385,19 +387,16 @@ namespace HR_LEAVEv2.HR
                             command.Parameters.AddWithValue("@FirstName", firstname);
                             command.Parameters.AddWithValue("@LastName", lastname);
                             command.Parameters.AddWithValue("@Email", email);
-                            command.Parameters.AddWithValue("@Vacation", vacation_leave);
-                            command.Parameters.AddWithValue("@Personal", personal_leave);
-                            command.Parameters.AddWithValue("@Casual", casual_leave);
-                            command.Parameters.AddWithValue("@Sick", sick_leave);
-                            command.Parameters.AddWithValue("@Bereavement", bereavement_leave);
-                            command.Parameters.AddWithValue("@Maternity", maternity_leave);
-                            command.Parameters.AddWithValue("@PreRetirement", pre_retirement_leave);
+                            command.Parameters.AddWithValue("@Vacation", currentLeaveBalances["vacation"]);
+                            command.Parameters.AddWithValue("@Personal", currentLeaveBalances["personal"]);
+                            command.Parameters.AddWithValue("@Casual", currentLeaveBalances["casual"]);
+                            command.Parameters.AddWithValue("@Sick", currentLeaveBalances["sick"]);
+                            command.Parameters.AddWithValue("@Bereavement", currentLeaveBalances["bereavement"]);
+                            command.Parameters.AddWithValue("@Maternity", currentLeaveBalances["maternity"]);
+                            command.Parameters.AddWithValue("@PreRetirement", currentLeaveBalances["preRetirement"]);
 
                             int rowsAffected = command.ExecuteNonQuery();
-                            if (rowsAffected > 0)
-                            {
-                                isInsertSuccessful = true;
-                            }
+                            isInsertSuccessful = rowsAffected > 0;
 
                         }
                     }
@@ -436,10 +435,7 @@ namespace HR_LEAVEv2.HR
                                     command.Parameters.AddWithValue("@RoleId", role);
 
                                     int rowsAffected = command.ExecuteNonQuery();
-                                    if (rowsAffected > 0)
-                                    {
-                                        isInsertSuccessful = true;
-                                    }
+                                    isInsertSuccessful = rowsAffected > 0;
 
                                 }
                             }
@@ -502,7 +498,8 @@ namespace HR_LEAVEv2.HR
                                             {
                                                 isInsertSuccessful = true;
                                                 fullFormSubmitSuccessPanel.Style.Add("display", "inline-block");
-                                            }
+                                            } else
+                                                isInsertSuccessful = false;
 
                                         }
                                     }
@@ -536,29 +533,27 @@ namespace HR_LEAVEv2.HR
                     {
                         connection.Open();
                         string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([employee_id],[employee_name], [employee_roles], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @EmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @EmployeeId), 
-                                        @Roles,
+                                        @HrId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
                                         @CreatedAt);
                                 ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@AffectedEmployeeId", emp_id);
 
                             /*
                              * Add info about new employee created such as:
-                             * Employee ID
                              * Leave balances: Vacation, Sick, Personal, Casual
-                             * Employee Roles
+                             * Employee permissions
                              * */
-                            string action = $"Created new Employee; ID= {emp_id}, Vacation:{vacation_leave}, Sick:{sick_leave}, Personal:{personal_leave}, Casual:{casual_leave}; Permissions: {String.Join(",", authorizations.ToArray())}";
+                            string action = $"Created new Employee; {String.Join(", ", currentLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())} ; Permissions: {String.Join(",", authorizations.ToArray())}";
                             command.Parameters.AddWithValue("@Action", action);
-
-                            string roles = $"{String.Join(",", this.roles.ToArray())}";
-                            command.Parameters.AddWithValue("@Roles", roles);
 
                             command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
                             command.ExecuteNonQuery();
@@ -651,6 +646,8 @@ namespace HR_LEAVEv2.HR
                                 if (reader["role_id"].ToString() == "hr_public_officer")
                                     publicServiceCheck.Checked = true;
                             }
+
+                            // store initial roles
                             this.previousRoles = new List<string>();
                             if (supervisorCheck.Checked)
                                 this.previousRoles.Add("sup");
@@ -664,6 +661,7 @@ namespace HR_LEAVEv2.HR
                                 this.previousRoles.Add("hr_contract");
                             if (publicServiceCheck.Checked)
                                 this.previousRoles.Add("hr_public_officer");
+
 
                             ViewState["previousRoles"] = this.previousRoles;
                         }
@@ -710,6 +708,18 @@ namespace HR_LEAVEv2.HR
 
                                 empNameHeader.InnerText = reader["employee_name"].ToString();
                             }
+
+                            // store initial leave balances
+                            this.previousLeaveBalances = new Dictionary<string, string>();
+                            this.previousLeaveBalances["vacation"] = vacationLeaveInput.Text;
+                            this.previousLeaveBalances["personal"] = personalLeaveInput.Text;
+                            this.previousLeaveBalances["casual"] = casualLeaveInput.Text;
+                            this.previousLeaveBalances["sick"] = sickLeaveInput.Text;
+                            this.previousLeaveBalances["bereavement"] = bereavementLeaveInput.Text;
+                            this.previousLeaveBalances["maternity"] = maternityLeaveInput.Text;
+                            this.previousLeaveBalances["pre_retirement"] = preRetirementLeaveInput.Text;
+
+                            ViewState["previousLeaveBalances"] = this.previousLeaveBalances;
                         }
                     }
                 }
@@ -774,7 +784,7 @@ namespace HR_LEAVEv2.HR
             string empId = Request.QueryString["empId"];
 
             //Leave Balances 
-            string sick_leave, personal_leave, casual_leave, vacation_leave, bereavement_leave, maternity_leave, pre_retirement_leave;
+            Dictionary<string, string> currentLeaveBalances = new Dictionary<string, string>();
 
             //Roles
             List<string> authorizations = new List<string>();
@@ -782,10 +792,15 @@ namespace HR_LEAVEv2.HR
             //Employment Records
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
 
+            // used to check whether any value is changed 
+            Boolean isRolesChanged, isLeaveBalancesChanged, isEmpRecordChanged;
+            isRolesChanged = isLeaveBalancesChanged = isEmpRecordChanged = false;
+
+            // used to check if there was any error in changing values
             Boolean isRolesEditSuccessful, isLeaveEditSuccessful, isEmpRecordEditSuccessful, isEmpRecordDeleteSuccessful, isEmpRecordInsertSuccessful;
             isRolesEditSuccessful = isLeaveEditSuccessful = isEmpRecordEditSuccessful = isEmpRecordDeleteSuccessful = isEmpRecordInsertSuccessful = true;
 
-            // Edit roles
+            // ROLES--------------------------------------------------------------------------------------------------------------------------
             if (authorizationLevelPanel.Visible)
             {
                 // get data from checkboxes and set authorizations
@@ -806,30 +821,6 @@ namespace HR_LEAVEv2.HR
                         authorizations.Add("hr_public_officer");
                 }
 
-                //delete all roles attached to employee except 'emp'
-                try
-                {
-                    string sql = $@"
-                            DELETE FROM [dbo].[employeerole]
-                            WHERE employee_id = {empId} AND role_id <> 'emp';
-                        ";
-
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
-                        using (SqlCommand command = new SqlCommand(sql, connection))
-                        {
-                            int rowsAffected = command.ExecuteNonQuery();
-                            isRolesEditSuccessful = true;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // exception logic
-                    isRolesEditSuccessful = false;
-                }
-
                 // previous roles holds the employee's previous roles. The following code looks at the current roles being added and checks which roles previously there that are no longer there
                 // As such, the changedRoles list will contain the list of roles which were deleted
                 List<string> deletedRoles = new List<string>();
@@ -838,8 +829,37 @@ namespace HR_LEAVEv2.HR
                     if (!authorizations.Contains(role))
                         deletedRoles.Add(role);
                 }
-                if(deletedRoles.Count > 0)
+
+                if (deletedRoles.Count > 0)
                 {
+                    //delete roles which were previously assigned to employee but which are now being removed
+                    foreach(string roleToDelete in deletedRoles)
+                    {
+                        try
+                        {
+                            string sql = $@"
+                            DELETE FROM [dbo].[employeerole]
+                            WHERE employee_id = '{empId}' AND role_id = '{roleToDelete}';
+                        ";
+
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                            {
+                                connection.Open();
+                                using (SqlCommand command = new SqlCommand(sql, connection))
+                                {
+                                    int rowsAffected = command.ExecuteNonQuery();
+                                    isRolesEditSuccessful = rowsAffected > 0;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // exception logic
+                            isRolesEditSuccessful = false;
+                        }
+                    }
+                    
+
                     // add audit log for deleting roles
                     try
                     {
@@ -847,31 +867,29 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([employee_id],[employee_name], [employee_roles], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @EmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @EmployeeId), 
-                                        @Roles,
+                                        @HrId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
                                         @CreatedAt);
                                 ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*
-                                 * Add info about new employee created such as:
+                                 * Add info about edits made to employee such as:
                                  * Employee ID
                                  * Roles deleted
-                                 * Employee Roles
                                  * */
 
 
-                                string action = $"Edited roles for employee ID={empId}; Roles Deleted= {String.Join(",", deletedRoles.ToArray())}";
+                                string action = $"Edited roles; Roles Deleted= {String.Join(", ", deletedRoles.ToArray())}";
                                 command.Parameters.AddWithValue("@Action", action);
-
-                                string roles = $"{String.Join(",", this.roles.ToArray())}";
-                                command.Parameters.AddWithValue("@Roles", roles);
 
                                 command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
                                 command.ExecuteNonQuery();
@@ -885,7 +903,8 @@ namespace HR_LEAVEv2.HR
                     }
                 }
 
-                // previous roles holds the employee's previous roles. The following code looks at the previous roles and checks which roles were added to this list
+                // previous roles holds the employee's previous roles. The following code looks at the previous roles and checks which roles were added to the employee
+                // As such, addedRoles contains the list of all roles added to the employee that were not previously there
                 List<string> addedRoles = new List<string>();
                 foreach (string role in authorizations)
                 {
@@ -893,19 +912,19 @@ namespace HR_LEAVEv2.HR
                         addedRoles.Add(role);
                 }
 
-                // add roles back to employee 
-                if (authorizations.Count > 0)
+                if (addedRoles.Count > 0)
                 {
+                    // add roles back to employee 
                     foreach (string role in authorizations)
                     {
                         try
                         {
                             string sql = $@"
-                            INSERT INTO [dbo].[employeerole]
-                                ([employee_id], [role_id])
-                            VALUES
-                                (@EmployeeId, @RoleId);
-                        ";
+                                INSERT INTO [dbo].[employeerole]
+                                    ([employee_id], [role_id])
+                                VALUES
+                                    (@EmployeeId, @RoleId);
+                            ";
 
                             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                             {
@@ -916,10 +935,7 @@ namespace HR_LEAVEv2.HR
                                     command.Parameters.AddWithValue("@RoleId", role);
 
                                     int rowsAffected = command.ExecuteNonQuery();
-                                    if (rowsAffected > 0)
-                                    {
-                                        isRolesEditSuccessful = true;
-                                    }
+                                    isRolesEditSuccessful = rowsAffected > 0;
 
                                 }
                             }
@@ -932,101 +948,101 @@ namespace HR_LEAVEv2.HR
                         }
                     }
 
-                    if (addedRoles.Count > 0)
+                    // add audit log for roles added
+                    try
                     {
-                        // add audit log for roles added
-                        try
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                         {
-                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                            {
-                                connection.Open();
-                                string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([employee_id],[employee_name], [employee_roles], [action], [created_at])
+                            connection.Open();
+                            string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @EmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @EmployeeId), 
-                                        @Roles,
+                                        @HrId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
                                         @CreatedAt);
                                 ";
-                                using (SqlCommand command = new SqlCommand(sql, connection))
-                                {
-                                    command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
-                                    /*
-                                     * Add info about new employee created such as:
-                                     * Employee ID
-                                     * Roles added
-                                     * Employee Roles
-                                     * */
-                                    string action = $"Edited roles for employee ID={empId}; Roles Added= {String.Join(",", addedRoles.ToArray())}";
-                                    command.Parameters.AddWithValue("@Action", action);
+                                /*
+                                 * Add info about edits made to employee such as:
+                                 * Employee ID
+                                 * Roles added
+                                 * */
+                                string action = $"Edited roles; Roles Added= {String.Join(", ", addedRoles.ToArray())}";
+                                command.Parameters.AddWithValue("@Action", action);
 
-                                    string roles = $"{String.Join(",", this.roles.ToArray())}";
-                                    command.Parameters.AddWithValue("@Roles", roles);
-
-                                    command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                                    command.ExecuteNonQuery();
-                                }
+                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                                command.ExecuteNonQuery();
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            //exception logic
-                            Console.WriteLine(ex.Message.ToString());
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        Console.WriteLine(ex.Message.ToString());
                     }
                 }
-                else
-                    isRolesEditSuccessful = true;
+
+                // there was a change made to the roles
+                if (deletedRoles.Count > 0 || addedRoles.Count > 0)
+                    isRolesChanged = true;
                    
             }
+            // END ROLES--------------------------------------------------------------------------------------------------------------------------
 
-            // Edit Leave balances
 
-            if (isRolesEditSuccessful == true || !authorizationLevelPanel.Visible)
+            // EDIT LEAVE BALANCES--------------------------------------------------------------------------------------------------------------------------
+
+            // get data from leave balances
+            currentLeaveBalances["vacation"] = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
+            currentLeaveBalances["personal"] = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
+            currentLeaveBalances["casual"] = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
+            currentLeaveBalances["sick"] = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
+            currentLeaveBalances["bereavement"] = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
+            currentLeaveBalances["maternity"] = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
+            currentLeaveBalances["pre_retirement"] = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
+
+            //checks which leave balances were edited and adds them to a new dictionary (editedLeaveBalances)
+            // As such, editedLeaveBalances contains the dictionary of leave balances which were edited
+            Dictionary<string, string> editedLeaveBalances = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, string> entry in this.previousLeaveBalances)
             {
+                if (currentLeaveBalances[entry.Key] != this.previousLeaveBalances[entry.Key])
+                    editedLeaveBalances[entry.Key] = currentLeaveBalances[entry.Key];
+            }
 
-                // get data from leave 
-                sick_leave = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
-                personal_leave = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
-                casual_leave = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
-                vacation_leave = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
-                bereavement_leave = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
-                maternity_leave = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
-                pre_retirement_leave = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
-
-                // update all leave balance data 
+            if (editedLeaveBalances.Keys.Count > 0)
+            {
+                // update edited leave balance data 
                 try
                 {
                     string sql = $@"
-                    UPDATE [dbo].[employee]
-                    SET 
-                            vacation = @Vacation
-                        ,personal = @Personal
-                        ,casual = @Casual
-                        ,sick = @Sick
-                        ,bereavement = @Bereavement
-                        ,maternity = @Maternity
-                        ,pre_retirement = @PreRetirement
-                    WHERE employee_id = {empId};
-                ";
+                            UPDATE [dbo].[employee]
+                            SET {String.Join(", ", editedLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())}
+                            WHERE employee_id = {empId};
+                        ";
 
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                     {
                         connection.Open();
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            command.Parameters.AddWithValue("@Vacation", vacation_leave);
-                            command.Parameters.AddWithValue("@Personal", personal_leave);
-                            command.Parameters.AddWithValue("@Casual", casual_leave);
-                            command.Parameters.AddWithValue("@Sick", sick_leave);
-                            command.Parameters.AddWithValue("@Bereavement", bereavement_leave);
-                            command.Parameters.AddWithValue("@Maternity", maternity_leave);
-                            command.Parameters.AddWithValue("@PreRetirement", pre_retirement_leave);
+                            //command.Parameters.AddWithValue("@Vacation", currentLeaveBalances["vacation"]);
+                            //command.Parameters.AddWithValue("@Personal", currentLeaveBalances["personal"]);
+                            //command.Parameters.AddWithValue("@Casual", currentLeaveBalances["casual"]);
+                            //command.Parameters.AddWithValue("@Sick", currentLeaveBalances["sick"]);
+                            //command.Parameters.AddWithValue("@Bereavement", currentLeaveBalances["bereavement"]);
+                            //command.Parameters.AddWithValue("@Maternity", currentLeaveBalances["maternity"]);
+                            //command.Parameters.AddWithValue("@PreRetirement", currentLeaveBalances["pre_retirement"]);
 
                             int rowsAffected = command.ExecuteNonQuery();
-                            isLeaveEditSuccessful = true;
+                            isLeaveEditSuccessful = rowsAffected > 0;
 
                         }
                     }
@@ -1037,64 +1053,155 @@ namespace HR_LEAVEv2.HR
                     isLeaveEditSuccessful = false;
                 }
 
-                // Edit Emp Records
-                if (isLeaveEditSuccessful)
+                // add audit log for leave balances edited
+                try
                 {
-                   
-                    /**
-                        * datatable is formatted in the folowing manner in the ItemArray:
-                        * Index:         0             1            2         3        4        5          6               7              8
-                        * Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isDeleted
-                    * */
-
-                    if(!this.isTableEmpty())
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                     {
-                        //delete the records with an 'isDeleted' field of '1'
-                        foreach (DataRow dr in dt.Rows)
+                        connection.Open();
+                        string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    VALUES ( 
+                                        @HrId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            // once the row does not represent a newly added row and the 'isDeleted' field is '1'
-                            if (dr.ItemArray[0].ToString() != "-1" && dr.ItemArray[8].ToString() == "1")
-                            {
-                                try
-                                {
-                                    string sql = $@"
+                            command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
+
+                            /*
+                             * Add info about edits made to employee such as:
+                             * Employee ID
+                             * Leave Balance edited and the value which it was changed to
+                             * */
+                            string action = $"Edited leave balances; {String.Join(", ", editedLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())}";
+                            command.Parameters.AddWithValue("@Action", action);
+
+                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    Console.WriteLine(ex.Message.ToString());
+                }
+
+                // leave balances were changed
+                isLeaveBalancesChanged = true;
+            }
+            // END LEAVE BALANCES--------------------------------------------------------------------------------------------------------------------------
+
+            // EDIT EMPLOYMENT RECORDS--------------------------------------------------------------------------------------------------------------------------
+            /**
+                * datatable is formatted in the folowing manner in the ItemArray:
+                * Index:         0             1            2         3        4        5          6               7              8
+                * Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isDeleted
+            * */
+
+            if (!this.isTableEmpty())
+            {
+                // a list to contain the ids of deleted employment records. This list is used to create audit logs for deletion of records
+                List<string> deletedRecords = new List<string>();
+
+                //delete the records with an 'isDeleted' field of '1'
+                foreach (DataRow dr in dt.Rows)
+                {
+                    // once the row does not represent a newly added row and the 'isDeleted' field is '1'
+                    if (dr.ItemArray[0].ToString() != "-1" && dr.ItemArray[8].ToString() == "1")
+                    {
+                        try
+                        {
+                            string sql = $@"
                                 DELETE FROM [dbo].[employeeposition]
-                                WHERE employee_id = {empId} AND id = {dr.ItemArray[0]}
+                                WHERE employee_id = '{empId}' AND id = '{dr.ItemArray[0]}'
                             ";
 
-                                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                                    {
-                                        connection.Open();
-                                        using (SqlCommand command = new SqlCommand(sql, connection))
-                                        {
-                                            int rowsAffected = command.ExecuteNonQuery();
-                                            if (rowsAffected > 0)
-                                            {
-                                                isEmpRecordDeleteSuccessful = true;
-                                            }
-
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                            {
+                                connection.Open();
+                                using (SqlCommand command = new SqlCommand(sql, connection))
                                 {
-                                    // exception logic
-                                    isEmpRecordDeleteSuccessful = false;
+                                    int rowsAffected = command.ExecuteNonQuery();
+                                    isEmpRecordDeleteSuccessful = rowsAffected > 0;
                                 }
                             }
                         }
-
-                        //add new records data from gridview
-                        foreach (DataRow dr in dt.Rows)
+                        catch (Exception ex)
                         {
+                            // exception logic
+                            isEmpRecordDeleteSuccessful = false;
+                        }
 
-                            // only if the record id is '-1' then insert it
-                            if (dr.ItemArray[0].ToString() == "-1")
+                        // add id of deleted record to deletedRecords list. This is used to create an audit log for the deletion of employment records
+                        if (isEmpRecordDeleteSuccessful)
+                            deletedRecords.Add(dr.ItemArray[0].ToString());
+                    }
+                }
+
+                // add audit log for deleted records
+                if(deletedRecords.Count > 0)
+                {
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
+                            INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                            VALUES ( 
+                                @HrId, 
+                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                @AffectedEmployeeId,
+                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                @Action, 
+                                @CreatedAt);
+                        ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                // insert new record
-                                try
-                                {
-                                    string sql = $@"
+                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
+
+                                /*
+                                    * Add info about edits made to employee such as:
+                                    * Employee ID
+                                    * ID of Employment Records deleted
+                                    * */
+                                string action = $"Deleted employment records; {String.Join(", ", deletedRecords.Select(lb =>  "id =" + lb).ToArray())}";
+                                command.Parameters.AddWithValue("@Action", action);
+
+                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        Console.WriteLine(ex.Message.ToString());
+                    }
+                }
+
+                // a list to contain the ids of added employment records. This list is used to create audit logs for addition of records
+                List<string> addedRecords = new List<string>();
+
+                //add new records data from gridview
+                foreach (DataRow dr in dt.Rows)
+                {
+
+                    // only if the record id is '-1' and isDeleted is '0' then insert it
+                    if (dr.ItemArray[0].ToString() == "-1" && dr.ItemArray[8].ToString() == "0")
+                    {
+                        // insert new record
+                        try
+                        {
+                            string sql = $@"
                                 INSERT INTO [dbo].[employeeposition]
                                     ([employee_id]
                                         ,[position_id]
@@ -1102,6 +1209,7 @@ namespace HR_LEAVEv2.HR
                                         ,[expected_end_date]
                                         ,[employment_type]
                                         ,[dept_id])
+                                OUTPUT INSERTED.id
                                 VALUES
                                     ( @EmployeeId
                                     ,@PositionId
@@ -1112,97 +1220,146 @@ namespace HR_LEAVEv2.HR
                                     );
                             ";
 
-                                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                                    {
-                                        connection.Open();
-                                        using (SqlCommand command = new SqlCommand(sql, connection))
-                                        {
-                                            command.Parameters.AddWithValue("@EmployeeId", empId);
-                                            command.Parameters.AddWithValue("@EmploymentType", dr.ItemArray[1]);
-                                            command.Parameters.AddWithValue("@DeptId", dr.ItemArray[2]);
-                                            command.Parameters.AddWithValue("@PositionId", dr.ItemArray[4]);
-                                            command.Parameters.AddWithValue("@StartDate", dr.ItemArray[6]);
-                                            command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[7]);
-
-                                            int rowsAffected = command.ExecuteNonQuery();
-                                            if (rowsAffected > 0)
-                                            {
-                                                isEmpRecordInsertSuccessful = true;
-                                            }
-
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                            {
+                                connection.Open();
+                                using (SqlCommand command = new SqlCommand(sql, connection))
                                 {
-                                    // exception logic
-                                    isEmpRecordInsertSuccessful = false;
+                                    command.Parameters.AddWithValue("@EmployeeId", empId);
+                                    command.Parameters.AddWithValue("@EmploymentType", dr.ItemArray[1]);
+                                    command.Parameters.AddWithValue("@DeptId", dr.ItemArray[2]);
+                                    command.Parameters.AddWithValue("@PositionId", dr.ItemArray[4]);
+                                    command.Parameters.AddWithValue("@StartDate", dr.ItemArray[6]);
+                                    command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[7]);
+
+                                    string new_record_id = command.ExecuteScalar().ToString();
+                                    isEmpRecordInsertSuccessful = !String.IsNullOrWhiteSpace(new_record_id);
+
+                                    // adding id of inserted record in added records list
+                                    if (isEmpRecordInsertSuccessful)
+                                        addedRecords.Add(new_record_id);
                                 }
                             }
                         }
-                    } else
-                    {
-                        noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
-                        isEmpRecordInsertSuccessful = isEmpRecordDeleteSuccessful = false;
+                        catch (Exception ex)
+                        {
+                            // exception logic
+                            isEmpRecordInsertSuccessful = false;
+                        }
                     }
-                        
-
-
-                    isEmpRecordEditSuccessful = isEmpRecordDeleteSuccessful && isEmpRecordInsertSuccessful;
                 }
-            }
+
+                // add audit log for added records
+                if(addedRecords.Count > 0)
+                {
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
+                            INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                            VALUES ( 
+                                @HrId, 
+                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                @AffectedEmployeeId,
+                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                @Action, 
+                                @CreatedAt);
+                        ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
+
+                                /*
+                                    * Add info about edits made to employee such as:
+                                    * Employee ID
+                                    * ID of Employment Records added
+                                    * */
+                                string action = $"Added employment records; {String.Join(", ", addedRecords.Select(lb => "id =" + lb).ToArray())}";
+                                command.Parameters.AddWithValue("@Action", action);
+
+                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        Console.WriteLine(ex.Message.ToString());
+                    }
+                }
+
+                if (deletedRecords.Count > 0 || addedRecords.Count > 0)
+                    isEmpRecordChanged = true;
+            } else
+            {
+                noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
+                isEmpRecordInsertSuccessful = isEmpRecordDeleteSuccessful = false;
+            }                      
+            isEmpRecordEditSuccessful = isEmpRecordDeleteSuccessful && isEmpRecordInsertSuccessful;
+
+            // END EMPLOYMENT RECORDS--------------------------------------------------------------------------------------------------------------------------
 
 
-            // show user feedback
-            if(isRolesEditSuccessful && isLeaveEditSuccessful && isEmpRecordEditSuccessful)
+            // USER FEEDBACK--------------------------------------------------------------------------------------------------------------------------
+            // general success message
+            if (isRolesEditSuccessful && isLeaveEditSuccessful && isEmpRecordEditSuccessful)
                 editFullSuccessPanel.Style.Add("display", "inline-block");
             else
             {
-                // specific success messages
-                if (isRolesEditSuccessful)
+                // SUCCESS MESSAGES---------------------------------------------------------------
+
+                // successful roles edit
+                if (isRolesChanged && isRolesEditSuccessful)
                     editRolesSuccessPanel.Style.Add("display", "inline-block");
-                if (isLeaveEditSuccessful)
+
+                // successful leave balances edit
+                if (isLeaveBalancesChanged && isLeaveEditSuccessful)
                     editLeaveSuccessPanel.Style.Add("display", "inline-block");
-                if (isEmpRecordEditSuccessful)
+
+                // successful employment records edit
+                if (isEmpRecordChanged && isEmpRecordEditSuccessful)
                     editEmpRecordSuccessPanel.Style.Add("display", "inline-block");
+
+                // ERROR MESSAGES------------------------------------------------------------------
 
                 // general error message if all aspects of edit fail
                 if(!isRolesEditSuccessful && !isLeaveEditSuccessful && !isEmpRecordEditSuccessful)
                     editEmpErrorPanel.Style.Add("display", "inline-block");
-                else
+
+                // roles edit error
+                if (!isRolesEditSuccessful)
+                    editRolesErrorPanel.Style.Add("display", "inline-block");
+
+                // leave balances edit error
+                if (!isLeaveEditSuccessful)
+                    editLeaveBalancesErrorPanel.Style.Add("display", "inline-block");
+
+                // emp records errors
+                if (!isEmpRecordEditSuccessful)
                 {
-                    //more specific error messages
-
-                    // roles edit error
-                    if (!isRolesEditSuccessful)
-                        editRolesErrorPanel.Style.Add("display", "inline-block");
-
-                    // leave balances edit error
-                    if (!isLeaveEditSuccessful)
-                        editLeaveBalancesErrorPanel.Style.Add("display", "inline-block");
-
-                    // emp records errors
-                    if (!isEmpRecordEditSuccessful)
+                    // general emp record edit error
+                    if(!isEmpRecordInsertSuccessful && !isEmpRecordDeleteSuccessful)
+                        editEmpRecordErrorPanel.Style.Add("display", "inline-block");
+                    else
                     {
-                        // general emp record edit error
-                        if(!isEmpRecordInsertSuccessful && !isEmpRecordDeleteSuccessful)
-                            editEmpRecordErrorPanel.Style.Add("display", "inline-block");
-                        else
-                        {
-                            // specific emp record edit errors
+                        // specific emp record edit errors
 
-                            // error deleting emp record(s)
-                            if (!isEmpRecordDeleteSuccessful)
-                                deleteEmpRecordsErrorPanel.Style.Add("display", "inline-block");
+                        // error deleting emp record(s)
+                        if (!isEmpRecordDeleteSuccessful)
+                            deleteEmpRecordsErrorPanel.Style.Add("display", "inline-block");
 
-                            // error inserting new emp record(s)
-                            if (!isEmpRecordInsertSuccessful)
-                                addEmpRecordsErrorPanel.Style.Add("display", "inline-block");
-                        }
-                       
+                        // error inserting new emp record(s)
+                        if (!isEmpRecordInsertSuccessful)
+                            addEmpRecordsErrorPanel.Style.Add("display", "inline-block");
                     }
+                       
                 }
             }
+            // END USER FEEDBACK--------------------------------------------------------------------------------------------------------------------------
 
             //scroll to top of page
             Page.MaintainScrollPositionOnPostBack = false;
@@ -1254,7 +1411,6 @@ namespace HR_LEAVEv2.HR
                 isDeleted = e.Row.Cells[i].Text.ToString() == "1";
                 if (isDeleted)
                     e.Row.CssClass= "hidden";
-                    //e.Row.Visible = false;
             }
         }
 
