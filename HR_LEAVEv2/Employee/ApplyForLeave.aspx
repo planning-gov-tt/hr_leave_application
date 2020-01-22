@@ -69,6 +69,10 @@
                 <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"  ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
         </div>
+        <%--<asp:Panel ID="numDaysAppliedForPanel" CssClass="row form-group" runat="server">
+            <label for="numDaysAppliedFor" style="font-size: 1.5em">Days applied for:</label>
+            <asp:Label ID="numDaysAppliedFor" runat="server" Text="0" Style="font-size: 1.2em"></asp:Label>
+        </asp:Panel>--%>
 
         <%--View mode: Shows the type of leave applied for--%>
         <%--Apply mode: Allows user to enter type of leave to apply for--%>
