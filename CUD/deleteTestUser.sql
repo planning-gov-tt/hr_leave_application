@@ -4,5 +4,9 @@ WHERE employee_id = '666'
 DELETE FROM dbo.employeerole
 WHERE employee_id = '666'
 
+DELETE FROM dbo.auditlog
+WHERE affected_employee_id = '666'
+
 DELETE FROM dbo.employee
 WHERE employee_id = '666'
+
