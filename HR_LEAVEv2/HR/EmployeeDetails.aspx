@@ -247,30 +247,30 @@
                         title="Click on any checkbox below to grant higher privileges to an employee"></i>
                     </h3>
                     <div class="form-group" id="authLevelDiv">
-                        <div class="form-check" id="supervisorCheckDiv">
+                        <asp:Panel ID="supervisorCheckDiv" runat="server" CssClass="form-check">
                             <label class="form-check-label" for="supervisorCheck">
                                 <asp:CheckBox ID="supervisorCheck" runat="server" CssClass="form-check-input" />
                                 <span>Supervisor</span>
                             </label>
-                        </div>
-                        <div class="form-check" id="hr1CheckDiv">
+                        </asp:Panel>
+                        <asp:Panel CssClass="form-check" ID="hr1CheckDiv" runat="server">
                             <label class="form-check-label" for="hr1Check">
                                 <asp:CheckBox ID="hr1Check" runat="server" CssClass="form-check-input" />
                                 <span>HR Level 1</span>
                             </label>
-                        </div>
-                        <div class="form-check" id="hr2CheckDiv">
+                        </asp:Panel>
+                        <asp:Panel CssClass="form-check" ID="hr2CheckDiv" runat="server">
                             <label class="form-check-label" for="hr2Check">
                                 <asp:CheckBox ID="hr2Check" runat="server" CssClass="form-check-input" />
                                 <span>HR Level 2</span>
                             </label>
-                        </div>
-                        <div class="form-check" id="hr3CheckDiv">
+                        </asp:Panel>
+                        <asp:Panel CssClass="form-check" ID="hr3CheckDiv" runat="server">
                             <label class="form-check-label" for="hr2Check">
                                 <asp:CheckBox ID="hr3Check" runat="server" CssClass="form-check-input" />
                                 <span>HR Level 3</span>
                             </label>
-                        </div>
+                        </asp:Panel>
                     </div>
                 </div>
                 <div class="row text-center" style="display: none; width: 80%; margin: 0 auto; margin-top: 5px; background-color: #f0f0f5" id="furtherDetailsForHrDiv">
@@ -513,7 +513,7 @@
     <script>
         Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
-            if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
+            if ($('#<%= hr2CheckDiv.ClientID %> input[type="checkbox"], #<%= hr3CheckDiv.ClientID %> input[type="checkbox"]').is(':checked')) {
                 $('#furtherDetailsForHrDiv').css("display", "block");
             }
             else {
@@ -523,7 +523,7 @@
 
             $('#authLevelDiv input[type="checkbox"]').click(function (e) {
                 // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
-                if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
+                if ($('#<%= hr2CheckDiv.ClientID %> input[type="checkbox"], #<%= hr3CheckDiv.ClientID %> input[type="checkbox"]').is(':checked')) {
                     $('#furtherDetailsForHrDiv').css("display", "block");
                 }
                 else {

@@ -38,6 +38,7 @@ namespace HR_LEAVEv2.Employee
                     string mode = Request.QueryString["mode"];
                     string leaveId = Request.QueryString["leaveId"];
 
+                    // populates page and authorizes user based on their permissions, whether the leave application was submitted to them as a supervisor or various HR criteria
                     LeaveTransactionDetails ltDetails = populatePage(leaveId);
                     if (mode == "view")
                         this.adjustPageForViewMode();

@@ -463,6 +463,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel authorizationLevelPanel;
         
         /// <summary>
+        /// supervisorCheckDiv control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel supervisorCheckDiv;
+        
+        /// <summary>
         /// supervisorCheck control.
         /// </summary>
         /// <remarks>
@@ -470,6 +479,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox supervisorCheck;
+        
+        /// <summary>
+        /// hr1CheckDiv control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel hr1CheckDiv;
         
         /// <summary>
         /// hr1Check control.
@@ -481,6 +499,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.CheckBox hr1Check;
         
         /// <summary>
+        /// hr2CheckDiv control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel hr2CheckDiv;
+        
+        /// <summary>
         /// hr2Check control.
         /// </summary>
         /// <remarks>
@@ -488,6 +515,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox hr2Check;
+        
+        /// <summary>
+        /// hr3CheckDiv control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel hr3CheckDiv;
         
         /// <summary>
         /// hr3Check control.

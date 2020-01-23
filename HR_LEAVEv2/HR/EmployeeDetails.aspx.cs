@@ -37,6 +37,7 @@ namespace HR_LEAVEv2.HR
 
                     if (mode == "edit")
                     {
+                        // populates page and authorizes HR user based on employee's employment type
                         populatePage(empId);
                         this.adjustPageForEditMode();
                     }
@@ -68,7 +69,18 @@ namespace HR_LEAVEv2.HR
 
             //authorizations
             //if hr 1 then authorizations can be edited
-            authorizationLevelPanel.Visible = permissions.Contains("hr1_permissions");
+
+            if (permissions.Contains("hr1_permissions"))
+            {
+                authorizationLevelPanel.Visible = true;
+            }
+            else
+            {
+                if (permissions.Contains("hr2_permissions"))
+                    hr1CheckDiv.Visible = false;
+                else if (permissions.Contains("hr3_permissions"))
+                    hr1CheckDiv.Visible = hr2CheckDiv.Visible = false;
+            }
 
             //add emp record
             addEmpRecordForm.Visible = false;
@@ -620,6 +632,70 @@ namespace HR_LEAVEv2.HR
 
         protected void populatePage(string empId)
         {
+            // get employment record and populate gridview
+            // the sql command executed also initializes the isDeleted field as 0 to meant 'not deleted'
+            // employment records are loaded first in order to check the employment type such that the current HR viewing the page can be authorized
+            DataTable dataTable = null;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                            SELECT 
+                                ep.id record_id,
+                                ep.employment_type,
+                                ep.dept_id,
+                                d.dept_name,
+                                ep.position_id pos_id,
+                                p.pos_name,
+                                FORMAT(ep.start_date, 'MM/dd/yyyy') start_date, 
+                                FORMAT(ep.expected_end_date, 'MM/dd/yyyy') expected_end_date,
+                                '0' as isDeleted
+                                
+                            FROM [dbo].[employeeposition] ep
+
+                            LEFT JOIN [dbo].[department] d
+                            ON d.dept_id = ep.dept_id
+    
+                            LEFT JOIN [dbo].[position] p
+                            ON p.pos_id = ep.position_id
+
+                            WHERE employee_id = {empId}
+                            ORDER BY start_date DESC;
+                    ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
+                        dataTable = new DataTable();
+                        sqlDataAdapter.Fill(dataTable);
+
+                        ViewState["Gridview1_dataSource"] = dataTable;
+                        this.bindGridview();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                Console.WriteLine(ex.Message.ToString());
+            }
+
+            // the following code ensures that the current HR can view and edit the information presented based on the employee's employment type
+            if(dataTable != null && dataTable.Rows.Count > 0)
+            {
+                // the first row in the dataTable is used because the data is ordered by start date such that the first record will show the most recent employment record. This
+                // will therefore contain the most recent and accurate employment type: Contract or Public Service. Using this, the permissions are used for authorization
+                string empType = dataTable.Rows[0].ItemArray[1].ToString();
+                if (!permissions.Contains("hr1_permissions"))
+                {
+                    // the HR 2, HR 3 must have permissions to view data for the same employment type as for the employee who submitted the application
+                    //check if hr can view applications from the relevant employment type 
+                    if ((empType == "Contract" && !permissions.Contains("contract_permissions")) || (empType == "Public Service" && !permissions.Contains("public_officer_permissions")))
+                        Response.Redirect("~/AccessDenied.aspx");
+                }
+            }
+            
 
             // get roles and populate checkboxes
             try
@@ -740,53 +816,7 @@ namespace HR_LEAVEv2.HR
             {
                 //exception logic
                 Console.WriteLine(ex.Message.ToString());
-            }
-
-            // get employment record and populate gridview
-            // the sql command executed also initializes the isDeleted field as 0 to meant 'not deleted'
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-                    string sql = $@"
-                            SELECT 
-                                ep.id record_id,
-                                ep.employment_type,
-                                ep.dept_id,
-                                d.dept_name,
-                                ep.position_id pos_id,
-                                p.pos_name,
-                                FORMAT(ep.start_date, 'MM/dd/yyyy') start_date, 
-                                FORMAT(ep.expected_end_date, 'MM/dd/yyyy') expected_end_date,
-                                '0' as isDeleted
-                                
-                            FROM [dbo].[employeeposition] ep
-
-                            LEFT JOIN [dbo].[department] d
-                            ON d.dept_id = ep.dept_id
-    
-                            LEFT JOIN [dbo].[position] p
-                            ON p.pos_id = ep.position_id
-
-                            WHERE employee_id = {empId};
-                    ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
-                        DataTable dataTable = new DataTable(); 
-                        sqlDataAdapter.Fill(dataTable);
-
-                        ViewState["Gridview1_dataSource"] = dataTable;
-                        this.bindGridview();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //exception logic
-                Console.WriteLine(ex.Message.ToString());
-            }
+            } 
 
         }
 
