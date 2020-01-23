@@ -419,6 +419,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     LinkButton btnNotRecommended = (LinkButton)e.Row.FindControl("btnNotRecommended");
                     LinkButton btnRecommended = (LinkButton)e.Row.FindControl("btnRecommended");
+                    LinkButton btnEditLeaveRequest = (LinkButton)e.Row.FindControl("btnEditLeaveRequest");
 
                     // only show buttons if HR has not acted or pending
                     // else do not show buttons
@@ -428,7 +429,7 @@ namespace HR_LEAVEv2.UserControls
                     }
                     else
                     {
-                        btnNotRecommended.Visible = btnRecommended.Visible = false;
+                        btnNotRecommended.Visible = btnRecommended.Visible = btnEditLeaveRequest.Visible = false;
                     }
                 }
             }

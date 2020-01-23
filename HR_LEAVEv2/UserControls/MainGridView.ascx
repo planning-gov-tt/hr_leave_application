@@ -163,6 +163,7 @@
 
                     <%--employee buttons--%>
                     <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Cancel Leave Request" Visible="<%# btnEmpVisible %>" runat="server"
+                        OnClientClick ="return confirm('Cancel leave applciation?');"
                         CommandName="cancelLeave"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-trash-o" aria-hidden="true"></i>
@@ -197,7 +198,9 @@
 
                     <asp:LinkButton ID="btnEditLeaveRequest" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request" Visible="<%# btnSupVisible || btnHrVisible %>" runat="server"
                         CommandName="editLeaveRequest"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                         OnClientClick="return confirm('Cancel leave application?');" 
+                        >
                         <i class="fa fa-pencil" aria-hidden="true"></i>
                     </asp:LinkButton>
 

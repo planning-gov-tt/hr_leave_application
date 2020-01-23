@@ -927,7 +927,7 @@ namespace HR_LEAVEv2.HR
                 if (addedRoles.Count > 0)
                 {
                     // add roles back to employee 
-                    foreach (string role in authorizations)
+                    foreach (string role in addedRoles)
                     {
                         try
                         {
