@@ -534,10 +534,10 @@ namespace HR_LEAVEv2.HR
                     {
                         connection.Open();
                         string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @HrId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                         @AffectedEmployeeId,
                                         (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
@@ -545,7 +545,7 @@ namespace HR_LEAVEv2.HR
                                 ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                             command.Parameters.AddWithValue("@AffectedEmployeeId", emp_id);
 
                             /*
@@ -879,10 +879,10 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @HrId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                         @AffectedEmployeeId,
                                         (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
@@ -890,7 +890,7 @@ namespace HR_LEAVEv2.HR
                                 ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*
@@ -967,10 +967,10 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @HrId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                         @AffectedEmployeeId,
                                         (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
@@ -978,7 +978,7 @@ namespace HR_LEAVEv2.HR
                                 ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*
@@ -1072,10 +1072,10 @@ namespace HR_LEAVEv2.HR
                     {
                         connection.Open();
                         string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @HrId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                         @AffectedEmployeeId,
                                         (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
@@ -1083,7 +1083,7 @@ namespace HR_LEAVEv2.HR
                                 ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                             command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                             /*
@@ -1166,10 +1166,10 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                            INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                            INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                             VALUES ( 
-                                @HrId, 
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                @ActingEmployeeId, 
+                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                 @AffectedEmployeeId,
                                 (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                 @Action, 
@@ -1177,7 +1177,7 @@ namespace HR_LEAVEv2.HR
                         ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*
@@ -1270,10 +1270,10 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                            INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                            INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                             VALUES ( 
-                                @HrId, 
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                @ActingEmployeeId, 
+                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                 @AffectedEmployeeId,
                                 (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                 @Action, 
@@ -1281,7 +1281,7 @@ namespace HR_LEAVEv2.HR
                         ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*

@@ -455,7 +455,27 @@ namespace HR_LEAVEv2.UserControls
                     // if approved then ONLY show undo button
                     else if (leaveStatus == "Approved")
                     {
-                        btnUndoApprove.Visible = true;
+                        int startDateIndex = GetColumnIndexByName(e.Row, "start_date");
+                        string startDate = e.Row.Cells[startDateIndex].Text.ToString();
+
+                        if (!string.IsNullOrEmpty(startDate))
+                        {
+                            DateTime start = DateTime.MinValue;
+                            try
+                            {
+                                start = Convert.ToDateTime(startDate);
+                            } catch(FormatException fe)
+                            {
+                                throw fe;
+                            }
+
+                            // if today is a day before the start date of the application then show undo button
+                            if (DateTime.Compare(DateTime.Today, start) < 0)
+                                btnUndoApprove.Visible = true;
+                            else
+                                btnUndoApprove.Visible = false;
+                        }
+                       
                         btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = false;
                     }
                     else if (leaveStatus == "Not Recommended")
@@ -646,14 +666,111 @@ namespace HR_LEAVEv2.UserControls
                     sqlCommand.CommandText = sql;
                 }
             }
-
+            Boolean isQuerySuccessful;
             // execute sql
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
                 sqlConnection.Open();
                 sqlCommand.Connection = sqlConnection;
-                sqlCommand.ExecuteNonQuery();
+                int rowsAffected = sqlCommand.ExecuteNonQuery();
+
+                isQuerySuccessful = rowsAffected > 0;
                 BindGridView(); // preserve the sort direction in the viewstate
+            }
+
+            // add audit logs
+            if (isQuerySuccessful)
+            {
+                // get employee_id associated with row
+                string employee_id = GridView.DataKeys[index].Values["employee_id"].ToString();
+                string actingEmployeeID, affectedEmployeeId;
+                string action;
+
+                actingEmployeeID = affectedEmployeeId = action = string.Empty;
+
+                // Cancel Leave
+                if (commandName == "cancelLeave")
+                {
+                    actingEmployeeID = affectedEmployeeId = Session["emp_id"].ToString();
+                    action = "Canceled leave application";
+                }
+
+                // Recommend
+                if (commandName == "recommend")
+                {
+                    actingEmployeeID = Session["emp_id"].ToString();
+                    affectedEmployeeId = employee_id;
+                    action = "Recommended leave application";
+                }
+
+                // Not Recommend
+                if (commandName == "notRecommend")
+                {
+                    actingEmployeeID = Session["emp_id"].ToString();
+                    affectedEmployeeId = employee_id;
+                    action = "Unrecommended leave application";
+                }
+
+                // Approve
+                if (commandName == "approved")
+                {
+                    actingEmployeeID = Session["emp_id"].ToString();
+                    affectedEmployeeId = employee_id;
+                    action = "Approved leave application";
+                }
+
+                // Not Approve
+                if (commandName == "notApproved")
+                {
+                    actingEmployeeID = Session["emp_id"].ToString();
+                    affectedEmployeeId = employee_id;
+                    action = "Unapproved leave application";
+                }
+
+                // Undo Approve
+                if (commandName == "undoApprove")
+                {
+                    actingEmployeeID = Session["emp_id"].ToString();
+                    affectedEmployeeId = employee_id;
+                    action = "Undid approval leave application";
+                }
+
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    VALUES ( 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@ActingEmployeeId", actingEmployeeID);
+                            command.Parameters.AddWithValue("@AffectedEmployeeId", affectedEmployeeId);
+
+                            /*
+                             * Add id of leave transaction recommended
+                             * */
+
+                            command.Parameters.AddWithValue("@Action", $"{action}; ID= {transaction_id}");
+
+                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    Console.WriteLine(ex.Message.ToString());
+                }
             }
         }
 
