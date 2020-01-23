@@ -71,10 +71,11 @@
                                 </span>
                             </div>
                             <div class="custom-card-footer">
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
-                                    <i class="fa fa-address-card-o" aria-hidden="true"></i>
-                                    Details
-                                </button>
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                        <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                                    </button>
+                                </span>
                             </div>
                         </div>
                     </td>
@@ -101,10 +102,11 @@
                                 </span>
                             </div>
                             <div class="custom-card-footer">
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
-                                    <i class="fa fa-address-card-o" aria-hidden="true"></i>
-                                    Details
-                                </button>
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                        <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                                    </button>
+                                </span>
                             </div>
                         </div>
                     </td>

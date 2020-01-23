@@ -70,14 +70,14 @@
                                 </span>
                             </div>
                             <div class="custom-card-footer">
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
-                                    <i class="fa fa-address-card-o" aria-hidden="true"></i>
-                                    Details
-                                </button>
-                                <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>">
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                        <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                                    </button>
+                                </span>                               
+                                <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>" class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit">
                                     <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color:black;">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
-                                        Edit
                                     </button>
                                 </a>
                             </div>
@@ -107,14 +107,14 @@
                                 </span>
                             </div>
                             <div class="custom-card-footer">
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
-                                    <i class="fa fa-address-card-o" aria-hidden="true"></i>
-                                    Details
-                                </button>
-                                <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>">
-                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning" style="margin-left: 5px; color:black;">
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                        <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                                    </button>
+                                </span>                               
+                                <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>" class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color:black;">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
-                                        Edit
                                     </button>
                                 </a>
                             </div>
