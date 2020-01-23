@@ -171,13 +171,13 @@ CREATE TABLE [dbo].[employeeposition] (
 
 CREATE TABLE [dbo].[auditlog] (
   [log_id] INT IDENTITY (1, 1) PRIMARY KEY,
-  [hr_id] NVARCHAR (10) NOT NULL,
-  [hr_name] NVARCHAR (60) NOT NULL,
+  [acting_employee_id] NVARCHAR (10) NOT NULL,
+  [acting_employee_name] NVARCHAR (60)NOT NULL,
   [affected_employee_id] NVARCHAR (10) NOT NULL,
   [affected_employee_name] NVARCHAR (60) NOT NULL,
   [action] NVARCHAR (200) NOT NULL,
   [created_at] DATETIME NOT NULL,
 
-  FOREIGN KEY ([hr_id])
+  FOREIGN KEY ([acting_employee_id])
     REFERENCES [dbo].[employee] ([employee_id])
 );
