@@ -31,6 +31,9 @@
         <h1>Edit Leave Application</h1>
     </asp:Panel>
 
+    <%--Edit mode: id of employee--%>
+    <asp:TextBox ID="empIdTxt" runat="server" Visible ="false"></asp:TextBox>
+
     <%--View mode, Edit mode: shows name of employee who submitted the leave application--%>
     <asp:Panel ID="empNamePanel" runat="server">
         <h2 id="empNameHeader" runat="server"></h2>

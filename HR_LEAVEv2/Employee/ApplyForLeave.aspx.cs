@@ -195,6 +195,7 @@ namespace HR_LEAVEv2.Employee
                             }
 
                             //populate form
+                            empIdTxt.Text = ltDetails.empId;
                             empNameHeader.InnerText = ltDetails.empName;
                             txtFrom.Text = ltDetails.startDate;
                             txtTo.Text = ltDetails.endDate;
@@ -554,6 +555,54 @@ namespace HR_LEAVEv2.Employee
                             // hide submit button
                             submitCommentsBtn.Visible = false;
                         }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                Console.WriteLine(ex.Message.ToString());
+            }
+
+            // add audit log
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    VALUES ( 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
+                        command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
+
+                        // hr and supervisor comment
+                        if (!String.IsNullOrEmpty(supComment) && !String.IsNullOrEmpty(hrComment))
+                            command.Parameters.AddWithValue("@Action", $"Submitted supervisor and hr comment; leave_transaction_id= {leaveId}, supervisor_comment= {supComment}, hr_comment= {hrComment}");
+                        else
+                        {
+                            // supervisor comment
+                            if (!String.IsNullOrEmpty(supComment))
+                                command.Parameters.AddWithValue("@Action", $"Submitted supervisor comment; leave_transaction_id= {leaveId}, supervisor_comment= {supComment}");
+
+                            // hr comment
+                            if (!String.IsNullOrEmpty(hrComment))    
+                                command.Parameters.AddWithValue("@Action", $"Submitted HR comment; leave_transaction_id= {leaveId}, hr_comment= {hrComment}");
+                        }
+                        
+
+
+                        command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                        command.ExecuteNonQuery();
                     }
                 }
             }
