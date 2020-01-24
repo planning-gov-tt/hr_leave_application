@@ -52,7 +52,10 @@ namespace HR_LEAVEv2.HR
                     sql = $@"
                         SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
                         FROM [dbo].[employee] e
-                        WHERE e.employee_id != {Session["emp_id"].ToString()}
+                        LEFT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE ep.actual_end_date IS NULL
+                        ORDER BY email ASC;
                     ";
                 }
                 else
@@ -70,6 +73,7 @@ namespace HR_LEAVEv2.HR
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
                         WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND ep.actual_end_date IS NULL
+                        ORDER BY email ASC;
                     ";
                 }
 
@@ -118,7 +122,8 @@ namespace HR_LEAVEv2.HR
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
                         WHERE
-                         ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString) ); 
+                         ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
+                        ORDER BY email ASC; 
                     ";
                 }
                 else
@@ -136,7 +141,8 @@ namespace HR_LEAVEv2.HR
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
                         WHERE ep.employment_type='{emp_type}' AND 
-                        ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString) ); 
+                        ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
+                        ORDER BY email ASC;  
 
                     ";
                 }

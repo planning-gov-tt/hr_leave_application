@@ -27,8 +27,13 @@ namespace HR_LEAVEv2.HR
             if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
 
+            // validator for end date when adding employment records
+            // an end date is required for Public service employment types but is autofilled if empty for Contract employment types
+            endDateRequiredValidator.Enabled = empTypeList.SelectedValue == "Public Service";
+
             if (!this.IsPostBack)
             {
+
                 ViewState["Gridview1_dataSource"] = null;
                 if (Request.QueryString.HasKeys())
                 {
@@ -209,8 +214,8 @@ namespace HR_LEAVEv2.HR
                     dt.Columns.Add("dept_name", typeof(string));
                     dt.Columns.Add("pos_id", typeof(string));
                     dt.Columns.Add("pos_name", typeof(string));
-                    dt.Columns.Add("start_date", typeof(string));
-                    dt.Columns.Add("expected_end_date", typeof(string));
+                    dt.Columns.Add("start_date", typeof(DateTime));
+                    dt.Columns.Add("expected_end_date", typeof(DateTime));
                     dt.Columns.Add("isDeleted", typeof(string));
                 } else
                     dt = ViewState["Gridview1_dataSource"] as DataTable;
@@ -230,8 +235,8 @@ namespace HR_LEAVEv2.HR
                     expected_end_date = Convert.ToDateTime(endDate);
       
                 //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isDeleted
-                dt.Rows.Add(-1,emp_type, dept_id, dept_name, position_id, position_name, startDate, expected_end_date.ToString("MM/dd/yyyy"),"0");
-    
+                dt.Rows.Add(-1,emp_type, dept_id, dept_name, position_id, position_name, Convert.ToDateTime(startDate), expected_end_date,"0");
+
                 ViewState["Gridview1_dataSource"] = dt;
 
                 this.bindGridview();
@@ -262,7 +267,20 @@ namespace HR_LEAVEv2.HR
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
             if(dt != null)
             {
-                GridView1.DataSource = dt;
+                DataTable frontEndDt = dt.Copy();
+                // delete records that have isDeleted = 1
+                foreach (DataRow dr in frontEndDt.Select(""))
+                {
+                    if (dr["isDeleted"].ToString() == "1")
+                        dr.Delete();
+                }
+
+                DataView dataView = frontEndDt.AsDataView();
+                dataView.Sort = "start_date DESC";
+                frontEndDt = dataView.ToTable();
+
+                ViewState["Gridview1_frontend_dataSource"] = frontEndDt;
+                GridView1.DataSource = frontEndDt;
                 GridView1.DataBind();
             }
         }
@@ -278,8 +296,29 @@ namespace HR_LEAVEv2.HR
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
             if(dt != null)
             {
-                // sets isDeleted to 1, ie, deleted
-                dt.Rows[e.RowIndex].SetField<string>(8, "1");
+                // sets isDeleted to 1, ie, deleted for relevant record in dt based on the info from frontEnd datatable
+                DataTable frontEndDt = ViewState["Gridview1_frontend_dataSource"] as DataTable;
+                DataRow rowToBeDeleted = frontEndDt.Rows[e.RowIndex];
+
+                // find index of row with same information in dt
+                foreach(DataRow dr in dt.Rows)
+                {
+                    bool isRowDataEqual = true;
+                    for(int i = 0; i < dr.ItemArray.Length; i += 1)
+                    {
+                        if (dr.ItemArray[i].ToString() != rowToBeDeleted.ItemArray[i].ToString())
+                        {
+                            isRowDataEqual = false;
+                            break;
+                        }
+                    }
+
+                    // set isDeleted
+                    if (isRowDataEqual)
+                        dr.SetField<string>(8, "1");
+                }
+
+                //dt.Rows[e.RowIndex].SetField<string>(8, "1");
                 ViewState["Gridview1_dataSource"] = dt;
             }
             this.bindGridview();
@@ -649,8 +688,8 @@ namespace HR_LEAVEv2.HR
                                 d.dept_name,
                                 ep.position_id pos_id,
                                 p.pos_name,
-                                FORMAT(ep.start_date, 'MM/dd/yyyy') start_date, 
-                                FORMAT(ep.expected_end_date, 'MM/dd/yyyy') expected_end_date,
+                                ep.start_date, 
+                                ep.expected_end_date,
                                 '0' as isDeleted
                                 
                             FROM [dbo].[employeeposition] ep
@@ -1075,14 +1114,6 @@ namespace HR_LEAVEv2.HR
                         connection.Open();
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            //command.Parameters.AddWithValue("@Vacation", currentLeaveBalances["vacation"]);
-                            //command.Parameters.AddWithValue("@Personal", currentLeaveBalances["personal"]);
-                            //command.Parameters.AddWithValue("@Casual", currentLeaveBalances["casual"]);
-                            //command.Parameters.AddWithValue("@Sick", currentLeaveBalances["sick"]);
-                            //command.Parameters.AddWithValue("@Bereavement", currentLeaveBalances["bereavement"]);
-                            //command.Parameters.AddWithValue("@Maternity", currentLeaveBalances["maternity"]);
-                            //command.Parameters.AddWithValue("@PreRetirement", currentLeaveBalances["pre_retirement"]);
-
                             int rowsAffected = command.ExecuteNonQuery();
                             isLeaveEditSuccessful = rowsAffected > 0;
 
@@ -1446,13 +1477,19 @@ namespace HR_LEAVEv2.HR
             // Values of isDeleted and what they mean:
             // isDeleted = 1 ---> Row is deleted
             // isDeleted = 0 ---> Row is not deleted
-            Boolean isDeleted;
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
                 int i = GetColumnIndexByName(e.Row, "isDeleted");
-                isDeleted = e.Row.Cells[i].Text.ToString() == "1";
-                if (isDeleted)
-                    e.Row.CssClass= "hidden";
+
+                // row is deleted if isDeleted = 1
+                if (e.Row.Cells[i].Text.ToString() == "1")
+                    e.Row.CssClass = "hidden";
+
+                i = GetColumnIndexByName(e.Row, "record_id");
+
+                // row is a new record if record_id = -1
+                if (e.Row.Cells[i].Text.ToString() == "-1")
+                    e.Row.CssClass = "new-record";
             }
         }
 
@@ -1465,5 +1502,6 @@ namespace HR_LEAVEv2.HR
             GridView1.HeaderRow.Visible = !isTableEmpty();
 
         }
+
     }
 }

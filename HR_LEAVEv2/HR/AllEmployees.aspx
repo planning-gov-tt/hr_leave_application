@@ -24,6 +24,9 @@
                     <i class="fa fa-times"></i>
                     Clear Search
                 </button>
+                <%--<asp:LinkButton ID="LinkButton2" runat="server" CssClass="btn btn-primary" OnClick="searchBtn_Click" Style="margin-top: 15px; margin-right:5px;">
+                    <i class="fa fa-search"></i>
+                </asp:LinkButton>--%>
                 <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-primary" OnClick="newEmployeeBtn_Click" Style="margin-top: 15px">
                     <i class="fa fa-plus"></i>
                     Add new Employee
