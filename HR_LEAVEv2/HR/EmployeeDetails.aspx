@@ -12,6 +12,10 @@
             margin: 0 5px;
             margin-bottom:25px;
         }
+
+        .new-record{
+            background-color: #e0e0eb;
+        }
     </style>
 
     <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to all employees" OnClick="returnToPreviousBtn_Click">
@@ -40,6 +44,7 @@
 
                     <%--SUCCESSES---------------------------------------------------------------------------------------------%>
 
+                    <%--EDIT EMPLOYEE SUCCESSES-------------------------------------------------------------------------------%>
                     <%--General Successful edit of employee--%>
                     <asp:Panel ID="editFullSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
@@ -72,6 +77,8 @@
                         </span>
                     </asp:Panel>
 
+                    <%--ADD NEW EMPLOYEE SUCCESSES-------------------------------------------------------------------------------%>
+
                     <%--General Successful insert of new employee--%>
                     <asp:Panel ID="fullFormSubmitSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
@@ -81,6 +88,8 @@
                     </asp:Panel>
 
                     <%--ERRORS---------------------------------------------------------------------------------------------------%>
+
+                    <%--EDIT EMPLOYEE ERRORS-------------------------------------------------------------------------------%>
                     <%--General Error in editing employee--%>
                     <asp:Panel ID="editEmpErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
@@ -129,11 +138,21 @@
                         </span>
                     </asp:Panel>
 
+                    <%--ADD NEW EMPLOYEE ERRORS-------------------------------------------------------------------------------%>
+
                     <%--General Error in adding new employee--%>
                     <asp:Panel ID="fullFormErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="Span2" runat="server">Employee not added</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Duplicate primary key: new employee has same employee id as another in the db--%>
+                    <asp:Panel ID="duplicateIdentifierPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span15" runat="server">The entered employee ID already exists in database</span>
                         </span>
                     </asp:Panel>
 
@@ -157,7 +176,7 @@
             </asp:UpdatePanel>
         </asp:Panel>
 
-        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-left: 10px;  margin-bottom: 15px;">
+        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-bottom: 15px;">
                 <i class="fa fa-times" aria-hidden="true"></i>
                 Clear Form
         </asp:LinkButton>
@@ -169,7 +188,13 @@
             <asp:Panel ID="empBasicInfoPanel" runat="server" CssClass="row text-center" Style="background-color: #e0e0eb; padding-bottom: 15px; margin-bottom: 5px;">
                 <h3>IDs and Email</h3>
                 <div class="form-group text-left" style="width: 75%; margin: 0 auto; padding-bottom: 15px;">
-                    <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator11" runat="server" ControlToValidate="employeeIdInput" ErrorMessage="Please enter valid employee ID" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                    <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" 
+                        ID="RegularExpressionValidator11" runat="server" 
+                        ControlToValidate="employeeIdInput" 
+                        ErrorMessage="Please enter valid employee ID" ForeColor="Red" 
+                        ValidationExpression="^[0-9]*$" 
+                        Display="Dynamic" 
+                        Style="float: right;">  
                     </asp:RegularExpressionValidator>
                     <asp:RequiredFieldValidator ValidationGroup="submitFullFormGroup" ID="RequiredFieldValidator4" runat="server" ControlToValidate="employeeIdInput" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" Style="float: right;"></asp:RequiredFieldValidator>
                     <label for="employeeIdInput" style="display: block">Employee ID</label>
@@ -177,14 +202,28 @@
 
                 </div>
                 <div class="form-group text-left" style="width: 75%; margin: 0 auto; padding-bottom: 15px;">
-                    <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator12" runat="server" ControlToValidate="ihrisNumInput" ErrorMessage="Please enter valid IHRIS ID" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                    <asp:RegularExpressionValidator 
+                        ValidationGroup="submitFullFormGroup" 
+                        ID="RegularExpressionValidator12" 
+                        runat="server" 
+                        ControlToValidate="ihrisNumInput" 
+                        ErrorMessage="Please enter valid IHRIS ID" 
+                        ForeColor="Red" 
+                        ValidationExpression="^[0-9]*$" 
+                        Display="Dynamic" 
+                        Style="float: right;">  
                     </asp:RegularExpressionValidator>
                     <asp:RequiredFieldValidator ValidationGroup="submitFullFormGroup" ID="RequiredFieldValidator5" runat="server" ControlToValidate="ihrisNumInput" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" Style="float: right;"></asp:RequiredFieldValidator>
                     <label for="ihrisNumInput" style="display: block">IHRIS ID</label>
                     <asp:TextBox ID="ihrisNumInput" runat="server" CssClass="form-control" placeholder="Enter IHRIS ID" Style="display: inline-block"></asp:TextBox>
                 </div>
                 <div class="form-group text-left" style="width: 75%; margin: 0 auto; padding-bottom: 15px;">
-                    <asp:RegularExpressionValidator ID="RegularExpressionValidator13" runat="server" ControlToValidate="adEmailInput" ErrorMessage="Please enter valid email" ForeColor="Red"
+                    <asp:RegularExpressionValidator 
+                        ID="RegularExpressionValidator13" 
+                        runat="server" 
+                        ControlToValidate="adEmailInput" 
+                        ErrorMessage="Please enter valid email" 
+                        ForeColor="Red"
                         ValidationExpression="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@planning.gov.tt$"
                         Display="Dynamic" Style="float: right;">  
                     </asp:RegularExpressionValidator>
@@ -212,30 +251,30 @@
                         title="Click on any checkbox below to grant higher privileges to an employee"></i>
                     </h3>
                     <div class="form-group" id="authLevelDiv">
-                        <div class="form-check" id="supervisorCheckDiv">
+                        <asp:Panel ID="supervisorCheckDiv" runat="server" CssClass="form-check">
                             <label class="form-check-label" for="supervisorCheck">
                                 <asp:CheckBox ID="supervisorCheck" runat="server" CssClass="form-check-input" />
                                 <span>Supervisor</span>
                             </label>
-                        </div>
-                        <div class="form-check" id="hr1CheckDiv">
+                        </asp:Panel>
+                        <asp:Panel CssClass="form-check" ID="hr1CheckDiv" runat="server">
                             <label class="form-check-label" for="hr1Check">
                                 <asp:CheckBox ID="hr1Check" runat="server" CssClass="form-check-input" />
                                 <span>HR Level 1</span>
                             </label>
-                        </div>
-                        <div class="form-check" id="hr2CheckDiv">
+                        </asp:Panel>
+                        <asp:Panel CssClass="form-check" ID="hr2CheckDiv" runat="server">
                             <label class="form-check-label" for="hr2Check">
                                 <asp:CheckBox ID="hr2Check" runat="server" CssClass="form-check-input" />
                                 <span>HR Level 2</span>
                             </label>
-                        </div>
-                        <div class="form-check" id="hr3CheckDiv">
+                        </asp:Panel>
+                        <asp:Panel CssClass="form-check" ID="hr3CheckDiv" runat="server">
                             <label class="form-check-label" for="hr2Check">
                                 <asp:CheckBox ID="hr3Check" runat="server" CssClass="form-check-input" />
                                 <span>HR Level 3</span>
                             </label>
-                        </div>
+                        </asp:Panel>
                     </div>
                 </div>
                 <div class="row text-center" style="display: none; width: 80%; margin: 0 auto; margin-top: 5px; background-color: #f0f0f5" id="furtherDetailsForHrDiv">
@@ -300,7 +339,7 @@
 
             <%--Bereavement--%>
             <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator8" runat="server" ControlToValidate="bereavementLeaveInput" ErrorMessage="Please enter valid sick leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator8" runat="server" ControlToValidate="bereavementLeaveInput" ErrorMessage="Please enter valid bereavement leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
                 </asp:RegularExpressionValidator>
                 <label for="bereavementLeaveInput">Bereavement Leave</label>
                 <asp:TextBox CssClass="form-control" ID="bereavementLeaveInput" placeholder="Enter bereavement leave balance" runat="server"></asp:TextBox>
@@ -308,7 +347,7 @@
 
             <%--Maternity--%>
             <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator9" runat="server" ControlToValidate="maternityLeaveInput" ErrorMessage="Please enter valid sick leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator9" runat="server" ControlToValidate="maternityLeaveInput" ErrorMessage="Please enter valid maternity leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
                 </asp:RegularExpressionValidator>
                 <label for="maternityLeaveInput">Maternity Leave</label>
                 <asp:TextBox CssClass="form-control" ID="maternityLeaveInput" placeholder="Enter maternity leave balance" runat="server"></asp:TextBox>
@@ -316,7 +355,7 @@
 
             <%--Pre-Retirement--%>
             <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator10" runat="server" ControlToValidate="preRetirementLeaveInput" ErrorMessage="Please enter valid sick leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator10" runat="server" ControlToValidate="preRetirementLeaveInput" ErrorMessage="Please enter valid pre-retirement leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
                 </asp:RegularExpressionValidator>
                 <label for="preRetirementLeaveInput">Pre-retirement Leave</label>
                 <asp:TextBox CssClass="form-control" ID="preRetirementLeaveInput" placeholder="Enter pre-retirement leave balance" runat="server"></asp:TextBox>
@@ -332,7 +371,7 @@
                         <div class="container" style="width: 80%; height: 95%">
                             <div class="form-group" style="margin-top: 25px;">
                                 <label for="empTypeList">Employment Type</label>
-                                <asp:DropDownList ID="empTypeList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource3" DataTextField="type_id" Style="display: inline-block;"></asp:DropDownList>
+                                <asp:DropDownList ID="empTypeList" runat="server" CssClass="form-control" Width="225px" AutoPostBack="true" DataSourceID="SqlDataSource3" DataTextField="type_id" Style="display: inline-block;"></asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [type_id] FROM [employmenttype] ORDER BY [type_id]"></asp:SqlDataSource>
                             </div>
                             <div class="form-group" style="margin-top: 45px;">
@@ -360,7 +399,16 @@
                                     <asp:TextBox ID="txtEndDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
                                     <i id="endDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
                                     <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtEndDate" PopupButtonID="endDateCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
+                                    <asp:RequiredFieldValidator 
+                                        ValidationGroup="empRecord" 
+                                        ID="endDateRequiredValidator" 
+                                        runat="server" 
+                                        ControlToValidate="txtEndDate" 
+                                        Display="Dynamic" 
+                                        ErrorMessage="Required"
+                                        ForeColor="Red">
 
+                                    </asp:RequiredFieldValidator>
                                 </span>
                             </div>
 
@@ -391,19 +439,40 @@
                         </div>
 
                     </asp:Panel>
-
-                    <asp:GridView ID="GridView1" runat="server" BorderStyle="None" CssClass="table" GridLines="Horizontal" OnRowDataBound="GridView1_RowDataBound" OnDataBound="GridView1_DataBound"
-                        AutoGenerateColumns="false" Style="margin: 0 auto;" AutoGenerateDeleteButton="false" AllowSorting="true"
-                        AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" OnRowDeleting="GridView1_RowDeleting">
+                    <%--OnRowDeleting="GridView1_RowDeleting"--%>
+                    <asp:GridView ID="GridView1" 
+                        runat="server" 
+                        BorderStyle="None" CssClass="table" Style="margin: 0 auto;" 
+                        GridLines="Horizontal" 
+                        OnRowDataBound="GridView1_RowDataBound" OnDataBound="GridView1_DataBound" OnRowDeleting="GridView1_RowDeleting"
+                        AutoGenerateColumns="false" 
+                        AutoGenerateDeleteButton="false" 
+                        AllowSorting="true" AllowPaging="true" 
+                        PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging">
                         <Columns>
-                            <asp:CommandField ShowDeleteButton="true" 
-                                DeleteText="<i class='btn btn-danger fa fa-trash-o content-tooltipped' data-toggle='tooltip' data-placement='left' title='Delete employment record' aria-hidden='true' ></i>" CausesValidation="false" />
-                            
+                            <asp:TemplateField HeaderText="Action" Visible="true">
+                                <ItemTemplate>
+                                    <%--delete button--%>
+                                    <asp:LinkButton ID="deleteBtn" 
+                                        runat="server" 
+                                        CssClass="btn btn-danger content-tooltipped" 
+                                        data-toggle="tooltip" 
+                                        data-placement="left" 
+                                        title="Delete employment record"
+                                        OnClientClick="return confirm('Delete record?');" 
+                                        CommandName="delete" 
+                                        CausesValidation="false"
+                                        >
+                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    </asp:LinkButton>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
                             <%--Index 0: Employment record ID--%>
-                            <asp:BoundField HeaderText="Employment Record ID" DataField="record_id" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden"/>
+                            <asp:BoundField HeaderText="Employment Record ID" DataField="record_id" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden" />
 
                             <%--Index 1: Employment Type--%>
-                            <asp:BoundField HeaderText="Employment Type" DataField="employment_type"/>
+                            <asp:BoundField HeaderText="Employment Type" DataField="employment_type" />
 
                             <%--Index 2: Department ID--%>
                             <asp:BoundField HeaderText="Department ID" DataField="dept_id" Visible="false" />
@@ -412,19 +481,19 @@
                             <asp:BoundField HeaderText="Department" DataField="dept_name" />
 
                             <%--Index 4: Position ID--%>
-                            <asp:BoundField HeaderText="Position ID" DataField="pos_id" Visible="false"/>
+                            <asp:BoundField HeaderText="Position ID" DataField="pos_id" Visible="false" />
 
                             <%--Index 5: Position--%>
                             <asp:BoundField HeaderText="Position" DataField="pos_name" />
 
                             <%--Index 6: Start--%>
-                            <asp:BoundField HeaderText="Start" DataField="start_date"/>
+                            <asp:BoundField HeaderText="Start" DataField="start_date" DataFormatString="{0:MM/dd/yyyy}" />
 
                             <%--Index 7: Expected End Date--%>
-                            <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date"  />
+                            <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date" DataFormatString="{0:MM/dd/yyyy}"/>
 
                             <%--Index 8: isDeleted--%>
-                            <asp:BoundField HeaderText="isDeleted" DataField="isDeleted" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden"/>
+                            <asp:BoundField HeaderText="isDeleted" DataField="isDeleted" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden" />
 
                         </Columns>
                     </asp:GridView>
@@ -457,24 +526,26 @@
     <script>
         Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
-            if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
+            if ($('#<%= hr2CheckDiv.ClientID %> input[type="checkbox"], #<%= hr3CheckDiv.ClientID %> input[type="checkbox"]').is(':checked')) {
                 $('#furtherDetailsForHrDiv').css("display", "block");
             }
             else {
                 $('#furtherDetailsForHrDiv').css("display", "none");
                 $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
             }
+
+            $('#authLevelDiv input[type="checkbox"]').click(function (e) {
+                // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
+                if ($('#<%= hr2CheckDiv.ClientID %> input[type="checkbox"], #<%= hr3CheckDiv.ClientID %> input[type="checkbox"]').is(':checked')) {
+                    $('#furtherDetailsForHrDiv').css("display", "block");
+                }
+                else {
+                    $('#furtherDetailsForHrDiv').css("display", "none");
+                    $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
+                }
+            });
         });
 
-        $('#authLevelDiv input[type="checkbox"]').click(function (e) {
-            // show section to choose whether new HR 2,3 employee is dealing with contract or public service 
-            if ($('#hr2CheckDiv input[type="checkbox"], #hr3CheckDiv input[type="checkbox"]').is(':checked')) {
-                $('#furtherDetailsForHrDiv').css("display", "block");
-            }
-            else {
-                $('#furtherDetailsForHrDiv').css("display", "none");
-                $('#furtherDetailsForHrDiv input[type="checkbox"]').prop('checked', false);
-            }
-        });
+        
     </script>
 </asp:Content>

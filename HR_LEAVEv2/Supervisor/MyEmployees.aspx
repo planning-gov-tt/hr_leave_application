@@ -3,14 +3,14 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
-        .custom-no-dp-header-icon {
-            font-size: 8em;
-            margin-top: 15%;
-        }
-
         #leaveCountHeader {
             font-size: 1.75em;
         }
+
+        .custom-no-dp-header-icon {
+    font-size: 8em;
+    margin-top: 15%;
+}
     </style>
 
     <h1><%: Title %></h1>
@@ -57,24 +57,25 @@
                             <h3 style="margin-top: 10px;">
                                 <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h3>
                             <div class="custom-card-body">
-                                <span>
-                                    <h5 style="display: inline;">Employee ID:</h5>
-                                    <asp:Label runat="server" ID="emp_idLabel" Text='<%#Eval("employee_id") %>'></asp:Label>
-                                    <br />
+                                <div>
+                                    <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
+                                    <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
+                                </div>
+                                <span >
+                                    <h5 style="display: inline;" class="custom-card-body-header-text">IHRIS ID:</h5>
+                                    <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </span>
-                                <span>
-                                    <h5 style="display: inline;">IHRIS ID:</h5>
-                                    <asp:Label runat="server" ID="ihris_idLabel" Text='<%#Eval("ihris_id") %>'></asp:Label>
-                                    <br />
-                                </span>
-                                <span>
-                                    <h5 style="margin-bottom: 5px;">Email:</h5>
-                                    <asp:Label runat="server" ID="Label1" Text='<%#Eval("email") %>'></asp:Label>
-                                    <br />
+                                <span >
+                                    <h5 style="margin-bottom: 3px;" class="custom-card-body-header-text">Email:</h5>
+                                    <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </span>
                             </div>
-                            <div style="position: absolute; bottom: 20px; left: 25%;">
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">Employee Details</button>
+                            <div class="custom-card-footer">
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                        <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                                    </button>
+                                </span>
                             </div>
                         </div>
                     </td>
@@ -87,24 +88,25 @@
                             <h3 style="margin-top: 10px;">
                                 <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h3>
                             <div class="custom-card-body">
-                                <span>
-                                    <h5 style="display: inline;">Employee ID:</h5>
-                                    <asp:Label runat="server" ID="emp_idLabel" Text='<%#Eval("employee_id") %>'></asp:Label>
-                                    <br />
+                                <div>
+                                    <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
+                                    <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
+                                </div>
+                                <span >
+                                    <h5 style="display: inline;" class="custom-card-body-header-text">IHRIS ID:</h5>
+                                    <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </span>
-                                <span>
-                                    <h5 style="display: inline;">IHRIS ID:</h5>
-                                    <asp:Label runat="server" ID="ihris_idLabel" Text='<%#Eval("ihris_id") %>'></asp:Label>
-                                    <br />
-                                </span>
-                                <span>
-                                    <h5 style="margin-bottom: 5px;">Email:</h5>
-                                    <asp:Label runat="server" ID="Label1" Text='<%#Eval("email") %>'></asp:Label>
-                                    <br />
+                                <span >
+                                    <h5 style="margin-bottom: 3px;" class="custom-card-body-header-text">Email:</h5>
+                                    <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </span>
                             </div>
-                            <div style="position: absolute; bottom: 20px; left: 25%;">
-                                <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">Employee Details</button>
+                            <div class="custom-card-footer">
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                        <i class="fa fa-address-card-o" aria-hidden="true"></i>
+                                    </button>
+                                </span>
                             </div>
                         </div>
                     </td>

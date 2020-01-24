@@ -38,6 +38,7 @@ namespace HR_LEAVEv2.Employee
                     string mode = Request.QueryString["mode"];
                     string leaveId = Request.QueryString["leaveId"];
 
+                    // populates page and authorizes user based on their permissions, whether the leave application was submitted to them as a supervisor or various HR criteria
                     LeaveTransactionDetails ltDetails = populatePage(leaveId);
                     if (mode == "view")
                         this.adjustPageForViewMode();
@@ -129,59 +130,73 @@ namespace HR_LEAVEv2.Employee
                             // check permissions of current user
                             List<string> permissions = (List<string>)Session["permissions"];
 
-                            // Employee
-                            if (permissions.Contains("emp_permissions") && !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")) && !permissions.Contains("sup_permissions"))
+                            if (!permissions.Contains("hr1_permissions"))
                             {
-                                // employee can only view their own leave applications
-                                if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.empId)
-                                    Response.Redirect("~/AccessDenied.aspx");
+                                // HR 2, HR 3, Supervisors, Employees and every combination
 
-                            }
-                            // Supervisor
-                            if (permissions.Contains("sup_permissions") && !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
-                            {
-                                // supervisor can only view if they were the one who the application was submitted to
-                                if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.supId)
-                                    Response.Redirect("~/AccessDenied.aspx");
-                            }
-                            // HR 1 can see everybody's data
 
-                            // HR 2
-                            if (permissions.Contains("hr2_permissions"))
-                            {
-                                if (!String.IsNullOrEmpty(ltDetails.empType))
+                                if(Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.empId)
                                 {
-                                    // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
-                                    if (
-                                        (
-                                            //check if hr can view applications from the relevant employment type 
-                                            (ltDetails.empType == "Contract" && !permissions.Contains("contract_permissions"))
-                                            ||
-                                            (ltDetails.empType == "Public Service" && !permissions.Contains("public_officer_permissions"))
-                                        )
+                                    // All combinations of HR 2, HR 3, Supervisor and Employee that did not submit the application. This means that only people with HR 2 privileges or 
+                                    // the supervisor who the LA was submitted to can see it
 
-                                        ||
-
-                                        (
-                                            //check if hr can view applications of the relevant leave type
-                                            (ltDetails.typeOfLeave == "Sick" && !permissions.Contains("approve_sick"))
-                                            ||
-                                            (ltDetails.typeOfLeave == "Vacation" && !permissions.Contains("approve_vacation"))
-                                            ||
-                                            (ltDetails.typeOfLeave == "Casual" && !permissions.Contains("approve_casual"))
-                                        )
-                                       )
+                                    // HR 3
+                                    // HR 3 should not have access to leave application data
+                                    if (permissions.Contains("hr3_permissions"))
                                         Response.Redirect("~/AccessDenied.aspx");
 
-                                }
+                                    // HR 2
+                                    if (permissions.Contains("hr2_permissions"))
+                                    {
+                                        if (!String.IsNullOrEmpty(ltDetails.empType))
+                                        {
+                                            // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
+                                            if (
+                                                (
+                                                    //check if hr can view applications from the relevant employment type 
+                                                    (ltDetails.empType == "Contract" && !permissions.Contains("contract_permissions"))
+                                                    ||
+                                                    (ltDetails.empType == "Public Service" && !permissions.Contains("public_officer_permissions"))
+                                                )
+
+                                                ||
+
+                                                (
+                                                    //check if hr can view applications of the relevant leave type
+                                                    (ltDetails.typeOfLeave == "Sick" && !permissions.Contains("approve_sick"))
+                                                    ||
+                                                    (ltDetails.typeOfLeave == "Vacation" && !permissions.Contains("approve_vacation"))
+                                                    ||
+                                                    (ltDetails.typeOfLeave == "Casual" && !permissions.Contains("approve_casual"))
+                                                )
+                                               )
+                                                Response.Redirect("~/AccessDenied.aspx");
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // if emp trying to view LA is supervisor 
+                                        if (permissions.Contains("sup_permissions"))
+                                        {
+                                            //LA was not submitted to them
+                                            if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.supId)
+                                                Response.Redirect("~/AccessDenied.aspx");
+                                        } else
+                                        {
+                                            // if another emp trying to view LA and they did not submit the LA
+                                            if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.empId)
+                                                Response.Redirect("~/AccessDenied.aspx");
+                                        }
+                                        
+                                    }
+                                    
+                                } 
+
                             }
 
-                            // HR 3
-                            // HR 3 should not have access to leave application data
-                            if (permissions.Contains("hr3_permissions"))
-                                Response.Redirect("~/AccessDenied.aspx");
-
                             //populate form
+                            empIdTxt.Text = ltDetails.empId;
                             empNameHeader.InnerText = ltDetails.empName;
                             txtFrom.Text = ltDetails.startDate;
                             txtTo.Text = ltDetails.endDate;
@@ -541,6 +556,54 @@ namespace HR_LEAVEv2.Employee
                             // hide submit button
                             submitCommentsBtn.Visible = false;
                         }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                Console.WriteLine(ex.Message.ToString());
+            }
+
+            // add audit log
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    VALUES ( 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
+                        command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
+
+                        // hr and supervisor comment
+                        if (!String.IsNullOrEmpty(supComment) && !String.IsNullOrEmpty(hrComment))
+                            command.Parameters.AddWithValue("@Action", $"Submitted supervisor and hr comment; leave_transaction_id= {leaveId}, supervisor_comment= {supComment}, hr_comment= {hrComment}");
+                        else
+                        {
+                            // supervisor comment
+                            if (!String.IsNullOrEmpty(supComment))
+                                command.Parameters.AddWithValue("@Action", $"Submitted supervisor comment; leave_transaction_id= {leaveId}, supervisor_comment= {supComment}");
+
+                            // hr comment
+                            if (!String.IsNullOrEmpty(hrComment))    
+                                command.Parameters.AddWithValue("@Action", $"Submitted HR comment; leave_transaction_id= {leaveId}, hr_comment= {hrComment}");
+                        }
+                        
+
+
+                        command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                        command.ExecuteNonQuery();
                     }
                 }
             }

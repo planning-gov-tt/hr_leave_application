@@ -48,7 +48,10 @@ namespace HR_LEAVEv2.Supervisor
                         FROM [dbo].[employee] e
                         JOIN [dbo].assignment a
                         ON e.employee_id = a.supervisee_id
-                        WHERE a.supervisor_id = {Session["emp_id"].ToString()};
+                        LEFT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE ep.actual_end_date IS NULL AND a.supervisor_id = {Session["emp_id"].ToString()}
+                        ORDER BY email ASC;
                     ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -90,9 +93,12 @@ namespace HR_LEAVEv2.Supervisor
                         FROM [dbo].[employee] e
                         JOIN [dbo].assignment a
                         ON e.employee_id = a.supervisee_id
-                        WHERE a.supervisor_id = {Session["emp_id"].ToString()}
+                        LEFT JOIN [dbo].employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE ep.actual_end_date IS NULL AND a.supervisor_id = {Session["emp_id"].ToString()}
                             AND
-                        ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString) ); 
+                        ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
+                        ORDER BY email ASC; 
                     ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))

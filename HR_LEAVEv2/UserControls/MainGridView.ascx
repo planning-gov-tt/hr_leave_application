@@ -14,45 +14,45 @@
 <div id="filterContainer" class="container" style="padding-bottom: 30px">
     <div class="row" style="text-align: right">
         <div class="col-xs-3 form-group">
-            <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
+            <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="bottom" title="Enter submitted from date" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
             <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
-            <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
+            <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="bottom" title="Enter submitted to date" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
             <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" Format="MM/dd/yyyy"/>
         </div>
         <div class="col-xs-3 form-group">
-            <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
+            <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="bottom" title="Enter start date" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
             <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
-            <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
+            <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="bottom" title="Enter end date" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
             <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" Format="MM/dd/yyyy"/>
         </div>
     </div>
     <div id="divTbSupervisor" class="row" runat="server">
         <div class="col-sm-12 form-group" style="text-align: center">
-            <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control" placeholder="Supervisor Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
+            <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="right" title="Enter supervisor name/ID" placeholder="Supervisor Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
     <div id="divTbEmployee" class="row" runat="server">
         <div class="col-sm-12 form-group" style="text-align: center">
-            <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control" placeholder="Employee Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
+            <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="right" title="Enter employee name/ID" placeholder="Employee Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-4">
-            <asp:DropDownList CssClass="form-control" runat="server" ID="ddlType" DataSourceID="SqlDataSource1" DataTextField="type_id" DataValueField="type_id" AppendDataBoundItems="true">
+            <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter type of leave" runat="server" ID="ddlType" DataSourceID="SqlDataSource1" DataTextField="type_id" DataValueField="type_id" AppendDataBoundItems="true">
                 <asp:ListItem Text="Leave Types (All)" Value=""></asp:ListItem>
             </asp:DropDownList>
             <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" SelectCommand="SELECT [type_id] FROM [leavetype] ORDER BY [type_id] DESC"></asp:SqlDataSource>
         </div>
         <div class="col-sm-4">
-            <asp:DropDownList CssClass="form-control" runat="server" ID="ddlStatus">
+            <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter status of leave" runat="server" ID="ddlStatus">
                 <asp:ListItem Text="Status (All)" Value=""></asp:ListItem>
                 <asp:ListItem Text="Pending" Value="Pending"></asp:ListItem>
                 <asp:ListItem Text="Recommended" Value="Recommended"></asp:ListItem>
@@ -63,7 +63,7 @@
             </asp:DropDownList>
         </div>
         <div class="col-sm-4">
-            <asp:DropDownList CssClass="form-control" runat="server" ID="ddlQualified">
+            <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter value for if user is qualified" runat="server" ID="ddlQualified">
                 <asp:ListItem Text="Qualified (All)" Value=""></asp:ListItem>
                 <asp:ListItem Text="Yes" Value="Yes"></asp:ListItem>
                 <asp:ListItem Text="No" Value="No"></asp:ListItem>
@@ -163,6 +163,7 @@
 
                     <%--employee buttons--%>
                     <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Cancel Leave Request" Visible="<%# btnEmpVisible %>" runat="server"
+                        OnClientClick ="return confirm('Cancel leave application?');"
                         CommandName="cancelLeave"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                         <i class="fa fa-trash-o" aria-hidden="true"></i>
@@ -197,7 +198,8 @@
 
                     <asp:LinkButton ID="btnEditLeaveRequest" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request" Visible="<%# btnSupVisible || btnHrVisible %>" runat="server"
                         CommandName="editLeaveRequest"
-                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
+                        CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                        >
                         <i class="fa fa-pencil" aria-hidden="true"></i>
                     </asp:LinkButton>
 

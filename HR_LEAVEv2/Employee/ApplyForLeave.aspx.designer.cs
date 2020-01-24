@@ -49,6 +49,15 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.Panel editModeTitle;
         
         /// <summary>
+        /// empIdTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox empIdTxt;
+        
+        /// <summary>
         /// empNamePanel control.
         /// </summary>
         /// <remarks>

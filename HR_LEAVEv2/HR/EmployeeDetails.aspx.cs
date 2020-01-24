@@ -27,8 +27,13 @@ namespace HR_LEAVEv2.HR
             if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
 
+            // validator for end date when adding employment records
+            // an end date is required for Public service employment types but is autofilled if empty for Contract employment types
+            endDateRequiredValidator.Enabled = empTypeList.SelectedValue == "Public Service";
+
             if (!this.IsPostBack)
             {
+
                 ViewState["Gridview1_dataSource"] = null;
                 if (Request.QueryString.HasKeys())
                 {
@@ -37,6 +42,7 @@ namespace HR_LEAVEv2.HR
 
                     if (mode == "edit")
                     {
+                        // populates page and authorizes HR user based on employee's employment type
                         populatePage(empId);
                         this.adjustPageForEditMode();
                     }
@@ -68,7 +74,18 @@ namespace HR_LEAVEv2.HR
 
             //authorizations
             //if hr 1 then authorizations can be edited
-            authorizationLevelPanel.Visible = permissions.Contains("hr1_permissions");
+
+            if (permissions.Contains("hr1_permissions"))
+            {
+                authorizationLevelPanel.Visible = true;
+            }
+            else
+            {
+                if (permissions.Contains("hr2_permissions"))
+                    hr1CheckDiv.Visible = false;
+                else if (permissions.Contains("hr3_permissions"))
+                    hr1CheckDiv.Visible = hr2CheckDiv.Visible = false;
+            }
 
             //add emp record
             addEmpRecordForm.Visible = false;
@@ -197,8 +214,8 @@ namespace HR_LEAVEv2.HR
                     dt.Columns.Add("dept_name", typeof(string));
                     dt.Columns.Add("pos_id", typeof(string));
                     dt.Columns.Add("pos_name", typeof(string));
-                    dt.Columns.Add("start_date", typeof(string));
-                    dt.Columns.Add("expected_end_date", typeof(string));
+                    dt.Columns.Add("start_date", typeof(DateTime));
+                    dt.Columns.Add("expected_end_date", typeof(DateTime));
                     dt.Columns.Add("isDeleted", typeof(string));
                 } else
                     dt = ViewState["Gridview1_dataSource"] as DataTable;
@@ -218,8 +235,8 @@ namespace HR_LEAVEv2.HR
                     expected_end_date = Convert.ToDateTime(endDate);
       
                 //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isDeleted
-                dt.Rows.Add(-1,emp_type, dept_id, dept_name, position_id, position_name, startDate, expected_end_date.ToString("MM/dd/yyyy"),"0");
-    
+                dt.Rows.Add(-1,emp_type, dept_id, dept_name, position_id, position_name, Convert.ToDateTime(startDate), expected_end_date,"0");
+
                 ViewState["Gridview1_dataSource"] = dt;
 
                 this.bindGridview();
@@ -250,7 +267,20 @@ namespace HR_LEAVEv2.HR
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
             if(dt != null)
             {
-                GridView1.DataSource = dt;
+                DataTable frontEndDt = dt.Copy();
+                // delete records that have isDeleted = 1
+                foreach (DataRow dr in frontEndDt.Select(""))
+                {
+                    if (dr["isDeleted"].ToString() == "1")
+                        dr.Delete();
+                }
+
+                DataView dataView = frontEndDt.AsDataView();
+                dataView.Sort = "start_date DESC";
+                frontEndDt = dataView.ToTable();
+
+                ViewState["Gridview1_frontend_dataSource"] = frontEndDt;
+                GridView1.DataSource = frontEndDt;
                 GridView1.DataBind();
             }
         }
@@ -266,8 +296,29 @@ namespace HR_LEAVEv2.HR
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
             if(dt != null)
             {
-                // sets isDeleted to 1, ie, deleted
-                dt.Rows[e.RowIndex].SetField<string>(8, "1");
+                // sets isDeleted to 1, ie, deleted for relevant record in dt based on the info from frontEnd datatable
+                DataTable frontEndDt = ViewState["Gridview1_frontend_dataSource"] as DataTable;
+                DataRow rowToBeDeleted = frontEndDt.Rows[e.RowIndex];
+
+                // find index of row with same information in dt
+                foreach(DataRow dr in dt.Rows)
+                {
+                    bool isRowDataEqual = true;
+                    for(int i = 0; i < dr.ItemArray.Length; i += 1)
+                    {
+                        if (dr.ItemArray[i].ToString() != rowToBeDeleted.ItemArray[i].ToString())
+                        {
+                            isRowDataEqual = false;
+                            break;
+                        }
+                    }
+
+                    // set isDeleted
+                    if (isRowDataEqual)
+                        dr.SetField<string>(8, "1");
+                }
+
+                //dt.Rows[e.RowIndex].SetField<string>(8, "1");
                 ViewState["Gridview1_dataSource"] = dt;
             }
             this.bindGridview();
@@ -280,7 +331,7 @@ namespace HR_LEAVEv2.HR
             this.clearErrors();
 
             // IDs, email
-            string emp_id, ihris_id, email, firstname, lastname;
+            string emp_id, ihris_id, email, firstname, lastname, username;
 
             emp_id = employeeIdInput.Text;
             ihris_id = ihrisNumInput.Text;
@@ -289,14 +340,18 @@ namespace HR_LEAVEv2.HR
             // get first name, last name and username from active directory
             Auth auth = new Auth();
             string nameFromAd = auth.getUserInfoFromActiveDirectory(email);
+            firstname = lastname = username = string.Empty;
 
-            // set first and last name
-            string[] name = nameFromAd.Split(' ');
-            firstname = name[0];
-            lastname = name[1];
+            if (!String.IsNullOrEmpty(nameFromAd))
+            {
+                // set first and last name
+                string[] name = nameFromAd.Split(' ');
+                firstname = name[0];
+                lastname = name[1];
 
-            //set username
-            string username = $"PLANNING\\ {firstname} {lastname}";
+                //set username
+                username = $"PLANNING\\ {firstname} {lastname}";
+            }
 
             // Leave Balances 
             Dictionary<string, string> currentLeaveBalances = new Dictionary<string, string>();
@@ -334,7 +389,8 @@ namespace HR_LEAVEv2.HR
             // Employment Records
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
 
-            Boolean isInsertSuccessful = false;
+            Boolean isInsertSuccessful, isDuplicateIdentifier;
+            isInsertSuccessful = isDuplicateIdentifier = false;
 
             // name from AD must be populated because that means the user exists in AD
             // dt cannot be null because that means that no employment record is added
@@ -404,6 +460,8 @@ namespace HR_LEAVEv2.HR
                 catch (Exception ex)
                 {
                     // exception logic
+                    if (ex.Message.ToString().Contains("Violation of PRIMARY KEY constraint") || ex.Message.ToString().Contains("Cannot insert duplicate key in object 'dbo.employee'"))
+                        isDuplicateIdentifier = true;
                     isInsertSuccessful = false;
                 }
 
@@ -447,6 +505,8 @@ namespace HR_LEAVEv2.HR
                             break;
                         }
                     }
+
+                    // Employment Records
                     if (isInsertSuccessful)
                     {
                         isInsertSuccessful = false;
@@ -515,14 +575,6 @@ namespace HR_LEAVEv2.HR
                     }
                 }
             }
-            else
-            {
-                if (String.IsNullOrEmpty(nameFromAd))
-                    emailNotFoundErrorPanel.Style.Add("display", "inline-block");
-                if (dt == null)
-                    noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
-                isInsertSuccessful = false;
-            }
 
             if (isInsertSuccessful)
             {
@@ -533,10 +585,10 @@ namespace HR_LEAVEv2.HR
                     {
                         connection.Open();
                         string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @HrId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                         @AffectedEmployeeId,
                                         (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
@@ -544,7 +596,7 @@ namespace HR_LEAVEv2.HR
                                 ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                             command.Parameters.AddWithValue("@AffectedEmployeeId", emp_id);
 
                             /*
@@ -565,8 +617,18 @@ namespace HR_LEAVEv2.HR
                     //exception logic
                     Console.WriteLine(ex.Message.ToString());
                 }
-            } else
+            }
+            else
+            {
                 fullFormErrorPanel.Style.Add("display", "inline-block");
+                if (String.IsNullOrEmpty(nameFromAd))
+                    emailNotFoundErrorPanel.Style.Add("display", "inline-block");
+                if (dt == null)
+                    noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
+                if(isDuplicateIdentifier)
+                    duplicateIdentifierPanel.Style.Add("display", "inline-block");
+            }
+                
 
             //scroll to top of page
             Page.MaintainScrollPositionOnPostBack = false;
@@ -601,6 +663,7 @@ namespace HR_LEAVEv2.HR
             addEmpRecordsErrorPanel.Style.Add("display", "none");
 
             fullFormErrorPanel.Style.Add("display", "none");
+            duplicateIdentifierPanel.Style.Add("display", "none");
             emailNotFoundErrorPanel.Style.Add("display", "none");
             noEmploymentRecordEnteredErrorPanel.Style.Add("display", "none");
             fullFormSubmitSuccessPanel.Style.Add("display", "none");
@@ -608,6 +671,70 @@ namespace HR_LEAVEv2.HR
 
         protected void populatePage(string empId)
         {
+            // get employment record and populate gridview
+            // the sql command executed also initializes the isDeleted field as 0 to meant 'not deleted'
+            // employment records are loaded first in order to check the employment type such that the current HR viewing the page can be authorized
+            DataTable dataTable = null;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                            SELECT 
+                                ep.id record_id,
+                                ep.employment_type,
+                                ep.dept_id,
+                                d.dept_name,
+                                ep.position_id pos_id,
+                                p.pos_name,
+                                ep.start_date, 
+                                ep.expected_end_date,
+                                '0' as isDeleted
+                                
+                            FROM [dbo].[employeeposition] ep
+
+                            LEFT JOIN [dbo].[department] d
+                            ON d.dept_id = ep.dept_id
+    
+                            LEFT JOIN [dbo].[position] p
+                            ON p.pos_id = ep.position_id
+
+                            WHERE employee_id = {empId}
+                            ORDER BY start_date DESC;
+                    ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
+                        dataTable = new DataTable();
+                        sqlDataAdapter.Fill(dataTable);
+
+                        ViewState["Gridview1_dataSource"] = dataTable;
+                        this.bindGridview();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                Console.WriteLine(ex.Message.ToString());
+            }
+
+            // the following code ensures that the current HR can view and edit the information presented based on the employee's employment type
+            if(dataTable != null && dataTable.Rows.Count > 0)
+            {
+                // the first row in the dataTable is used because the data is ordered by start date such that the first record will show the most recent employment record. This
+                // will therefore contain the most recent and accurate employment type: Contract or Public Service. Using this, the permissions are used for authorization
+                string empType = dataTable.Rows[0].ItemArray[1].ToString();
+                if (!permissions.Contains("hr1_permissions"))
+                {
+                    // the HR 2, HR 3 must have permissions to view data for the same employment type as for the employee who submitted the application
+                    //check if hr can view applications from the relevant employment type 
+                    if ((empType == "Contract" && !permissions.Contains("contract_permissions")) || (empType == "Public Service" && !permissions.Contains("public_officer_permissions")))
+                        Response.Redirect("~/AccessDenied.aspx");
+                }
+            }
+            
 
             // get roles and populate checkboxes
             try
@@ -728,53 +855,7 @@ namespace HR_LEAVEv2.HR
             {
                 //exception logic
                 Console.WriteLine(ex.Message.ToString());
-            }
-
-            // get employment record and populate gridview
-            // the sql command executed also initializes the isDeleted field as 0 to meant 'not deleted'
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-                    string sql = $@"
-                            SELECT 
-                                ep.id record_id,
-                                ep.employment_type,
-                                ep.dept_id,
-                                d.dept_name,
-                                ep.position_id pos_id,
-                                p.pos_name,
-                                FORMAT(ep.start_date, 'MM/dd/yyyy') start_date, 
-                                FORMAT(ep.expected_end_date, 'MM/dd/yyyy') expected_end_date,
-                                '0' as isDeleted
-                                
-                            FROM [dbo].[employeeposition] ep
-
-                            LEFT JOIN [dbo].[department] d
-                            ON d.dept_id = ep.dept_id
-    
-                            LEFT JOIN [dbo].[position] p
-                            ON p.pos_id = ep.position_id
-
-                            WHERE employee_id = {empId};
-                    ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
-                        DataTable dataTable = new DataTable(); 
-                        sqlDataAdapter.Fill(dataTable);
-
-                        ViewState["Gridview1_dataSource"] = dataTable;
-                        this.bindGridview();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //exception logic
-                Console.WriteLine(ex.Message.ToString());
-            }
+            } 
 
         }
 
@@ -867,10 +948,10 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @HrId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                         @AffectedEmployeeId,
                                         (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
@@ -878,7 +959,7 @@ namespace HR_LEAVEv2.HR
                                 ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*
@@ -915,7 +996,7 @@ namespace HR_LEAVEv2.HR
                 if (addedRoles.Count > 0)
                 {
                     // add roles back to employee 
-                    foreach (string role in authorizations)
+                    foreach (string role in addedRoles)
                     {
                         try
                         {
@@ -955,10 +1036,10 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @HrId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                         @AffectedEmployeeId,
                                         (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
@@ -966,7 +1047,7 @@ namespace HR_LEAVEv2.HR
                                 ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*
@@ -1033,14 +1114,6 @@ namespace HR_LEAVEv2.HR
                         connection.Open();
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            //command.Parameters.AddWithValue("@Vacation", currentLeaveBalances["vacation"]);
-                            //command.Parameters.AddWithValue("@Personal", currentLeaveBalances["personal"]);
-                            //command.Parameters.AddWithValue("@Casual", currentLeaveBalances["casual"]);
-                            //command.Parameters.AddWithValue("@Sick", currentLeaveBalances["sick"]);
-                            //command.Parameters.AddWithValue("@Bereavement", currentLeaveBalances["bereavement"]);
-                            //command.Parameters.AddWithValue("@Maternity", currentLeaveBalances["maternity"]);
-                            //command.Parameters.AddWithValue("@PreRetirement", currentLeaveBalances["pre_retirement"]);
-
                             int rowsAffected = command.ExecuteNonQuery();
                             isLeaveEditSuccessful = rowsAffected > 0;
 
@@ -1060,10 +1133,10 @@ namespace HR_LEAVEv2.HR
                     {
                         connection.Open();
                         string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
-                                        @HrId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                         @AffectedEmployeeId,
                                         (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                         @Action, 
@@ -1071,7 +1144,7 @@ namespace HR_LEAVEv2.HR
                                 ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                             command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                             /*
@@ -1154,10 +1227,10 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                            INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                            INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                             VALUES ( 
-                                @HrId, 
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                @ActingEmployeeId, 
+                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                 @AffectedEmployeeId,
                                 (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                 @Action, 
@@ -1165,7 +1238,7 @@ namespace HR_LEAVEv2.HR
                         ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*
@@ -1258,10 +1331,10 @@ namespace HR_LEAVEv2.HR
                         {
                             connection.Open();
                             string sql = $@"
-                            INSERT INTO [dbo].[auditlog] ([hr_id], [hr_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                            INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                             VALUES ( 
-                                @HrId, 
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @HrId), 
+                                @ActingEmployeeId, 
+                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
                                 @AffectedEmployeeId,
                                 (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
                                 @Action, 
@@ -1269,7 +1342,7 @@ namespace HR_LEAVEv2.HR
                         ";
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                command.Parameters.AddWithValue("@HrId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
                                 /*
@@ -1404,13 +1477,19 @@ namespace HR_LEAVEv2.HR
             // Values of isDeleted and what they mean:
             // isDeleted = 1 ---> Row is deleted
             // isDeleted = 0 ---> Row is not deleted
-            Boolean isDeleted;
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
                 int i = GetColumnIndexByName(e.Row, "isDeleted");
-                isDeleted = e.Row.Cells[i].Text.ToString() == "1";
-                if (isDeleted)
-                    e.Row.CssClass= "hidden";
+
+                // row is deleted if isDeleted = 1
+                if (e.Row.Cells[i].Text.ToString() == "1")
+                    e.Row.CssClass = "hidden";
+
+                i = GetColumnIndexByName(e.Row, "record_id");
+
+                // row is a new record if record_id = -1
+                if (e.Row.Cells[i].Text.ToString() == "-1")
+                    e.Row.CssClass = "new-record";
             }
         }
 
@@ -1423,5 +1502,6 @@ namespace HR_LEAVEv2.HR
             GridView1.HeaderRow.Visible = !isTableEmpty();
 
         }
+
     }
 }
