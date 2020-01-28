@@ -9,7 +9,7 @@
     <h1><%: Title %></h1>
     <div class="container-fluid">
         <div class="container" style="width: 65%;">
-            <div class="row text-center" style="margin-top: 25px;">
+            <div class="row text-center" style="margin-top: 20px;">
                 <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group" Width="510px" Style="margin: 0 auto;">
                     <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control" placeholder="Search Employee" aria-label="Search Employee" aria-describedby="basic-addon2" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
                     <div class="input-group-addon">
@@ -24,16 +24,19 @@
                     <i class="fa fa-times"></i>
                     Clear Search
                 </button>
-                <%--<asp:LinkButton ID="LinkButton2" runat="server" CssClass="btn btn-primary" OnClick="searchBtn_Click" Style="margin-top: 15px; margin-right:5px;">
-                    <i class="fa fa-search"></i>
-                </asp:LinkButton>--%>
-                <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-primary" OnClick="newEmployeeBtn_Click" Style="margin-top: 15px">
+                <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-primary" OnClick="newEmployeeBtn_Click" Style="margin-top: 15px; margin-right:5px;">
                     <i class="fa fa-plus"></i>
                     Add new Employee
                 </asp:LinkButton>
+                <asp:DropDownList ID="employeeStatusDropDown" runat="server" OnSelectedIndexChanged="employeeStatusDropDown_SelectedIndexChanged" AutoPostBack="true"
+                    CssClass="form-control" Width="100px" Style="margin: 0 auto; margin-top:15px; display:inline;">
+                    <asp:ListItem Selected="True">Active</asp:ListItem>
+                    <asp:ListItem>Inactive</asp:ListItem>
+                </asp:DropDownList>
+                
             </div>
         </div>
-        <div class="container" style="margin-top: 55px;">
+        <div class="container" style="margin-top: 30px;">
             <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;">
                 <EmptyDataTemplate>
                     <div class="alert alert-info text-center" role="alert" style="width: 30%; margin: auto">
@@ -54,12 +57,11 @@
                     <td align="center">
                         <div class="custom-card" style="position: relative;">
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
-                            <h4 style="margin-top: 10px;">
-                                <strong>
-                                    <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></strong>
-
+                            <h4 style="margin-top: 10px; margin-bottom:0px;">
+                                <strong><asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></strong>
                             </h4>
                             <div class="custom-card-body">
+                                <div class='<%#Eval("bootstrapClass") %>'><%#Eval("isActive") %></div>
                                 <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
                                     <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
@@ -93,11 +95,11 @@
                     <td align="center">
                         <div class="custom-card" style="margin-left: 20px; margin-right: 20px; position: relative;">
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
-                            <h4 style="margin-top: 10px;">
-                                <strong>
-                                    <asp:Label runat="server" ID="Label2" Text='<%#Eval("Name") %>'></asp:Label></strong>
+                            <h4 style="margin-top: 10px; margin-bottom:0px;">
+                                <strong><asp:Label runat="server" ID="Label2" Text='<%#Eval("Name") %>'></asp:Label></strong>
                             </h4>
                             <div class="custom-card-body">
+                                <div class='<%#Eval("bootstrapClass") %>'><%#Eval("isActive") %></div>
                                 <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
                                     <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
