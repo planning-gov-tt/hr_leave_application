@@ -41,6 +41,13 @@
         <asp:Panel ID="validationRowPanel" runat="server" CssClass="row text-center" Style="margin-top: 25px;">
             <asp:UpdatePanel ID="UpdatePanel2" runat="server">
                 <ContentTemplate>
+                    <%--NO EDITS MADE---------------------------------------------------------------------------------------------%>
+                    <asp:Panel ID="noChangesMadePanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-info">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            <span id="Span18" runat="server">No changes made</span>
+                        </span>
+                    </asp:Panel>
 
                     <%--SUCCESSES---------------------------------------------------------------------------------------------%>
 
@@ -57,7 +64,7 @@
                     <asp:Panel ID="editRolesSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span5" runat="server">Employee roles successfully edited</span>
+                            <span id="Span5" runat="server">Authorizations successfully edited</span>
                         </span>
                     </asp:Panel>
 
@@ -65,7 +72,7 @@
                      <asp:Panel ID="editLeaveSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span7" runat="server">Employee leave balances successfully edited</span>
+                            <span id="Span7" runat="server">Leave balances successfully edited</span>
                         </span>
                     </asp:Panel>
 
@@ -73,7 +80,7 @@
                      <asp:Panel ID="editEmpRecordSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span8" runat="server">Employee employment records successfully edited</span>
+                            <span id="Span8" runat="server">Employment record(s) successfully edited</span>
                         </span>
                     </asp:Panel>
 
@@ -102,7 +109,7 @@
                     <asp:Panel ID="editRolesErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span10" runat="server">Roles not edited</span>
+                            <span id="Span10" runat="server">Authorizations not edited</span>
                         </span>
                     </asp:Panel>
 
@@ -118,7 +125,7 @@
                     <asp:Panel ID="editEmpRecordErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span12" runat="server">Employment Record not edited</span>
+                            <span id="Span12" runat="server">Employment Record(s) not edited</span>
                         </span>
                     </asp:Panel>
 
@@ -432,6 +439,10 @@
                                 <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
+                                </asp:Panel>
+                                <asp:Panel ID="duplicateRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span17" runat="server">Cannot add duplicate record</span>
                                 </asp:Panel>
                             </div>
                         </div>
