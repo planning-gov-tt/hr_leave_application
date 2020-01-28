@@ -193,13 +193,8 @@
 
                     </asp:DropDownList>
                 </div>
-
-                <asp:UpdatePanel ID="UpdatePanel1" runat="server">
-                    <ContentTemplate>
-                        <asp:ContentPlaceHolder ID="MainContent" runat="server">
-                        </asp:ContentPlaceHolder>
-                    </ContentTemplate>
-                </asp:UpdatePanel>
+                <asp:ContentPlaceHolder ID="MainContent" runat="server">
+                </asp:ContentPlaceHolder>
             </div>
 
         </div>      

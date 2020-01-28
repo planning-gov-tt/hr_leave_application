@@ -54,7 +54,7 @@ namespace HR_LEAVEv2.HR
                         FROM [dbo].[employee] e
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
-                        WHERE ep.actual_end_date IS NULL
+                        WHERE ep.actual_end_date IS NULL AND e.employee_id <> {Session["emp_id"].ToString()}
                         ORDER BY email ASC;
                     ";
                 }
@@ -72,7 +72,7 @@ namespace HR_LEAVEv2.HR
                         FROM [dbo].[employee] e
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
-                        WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND ep.actual_end_date IS NULL
+                        WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND ep.actual_end_date IS NULL AND e.employee_id <> {Session["emp_id"].ToString()}
                         ORDER BY email ASC;
                     ";
                 }
@@ -122,7 +122,8 @@ namespace HR_LEAVEv2.HR
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
                         WHERE
-                         ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
+                            ep.actual_end_date IS NULL AND e.employee_id <> {Session["emp_id"].ToString()} AND
+                            ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
                         ORDER BY email ASC; 
                     ";
                 }
@@ -140,7 +141,7 @@ namespace HR_LEAVEv2.HR
                         FROM [dbo].[employee] e
                         LEFT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
-                        WHERE ep.employment_type='{emp_type}' AND 
+                        WHERE ep.employment_type='{emp_type}' AND AND e.employee_id <> {Session["emp_id"].ToString()} AND ep.actual_end_date IS NULL AND 
                         ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
                         ORDER BY email ASC;  
 

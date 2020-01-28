@@ -20,7 +20,7 @@
                         </asp:LinkButton>
                     </div>
                 </asp:Panel>
-                <button id="clearSearchBtn" class="btn btn-primary" style="display:none; margin-top:15px; margin-right:5px;">
+                <button id="clearSearchBtn" class="btn btn-primary" style="display: none; margin-top: 15px; margin-right: 5px;">
                     <i class="fa fa-times"></i>
                     Clear Search
                 </button>
@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="container" style="margin-top: 55px;">
-            <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;" >
+            <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;">
                 <EmptyDataTemplate>
                     <div class="alert alert-info text-center" role="alert" style="width: 30%; margin: auto">
                         <i class="fa fa-info-circle"></i>
@@ -55,31 +55,32 @@
                         <div class="custom-card" style="position: relative;">
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
                             <h4 style="margin-top: 10px;">
-                                <strong><asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></strong>
-                                
+                                <strong>
+                                    <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></strong>
+
                             </h4>
                             <div class="custom-card-body">
                                 <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
                                     <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </div>
-                                <span >
+                                <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">IHRIS ID:</h5>
                                     <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </span>
-                                <span >
+                                </div>
+                                <div>
                                     <h5 style="margin-bottom: 3px;" class="custom-card-body-header-text">Email:</h5>
                                     <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </span>
+                                </div>
                             </div>
                             <div class="custom-card-footer">
                                 <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
                                     <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
                                         <i class="fa fa-address-card-o" aria-hidden="true"></i>
                                     </button>
-                                </span>                               
+                                </span>
                                 <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>" class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit">
-                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color:black;">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color: black;">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                     </button>
                                 </a>
@@ -93,30 +94,31 @@
                         <div class="custom-card" style="margin-left: 20px; margin-right: 20px; position: relative;">
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
                             <h4 style="margin-top: 10px;">
-                                <strong><asp:Label runat="server" ID="Label2" Text='<%#Eval("Name") %>'></asp:Label></strong>
+                                <strong>
+                                    <asp:Label runat="server" ID="Label2" Text='<%#Eval("Name") %>'></asp:Label></strong>
                             </h4>
                             <div class="custom-card-body">
                                 <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
                                     <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </div>
-                                <span >
+                                <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">IHRIS ID:</h5>
                                     <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </span>
-                                <span>
+                                </div>
+                                <div>
                                     <h5 style="margin-bottom: 3px;" class="custom-card-body-header-text">Email:</h5>
                                     <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </span>
+                                </div>
                             </div>
                             <div class="custom-card-footer">
                                 <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
                                     <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
                                         <i class="fa fa-address-card-o" aria-hidden="true"></i>
                                     </button>
-                                </span>                               
+                                </span>
                                 <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>" class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit">
-                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color:black;">
+                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color: black;">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                     </button>
                                 </a>
@@ -147,12 +149,11 @@
             </asp:ListView>
             <asp:DataPager ID="DataPager1" PagedControlID="ListView1" PageSize="8" runat="server">
                 <Fields>
-                    <asp:NumericPagerField ButtonType="Link"/>                
+                    <asp:NumericPagerField ButtonType="Link" />
                 </Fields>
             </asp:DataPager>
 
             <%--Modal--%>
-
             <div class="modal fade" id="empDetailsModal" tabindex="-1" role="dialog" aria-labelledby="empDetailsTitle" aria-hidden="true">
                 <div class="modal-dialog" role="document" style="width: 65%;">
                     <div class="modal-content">
@@ -224,7 +225,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
