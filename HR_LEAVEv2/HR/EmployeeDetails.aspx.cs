@@ -212,7 +212,7 @@ namespace HR_LEAVEv2.HR
              * 4. employment type
              * 5. dept
              */
-
+            clearErrors();
             string  position_id, position_name, startDate, endDate, emp_type, dept_id, dept_name;
             emp_type = empTypeList.SelectedValue;
             startDate = txtStartDate.Text.ToString();
@@ -256,11 +256,32 @@ namespace HR_LEAVEv2.HR
                 }
                 else
                     expected_end_date = Convert.ToDateTime(endDate);
-      
-                //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged
-                dt.Rows.Add(-1,emp_type, dept_id, dept_name, position_id, position_name, Convert.ToDateTime(startDate), expected_end_date,"0", "");
 
-                ViewState["Gridview1_dataSource"] = dt;
+                bool isDuplicate = false;
+                // check that row is not a duplicate row by comparing employment_type, dept_id, pos_id and start_date
+                foreach(DataRow dr in dt.Rows)
+                {
+                    string dtEmpType = dr.ItemArray[(int)add_emp_records_columns.employment_type].ToString(),
+                           dtDeptId = dr.ItemArray[(int)add_emp_records_columns.dept_id].ToString(),
+                           dtPosId = dr.ItemArray[(int)add_emp_records_columns.pos_id].ToString(),
+                           dtStartDate = Convert.ToDateTime(dr.ItemArray[(int)add_emp_records_columns.start_date]).ToString("MM/dd/yyyy");
+
+                    if (dtEmpType == emp_type && dtDeptId == dept_id && dtPosId == position_id && dtStartDate == startDate)
+                    {
+                        isDuplicate = true;
+                        break;
+                    }
+                }
+
+                if (!isDuplicate)
+                {
+                    //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged
+                    dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, Convert.ToDateTime(startDate), expected_end_date, "0", "");
+
+                    ViewState["Gridview1_dataSource"] = dt;
+                }    
+                else
+                    duplicateRecordPanel.Style.Add("display", "inline-block");
 
                 this.bindGridview();
 
@@ -297,9 +318,8 @@ namespace HR_LEAVEv2.HR
                     if (dr["isChanged"].ToString() == "1")
                         dr.Delete();
                 }
-
                 DataView dataView = frontEndDt.AsDataView();
-                dataView.Sort = "start_date DESC";
+                dataView.Sort = "start_date DESC, actual_end_date ASC";
                 frontEndDt = dataView.ToTable();
 
                 ViewState["Gridview1_frontend_dataSource"] = frontEndDt;
@@ -314,22 +334,20 @@ namespace HR_LEAVEv2.HR
             this.bindGridview();
         }
 
-        protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        protected int getIndexOfRelevantRowInBackendDataTable(DataRow rowToFind)
         {
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
-            if(dt != null)
+            if (dt != null)
             {
-                // sets isChanged to 1, ie, deleted for relevant record in dt based on the info from frontEnd datatable
-                DataTable frontEndDt = ViewState["Gridview1_frontend_dataSource"] as DataTable;
-                DataRow rowToBeDeleted = frontEndDt.Rows[e.RowIndex];
+                int index = 0;
 
-                // find index of row with same information in dt
-                foreach(DataRow dr in dt.Rows)
+                // find index of row with same information in rowToFind
+                foreach (DataRow dr in dt.Rows)
                 {
                     bool isRowFound = true;
-                    for(int i = 0; i < dr.ItemArray.Length; i += 1)
+                    for (int i = 0; i < dr.ItemArray.Length; i += 1)
                     {
-                        if (dr.ItemArray[i].ToString() != rowToBeDeleted.ItemArray[i].ToString())
+                        if (dr.ItemArray[i].ToString() != rowToFind.ItemArray[i].ToString())
                         {
                             isRowFound = false;
                             break;
@@ -338,10 +356,30 @@ namespace HR_LEAVEv2.HR
 
                     // set isChanged
                     if (isRowFound)
-                        dr.SetField<string>((int)add_emp_records_columns.isChanged, "1");
-                }
+                        return index;
 
-                ViewState["Gridview1_dataSource"] = dt;
+                    index += 1;
+                }
+            }
+
+            return -1;
+        } 
+
+        protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+            if(dt != null)
+            {
+                // sets isChanged to 1, ie, deleted for relevant record in dt based on the info from frontEnd datatable
+                DataTable frontEndDt = ViewState["Gridview1_frontend_dataSource"] as DataTable;
+                DataRow rowToBeDeleted = frontEndDt.Rows[e.RowIndex];
+                int indexOfRowInDt = getIndexOfRelevantRowInBackendDataTable(rowToBeDeleted);
+                if(indexOfRowInDt != -1)
+                {
+                    dt.Rows[indexOfRowInDt].SetField<string>((int)add_emp_records_columns.isChanged, "1");
+                    ViewState["Gridview1_dataSource"] = dt;
+                }
+                
             }
             this.bindGridview();
         }
@@ -681,6 +719,7 @@ namespace HR_LEAVEv2.HR
             editRolesErrorPanel.Style.Add("display", "none");
             editLeaveBalancesErrorPanel.Style.Add("display", "none");
             editEmpRecordErrorPanel.Style.Add("display", "none");
+            editEndDateEmpRecordsPanel.Style.Add("display", "none");
             deleteEmpRecordsErrorPanel.Style.Add("display", "none");
             addEmpRecordsErrorPanel.Style.Add("display", "none");
 
@@ -689,6 +728,17 @@ namespace HR_LEAVEv2.HR
             emailNotFoundErrorPanel.Style.Add("display", "none");
             noEmploymentRecordEnteredErrorPanel.Style.Add("display", "none");
             fullFormSubmitSuccessPanel.Style.Add("display", "none");
+
+            //EMPLOYMENT RECORD
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            dateComparisonValidationMsgPanel.Style.Add("display", "none");
+            duplicateRecordPanel.Style.Add("display", "none");
+
+            // END EMPLOYMENT RECORD
+            invalidEndDatePanel.Style.Add("display", "none");
+            emptyEndDatePanel.Style.Add("display", "none");
+            endDateBeforeStartDatePanel.Style.Add("display", "none");
         }
 
         protected void populatePage(string empId)
@@ -1292,7 +1342,7 @@ namespace HR_LEAVEv2.HR
                 {
 
                     // only if the record id is '-1' and isChanged is '0' (representing a undeleted row) then insert it
-                    if (dr.ItemArray[(int)add_emp_records_columns.record_id].ToString() == "-1" && dr.ItemArray[(int)add_emp_records_columns.isChanged].ToString() == "0")
+                    if (dr.ItemArray[(int)add_emp_records_columns.record_id].ToString() == "-1" && dr.ItemArray[(int)add_emp_records_columns.isChanged].ToString() != "-1")
                     {
                         // insert new record
                         try
@@ -1331,9 +1381,13 @@ namespace HR_LEAVEv2.HR
                                     string new_record_id = command.ExecuteScalar().ToString();
                                     isEmpRecordInsertSuccessful = !String.IsNullOrWhiteSpace(new_record_id);
 
-                                    // adding id of inserted record in added records list
+                                    
                                     if (isEmpRecordInsertSuccessful)
-                                        addedRecords.Add(new_record_id);
+                                    {
+                                        addedRecords.Add(new_record_id); // adding id of inserted record in added records list
+                                        dr.SetField<string>((int)add_emp_records_columns.record_id, new_record_id); // add new id of inserted record into datatable
+                                    }
+                                        
                                 }
                             }
                         }
@@ -1483,66 +1537,77 @@ namespace HR_LEAVEv2.HR
 
             // END EMPLOYMENT RECORDS--------------------------------------------------------------------------------------------------------------------------
 
+            // reset page so it is ready for new edits
+            populatePage(empId);
 
             // USER FEEDBACK--------------------------------------------------------------------------------------------------------------------------
-            // general success message
-            if (isRolesEditSuccessful && isLeaveEditSuccessful && isEmpRecordEditSuccessful)
-                editFullSuccessPanel.Style.Add("display", "inline-block");
+            if(!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged)
+            {
+                noChangesMadePanel.Style.Add("display", "inline-block");
+            }
             else
             {
+
                 // SUCCESS MESSAGES---------------------------------------------------------------
 
-                // successful roles edit
-                if (isRolesChanged && isRolesEditSuccessful)
-                    editRolesSuccessPanel.Style.Add("display", "inline-block");
-
-                // successful leave balances edit
-                if (isLeaveBalancesChanged && isLeaveEditSuccessful)
-                    editLeaveSuccessPanel.Style.Add("display", "inline-block");
-
-                // successful employment records edit
-                if (isEmpRecordChanged && isEmpRecordEditSuccessful)
-                    editEmpRecordSuccessPanel.Style.Add("display", "inline-block");
-
-                // ERROR MESSAGES------------------------------------------------------------------
-
-                // general error message if all aspects of edit fail
-                if(!isRolesEditSuccessful && !isLeaveEditSuccessful && !isEmpRecordEditSuccessful)
-                    editEmpErrorPanel.Style.Add("display", "inline-block");
-
-                // roles edit error
-                if (!isRolesEditSuccessful)
-                    editRolesErrorPanel.Style.Add("display", "inline-block");
-
-                // leave balances edit error
-                if (!isLeaveEditSuccessful)
-                    editLeaveBalancesErrorPanel.Style.Add("display", "inline-block");
-
-                // emp records errors
-                if (!isEmpRecordEditSuccessful)
+                // general success message
+                if ((isRolesChanged && isLeaveBalancesChanged && isEmpRecordChanged) && (isRolesEditSuccessful && isLeaveEditSuccessful && isEmpRecordEditSuccessful))
+                    editFullSuccessPanel.Style.Add("display", "inline-block");
+                else
                 {
-                    // general emp record edit error
-                    if(!isEmpRecordInsertSuccessful && !isEmpRecordDeleteSuccessful && !isEmpRecordEditEndDateSuccessful)
-                        editEmpRecordErrorPanel.Style.Add("display", "inline-block");
-                    else
+                    // successful roles edit
+                    if (isRolesChanged && isRolesEditSuccessful)
+                        editRolesSuccessPanel.Style.Add("display", "inline-block");
+
+                    // successful leave balances edit
+                    if (isLeaveBalancesChanged && isLeaveEditSuccessful)
+                        editLeaveSuccessPanel.Style.Add("display", "inline-block");
+
+                    // successful employment records edit
+                    if (isEmpRecordChanged && isEmpRecordEditSuccessful)
+                        editEmpRecordSuccessPanel.Style.Add("display", "inline-block");
+
+                    // ERROR MESSAGES------------------------------------------------------------------
+
+                    // general error message if all aspects of edit fail
+                    if (!isRolesEditSuccessful && !isLeaveEditSuccessful && !isEmpRecordEditSuccessful)
+                        editEmpErrorPanel.Style.Add("display", "inline-block");
+
+                    // roles edit error
+                    if (!isRolesEditSuccessful)
+                        editRolesErrorPanel.Style.Add("display", "inline-block");
+
+                    // leave balances edit error
+                    if (!isLeaveEditSuccessful)
+                        editLeaveBalancesErrorPanel.Style.Add("display", "inline-block");
+
+                    // emp records errors
+                    if (!isEmpRecordEditSuccessful)
                     {
-                        // specific emp record edit errors
+                        // general emp record edit error
+                        if (!isEmpRecordInsertSuccessful && !isEmpRecordDeleteSuccessful && !isEmpRecordEditEndDateSuccessful)
+                            editEmpRecordErrorPanel.Style.Add("display", "inline-block");
+                        else
+                        {
+                            // specific emp record edit errors
 
-                        // error deleting emp record(s)
-                        if (!isEmpRecordDeleteSuccessful)
-                            deleteEmpRecordsErrorPanel.Style.Add("display", "inline-block");
+                            // error deleting emp record(s)
+                            if (!isEmpRecordDeleteSuccessful)
+                                deleteEmpRecordsErrorPanel.Style.Add("display", "inline-block");
 
-                        // error inserting new emp record(s)
-                        if (!isEmpRecordInsertSuccessful)
-                            addEmpRecordsErrorPanel.Style.Add("display", "inline-block");
+                            // error inserting new emp record(s)
+                            if (!isEmpRecordInsertSuccessful)
+                                addEmpRecordsErrorPanel.Style.Add("display", "inline-block");
 
-                        // error editing end date in emp record(s)
-                        if (!isEmpRecordEditEndDateSuccessful)
-                            editEndDateEmpRecordsPanel.Style.Add("display", "inline-block");
+                            // error editing end date in emp record(s)
+                            if (!isEmpRecordEditEndDateSuccessful)
+                                editEndDateEmpRecordsPanel.Style.Add("display", "inline-block");
+                        }
+
                     }
-                       
                 }
-            }
+               
+            }    
             // END USER FEEDBACK--------------------------------------------------------------------------------------------------------------------------
 
             //scroll to top of page
@@ -1626,7 +1691,8 @@ namespace HR_LEAVEv2.HR
 
                 // store data about row which must be edited
                 int index = Convert.ToInt32(e.CommandArgument);
-                Session["startDate"] = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index],"start_date")].Text.ToString();
+                string st;
+                Session["startDate"] =  st =GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index],"start_date")].Text.ToString();
                 Session["empRecordRowIndex"] = index;
 
                 // show modal
@@ -1661,13 +1727,20 @@ namespace HR_LEAVEv2.HR
                     string startDate = string.Empty;
                     if (Session["startDate"] != null)
                         startDate = Session["startDate"].ToString();
-                    // compare dates to ensure end date is not before start date
-                    if (DateTime.Compare(Convert.ToDateTime(startDate), end) > 0)
+                    if (!String.IsNullOrEmpty(startDate))
                     {
-                        invalidEndDatePanel.Style.Add("display", "inline-block");
-                        endDateBeforeStartDatePanel.Style.Add("display", "inline-block");
+                        // compare dates to ensure end date is not before start date
+                        if (DateTime.Compare(Convert.ToDateTime(startDate), end) > 0)
+                        {
+                            invalidEndDatePanel.Style.Add("display", "inline-block");
+                            endDateBeforeStartDatePanel.Style.Add("display", "inline-block");
+                            isValidated = false;
+                        }
+                    } else
+                    {
                         isValidated = false;
                     }
+                    
                 }
             }
             else
@@ -1681,13 +1754,18 @@ namespace HR_LEAVEv2.HR
             {
                 // edit datatable and rebind gridview
 
-                int index = Convert.ToInt32(Session["empRecordRowIndex"]);
-                
-                if(ViewState["Gridview1_dataSource"] != null)
+                int indexInFrontEndDataTable = Convert.ToInt32(Session["empRecordRowIndex"]);
+                DataTable frontEndDt = ViewState["Gridview1_frontend_dataSource"] as DataTable;
+                DataRow rowToEndRecordOn = frontEndDt.Rows[indexInFrontEndDataTable];
+
+
+                if (ViewState["Gridview1_dataSource"] != null)
                 {
                     DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
-                    dt.Rows[index].SetField<string>((int)add_emp_records_columns.isChanged, "2");
-                    dt.Rows[index].SetField<string>((int)add_emp_records_columns.actual_end_date, end.ToString("MM/dd/yyyy"));
+
+                    int indexInDt = getIndexOfRelevantRowInBackendDataTable(rowToEndRecordOn);
+                    dt.Rows[indexInDt].SetField<string>((int)add_emp_records_columns.isChanged, "2");
+                    dt.Rows[indexInDt].SetField<string>((int)add_emp_records_columns.actual_end_date, end.ToString("MM/dd/yyyy"));
                     ViewState["Gridview1_dataSource"] = dt;
                     this.bindGridview();
 
