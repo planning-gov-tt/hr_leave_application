@@ -169,6 +169,11 @@
                         <span id="Span5" runat="server">End date is on the weekend</span>
                     </asp:Panel>
 
+                    <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="Span6" runat="server">More than 2 days of consecutive sick leave requires a medical leave of absence</span>
+                    </asp:Panel>
+
                     <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
@@ -193,7 +198,7 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
                     </asp:Panel>
-                    <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none" role="alert">
+                    <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none;" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span id="successMsg" runat="server">Application successfully submitted</span>
                         <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />

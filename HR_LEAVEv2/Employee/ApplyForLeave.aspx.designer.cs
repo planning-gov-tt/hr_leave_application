@@ -409,6 +409,24 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span5;
         
         /// <summary>
+        /// moreThan2DaysConsecutiveSickLeave control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel moreThan2DaysConsecutiveSickLeave;
+        
+        /// <summary>
+        /// Span6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span6;
+        
+        /// <summary>
         /// invalidStartDateValidationMsgPanel control.
         /// </summary>
         /// <remarks>

@@ -356,6 +356,7 @@ namespace HR_LEAVEv2.Employee
             invalidEndDateValidationMsgPanel.Style.Add("display", "none");
             invalidVacationStartDateMsgPanel.Style.Add("display", "none");
             invalidSickLeaveStartDate.Style.Add("display", "none");
+            moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
 
             DateTime start, end;
             start = end = DateTime.MinValue;
@@ -430,6 +431,12 @@ namespace HR_LEAVEv2.Employee
                 // if type of leave is sick: ensure you can only apply for it retroactively
                 if (typeOfLeave.SelectedValue.Equals("Sick"))
                 {
+                    if((end - start).Days + 1 > 2)
+                    {
+                        moreThan2DaysConsecutiveSickLeave.Style.Add("display", "inline-block");
+                        isValidated = false;
+                    }
+                    
                     if (DateTime.Compare(end, DateTime.Today) > 0)
                     {
                         invalidSickLeaveStartDate.Style.Add("display", "inline-block");
