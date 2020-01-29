@@ -9,6 +9,9 @@ namespace HR_LEAVEv2.UserControls
     {
         public string selectedSupId = "-1";
         public string validationGroup { get; set; }
+
+        public string empId;
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -26,9 +29,10 @@ namespace HR_LEAVEv2.UserControls
                     }
                 }
                 if (!String.IsNullOrEmpty(validationGroup))
-                {
                     comboBoxRequiredValidator.ValidationGroup = validationGroup;
-                }
+
+               
+                SqlDataSource1.SelectParameters.Add("empId", Session["emp_id"].ToString());
             }
             
         }

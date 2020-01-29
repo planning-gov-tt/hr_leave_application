@@ -385,6 +385,20 @@ namespace HR_LEAVEv2.Employee
 
             if (isValidated)
             {
+                //ensure start date is not a weekend
+                if(start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    startDateIsWeekend.Style.Add("display", "inline-block");
+                    isValidated = false;
+                }
+
+                //ensure end date is not weekend
+                if (end.DayOfWeek == DayOfWeek.Saturday || end.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    endDateIsWeekend.Style.Add("display", "inline-block");
+                    isValidated = false;
+                }
+
                 // ensure start date is not a day before today once not sick leave
                 if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, DateTime.Today) < 0)
                 {
@@ -429,6 +443,7 @@ namespace HR_LEAVEv2.Employee
 
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
+            invalidSupervisor.Style.Add("display", "none");
 
             /* data to be submitted
              * 1. Employee id
@@ -451,7 +466,7 @@ namespace HR_LEAVEv2.Employee
 
             // validate form values
             Boolean isValidated = validateDates(startDate, endDate);
-            if (isValidated)
+            if (isValidated && supId != "-1")
             {
                 try
                 {
@@ -502,6 +517,11 @@ namespace HR_LEAVEv2.Employee
                 }
 
             }
+            else if(supId == "-1")
+            {
+                invalidSupervisor.Style.Add("display", "inline-block");
+            }
+            
         }
 
         protected void refreshForm(object sender, EventArgs e)
