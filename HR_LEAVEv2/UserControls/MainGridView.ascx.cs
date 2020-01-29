@@ -425,6 +425,10 @@ namespace HR_LEAVEv2.UserControls
                     // else do not show buttons
                     if (leaveStatus == "Pending" || leaveStatus == "Recommended" || leaveStatus == "Not Recommended")
                     {
+                        if(leaveStatus == "Recommended")
+                            btnRecommended.Style.Add("opacity", "0.55");
+                        else if(leaveStatus == "Not Recommended")
+                            btnNotRecommended.Style.Add("opacity", "0.55");
                         btnNotRecommended.Visible = btnRecommended.Visible = true;
                     }
                     else
@@ -448,6 +452,10 @@ namespace HR_LEAVEv2.UserControls
                     // if recommended or not approved then show all buttons except undo
                     if (leaveStatus == "Recommended" || leaveStatus == "Not Approved")
                     {
+
+                        if(leaveStatus == "Not Approved")
+                            btnNotApproved.Style.Add("opacity", "0.55");
+
                         btnUndoApprove.Visible = false;
                         btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = true;
                     }
@@ -455,6 +463,7 @@ namespace HR_LEAVEv2.UserControls
                     // if approved then ONLY show undo button
                     else if (leaveStatus == "Approved")
                     {
+
                         int startDateIndex = GetColumnIndexByName(e.Row, "start_date");
                         string startDate = e.Row.Cells[startDateIndex].Text.ToString();
 
@@ -486,7 +495,6 @@ namespace HR_LEAVEv2.UserControls
                 }
             }
         }
-
 
         protected void GridView_RowCommand(object sender, GridViewCommandEventArgs e)
         {

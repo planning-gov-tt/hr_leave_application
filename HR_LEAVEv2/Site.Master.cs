@@ -21,7 +21,12 @@ namespace HR_LEAVEv2
                 Session["emp_email"] = auth.getEmailOfSignedInUserFromActiveDirectory();
 
             if (Session["emp_email"] != null)
-                Session["emp_username"] = auth.getUserInfoFromActiveDirectory(Session["emp_email"].ToString());
+            {
+                string username = auth.getUserInfoFromActiveDirectory(Session["emp_email"].ToString());
+                username = string.IsNullOrEmpty(username) ? "User not in Active Directory" : username;
+                Session["emp_username"] = username;
+            }
+                
             // store employee's id in Session
             if (Session["emp_id"] == null && Session["emp_email"] != null)
                 Session["emp_id"] = auth.getUserEmployeeId(Session["emp_email"].ToString());
