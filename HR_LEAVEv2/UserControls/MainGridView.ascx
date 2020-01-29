@@ -142,11 +142,11 @@
 
         <Columns>
 
-            <asp:BoundField HeaderText="Date Submitted" DataField="date_submitted" SortExpression="date_submitted" />
+            <asp:BoundField HeaderText="Date Submitted" DataField="date_submitted" SortExpression="date_submitted" DataFormatString="{0:d/MM/yyyy hh:mm tt}" />
             <asp:BoundField HeaderText="Supervisor" DataField="supervisor_name" SortExpression="supervisor_name" />
             <asp:BoundField HeaderText="Employee" DataField="employee_name" SortExpression="employee_name" />
-            <asp:BoundField HeaderText="Start Date" DataField="start_date" SortExpression="start_date" />
-            <asp:BoundField HeaderText="End Date" DataField="end_date" SortExpression="end_date" />
+            <asp:BoundField HeaderText="Start Date" DataField="start_date" SortExpression="start_date"  />
+            <asp:BoundField HeaderText="End Date" DataField="end_date" SortExpression="end_date"  />
             <asp:BoundField HeaderText="Leave Type" DataField="leave_type" SortExpression="leave_type" />
             <%--<asp:BoundField HeaderText="Qualified" DataField="" SortExpression="" />--%>
             <asp:BoundField HeaderText="Status" DataField="status" SortExpression="status" />

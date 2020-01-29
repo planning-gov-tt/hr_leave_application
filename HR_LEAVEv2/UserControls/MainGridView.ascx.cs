@@ -35,8 +35,8 @@ namespace HR_LEAVEv2.UserControls
                 ep.employment_type employment_type,
 
                 lt.leave_type leave_type,
-                FORMAT(lt.start_date, 'MM/dd/yy') start_date,
-                FORMAT(lt.end_date, 'MM/dd/yy') end_date,
+                FORMAT(lt.start_date, 'd/MM/yyyy') start_date,
+                FORMAT(lt.end_date, 'd/MM/yyyy') end_date,
 
                 s.employee_id supervisor_id,
                 s.last_name + ', ' + LEFT(s.first_name, 1) + '.' AS supervisor_name,
@@ -472,7 +472,8 @@ namespace HR_LEAVEv2.UserControls
                             DateTime start = DateTime.MinValue;
                             try
                             {
-                                start = Convert.ToDateTime(startDate);
+                                //start = Convert.ToDateTime(startDate);
+                                start = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                             } catch(FormatException fe)
                             {
                                 throw fe;
@@ -602,10 +603,12 @@ namespace HR_LEAVEv2.UserControls
                     if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
                     {
                         int indexStartDate = GetColumnIndexByName(row, "start_date");
-                        startDate = DateTime.Parse(row.Cells[indexStartDate].Text);
+                        startDate = DateTime.ParseExact(row.Cells[indexStartDate].Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                        //startDate = DateTime.Parse(row.Cells[indexStartDate].Text);
 
                         int indexEndDate = GetColumnIndexByName(row, "end_date");
-                        endDate = DateTime.Parse(row.Cells[indexEndDate].Text);
+                        endDate = DateTime.ParseExact(row.Cells[indexEndDate].Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                        //endDate = DateTime.Parse(row.Cells[indexEndDate].Text);
 
                         int indexLeavetype = GetColumnIndexByName(row, "leave_type");
                         leaveType = (row.Cells[indexLeavetype].Text).ToString();
@@ -704,7 +707,7 @@ namespace HR_LEAVEv2.UserControls
                 }
 
                 // Recommend
-                if (commandName == "recommend")
+                if (commandName == "recommended")
                 {
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -712,7 +715,7 @@ namespace HR_LEAVEv2.UserControls
                 }
 
                 // Not Recommend
-                if (commandName == "notRecommend")
+                if (commandName == "notRecommended")
                 {
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -813,7 +816,8 @@ namespace HR_LEAVEv2.UserControls
             try
             {
                 if (!String.IsNullOrEmpty(startDate))
-                    start = Convert.ToDateTime(startDate);
+                    start = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                //start = Convert.ToDateTime(startDate);
                 else
                     throw new FormatException();
 
@@ -831,7 +835,8 @@ namespace HR_LEAVEv2.UserControls
             try
             {
                 if (!String.IsNullOrEmpty(endDate))
-                    end = Convert.ToDateTime(endDate);
+                    end = DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                //end = Convert.ToDateTime(endDate);
                 else
                     throw new FormatException();
             }
