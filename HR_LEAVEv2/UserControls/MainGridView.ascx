@@ -14,22 +14,22 @@
 <div id="filterContainer" class="container" style="padding-bottom: 30px">
     <div class="row" style="text-align: right">
         <div class="col-xs-3 form-group">
-            <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="bottom" title="Enter submitted from date" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
+            <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter submitted from date" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
             <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
-            <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="bottom" title="Enter submitted to date" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
+            <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter submitted to date" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
             <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" Format="MM/dd/yyyy"/>
         </div>
         <div class="col-xs-3 form-group">
-            <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="bottom" title="Enter start date" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
+            <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter start date" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
             <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
-            <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="bottom" title="Enter end date" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
+            <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter end date" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
             <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" Format="MM/dd/yyyy"/>
         </div>

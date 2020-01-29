@@ -35,7 +35,7 @@
             <div class="tab-pane fade" id="viewLeaveLogs" role="tabpanel" aria-labelledby="viewLeaveLogsTab">
                 <h3>My Leave Logs</h3>
 
-                <div id="leaveLogContainer" style="margin-top:15px;">
+                <div id="leaveLogContainer" style="margin-top:35px;">
                     <TWebControl:GridViewWebControl ID="GridViewWebControlEmp" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
                 </div>
             </div>
