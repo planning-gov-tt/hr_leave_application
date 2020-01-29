@@ -71,7 +71,7 @@
                                     <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </div>
                                 <div>
-                                    <h5 style="margin-bottom: 3px;" class="custom-card-body-header-text">Email:</h5>
+                                    <h5 class="custom-card-body-header-text">Email:</h5>
                                     <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </div>
                             </div>
@@ -109,7 +109,7 @@
                                     <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </div>
                                 <div>
-                                    <h5 style="margin-bottom: 3px;" class="custom-card-body-header-text">Email:</h5>
+                                    <h5 class="custom-card-body-header-text">Email:</h5>
                                     <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </div>
                             </div>
