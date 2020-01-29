@@ -36,7 +36,13 @@ namespace HR_LEAVEv2.HR
 
             if (!IsPostBack)
             {
-                ViewState["viewActive"] = true;
+                if (Session["viewForAllEmployees"] != null)
+                {
+                    employeeStatusDropDown.SelectedValue = Session["viewForAllEmployees"].ToString();
+                    DataPager1.SetPageProperties(0, 8, false);
+                }
+
+                ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
                 bindListView();
             }
         }
@@ -384,8 +390,8 @@ namespace HR_LEAVEv2.HR
 
         protected void employeeStatusDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string selectedValue = employeeStatusDropDown.SelectedItem.Text;
-            ViewState["viewActive"] = selectedValue == "Active";
+            Session["viewForAllEmployees"] = employeeStatusDropDown.SelectedValue;
+            ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
             DataPager1.SetPageProperties(0, 8, false);
             bindListView();
         }
