@@ -55,7 +55,6 @@
                         <img id="mopd-logo" src="<%= ResolveClientUrl("~/Assets/mopd_logo.jpg") %>" alt="Ministry of Planning and Development"/>
                         <strong>MoPD</strong>
                     </a>
-                    
                 </div>
 
                 <ul class="list-unstyled components">
@@ -185,9 +184,13 @@
                             <i class="fa fa-align-left"></i>
                             <span>Toggle Sidebar</span>
                         </button>
+                        <span style="float:right; font-size:1.2em">
+                            <%=Session["emp_username"].ToString() %>
+                        </span>
+                        
                     </div>
                 </nav>
-
+                
                 <div id="userSelectContainer">
                     <asp:DropDownList ID="ddlSelectUser" runat="server" AutoPostBack="true" OnSelectedIndexChanged="indexChanged">
 
