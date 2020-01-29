@@ -2,9 +2,9 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <style>
         .custom-no-dp-header-icon {
-    font-size: 8em;
-    margin-top: 15%;
-}
+            font-size: 4em;
+            margin-top: 5%;
+        }
     </style>
     <h1><%: Title %></h1>
     <div class="container-fluid">

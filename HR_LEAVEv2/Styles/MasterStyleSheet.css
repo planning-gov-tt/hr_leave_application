@@ -169,7 +169,7 @@ a, a:active, a:focus, button, button:active, button:focus{
 /* styles for cards */
 .custom-card{
     border:1px solid black; 
-    height:400px; 
+    height:335px; 
     width:225px;
     text-align:center;
     margin-bottom:20px;
@@ -177,7 +177,7 @@ a, a:active, a:focus, button, button:active, button:focus{
 
 .custom-card-header{
     background-color:#f0f0f0; 
-    height:40%;
+    height:23%;
 }
 
 .custom-card-body{
