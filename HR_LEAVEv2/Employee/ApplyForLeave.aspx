@@ -57,7 +57,7 @@
                 <label for="txtFrom" style="font-size:1.5em">From:</label>
                 <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
+                <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
                 <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
             <%--End Date--%>
@@ -65,7 +65,7 @@
                 <label for="txtTo" style="font-size:1.5em">To:</label>
                 <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" style="width:150px; display:inline;"></asp:TextBox> 
                 <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" Format="MM/dd/yyyy"/>
+                <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" Format="d/MM/yyyy"/>
                 <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"  ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </div>
         </div>
