@@ -91,7 +91,10 @@ INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name
 ('05356', '05356', 'PLANNING\ Usha Balkaran', 'Usha', 'Balkaran', 'Usha.Balkaran@planning.gov.tt', 30, 0, 5, 14, 2, 0, 30), -- HRO3
 
 -- PS
-('07525', '07525', 'PLANNING\ Joanne Deoraj', 'Joanne', 'Deoraj', 'Joanne.Deoraj@planning.gov.tt', 50, 0, 5, 14, 2, 0, 0); -- PS
+('07525', '07525', 'PLANNING\ Joanne Deoraj', 'Joanne', 'Deoraj', 'Joanne.Deoraj@planning.gov.tt', 50, 0, 5, 14, 2, 0, 0), -- PS
+
+-- Minister
+('4', '4', 'PLANNING\ Cherrie-Ann Crichlow-Cockburn', 'Cherrie-Ann', 'Crichlow-Cockburn', 'Cherrie-Ann.Crichlow-Cockburn@planning.gov.tt', 50, 0, 5, 14, 2, 0, 0); -- Minister
 -- PM
 -- P
 
@@ -101,6 +104,9 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 ('1', 'emp'),
 ('115245', 'sup'),
 ('3', 'emp'),
+('4', 'emp'),
+('4', 'sup'),
+('4', 'hr1'),
 ('184164', 'sup'),
 ('157778', 'emp'),
 ('161720', 'emp'),
@@ -249,7 +255,9 @@ INSERT INTO [dbo].[position] ([pos_id], [pos_name], [pos_description], [vacation
 (4, 'Director', NULL, 25),
 (5, 'Associate Professional', NULL, 0),
 (6, 'System''s Specialist', NULL, 30),
-(7, 'HR Staff', NULL, 30);
+(7, 'HR Staff', NULL, 30),
+(8, 'Permanent Secretary', NULL, 40),
+(9, 'Minister', NULL, 40);
 
 SET IDENTITY_INSERT [dbo].[position] OFF;
 
@@ -276,7 +284,16 @@ INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start
 
 --more seed data
 (9, '184164', 6, '20180927', '20210927', NULL, 'Contract', 1),
-(10, '11948', 7, '20191025', '20221025', NULL, 'Public Service', 2)
+(10, '11948', 7, '20191025', '20221025', NULL, 'Public Service', 2),
+
+--supervisor for HR 2's 
+(11, '83612', 7, '20180927', '20210927', NULL, 'Contract', 2),
+
+--PS
+(12, '07525', 8, '20191025', '20221025', NULL, 'Public Service', 1),
+
+--Minister
+(13, '4', 9, '20191025', '20221025', NULL, 'Public Service', 1)
 ;
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;
