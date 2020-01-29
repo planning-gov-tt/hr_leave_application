@@ -36,6 +36,13 @@ namespace HR_LEAVEv2.HR
 
             if (!IsPostBack)
             {
+                if (Session["viewForAllEmployees"] != null)
+                {
+                    employeeStatusDropDown.SelectedValue = Session["viewForAllEmployees"].ToString();
+                    DataPager1.SetPageProperties(0, 8, false);
+                }
+
+                ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
                 bindListView();
             }
         }
@@ -45,18 +52,44 @@ namespace HR_LEAVEv2.HR
             try
             {
                 string sql;
-
+                string isActive = "IN", activeLabel = "Active", bootstrapClass = "label-success";
                 if (permissions.Contains("hr1_permissions"))
                 {
+
+                    if (ViewState["viewActive"] != null)
+                    {
+                        if(Convert.ToBoolean(ViewState["viewActive"]))
+                        {
+                            isActive = "IN";
+                            activeLabel = "Active";
+                            bootstrapClass = "label-success";
+                        }
+                        else
+                        {
+                            isActive = "NOT IN";
+                            activeLabel = "Inactive";
+                            bootstrapClass = "label-danger";
+                        }
+                            
+                    }
+                        
+
                     // HR 1
                     sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
-                        FROM [dbo].[employee] e
-                        LEFT JOIN [dbo].employeeposition ep
-                        ON e.employee_id = ep.employee_id
-                        WHERE ep.actual_end_date IS NULL AND e.employee_id <> {Session["emp_id"].ToString()}
-                        ORDER BY email ASC;
+                        SELECT
+                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
+                            FROM dbo.employee e
+
+                            WHERE e.employee_id <> {Session["emp_id"].ToString()} AND e.employee_id {isActive} 
+                            (
+                                select ep.employee_id
+                                from dbo.employeeposition ep
+                                where ep.actual_end_date IS NULL
+                                group by ep.employee_id
+                                having count(*) > 0
+                            ) 
                     ";
+                    
                 }
                 else
                 {
@@ -67,13 +100,36 @@ namespace HR_LEAVEv2.HR
                     else if (permissions.Contains("public_officer_permissions"))
                         emp_type = "Public Service";
 
+                    if (ViewState["viewActive"] != null)
+                    {
+                        if (Convert.ToBoolean(ViewState["viewActive"]))
+                        {
+                            isActive = "IN";
+                            activeLabel = "Active";
+                            bootstrapClass = "label-success";
+                        }
+                        else
+                        {
+                            isActive = "NOT IN";
+                            activeLabel = "Inactive";
+                            bootstrapClass = "label-danger";
+                        }
+                    }
+
                     sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
-                        FROM [dbo].[employee] e
-                        LEFT JOIN [dbo].employeeposition ep
-                        ON e.employee_id = ep.employee_id
-                        WHERE ep.employment_type='{emp_type}' AND GETDATE()>=ep.start_date AND ep.actual_end_date IS NULL AND e.employee_id <> {Session["emp_id"].ToString()}
-                        ORDER BY email ASC;
+                        SELECT
+                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email , '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
+                            FROM dbo.employee e
+                            JOIN employeeposition ep
+                            ON ep.employee_id = e.employee_id
+                            WHERE ep.employment_type='{emp_type}' AND e.employee_id <> {Session["emp_id"].ToString()} AND e.employee_id {isActive} 
+                            (
+                                select ep.employee_id
+                                from dbo.employeeposition ep
+                                where ep.actual_end_date IS NULL
+                                group by ep.employee_id
+                                having count(*) > 0
+                            );
                     ";
                 }
 
@@ -112,19 +168,44 @@ namespace HR_LEAVEv2.HR
             {
 
                 string sql;
-
+                string isActive = "IN", activeLabel = "Active", bootstrapClass = "label-success";
                 if (permissions.Contains("hr1_permissions"))
                 {
                     // HR 1
+                    if (ViewState["viewActive"] != null)
+                    {
+                        if (Convert.ToBoolean(ViewState["viewActive"]))
+                        {
+                            isActive = "IN";
+                            activeLabel = "Active";
+                            bootstrapClass = "label-success";
+                        }
+                        else
+                        {
+                            isActive = "NOT IN";
+                            activeLabel = "Inactive";
+                            bootstrapClass = "label-danger";
+                        }
+
+                    }
+
+
+                    // HR 1
                     sql = $@"
-                        SELECT DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
-                        FROM [dbo].[employee] e
-                        LEFT JOIN [dbo].employeeposition ep
-                        ON e.employee_id = ep.employee_id
-                        WHERE
-                            ep.actual_end_date IS NULL AND e.employee_id <> {Session["emp_id"].ToString()} AND
-                            ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
-                        ORDER BY email ASC; 
+                        SELECT
+                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
+                            FROM dbo.employee e
+
+                            WHERE e.employee_id <> {Session["emp_id"].ToString()} 
+                                AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
+                                AND e.employee_id {isActive} 
+                                (
+                                    select ep.employee_id
+                                    from dbo.employeeposition ep
+                                    where ep.actual_end_date IS NULL
+                                    group by ep.employee_id
+                                    having count(*) > 0
+                                ) 
                     ";
                 }
                 else
@@ -136,15 +217,39 @@ namespace HR_LEAVEv2.HR
                     else if (permissions.Contains("public_officer_permissions"))
                         emp_type = "Public Service";
 
-                    sql = $@"
-                        SELECT DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
-                        FROM [dbo].[employee] e
-                        LEFT JOIN [dbo].employeeposition ep
-                        ON e.employee_id = ep.employee_id
-                        WHERE ep.employment_type='{emp_type}' AND AND e.employee_id <> {Session["emp_id"].ToString()} AND ep.actual_end_date IS NULL AND 
-                        ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
-                        ORDER BY email ASC;  
+                    if (ViewState["viewActive"] != null)
+                    {
+                        if (Convert.ToBoolean(ViewState["viewActive"]))
+                        {
+                            isActive = "IN";
+                            activeLabel = "Active";
+                            bootstrapClass = "label-success";
+                        }
+                        else
+                        {
+                            isActive = "NOT IN";
+                            activeLabel = "Inactive";
+                            bootstrapClass = "label-danger";
+                        }
+                    }
 
+                    sql = $@"
+                        SELECT
+                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email , '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
+                            FROM dbo.employee e
+                            JOIN employeeposition ep
+                            ON ep.employee_id = e.employee_id
+                            WHERE e.employee_id <> {Session["emp_id"].ToString()} 
+                                AND ep.employment_type='{emp_type}'
+                                AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
+                                AND e.employee_id {isActive} 
+                                (
+                                    select ep.employee_id
+                                    from dbo.employeeposition ep
+                                    where ep.actual_end_date IS NULL
+                                    group by ep.employee_id
+                                    having count(*) > 0
+                                ) 
                     ";
                 }
 
@@ -281,6 +386,14 @@ namespace HR_LEAVEv2.HR
         protected void newEmployeeBtn_Click(object sender, EventArgs e)
         {
             Response.Redirect("~/HR/EmployeeDetails.aspx?mode=create");
+        }
+
+        protected void employeeStatusDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Session["viewForAllEmployees"] = employeeStatusDropDown.SelectedValue;
+            ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
+            DataPager1.SetPageProperties(0, 8, false);
+            bindListView();
         }
     }
 }

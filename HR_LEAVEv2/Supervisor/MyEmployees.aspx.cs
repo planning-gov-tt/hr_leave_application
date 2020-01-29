@@ -54,6 +54,22 @@ namespace HR_LEAVEv2.Supervisor
                         ORDER BY email ASC;
                     ";
 
+                sql = $@"
+                        SELECT
+                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
+                            FROM dbo.employee e
+                            JOIN [dbo].assignment a
+                            ON e.employee_id = a.supervisee_id
+                            WHERE a.supervisor_id = {Session["emp_id"].ToString()} AND e.employee_id IN
+                            (
+                                select ep.employee_id
+                                from dbo.employeeposition ep
+                                where ep.actual_end_date IS NULL
+                                group by ep.employee_id
+                                having count(*) > 0
+                            ) 
+                    ";
+
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
                     connection.Open();
@@ -89,16 +105,21 @@ namespace HR_LEAVEv2.Supervisor
             try
             {
                 string sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
-                        FROM [dbo].[employee] e
-                        JOIN [dbo].assignment a
-                        ON e.employee_id = a.supervisee_id
-                        LEFT JOIN [dbo].employeeposition ep
-                        ON e.employee_id = ep.employee_id
-                        WHERE ep.actual_end_date IS NULL AND a.supervisor_id = {Session["emp_id"].ToString()}
-                            AND
-                        ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
-                        ORDER BY email ASC; 
+                        SELECT
+                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
+                            FROM dbo.employee e
+                            JOIN [dbo].assignment a
+                            ON e.employee_id = a.supervisee_id
+                            WHERE a.supervisor_id = {Session["emp_id"].ToString()} 
+                                AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
+                                AND e.employee_id IN
+                                (
+                                    select ep.employee_id
+                                    from dbo.employeeposition ep
+                                    where ep.actual_end_date IS NULL
+                                    group by ep.employee_id
+                                    having count(*) > 0
+                                ) 
                     ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
