@@ -120,6 +120,7 @@ namespace HR_LEAVEv2
             } catch (Exception ex)
             {
                 //exception logic
+                throw ex;
             }
             
 

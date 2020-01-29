@@ -133,7 +133,7 @@ namespace HR_LEAVEv2.UserControls
                                     catch (Exception ex)
                                     {
                                         //exception logic
-                                        Console.WriteLine(ex.Message.ToString());
+                                        throw ex;
                                     }
                                 }
                             }

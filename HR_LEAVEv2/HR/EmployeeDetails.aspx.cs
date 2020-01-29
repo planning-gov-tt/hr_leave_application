@@ -675,7 +675,7 @@ namespace HR_LEAVEv2.HR
                 catch (Exception ex)
                 {
                     //exception logic
-                    Console.WriteLine(ex.Message.ToString());
+                    throw ex;
                 }
             }
             else
@@ -790,7 +790,7 @@ namespace HR_LEAVEv2.HR
             catch (Exception ex)
             {
                 //exception logic
-                Console.WriteLine(ex.Message.ToString());
+                throw ex;
             }
 
             // the following code ensures that the current HR can view and edit the information presented based on the employee's employment type
@@ -871,7 +871,7 @@ namespace HR_LEAVEv2.HR
             catch (Exception ex)
             {
                 //exception logic
-                Console.WriteLine(ex.Message.ToString());
+                throw ex;
             }
 
             // get leave balances and populate textboxes
@@ -927,7 +927,7 @@ namespace HR_LEAVEv2.HR
             catch (Exception ex)
             {
                 //exception logic
-                Console.WriteLine(ex.Message.ToString());
+                throw ex;
             } 
 
         }
@@ -1053,7 +1053,7 @@ namespace HR_LEAVEv2.HR
                     catch (Exception ex)
                     {
                         //exception logic
-                        Console.WriteLine(ex.Message.ToString());
+                        throw ex;
                     }
                 }
 
@@ -1139,7 +1139,7 @@ namespace HR_LEAVEv2.HR
                     catch (Exception ex)
                     {
                         //exception logic
-                        Console.WriteLine(ex.Message.ToString());
+                        throw ex;
                     }
                 }
 
@@ -1236,7 +1236,7 @@ namespace HR_LEAVEv2.HR
                 catch (Exception ex)
                 {
                     //exception logic
-                    Console.WriteLine(ex.Message.ToString());
+                    throw ex;
                 }
 
                 // leave balances were changed
@@ -1330,7 +1330,7 @@ namespace HR_LEAVEv2.HR
                     catch (Exception ex)
                     {
                         //exception logic
-                        Console.WriteLine(ex.Message.ToString());
+                        throw ex;
                     }
                 }
 
@@ -1438,7 +1438,7 @@ namespace HR_LEAVEv2.HR
                     catch (Exception ex)
                     {
                         //exception logic
-                        Console.WriteLine(ex.Message.ToString());
+                        throw ex;
                     }
                 }
 
@@ -1522,7 +1522,7 @@ namespace HR_LEAVEv2.HR
                     catch (Exception ex)
                     {
                         //exception logic
-                        Console.WriteLine(ex.Message.ToString());
+                        throw ex;
                     }
                 }
 

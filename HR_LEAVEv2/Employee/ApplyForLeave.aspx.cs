@@ -215,7 +215,7 @@ namespace HR_LEAVEv2.Employee
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw ex;
             }
 
             //Return to previous
@@ -518,9 +518,7 @@ namespace HR_LEAVEv2.Employee
                 }
                 catch (Exception ex)
                 {
-                    //validationMsg.InnerText = ex.Message;
-                    //validationMsgPanel.Style.Add("display", "inline-block");
-                    Response.Write(ex.Message.ToString());
+                    throw ex;
                 }
 
             }
@@ -589,7 +587,7 @@ namespace HR_LEAVEv2.Employee
             catch (Exception ex)
             {
                 //exception logic
-                Console.WriteLine(ex.Message.ToString());
+                throw ex;
             }
 
             // add audit log
@@ -637,7 +635,7 @@ namespace HR_LEAVEv2.Employee
             catch (Exception ex)
             {
                 //exception logic
-                Console.WriteLine(ex.Message.ToString());
+                throw ex;
             }
 
         }
