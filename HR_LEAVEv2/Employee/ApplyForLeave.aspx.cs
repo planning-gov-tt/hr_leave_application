@@ -634,5 +634,28 @@ namespace HR_LEAVEv2.Employee
             }
 
         }
+
+        protected void datesEntered(object sender, EventArgs e)
+        {
+            DateTime start, end;
+            start = end = DateTime.MinValue;
+            Boolean isStartDateFilled, isEndDateFilled;
+            isStartDateFilled = DateTime.TryParseExact(txtFrom.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start);
+            isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
+
+            if (typeOfLeave.SelectedIndex != 0)
+                validateDates(txtFrom.Text, txtTo.Text);
+
+            if (isStartDateFilled && isEndDateFilled)
+            {
+                numDaysAppliedFor.Text = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1).ToString() : "0";
+            }
+                
+        }
+
+        protected void typeOfLeave_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            validateDates(txtFrom.Text, txtTo.Text);
+        }
     }
 }

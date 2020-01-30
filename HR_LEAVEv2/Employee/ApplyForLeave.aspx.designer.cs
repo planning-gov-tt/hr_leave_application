@@ -112,6 +112,33 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.TextBox statusTxt;
         
         /// <summary>
+        /// leaveCountPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel leaveCountPanel;
+        
+        /// <summary>
+        /// UpdatePanelLeaveCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel UpdatePanelLeaveCount;
+        
+        /// <summary>
+        /// LeaveCountUserControl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::HR_LEAVEv2.UserControls.LeaveCountUserControlBS4 LeaveCountUserControl;
+        
+        /// <summary>
         /// txtFrom control.
         /// </summary>
         /// <remarks>
@@ -164,6 +191,24 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator toCalendarRequiredValidator;
+        
+        /// <summary>
+        /// numDaysAppliedForPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel numDaysAppliedForPanel;
+        
+        /// <summary>
+        /// numDaysAppliedFor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label numDaysAppliedFor;
         
         /// <summary>
         /// typeOfLeaveDropdownPanel control.
@@ -317,33 +362,6 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlTextArea hrCommentsTxt;
-        
-        /// <summary>
-        /// leaveCountPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel leaveCountPanel;
-        
-        /// <summary>
-        /// UpdatePanelLeaveCount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanelLeaveCount;
-        
-        /// <summary>
-        /// LeaveCountUserControl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::HR_LEAVEv2.UserControls.LeaveCountUserControlBS4 LeaveCountUserControl;
         
         /// <summary>
         /// UpdatePanel1 control.
