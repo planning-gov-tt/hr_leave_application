@@ -150,7 +150,7 @@ namespace HR_LEAVEv2.HR
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw ex;
             }
         }
 
@@ -270,7 +270,7 @@ namespace HR_LEAVEv2.HR
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw ex;
             }
         }
 

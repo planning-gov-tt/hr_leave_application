@@ -79,11 +79,11 @@ namespace HR_LEAVEv2.Employee
                             lt.employee_id, 
                             emp.first_name + ' ' + emp.last_name as 'employee_name', 
                             ep.employment_type , 
-                            FORMAT(lt.start_date, 'MM/dd/yyyy') start_date, 
-                            FORMAT(lt.end_date, 'MM/dd/yyyy') end_date, 
+                            FORMAT(lt.start_date, 'd/MM/yyyy') start_date, 
+                            FORMAT(lt.end_date, 'd/MM/yyyy') end_date, 
                             lt.leave_type, 
                             lt.status, 
-                            FORMAT(lt.created_at, 'MM/dd/yyyy HH:mm tt') as submitted_on,
+                            FORMAT(lt.created_at, 'd/MM/yyyy h:mm tt') as submitted_on,
                             lt.supervisor_id, 
                             e.first_name + ' ' + e.last_name as 'supervisor_name', 
                             lt.emp_comment, 
@@ -215,7 +215,7 @@ namespace HR_LEAVEv2.Employee
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw ex;
             }
 
             //Return to previous
@@ -349,7 +349,6 @@ namespace HR_LEAVEv2.Employee
 
         protected Boolean validateDates(string startDate, string endDate)
         {
-            // validationMsgPanel.Style.Add("display", "none");
             dateComparisonValidationMsgPanel.Style.Add("display", "none");
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");
             startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
@@ -357,28 +356,21 @@ namespace HR_LEAVEv2.Employee
             invalidVacationStartDateMsgPanel.Style.Add("display", "none");
             invalidSickLeaveStartDate.Style.Add("display", "none");
             moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
+            startDateIsWeekend.Style.Add("display", "none");
+            endDateIsWeekend.Style.Add("display", "none");
 
             DateTime start, end;
             start = end = DateTime.MinValue;
             Boolean isValidated = true;
 
             // validate start date is a date
-            try
-            {
-                start = Convert.ToDateTime(startDate);
-            }
-            catch (FormatException fe)
+            if(!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start))
             {
                 invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
 
-            // validate end date is a date
-            try
-            {
-                end = Convert.ToDateTime(endDate);
-            }
-            catch (FormatException fe)
+            if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
             {
                 invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
@@ -464,8 +456,11 @@ namespace HR_LEAVEv2.Employee
             string empId, leaveType, startDate, endDate, supId, comments;
             empId = Session["emp_id"].ToString();
             leaveType = typeOfLeave.SelectedValue;
+
+            // must convert start and end date to MM/d/yyyy format in order to insert into DB
             startDate = txtFrom.Text.ToString();
             endDate = txtTo.Text.ToString();
+
             supId = supervisor_select.selectedSupId;
             comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null;
 
@@ -489,8 +484,8 @@ namespace HR_LEAVEv2.Employee
                         VALUES
                            ( '{empId}'
                             ,'{leaveType}'
-                            ,'{startDate}'
-                            ,'{endDate}'
+                            ,'{DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
+                            ,'{DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             ,'{supId}'
                             ,'Pending'
                             ,@Comments
@@ -518,9 +513,7 @@ namespace HR_LEAVEv2.Employee
                 }
                 catch (Exception ex)
                 {
-                    //validationMsg.InnerText = ex.Message;
-                    //validationMsgPanel.Style.Add("display", "inline-block");
-                    Response.Write(ex.Message.ToString());
+                    throw ex;
                 }
 
             }
@@ -589,7 +582,7 @@ namespace HR_LEAVEv2.Employee
             catch (Exception ex)
             {
                 //exception logic
-                Console.WriteLine(ex.Message.ToString());
+                throw ex;
             }
 
             // add audit log
@@ -637,7 +630,7 @@ namespace HR_LEAVEv2.Employee
             catch (Exception ex)
             {
                 //exception logic
-                Console.WriteLine(ex.Message.ToString());
+                throw ex;
             }
 
         }

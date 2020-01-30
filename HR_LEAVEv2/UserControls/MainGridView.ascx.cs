@@ -35,8 +35,8 @@ namespace HR_LEAVEv2.UserControls
                 ep.employment_type employment_type,
 
                 lt.leave_type leave_type,
-                FORMAT(lt.start_date, 'MM/dd/yy') start_date,
-                FORMAT(lt.end_date, 'MM/dd/yy') end_date,
+                lt.start_date,
+                lt.end_date,
 
                 s.employee_id supervisor_id,
                 s.last_name + ', ' + LEFT(s.first_name, 1) + '.' AS supervisor_name,
@@ -262,25 +262,25 @@ namespace HR_LEAVEv2.UserControls
                 if (!string.IsNullOrEmpty(SubmittedFrom))
                 {
                     whereFilterGridView += $@"
-                        AND lt.created_at >= '{SubmittedFrom}'
+                        AND lt.created_at >= '{DateTime.ParseExact(SubmittedFrom, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(SubmittedTo))
                 {
                     whereFilterGridView += $@"
-                        AND lt.created_at <= '{SubmittedTo}'
+                        AND lt.created_at <= '{DateTime.ParseExact(SubmittedTo, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(StartDate))
                 {
                     whereFilterGridView += $@"
-                        AND lt.start_date >= '{StartDate}'
+                        AND lt.start_date >= '{DateTime.ParseExact(StartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(EndDate))
                 {
                     whereFilterGridView += $@"
-                        AND lt.end_date <= '{EndDate}'
+                        AND lt.end_date <= '{DateTime.ParseExact(EndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(SupervisorName_ID))
@@ -472,7 +472,8 @@ namespace HR_LEAVEv2.UserControls
                             DateTime start = DateTime.MinValue;
                             try
                             {
-                                start = Convert.ToDateTime(startDate);
+                                //start = Convert.ToDateTime(startDate);
+                                start = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                             } catch(FormatException fe)
                             {
                                 throw fe;
@@ -602,10 +603,12 @@ namespace HR_LEAVEv2.UserControls
                     if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
                     {
                         int indexStartDate = GetColumnIndexByName(row, "start_date");
-                        startDate = DateTime.Parse(row.Cells[indexStartDate].Text);
+                        startDate = DateTime.ParseExact(row.Cells[indexStartDate].Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                        //startDate = DateTime.Parse(row.Cells[indexStartDate].Text);
 
                         int indexEndDate = GetColumnIndexByName(row, "end_date");
-                        endDate = DateTime.Parse(row.Cells[indexEndDate].Text);
+                        endDate = DateTime.ParseExact(row.Cells[indexEndDate].Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                        //endDate = DateTime.Parse(row.Cells[indexEndDate].Text);
 
                         int indexLeavetype = GetColumnIndexByName(row, "leave_type");
                         leaveType = (row.Cells[indexLeavetype].Text).ToString();
@@ -704,7 +707,7 @@ namespace HR_LEAVEv2.UserControls
                 }
 
                 // Recommend
-                if (commandName == "recommend")
+                if (commandName == "recommended")
                 {
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -712,7 +715,7 @@ namespace HR_LEAVEv2.UserControls
                 }
 
                 // Not Recommend
-                if (commandName == "notRecommend")
+                if (commandName == "notRecommended")
                 {
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -777,7 +780,7 @@ namespace HR_LEAVEv2.UserControls
                 catch (Exception ex)
                 {
                     //exception logic
-                    Console.WriteLine(ex.Message.ToString());
+                    throw ex;
                 }
             }
         }
@@ -810,32 +813,17 @@ namespace HR_LEAVEv2.UserControls
             Boolean isValidated = true;
 
             // validate start date is a date
-            try
-            {
-                if (!String.IsNullOrEmpty(startDate))
-                    start = Convert.ToDateTime(startDate);
-                else
-                    throw new FormatException();
-
-            }
-            catch (FormatException fe)
+            if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start) || String.IsNullOrEmpty(startDate))
             {
                 if (type == 0)
                     invalidSubmittedFromDate.Style.Add("display", "inline-block");
-                else 
+                else
                     invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
 
             // validate end date is a date
-            try
-            {
-                if (!String.IsNullOrEmpty(endDate))
-                    end = Convert.ToDateTime(endDate);
-                else
-                    throw new FormatException();
-            }
-            catch (FormatException fe)
+            if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end) || String.IsNullOrEmpty(endDate))
             {
                 if (type == 0)
                     invalidSubmittedToDate.Style.Add("display", "inline-block");
@@ -843,7 +831,7 @@ namespace HR_LEAVEv2.UserControls
                     invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
-
+      
             if (isValidated)
             {
 
@@ -874,12 +862,11 @@ namespace HR_LEAVEv2.UserControls
             // reset all values to null throughout??
 
             // check if control exists first?? (because some may be hidden)
-
             SubmittedFrom = tbSubmittedFrom.Text.ToString();
-            SubmittedTo = tbSubmittedTo.Text.ToString();
+            SubmittedTo = tbSubmittedTo.Text.ToString(); 
 
             StartDate = tbStartDate.Text.ToString();
-            EndDate = tbEndDate.Text.ToString();
+            EndDate = tbEndDate.Text.ToString(); 
 
             // validate all dates
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");

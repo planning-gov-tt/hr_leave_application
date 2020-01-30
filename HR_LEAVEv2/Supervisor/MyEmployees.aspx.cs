@@ -88,7 +88,7 @@ namespace HR_LEAVEv2.Supervisor
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw ex;
             }
         }
 
@@ -139,7 +139,7 @@ namespace HR_LEAVEv2.Supervisor
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw ex;
             }
         }
 
