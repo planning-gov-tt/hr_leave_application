@@ -403,7 +403,7 @@
                                     <label for="txtStartDate">Start date</label>
                                     <asp:TextBox ID="txtStartDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
                                     <i id="startDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                                    <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtStartDate" PopupButtonID="startDateCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
+                                    <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtStartDate" PopupButtonID="startDateCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
                                     <asp:RequiredFieldValidator ValidationGroup="empRecord" ID="startDateRequiredValidator" runat="server" ControlToValidate="txtStartDate" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
                                 </span>
 
@@ -413,7 +413,7 @@
                                     </label>
                                     <asp:TextBox ID="txtEndDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
                                     <i id="endDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                                    <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtEndDate" PopupButtonID="endDateCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
+                                    <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="txtEndDate" PopupButtonID="endDateCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
                                     <asp:RequiredFieldValidator 
                                         ValidationGroup="empRecord" 
                                         ID="endDateRequiredValidator" 
@@ -439,6 +439,14 @@
                                 <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
+                                </asp:Panel>
+                                <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span19" runat="server">Start date is on the weekend</span>
+                                </asp:Panel>
+                                <asp:Panel ID="endDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span20" runat="server">Expected end date is on the weekend</span>
                                 </asp:Panel>
                                 <asp:Panel ID="duplicateRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -518,10 +526,10 @@
                             <asp:BoundField HeaderText="Position" DataField="pos_name" />
 
                             <%--Index 6: Start--%>
-                            <asp:BoundField HeaderText="Start Date" DataField="start_date" DataFormatString="{0:MM/dd/yyyy}" />
+                            <asp:BoundField HeaderText="Start Date" DataField="start_date" DataFormatString="{0:d/MM/yyyy}" />
 
                             <%--Index 7: Expected End Date--%>
-                            <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date" DataFormatString="{0:MM/dd/yyyy}"/>
+                            <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date" DataFormatString="{0:d/MM/yyyy}"/>
 
                             <%--Index 8: isDeleted--%>
                             <asp:BoundField HeaderText="isChanged" DataField="isChanged" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden" />
@@ -579,7 +587,7 @@
                                     <label for="txtEmpRecordEndDate">Enter end date:</label>
                                     <asp:TextBox ID="txtEmpRecordEndDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
                                     <i id="empRecordEndDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                                    <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtEmpRecordEndDate" PopupButtonID="empRecordEndDateCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
+                                    <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtEmpRecordEndDate" PopupButtonID="empRecordEndDateCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
                                 </div>
                             </div>
 
@@ -591,6 +599,10 @@
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>No end date is entered</span>
                             </asp:Panel>
+                            <asp:Panel ID="actualEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span21" runat="server">Actual end date is on the weekend</span>
+                                </asp:Panel>
                             <asp:Panel ID="endDateBeforeStartDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>End date cannot be before start date</span>
