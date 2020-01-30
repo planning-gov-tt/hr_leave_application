@@ -16,22 +16,22 @@
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter submitted from date" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
             <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
-            <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter submitted to date" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
             <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
-            <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" Format="MM/dd/yyyy"/>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" Format="d/MM/yyyy"/>
         </div>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter start date" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
             <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-            <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server" Format="MM/dd/yyyy"></ajaxToolkit:CalendarExtender>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter end date" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
             <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-            <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" Format="MM/dd/yyyy"/>
+            <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" Format="d/MM/yyyy"/>
         </div>
     </div>
     <div id="divTbSupervisor" class="row" runat="server">
@@ -142,11 +142,11 @@
 
         <Columns>
 
-            <asp:BoundField HeaderText="Date Submitted" DataField="date_submitted" SortExpression="date_submitted" DataFormatString="{0:d/MM/yyyy hh:mm tt}" />
+            <asp:BoundField HeaderText="Date Submitted" DataField="date_submitted" SortExpression="date_submitted" DataFormatString="{0:d/MM/yyyy h:mm tt}" />
             <asp:BoundField HeaderText="Supervisor" DataField="supervisor_name" SortExpression="supervisor_name" />
             <asp:BoundField HeaderText="Employee" DataField="employee_name" SortExpression="employee_name" />
-            <asp:BoundField HeaderText="Start Date" DataField="start_date" SortExpression="start_date"  />
-            <asp:BoundField HeaderText="End Date" DataField="end_date" SortExpression="end_date"  />
+            <asp:BoundField HeaderText="Start Date" DataField="start_date" SortExpression="start_date" DataFormatString="{0:d/MM/yyyy}" />
+            <asp:BoundField HeaderText="End Date" DataField="end_date" SortExpression="end_date"  DataFormatString="{0:d/MM/yyyy}"/>
             <asp:BoundField HeaderText="Leave Type" DataField="leave_type" SortExpression="leave_type" />
             <%--<asp:BoundField HeaderText="Qualified" DataField="" SortExpression="" />--%>
             <asp:BoundField HeaderText="Status" DataField="status" SortExpression="status" />

@@ -35,8 +35,8 @@ namespace HR_LEAVEv2.UserControls
                 ep.employment_type employment_type,
 
                 lt.leave_type leave_type,
-                FORMAT(lt.start_date, 'd/MM/yyyy') start_date,
-                FORMAT(lt.end_date, 'd/MM/yyyy') end_date,
+                lt.start_date,
+                lt.end_date,
 
                 s.employee_id supervisor_id,
                 s.last_name + ', ' + LEFT(s.first_name, 1) + '.' AS supervisor_name,
@@ -816,7 +816,7 @@ namespace HR_LEAVEv2.UserControls
             try
             {
                 if (!String.IsNullOrEmpty(startDate))
-                    start = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    start = DateTime.ParseExact(startDate, "MM/d/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                 //start = Convert.ToDateTime(startDate);
                 else
                     throw new FormatException();
@@ -835,7 +835,7 @@ namespace HR_LEAVEv2.UserControls
             try
             {
                 if (!String.IsNullOrEmpty(endDate))
-                    end = DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    end = DateTime.ParseExact(endDate, "MM/d/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                 //end = Convert.ToDateTime(endDate);
                 else
                     throw new FormatException();
@@ -879,12 +879,11 @@ namespace HR_LEAVEv2.UserControls
             // reset all values to null throughout??
 
             // check if control exists first?? (because some may be hidden)
+            SubmittedFrom = !String.IsNullOrEmpty(tbSubmittedFrom.Text.ToString()) ? DateTime.ParseExact(tbSubmittedFrom.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy") : string.Empty;
+            SubmittedTo = !String.IsNullOrEmpty(tbSubmittedTo.Text.ToString()) ? DateTime.ParseExact(tbSubmittedTo.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"): string.Empty; 
 
-            SubmittedFrom = tbSubmittedFrom.Text.ToString();
-            SubmittedTo = tbSubmittedTo.Text.ToString();
-
-            StartDate = tbStartDate.Text.ToString();
-            EndDate = tbEndDate.Text.ToString();
+            StartDate = !String.IsNullOrEmpty(tbStartDate.Text.ToString()) ? DateTime.ParseExact(tbStartDate.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"): string.Empty;
+            EndDate = !String.IsNullOrEmpty(tbEndDate.Text.ToString()) ? DateTime.ParseExact(tbEndDate.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"): string.Empty; 
 
             // validate all dates
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");
