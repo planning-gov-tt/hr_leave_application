@@ -262,25 +262,25 @@ namespace HR_LEAVEv2.UserControls
                 if (!string.IsNullOrEmpty(SubmittedFrom))
                 {
                     whereFilterGridView += $@"
-                        AND lt.created_at >= '{SubmittedFrom}'
+                        AND lt.created_at >= '{DateTime.ParseExact(SubmittedFrom, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(SubmittedTo))
                 {
                     whereFilterGridView += $@"
-                        AND lt.created_at <= '{SubmittedTo}'
+                        AND lt.created_at <= '{DateTime.ParseExact(SubmittedTo, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(StartDate))
                 {
                     whereFilterGridView += $@"
-                        AND lt.start_date >= '{StartDate}'
+                        AND lt.start_date >= '{DateTime.ParseExact(StartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(EndDate))
                 {
                     whereFilterGridView += $@"
-                        AND lt.end_date <= '{EndDate}'
+                        AND lt.end_date <= '{DateTime.ParseExact(EndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
                 if (!string.IsNullOrEmpty(SupervisorName_ID))
@@ -813,34 +813,17 @@ namespace HR_LEAVEv2.UserControls
             Boolean isValidated = true;
 
             // validate start date is a date
-            try
-            {
-                if (!String.IsNullOrEmpty(startDate))
-                    start = DateTime.ParseExact(startDate, "MM/d/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                //start = Convert.ToDateTime(startDate);
-                else
-                    throw new FormatException();
-
-            }
-            catch (FormatException fe)
+            if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start) || String.IsNullOrEmpty(startDate))
             {
                 if (type == 0)
                     invalidSubmittedFromDate.Style.Add("display", "inline-block");
-                else 
+                else
                     invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
 
             // validate end date is a date
-            try
-            {
-                if (!String.IsNullOrEmpty(endDate))
-                    end = DateTime.ParseExact(endDate, "MM/d/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                //end = Convert.ToDateTime(endDate);
-                else
-                    throw new FormatException();
-            }
-            catch (FormatException fe)
+            if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end) || String.IsNullOrEmpty(endDate))
             {
                 if (type == 0)
                     invalidSubmittedToDate.Style.Add("display", "inline-block");
@@ -848,7 +831,7 @@ namespace HR_LEAVEv2.UserControls
                     invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
-
+      
             if (isValidated)
             {
 
@@ -879,11 +862,11 @@ namespace HR_LEAVEv2.UserControls
             // reset all values to null throughout??
 
             // check if control exists first?? (because some may be hidden)
-            SubmittedFrom = !String.IsNullOrEmpty(tbSubmittedFrom.Text.ToString()) ? DateTime.ParseExact(tbSubmittedFrom.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy") : string.Empty;
-            SubmittedTo = !String.IsNullOrEmpty(tbSubmittedTo.Text.ToString()) ? DateTime.ParseExact(tbSubmittedTo.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"): string.Empty; 
+            SubmittedFrom = tbSubmittedFrom.Text.ToString();
+            SubmittedTo = tbSubmittedTo.Text.ToString(); 
 
-            StartDate = !String.IsNullOrEmpty(tbStartDate.Text.ToString()) ? DateTime.ParseExact(tbStartDate.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"): string.Empty;
-            EndDate = !String.IsNullOrEmpty(tbEndDate.Text.ToString()) ? DateTime.ParseExact(tbEndDate.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"): string.Empty; 
+            StartDate = tbStartDate.Text.ToString();
+            EndDate = tbEndDate.Text.ToString(); 
 
             // validate all dates
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");

@@ -83,7 +83,7 @@ namespace HR_LEAVEv2.Employee
                             FORMAT(lt.end_date, 'd/MM/yyyy') end_date, 
                             lt.leave_type, 
                             lt.status, 
-                            FORMAT(lt.created_at, 'd/MM/yyyy HH:mm tt') as submitted_on,
+                            FORMAT(lt.created_at, 'd/MM/yyyy h:mm tt') as submitted_on,
                             lt.supervisor_id, 
                             e.first_name + ' ' + e.last_name as 'supervisor_name', 
                             lt.emp_comment, 
@@ -349,7 +349,6 @@ namespace HR_LEAVEv2.Employee
 
         protected Boolean validateDates(string startDate, string endDate)
         {
-            // validationMsgPanel.Style.Add("display", "none");
             dateComparisonValidationMsgPanel.Style.Add("display", "none");
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");
             startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
@@ -357,30 +356,21 @@ namespace HR_LEAVEv2.Employee
             invalidVacationStartDateMsgPanel.Style.Add("display", "none");
             invalidSickLeaveStartDate.Style.Add("display", "none");
             moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
+            startDateIsWeekend.Style.Add("display", "none");
+            endDateIsWeekend.Style.Add("display", "none");
 
             DateTime start, end;
             start = end = DateTime.MinValue;
             Boolean isValidated = true;
 
             // validate start date is a date
-            try
-            {
-                //start = Convert.ToDateTime(startDate);
-                start = DateTime.ParseExact(startDate, "MM/d/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-            }
-            catch (FormatException fe)
+            if(!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start))
             {
                 invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
 
-            // validate end date is a date
-            try
-            {
-                //end = Convert.ToDateTime(endDate);
-                end = DateTime.ParseExact(endDate, "MM/d/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-            }
-            catch (FormatException fe)
+            if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
             {
                 invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
@@ -466,8 +456,11 @@ namespace HR_LEAVEv2.Employee
             string empId, leaveType, startDate, endDate, supId, comments;
             empId = Session["emp_id"].ToString();
             leaveType = typeOfLeave.SelectedValue;
-            startDate = DateTime.ParseExact(txtFrom.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy");
-            endDate = DateTime.ParseExact(txtTo.Text.ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy");
+
+            // must convert start and end date to MM/d/yyyy format in order to insert into DB
+            startDate = txtFrom.Text.ToString();
+            endDate = txtTo.Text.ToString();
+
             supId = supervisor_select.selectedSupId;
             comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null;
 
@@ -491,8 +484,8 @@ namespace HR_LEAVEv2.Employee
                         VALUES
                            ( '{empId}'
                             ,'{leaveType}'
-                            ,'{startDate}'
-                            ,'{endDate}'
+                            ,'{DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
+                            ,'{DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             ,'{supId}'
                             ,'Pending'
                             ,@Comments
