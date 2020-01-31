@@ -16,3 +16,5 @@ DROP TABLE [dbo].[rolepermission];
 DROP TABLE [dbo].[role];
 DROP TABLE [dbo].[permission];
 DROP TABLE [dbo].[auditlog];
+DROP TABLE [dbo].[filestorage];
+DROP TABLE [dbo].[employeefiles];

@@ -181,3 +181,21 @@ CREATE TABLE [dbo].[auditlog] (
   FOREIGN KEY ([acting_employee_id])
     REFERENCES [dbo].[employee] ([employee_id])
 );
+
+CREATE TABLE [dbo].[filestorage](
+  [file_id] UNIQUEIDENTIFIER PRIMARY KEY default NEWID(),
+  [file_data] IMAGE NOT NULL,
+  [file_name] NVARCHAR(200) NOT NULL,
+  [file_extension] NVARCHAR (25) NOT NULL,
+  [uploaded_on] DATETIME NOT NULL
+);
+
+CREATE TABLE [dbo].[employeefiles](
+  [id] INT IDENTITY (1, 1) PRIMARY KEY,
+  [employee_id] NVARCHAR(10) NOT NULL,
+  [file_id] UNIQUEIDENTIFIER NOT NULL,
+
+  FOREIGN KEY([employee_id]) REFERENCES [dbo].[employee] ([employee_id]),
+  FOREIGN KEY([file_id]) REFERENCES [dbo].[filestorage] ([file_id])
+
+);
