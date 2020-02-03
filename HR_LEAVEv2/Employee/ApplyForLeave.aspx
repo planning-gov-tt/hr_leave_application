@@ -109,6 +109,7 @@
                     <asp:ListItem Value=""></asp:ListItem>
                     <asp:ListItem Value="Sick"></asp:ListItem>
                     <asp:ListItem Value="Personal"></asp:ListItem>
+                    <asp:ListItem Value="Casual"></asp:ListItem>
                     <asp:ListItem Value="Vacation"></asp:ListItem>
                     <asp:ListItem Value="Maternity"></asp:ListItem>
                     <asp:ListItem Value="Pre-retirement"></asp:ListItem>

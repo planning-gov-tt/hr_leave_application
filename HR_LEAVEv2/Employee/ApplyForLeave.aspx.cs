@@ -384,18 +384,21 @@ namespace HR_LEAVEv2.Employee
             editModeTitle.Visible = true;
             applyModeTitle.Visible = false;
 
-
-            numDaysAppliedFor.Visible = false;
-            numDaysAppliedForEditTxt.Visible = true;
-
             //if supervisor on leave application, then they can leave a comment
             if(Session["emp_id"].ToString() == ltDetails.supId)
                 supCommentsTxt.Disabled = false;
 
             List<string> permissions = (List<string>)Session["permissions"];
 
-            if(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
+            if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
+            {
                 hrCommentsTxt.Disabled = false;
+                numDaysAppliedForEditTxt.Visible = true;
+                numDaysAppliedFor.Visible = false;
+            }
+            else
+                numDaysAppliedFor.Visible = true;
+                
 
             submitEditsPanel.Visible = true;
 
@@ -867,7 +870,7 @@ namespace HR_LEAVEv2.Employee
                     connection.Open();
                     string sql = $@"
                         UPDATE [dbo].leavetransaction 
-                        SET days_taken = @DaysTaken, sup_comment = @SupervisorComments, hr_comment = @HrComments
+                        SET days_taken = @DaysTaken, sup_comment = @SupervisorComments, hr_comment = @HrComments, 
                         WHERE transaction_id = {leaveId};
                     ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
