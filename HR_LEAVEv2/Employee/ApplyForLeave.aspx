@@ -131,12 +131,18 @@
         </div>
 
         <%--Apply mode: Allows user to upload docs--%>
-        <div class="row form-group">
+        <asp:Panel ID="fileUploadPanel" runat="server" Style="display:inline" CssClass="row form-group">
             <label for="FileUpload1" style="font-size:1.2em; display:inline;">Upload Files:</label>
-            <asp:Panel ID="fileUploadPanel" runat="server" Style="display:inline;">
-                <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin: auto; display: inline-block" />
+            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin: auto; display: inline-block" AllowMultiple="true"/> 
+            <br />
+            <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align:left; margin: 0 auto; display:inline-block;">
+                <div>Files uploaded:</div>
+                <asp:BulletedList ID="filesUploadedList" runat="server" BulletStyle="NotSet" Style="display:inline-block; text-align:left;"></asp:BulletedList>
             </asp:Panel>
-        </div>
+            <br />
+            <asp:Button ID="uploadBtn" runat="server" Text="Upload files" OnClick="uploadBtn_Click" CssClass="btn btn-primary"  Style="display:inline-block; "/>
+            <asp:Button ID="clearUploadedFiles" runat="server" Text="Clear files" OnClick="clearUploadedFiles_Click" CssClass="btn btn-primary" Style="display:inline-block; "/>                                
+        </asp:Panel>
         
 
         <%--View mode: Shows the comments made by employee when submitting the leave application --%>
@@ -167,6 +173,16 @@
                         <span id="Span3" runat="server">Could not verify supervisor</span>
                     </asp:Panel>
 
+                    <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
+                    </asp:Panel>
+
                     <asp:Panel ID="startDateIsWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span4" runat="server">Start date is on the weekend</span>
@@ -179,7 +195,7 @@
 
                     <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span id="Span6" runat="server">More than 2 days of consecutive sick leave requires a medical leave of absence</span>
+                        <span id="Span6" runat="server">No files currently uploaded. More than 2 days of consecutive sick leave requires a medical leave of absence.</span>
                     </asp:Panel>
 
                     <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
@@ -206,11 +222,22 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
                     </asp:Panel>
+                    <asp:Panel ID="errorInsertingFilesToDbPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="Span7" runat="server">Error inserting files into database</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="errorSubmittingLeaveApplicationPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="Span8" runat="server">Error submitting leave application</span>
+                    </asp:Panel>
+
                     <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none;" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span id="successMsg" runat="server">Application successfully submitted</span>
                         <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />
                     </asp:Panel>
+
                     <asp:Panel ID="submitButtonPanel" runat="server" CssClass="row form-group">
                         <asp:LinkButton ID="cancelBtn" runat="server" Text="Cancel" Style="margin-right: 35px;" CssClass="btn btn-danger" OnClick="refreshForm" CausesValidation="False">
                                  <i class="fa fa-times" aria-hidden="true"></i>

@@ -3,7 +3,7 @@
 
 
 <ajaxToolkit:ComboBox ID="ComboBox1" 
-    runat="server" 
+    runat="server" AutoPostBack="true" DropDownStyle="DropDownList"
     AutoCompleteMode="SuggestAppend" 
     DataSourceID="SqlDataSource1" 
     DataTextField="Supervisor Name" 

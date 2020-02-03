@@ -46,8 +46,7 @@ namespace HR_LEAVEv2.UserControls
                 LEFT(hr.first_name, 1) + '. ' + hr.last_name AS hr_manager_name,
                 lt.hr_manager_edit_date hr_manager_edit_date,
     
-                lt.status status,
-                lt.file_path file_path              
+                lt.status status              
             ";
 
         // general from
