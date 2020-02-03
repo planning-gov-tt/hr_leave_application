@@ -100,6 +100,7 @@ CREATE TABLE [dbo].[leavetransaction] (
   [leave_type] NVARCHAR (20) NOT NULL,
   [start_date] DATE NOT NULL,
   [end_date] DATE NOT NULL,
+  [days_taken] INT NOT NULL,
 
   [supervisor_id] NVARCHAR (10) NOT NULL,
   [supervisor_edit_date] DATETIME,
@@ -110,8 +111,7 @@ CREATE TABLE [dbo].[leavetransaction] (
   [status] NVARCHAR (30) NOT NULL,
   [emp_comment] NVARCHAR (120),
   [sup_comment] NVARCHAR (120),
-  [hr_comment] NVARCHAR (120),
-  [file_path] NVARCHAR (50),
+  [hr_comment] NVARCHAR (120)
 
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id]),
@@ -175,7 +175,7 @@ CREATE TABLE [dbo].[auditlog] (
   [acting_employee_name] NVARCHAR (60)NOT NULL,
   [affected_employee_id] NVARCHAR (10) NOT NULL,
   [affected_employee_name] NVARCHAR (60) NOT NULL,
-  [action] NVARCHAR (200) NOT NULL,
+  [action] NVARCHAR (300) NOT NULL,
   [created_at] DATETIME NOT NULL,
 
   FOREIGN KEY ([acting_employee_id])
@@ -192,9 +192,11 @@ CREATE TABLE [dbo].[filestorage](
 
 CREATE TABLE [dbo].[employeefiles](
   [id] INT IDENTITY (1, 1) PRIMARY KEY,
+  [leave_transaction_id] INT NOT NULL,
   [employee_id] NVARCHAR(10) NOT NULL,
   [file_id] UNIQUEIDENTIFIER NOT NULL,
 
+  FOREIGN KEY ([leave_transaction_id]) REFERENCES [dbo].[leavetransaction] ([transaction_id]),
   FOREIGN KEY([employee_id]) REFERENCES [dbo].[employee] ([employee_id]),
   FOREIGN KEY([file_id]) REFERENCES [dbo].[filestorage] ([file_id])
 
