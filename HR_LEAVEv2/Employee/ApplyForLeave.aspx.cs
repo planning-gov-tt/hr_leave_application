@@ -22,6 +22,7 @@ namespace HR_LEAVEv2.Employee
             public string empType { get; set; }
             public string startDate { get; set; }
             public string endDate { get; set; }
+            public string daysTaken { get; set; }
             public string typeOfLeave { get; set; }
             public string supId { get; set; }
             public string supName { get; set; }
@@ -121,6 +122,7 @@ namespace HR_LEAVEv2.Employee
                             ep.employment_type , 
                             FORMAT(lt.start_date, 'd/MM/yyyy') start_date, 
                             FORMAT(lt.end_date, 'd/MM/yyyy') end_date, 
+                            lt.days_taken,
                             lt.leave_type, 
                             lt.status, 
                             FORMAT(lt.created_at, 'd/MM/yyyy h:mm tt') as submitted_on,
@@ -155,6 +157,7 @@ namespace HR_LEAVEv2.Employee
                                     empType = reader["employment_type"].ToString(),
                                     startDate = reader["start_date"].ToString(),
                                     endDate = reader["end_date"].ToString(),
+                                    daysTaken = reader["days_taken"].ToString(),
                                     typeOfLeave = reader["leave_type"].ToString(),
                                     status = reader["status"].ToString(),
                                     submittedOn = reader["submitted_on"].ToString(),
@@ -240,13 +243,22 @@ namespace HR_LEAVEv2.Employee
                             empNameHeader.InnerText = ltDetails.empName;
                             txtFrom.Text = ltDetails.startDate;
                             txtTo.Text = ltDetails.endDate;
+                            numDaysAppliedFor.Text = ltDetails.daysTaken;
+
+                            // store previous num days applied for in viewstate
+                            ViewState["daysTaken"] = numDaysAppliedForEditTxt.Text = ltDetails.daysTaken;
+
                             typeOfLeaveTxt.Text = ltDetails.typeOfLeave;
                             statusTxt.Text = ltDetails.status;
                             submittedOnTxt.Text = "Submitted on: " + ltDetails.submittedOn;
                             supervisorNameTxt.Text = ltDetails.supName;
                             empCommentsTxt.Value = ltDetails.empComment;
-                            supCommentsTxt.Value = ltDetails.supComment;
-                            hrCommentsTxt.Value = ltDetails.hrComment;
+
+                            // store previous supervisor comment in viewstate
+                            ViewState["supComment"] = supCommentsTxt.Value =  ltDetails.supComment;
+
+                            // store previous HR comment in viewstate
+                            ViewState["hrComment"] = hrCommentsTxt.Value = ltDetails.hrComment;
 
                         }
 
@@ -309,8 +321,8 @@ namespace HR_LEAVEv2.Employee
             supCommentsTxt.Disabled = true;
             hrCommentsTxt.Disabled = true;
 
-            //comment edit
-            submitCommentsPanel.Visible = false;
+            //Edits
+            submitEditsPanel.Visible = false;
 
             return ltDetails;
         }
@@ -360,8 +372,8 @@ namespace HR_LEAVEv2.Employee
             //Submit Button
             submitButtonPanel.Visible = true;
 
-            //Submit Comments 
-            submitCommentsPanel.Visible = false;
+            //Submit Edits 
+            submitEditsPanel.Visible = false;
 
         }
 
@@ -372,7 +384,9 @@ namespace HR_LEAVEv2.Employee
             editModeTitle.Visible = true;
             applyModeTitle.Visible = false;
 
-            //Comments
+
+            numDaysAppliedFor.Visible = false;
+            numDaysAppliedForEditTxt.Visible = true;
 
             //if supervisor on leave application, then they can leave a comment
             if(Session["emp_id"].ToString() == ltDetails.supId)
@@ -383,7 +397,7 @@ namespace HR_LEAVEv2.Employee
             if(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
                 hrCommentsTxt.Disabled = false;
 
-            submitCommentsPanel.Visible = true;
+            submitEditsPanel.Visible = true;
 
         }
 
@@ -722,107 +736,6 @@ namespace HR_LEAVEv2.Employee
             Response.Redirect(Request.QueryString["returnUrl"]);
         }
 
-        protected void submitCommentsBtn_Click(object sender, EventArgs e)
-        {
-            string leaveId = Request.QueryString["leaveId"];
-            string supComment, hrComment;
-            supComment = hrComment = string.Empty;
-            if (supCommentsTxt.Disabled == false)
-                supComment = supCommentsTxt.InnerText;
-
-            if (hrCommentsTxt.Disabled == false)
-                hrComment = hrCommentsTxt.InnerText;
-
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-                    string sql = $@"
-                        UPDATE [dbo].leavetransaction 
-                        SET sup_comment = @SupervisorComments, hr_comment = @HrComments
-                        WHERE transaction_id = {leaveId};
-                    ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        if(supComment != string.Empty)
-                            command.Parameters.AddWithValue("@SupervisorComments", supComment);
-                        else
-                            command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
-
-                        if(hrComment != string.Empty)
-                            command.Parameters.AddWithValue("@HrComments", hrComment);
-                        else
-                            command.Parameters.AddWithValue("@HrComments", DBNull.Value);
-
-                        int rowsAffected = command.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            // show success message
-                            successfulSubmitCommentsMsgPanel.Visible = true;
-
-                            // hide submit button
-                            submitCommentsBtn.Visible = false;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //exception logic
-                throw ex;
-            }
-
-            // add audit log
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-                    string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                        command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
-
-                        // hr and supervisor comment
-                        if (!String.IsNullOrEmpty(supComment) && !String.IsNullOrEmpty(hrComment))
-                            command.Parameters.AddWithValue("@Action", $"Submitted supervisor and hr comment; leave_transaction_id= {leaveId}, supervisor_comment= {supComment}, hr_comment= {hrComment}");
-                        else
-                        {
-                            // supervisor comment
-                            if (!String.IsNullOrEmpty(supComment))
-                                command.Parameters.AddWithValue("@Action", $"Submitted supervisor comment; leave_transaction_id= {leaveId}, supervisor_comment= {supComment}");
-
-                            // hr comment
-                            if (!String.IsNullOrEmpty(hrComment))    
-                                command.Parameters.AddWithValue("@Action", $"Submitted HR comment; leave_transaction_id= {leaveId}, hr_comment= {hrComment}");
-                        }
-                        
-
-
-                        command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //exception logic
-                throw ex;
-            }
-
-        }
-
         protected void datesEntered(object sender, EventArgs e)
         {
             DateTime start, end;
@@ -921,5 +834,126 @@ namespace HR_LEAVEv2.Employee
             Session["uploadedFiles"] = null;
             validateDates(txtFrom.Text, txtTo.Text);
         }
+
+        protected void submitEditsBtn_Click(object sender, EventArgs e)
+        {
+            Boolean isSupCommentsChanged, isHrCommentsChanged, isDaysTakenChanged;
+            isSupCommentsChanged = isHrCommentsChanged = isDaysTakenChanged = false;
+
+            string leaveId = Request.QueryString["leaveId"];
+            string supComment, hrComment, daysTaken;
+            supComment = hrComment = daysTaken = string.Empty;
+
+            if (supCommentsTxt.Disabled == false)
+            {
+                supComment = supCommentsTxt.InnerText;
+                isSupCommentsChanged = ViewState["supComment"].ToString() != supComment;
+            }
+
+
+            if (hrCommentsTxt.Disabled == false)
+            {
+                hrComment = hrCommentsTxt.InnerText;
+                isHrCommentsChanged = ViewState["hrComment"].ToString() != hrComment;
+            }
+
+            daysTaken = numDaysAppliedForEditTxt.Text;
+            isDaysTakenChanged = ViewState["daysTaken"].ToString() != daysTaken;
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                        UPDATE [dbo].leavetransaction 
+                        SET days_taken = @DaysTaken, sup_comment = @SupervisorComments, hr_comment = @HrComments
+                        WHERE transaction_id = {leaveId};
+                    ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        if (supComment != string.Empty)
+                            command.Parameters.AddWithValue("@SupervisorComments", supComment);
+                        else
+                            command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
+
+                        if (hrComment != string.Empty)
+                            command.Parameters.AddWithValue("@HrComments", hrComment);
+                        else
+                            command.Parameters.AddWithValue("@HrComments", DBNull.Value);
+
+                        command.Parameters.AddWithValue("@DaysTaken", daysTaken);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            // show success message
+                            successfulSubmitEditsMsgPanel.Visible = true;
+
+                            // hide submit button
+                            submitEditsBtn.Visible = false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                throw ex;
+            }
+
+            // add audit log
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    VALUES ( 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
+                        command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
+
+                        List<string> actionString = new List<string>();
+
+                        if(isSupCommentsChanged)
+                            actionString.Add($" supervisor_comment= '{supComment}'");
+                        if(isHrCommentsChanged)
+                            actionString.Add($" hr_comment= '{hrComment}'");
+                        if(isDaysTakenChanged)
+                            actionString.Add($" days_taken= {daysTaken}");
+
+                        command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {String.Join(",",actionString.ToArray())}");
+                        command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                throw ex;
+            }
+        }
+
+        // to add limitations to what days taken can be
+        //protected void numDaysAppliedForEditTxt_TextChanged(object sender, EventArgs e)
+        //{
+        //    string previousDaysTaken = string.Empty;
+        //    if (ViewState["daysTaken"] != null)
+        //    {
+        //        previousDaysTaken = ViewState["daysTaken"].ToString();
+        //        if(Convert.ToInt32(numDaysAppliedForEditTxt.Text) > Convert.ToInt32(previousDaysTaken)) 
+        //    }
+                
+        //}
     }
 }

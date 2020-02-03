@@ -37,6 +37,7 @@ namespace HR_LEAVEv2.UserControls
                 lt.leave_type leave_type,
                 lt.start_date,
                 lt.end_date,
+                lt.days_taken,
 
                 s.employee_id supervisor_id,
                 s.last_name + ', ' + LEFT(s.first_name, 1) + '.' AS supervisor_name,

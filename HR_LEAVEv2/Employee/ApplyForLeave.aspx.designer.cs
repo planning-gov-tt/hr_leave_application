@@ -211,6 +211,24 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.Label numDaysAppliedFor;
         
         /// <summary>
+        /// numDaysAppliedForEditTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox numDaysAppliedForEditTxt;
+        
+        /// <summary>
+        /// RegularExpressionValidator11 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator11;
+        
+        /// <summary>
         /// typeOfLeaveDropdownPanel control.
         /// </summary>
         /// <remarks>
@@ -715,31 +733,31 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.LinkButton submitBtn;
         
         /// <summary>
-        /// submitCommentsPanel control.
+        /// submitEditsPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel submitCommentsPanel;
+        protected global::System.Web.UI.WebControls.Panel submitEditsPanel;
         
         /// <summary>
-        /// submitCommentsBtn control.
+        /// submitEditsBtn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton submitCommentsBtn;
+        protected global::System.Web.UI.WebControls.LinkButton submitEditsBtn;
         
         /// <summary>
-        /// successfulSubmitCommentsMsgPanel control.
+        /// successfulSubmitEditsMsgPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel successfulSubmitCommentsMsgPanel;
+        protected global::System.Web.UI.WebControls.Panel successfulSubmitEditsMsgPanel;
         
         /// <summary>
         /// Span2 control.

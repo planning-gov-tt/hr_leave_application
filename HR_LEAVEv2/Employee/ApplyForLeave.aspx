@@ -88,6 +88,14 @@
                 title="This count is a literal count and does not take into consideration holidays and weekends. Consult with HR to find out the exact amount of days taken"></i>
             <label for="numDaysAppliedFor" style="font-size: 1.2em">Days applied for:</label>
             <asp:Label ID="numDaysAppliedFor" runat="server" Text="0" Style="font-size: 1.1em"></asp:Label>
+            <asp:TextBox ID="numDaysAppliedForEditTxt" runat="server" Width ="35px" Visible="false" ></asp:TextBox>
+            <asp:RegularExpressionValidator ValidationGroup="editGroup" 
+                        ID="RegularExpressionValidator11" runat="server" 
+                        ControlToValidate="numDaysAppliedForEditTxt" 
+                        ErrorMessage="Please enter a valid number" ForeColor="Red" 
+                        ValidationExpression="^[0-9]*$" 
+                        Display="Dynamic">  
+                    </asp:RegularExpressionValidator>
         </asp:Panel>
 
         <%--View mode: Shows the type of leave applied for--%>
@@ -251,14 +259,14 @@
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
-        <asp:Panel ID="submitCommentsPanel" runat="server" CssClass="row" Style="margin-top: 15px;">
-            <asp:LinkButton ID="submitCommentsBtn" runat="server" Text="Submit comment(s)" CssClass="btn btn-success" OnClick="submitCommentsBtn_Click">
+        <asp:Panel ID="submitEditsPanel" runat="server" CssClass="row" Style="margin-top: 15px;">
+            <asp:LinkButton ID="submitEditsBtn" runat="server" CssClass="btn btn-success" OnClick="submitEditsBtn_Click" ValidationGroup="editGroup">
                 <i class="fa fa-send" aria-hidden="true"></i>
-                Submit comments
+                Submit edit(s)
             </asp:LinkButton>
-            <asp:Panel ID="successfulSubmitCommentsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
+            <asp:Panel ID="successfulSubmitEditsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
                 <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                <span id="Span2" runat="server">Comments successfully added to application</span>
+                <span id="Span2" runat="server">Edits successfully made</span>
                 <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left:3px;" OnClick="returnToPreviousBtn_Click"/>
             </asp:Panel>
         </asp:Panel>
