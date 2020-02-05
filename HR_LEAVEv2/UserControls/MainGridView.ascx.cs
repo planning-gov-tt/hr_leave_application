@@ -38,16 +38,7 @@ namespace HR_LEAVEv2.UserControls
                 lt.start_date,
                 lt.end_date,
                 lt.days_taken,
-
-                --IIF((
-				--(lt.leave_type = 'Sick' AND (lt.days_taken < e.sick)) OR
-				--(lt.leave_type = 'Casual' AND (lt.days_taken < e.casual)) OR
-				--(lt.leave_type = 'Vacation' AND (lt.days_taken < e.vacation)) OR
-				--(lt.leave_type = 'Personal' AND (lt.days_taken < e.personal)) OR
-				--(lt.leave_type = 'Bereavement' AND (lt.days_taken < e.bereavement)) OR
-				--(lt.leave_type = 'Maternity' AND (lt.days_taken < e.maternity)) OR
-				--(lt.leave_type = 'Pre-retirement' AND (lt.days_taken < e.pre_retirement))
-				--), 'Yes', 'No') as qualified,
+                lt.qualified,
 
                 s.employee_id supervisor_id,
                 s.last_name + ', ' + LEFT(s.first_name, 1) + '.' AS supervisor_name,
@@ -330,12 +321,12 @@ namespace HR_LEAVEv2.UserControls
                     ";
                 }
 
-                //if (!string.IsNullOrEmpty(Qualified))
-                //{
-                //    whereFilterGridView += $@"
-                //        AND qualified = {Qualified}
-                //    ";
-                //}
+                if (!string.IsNullOrEmpty(Qualified))
+                {
+                    whereFilterGridView += $@"
+                        AND qualified = '{Qualified}'
+                    ";
+                }
 
                 string sql = select + from + whereBindGridView + whereFilterGridView;
                 sqlCommand.CommandText = sql;

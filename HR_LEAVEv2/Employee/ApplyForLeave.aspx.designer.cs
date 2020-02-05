@@ -109,7 +109,7 @@ namespace HR_LEAVEv2.Employee {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox statusTxt;
+        protected global::System.Web.UI.WebControls.Label statusTxt;
         
         /// <summary>
         /// leaveCountPanel control.
@@ -139,6 +139,33 @@ namespace HR_LEAVEv2.Employee {
         protected global::HR_LEAVEv2.UserControls.LeaveCountUserControlBS4 LeaveCountUserControl;
         
         /// <summary>
+        /// startDateInfoPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel startDateInfoPanel;
+        
+        /// <summary>
+        /// startDateInfoTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label startDateInfoTxt;
+        
+        /// <summary>
+        /// startDateApplyPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel startDateApplyPanel;
+        
+        /// <summary>
         /// txtFrom control.
         /// </summary>
         /// <remarks>
@@ -164,6 +191,33 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator fromCalendarRequiredValidator;
+        
+        /// <summary>
+        /// endDateInfoPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel endDateInfoPanel;
+        
+        /// <summary>
+        /// endDateInfoTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label endDateInfoTxt;
+        
+        /// <summary>
+        /// endDateApplyPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel endDateApplyPanel;
         
         /// <summary>
         /// txtTo control.
@@ -229,6 +283,24 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator11;
         
         /// <summary>
+        /// qualifiedPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel qualifiedPanel;
+        
+        /// <summary>
+        /// qualifiedTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label qualifiedTxt;
+        
+        /// <summary>
         /// typeOfLeaveDropdownPanel control.
         /// </summary>
         /// <remarks>
@@ -271,7 +343,7 @@ namespace HR_LEAVEv2.Employee {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox typeOfLeaveTxt;
+        protected global::System.Web.UI.WebControls.Label typeOfLeaveTxt;
         
         /// <summary>
         /// supervisorSelectUserControlPanel control.
@@ -307,7 +379,7 @@ namespace HR_LEAVEv2.Employee {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox supervisorNameTxt;
+        protected global::System.Web.UI.WebControls.Label supervisorNameTxt;
         
         /// <summary>
         /// fileUploadPanel control.

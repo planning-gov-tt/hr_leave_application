@@ -7,7 +7,7 @@
     <style>
 
         #applyForLeaveContainer div.form-group{
-            margin-top:25px;
+            margin-top:20px;
         }
     </style>
     
@@ -44,9 +44,9 @@
             <asp:Label ID="submittedOnTxt" runat="server"></asp:Label>
         </asp:Panel>
         <%--View mode: Shows status of leave application--%> 
-        <asp:Panel ID="statusPanel" CssClass="row form-group" runat="server">
+        <asp:Panel ID="statusPanel" Style="display:block;margin-top:35px; margin-bottom:10px;" runat="server">
             <label for="statustxt" style="font-size:1.2em">Status:</label>
-            <asp:TextBox ID="statusTxt" runat="server" Style="display:block; margin:0 auto; text-align:center;"></asp:TextBox> 
+            <asp:Label ID="statusTxt" runat="server" Style="display:inline; margin:0 auto; text-align:center; font-size:1.05em;"></asp:Label> 
         </asp:Panel>
 
          <%--Apply mode: Shows the current leave balance of employee --%>
@@ -67,18 +67,30 @@
             <%--Start Date--%>
             <div style="display:inline-block; margin-right:15%;">
                 <label for="txtFrom" style="font-size:1.2em">From:</label>
-                <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" style="width:150px; height:auto; display:inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox> 
-                <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
-                <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
+                <asp:Panel ID="startDateInfoPanel" runat="server" Style="display:inline;">
+                    <asp:Label ID="startDateInfoTxt" runat="server" Style="display:inline;font-size:1.05em"></asp:Label> 
+                </asp:Panel>
+                <asp:Panel ID="startDateApplyPanel" runat="server">
+                    <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox>
+                    <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
+                    <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
+                    <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
+                </asp:Panel>
+                
             </div>
             <%--End Date--%>
-            <div style="display:inline-block;">
-                <label for="txtTo" style="font-size:1.2em">To:</label>
-                <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" style="width:150px; height:auto; display:inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox> 
-                <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
-                <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" Format="d/MM/yyyy"/>
-                <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"  ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
+            <div style="display: inline-block;">
+                <label for="txtTo" style="font-size: 1.2em">To:</label>
+                <asp:Panel ID="endDateInfoPanel" runat="server" Style="display:inline;">
+                    <asp:Label ID="endDateInfoTxt" runat="server" Style="display: inline;font-size:1.05em"></asp:Label>
+                </asp:Panel>
+                <asp:Panel ID="endDateApplyPanel" runat="server">
+                    <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox>
+                    <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
+                    <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" Format="d/MM/yyyy" />
+                    <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
+                </asp:Panel>
+
             </div>
         </div>
         <asp:Panel ID="numDaysAppliedForPanel" CssClass="row form-group" runat="server">
@@ -87,7 +99,7 @@
                 data-placement="left"
                 title="This count is a literal count and does not take into consideration holidays and weekends. Consult with HR to find out the exact amount of days taken"></i>
             <label for="numDaysAppliedFor" style="font-size: 1.2em">Days applied for:</label>
-            <asp:Label ID="numDaysAppliedFor" runat="server" Text="0" Style="font-size: 1.1em"></asp:Label>
+            <asp:Label ID="numDaysAppliedFor" runat="server" Text="0" Style="font-size: 1.05em"></asp:Label>
             <asp:TextBox ID="numDaysAppliedForEditTxt" runat="server" Width ="35px" Visible="false" ></asp:TextBox>
             <asp:RegularExpressionValidator ValidationGroup="editGroup" 
                         ID="RegularExpressionValidator11" runat="server" 
@@ -96,6 +108,12 @@
                         ValidationExpression="^[0-9]*$" 
                         Display="Dynamic">  
                     </asp:RegularExpressionValidator>
+        </asp:Panel>
+
+         <%--View mode: Shows if leave application is qualified--%> 
+        <asp:Panel ID="qualifiedPanel" Style="display:block;" runat="server">
+            <label for="qualifiedTxt" style="font-size:1.2em">Qualified for Leave:</label>
+            <asp:Label ID="qualifiedTxt" runat="server" Style="display:inline; margin:0 auto; text-align:center;font-size:1.05em;"></asp:Label> 
         </asp:Panel>
 
         <%--View mode: Shows the type of leave applied for--%>
@@ -118,9 +136,9 @@
                 <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </asp:Panel>
 
-            <%--view mode--%>
+            <%--view mode, edit mode--%>
             <asp:Panel ID="typeOfLeavePanel" runat="server" Style="display:inline;">
-                <asp:TextBox ID="typeOfLeaveTxt" runat="server" Style="text-align:center;"></asp:TextBox> 
+                <asp:Label ID="typeOfLeaveTxt" runat="server" Style="text-align:center;font-size:1.05em;"></asp:Label> 
             </asp:Panel>
         </div>
 
@@ -135,7 +153,7 @@
 
             <%--view mode--%>
             <asp:Panel ID="supervisorPanel" runat="server"  Style="display:inline;">
-                <asp:TextBox ID="supervisorNameTxt" runat="server" Style="text-align:center;"></asp:TextBox>
+                <asp:Label ID="supervisorNameTxt" runat="server" Style="text-align:center;font-size:1.05em;"></asp:Label>
             </asp:Panel>
         </div>
 
@@ -158,19 +176,19 @@
         <%--Apply mode: Allows employee to enter comments to explain anything necessary as to why they need the leave etc.--%>
         <asp:Panel ID="empCommentsPanel" runat="server" CssClass="row form-group">
             <label for="empCommentsTxt" style="font-size:1.2em">Employee Comments</label>
-            <textarea runat="server" class="form-control" id="empCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+            <textarea runat="server" class="form-control" id="empCommentsTxt" rows="4" style="width:45%; margin:0 auto; font-size:1.05em;"></textarea>
         </asp:Panel>
 
         <%--View mode: Shows the comments made by supervisor as to why they recommended or did not recommend the leave application --%>
         <asp:Panel ID="supCommentsPanel" runat="server" CssClass="row form-group">
             <label for="supCommentsTxt" style="font-size:1.2em">Supervisor Comments</label>
-            <textarea runat="server" class="form-control" id="supCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+            <textarea runat="server" class="form-control" id="supCommentsTxt" rows="4" style="width:45%; margin:0 auto;font-size:1.05em;"></textarea>
         </asp:Panel>
 
         <%--View mode: Shows the comments made by hr as to why they approved or did not approve the leave application --%>
         <asp:Panel ID="hrCommentsPanel" runat="server" CssClass="row form-group">
             <label for="hrCommentsTxt" style="font-size:1.2em">HR Comments</label>
-            <textarea runat="server" class="form-control" id="hrCommentsTxt" rows="4" style="width:45%; margin:0 auto;"></textarea>
+            <textarea runat="server" class="form-control" id="hrCommentsTxt" rows="4" style="width:45%; margin:0 auto;font-size:1.05em;"></textarea>
         </asp:Panel>
 
         <%--Apply mode: Shows any necessary validation messages to user --%>

@@ -23,6 +23,7 @@ namespace HR_LEAVEv2.Employee
             public string startDate { get; set; }
             public string endDate { get; set; }
             public string daysTaken { get; set; }
+            public string qualified { get; set; }
             public string typeOfLeave { get; set; }
             public string supId { get; set; }
             public string supName { get; set; }
@@ -67,16 +68,6 @@ namespace HR_LEAVEv2.Employee
             {
                 if(mode == "apply")
                 {
-                    // validate supervisor
-                    string supId = string.Empty;
-                    if (Session["supervisor_id"] != null)
-                        supId = Session["supervisor_id"].ToString();
-
-                    if(supId != "-1")
-                        invalidSupervisor.Style.Add("display", "none");
-                    else
-                        invalidSupervisor.Style.Add("display", "inline-block");
-
                     // validate dates
                     validateDates(txtFrom.Text, txtTo.Text);
                 }
@@ -122,6 +113,7 @@ namespace HR_LEAVEv2.Employee
                             ep.employment_type , 
                             FORMAT(lt.start_date, 'd/MM/yyyy') start_date, 
                             FORMAT(lt.end_date, 'd/MM/yyyy') end_date, 
+                            lt.qualified,
                             lt.days_taken,
                             lt.leave_type, 
                             lt.status, 
@@ -157,6 +149,7 @@ namespace HR_LEAVEv2.Employee
                                     empType = reader["employment_type"].ToString(),
                                     startDate = reader["start_date"].ToString(),
                                     endDate = reader["end_date"].ToString(),
+                                    qualified = reader["qualified"].ToString(),
                                     daysTaken = reader["days_taken"].ToString(),
                                     typeOfLeave = reader["leave_type"].ToString(),
                                     status = reader["status"].ToString(),
@@ -241,8 +234,8 @@ namespace HR_LEAVEv2.Employee
                             //populate form
                             empIdTxt.Text = ltDetails.empId;
                             empNameHeader.InnerText = ltDetails.empName;
-                            txtFrom.Text = ltDetails.startDate;
-                            txtTo.Text = ltDetails.endDate;
+                            startDateInfoTxt.Text = ltDetails.startDate;
+                            endDateInfoTxt.Text = ltDetails.endDate;
                             numDaysAppliedFor.Text = ltDetails.daysTaken;
 
                             // store previous num days applied for in viewstate
@@ -250,6 +243,7 @@ namespace HR_LEAVEv2.Employee
 
                             typeOfLeaveTxt.Text = ltDetails.typeOfLeave;
                             statusTxt.Text = ltDetails.status;
+                            qualifiedTxt.Text = ltDetails.qualified;
                             submittedOnTxt.Text = "Submitted on: " + ltDetails.submittedOn;
                             supervisorNameTxt.Text = ltDetails.supName;
                             empCommentsTxt.Value = ltDetails.empComment;
@@ -281,7 +275,6 @@ namespace HR_LEAVEv2.Employee
 
             //Status
             statusPanel.Visible = true;
-            statusTxt.Enabled = false;
 
             //File Upload
             fileUploadPanel.Visible = false;
@@ -299,22 +292,20 @@ namespace HR_LEAVEv2.Employee
 
 
             // Start Date
-            txtFrom.Enabled = false;
-            fromCalendarExtender.Enabled = false;
+            startDateApplyPanel.Visible = false;
+            startDateInfoPanel.Visible = true;
 
             // End Date
-            txtTo.Enabled = false;
-            toCalendarExtender.Enabled = false;
+            endDateApplyPanel.Visible = false;
+            endDateInfoPanel.Visible = true;
 
             // Type of Leave
             typeOfLeaveDropdownPanel.Visible = false;
             typeOfLeavePanel.Visible = true;
-            typeOfLeaveTxt.Enabled = false;
 
             //Supervisor Name
             supervisorSelectUserControlPanel.Visible = false;
             supervisorPanel.Visible = true;
-            supervisorNameTxt.Enabled = false;
 
             //Comments
             empCommentsTxt.Disabled = true;
@@ -353,6 +344,8 @@ namespace HR_LEAVEv2.Employee
 
             //Status
             statusPanel.Visible = false;
+
+            qualifiedPanel.Visible = false;
 
             //File upload
             fileUploadPanel.Visible = true;
@@ -548,9 +541,10 @@ namespace HR_LEAVEv2.Employee
             comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null;
 
             // validate form values
-            Boolean isValidated, isLeaveApplicationInsertSuccessful, isFileUploadSuccessful;
+            Boolean isValidated, isLeaveApplicationInsertSuccessful, isFileUploadSuccessful, areFilesUploaded;
             isLeaveApplicationInsertSuccessful = isFileUploadSuccessful = true;
-                
+            areFilesUploaded = false;
+        
             isValidated = validateDates(startDate, endDate);
             if (isValidated && supId != "-1")
             {
@@ -567,6 +561,7 @@ namespace HR_LEAVEv2.Employee
                            ,[leave_type]
                            ,[start_date]
                            ,[end_date]
+                           ,[qualified]
                            ,[days_taken]
                            ,[supervisor_id]
                            ,[status]
@@ -577,6 +572,17 @@ namespace HR_LEAVEv2.Employee
                             ,'{leaveType}'
                             ,'{DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             ,'{DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
+                            , (SELECT IIF((
+				                ( '{leaveType}'= 'Sick' AND {numDaysAppliedFor.Text} < e.sick) OR
+				                ('{leaveType}' = 'Casual' AND {numDaysAppliedFor.Text} < e.casual) OR
+				                ('{leaveType}' = 'Vacation' AND {numDaysAppliedFor.Text} < e.vacation) OR
+				                ('{leaveType}'= 'Personal' AND {numDaysAppliedFor.Text} < e.personal) OR
+				                ('{leaveType}' = 'Bereavement' AND {numDaysAppliedFor.Text} < e.bereavement) OR
+				                ('{leaveType}' = 'Maternity' AND {numDaysAppliedFor.Text} < e.maternity) OR
+				                ('{leaveType}' = 'Pre-retirement' AND {numDaysAppliedFor.Text} < e.pre_retirement)
+				                ), 'Yes', 'No')
+                              FROM [dbo].[employee] e
+                              WHERE e.employee_id = {empId})
                             , {numDaysAppliedFor.Text}
                             ,'{supId}'
                             ,'Pending'
@@ -605,6 +611,7 @@ namespace HR_LEAVEv2.Employee
 
                 if (isLeaveApplicationInsertSuccessful && files != null)
                 {
+                    areFilesUploaded = files.Count > 0;
                     // save uploaded file(s)
                     foreach (HttpPostedFile uploadedFile in files)
                     {
@@ -702,7 +709,12 @@ namespace HR_LEAVEv2.Employee
                             {
                                 command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                                 command.Parameters.AddWithValue("@AffectedEmployeeId", Session["emp_id"].ToString());
-                                command.Parameters.AddWithValue("@Action", $"Submitted leave application: leave_transaction_id= {transaction_id};Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb =>  "id= " + lb).ToArray())}");
+
+                                string fileActionString = String.Empty;
+                                if (areFilesUploaded)
+                                    fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
+
+                                command.Parameters.AddWithValue("@Action", $"Submitted leave application: leave_transaction_id= {transaction_id};{fileActionString}");
                                 command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
                                 command.ExecuteNonQuery();
                             }
@@ -870,7 +882,21 @@ namespace HR_LEAVEv2.Employee
                     connection.Open();
                     string sql = $@"
                         UPDATE [dbo].leavetransaction 
-                        SET days_taken = @DaysTaken, sup_comment = @SupervisorComments, hr_comment = @HrComments, 
+                        SET 
+                            days_taken = @DaysTaken, 
+                            sup_comment = @SupervisorComments, 
+                            hr_comment = @HrComments, 
+                            qualified = (SELECT IIF((
+				                ( '{typeOfLeave.SelectedValue}'= 'Sick' AND @DaysTaken < e.sick) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Casual' AND @DaysTaken < e.casual) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Vacation' AND @DaysTaken < e.vacation) OR
+				                ('{typeOfLeave.SelectedValue}'= 'Personal' AND @DaysTaken < e.personal) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Bereavement' AND @DaysTaken < e.bereavement) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Maternity' AND @DaysTaken < e.maternity) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Pre-retirement' AND @DaysTaken < e.pre_retirement)
+				                ), 'Yes', 'No')
+                              FROM [dbo].[employee] e
+                              WHERE e.employee_id = (SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId}))
                         WHERE transaction_id = {leaveId};
                     ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
@@ -930,11 +956,11 @@ namespace HR_LEAVEv2.Employee
                         if(isSupCommentsChanged)
                             actionString.Add($" supervisor_comment= '{supComment}'");
                         if(isHrCommentsChanged)
-                            actionString.Add($" hr_comment= '{hrComment}'");
+                            actionString.Add($"hr_comment= '{hrComment}'");
                         if(isDaysTakenChanged)
-                            actionString.Add($" days_taken= {daysTaken}");
+                            actionString.Add($"days_taken= {daysTaken}");
 
-                        command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {String.Join(",",actionString.ToArray())}");
+                        command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {String.Join(", ",actionString.ToArray())}");
                         command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
                         command.ExecuteNonQuery();
                     }

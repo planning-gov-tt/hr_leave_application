@@ -150,7 +150,7 @@
             <asp:BoundField HeaderText="Days Applied For" DataField="days_taken" SortExpression="days_taken" />
             <asp:BoundField HeaderText="Leave Type" DataField="leave_type" SortExpression="leave_type" />
             <asp:BoundField HeaderText="Status" DataField="status" SortExpression="status" />
-<%--            <asp:BoundField HeaderText="Qualified" DataField="qualified" SortExpression="qualified" />--%>
+            <asp:BoundField HeaderText="Qualified" DataField="qualified" SortExpression="qualified" />
 
             <%--action buttons--%>
             <asp:TemplateField HeaderText="Action" Visible="true">
