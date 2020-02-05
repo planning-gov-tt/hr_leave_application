@@ -194,39 +194,39 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 
 SET IDENTITY_INSERT [dbo].[leavetransaction] ON;
 
-INSERT INTO [dbo].[leavetransaction] ([transaction_id], [created_at], [employee_id], [leave_type], [start_date], [end_date],[days_taken], [supervisor_id], [supervisor_edit_date], [hr_manager_id], [hr_manager_edit_date], [status], [emp_comment],[sup_comment],[hr_comment]) VALUES
--- SENARIOS 
+INSERT INTO [dbo].[leavetransaction] ([transaction_id], [created_at], [employee_id], [leave_type], [start_date], [end_date], [qualified],[days_taken], [supervisor_id], [supervisor_edit_date], [hr_manager_id], [hr_manager_edit_date], [status], [emp_comment],[sup_comment],[hr_comment]) VALUES
+-- SCENARIOS 
 -- VIEWS: (emp, sup, hr)
 
 -- emp applies for sick leave to sup, pending
-(1, '20191208 10:00:00 AM', '1', 'Sick', '20191201', '20191207',7, '115245', NULL, NULL, NULL, 'Pending', NULL, 'Good employee, normally prompt and consistent', NULL),
+(1, '20191208 10:00:00 AM', '1', 'Sick', '20191201', '20191207','Yes',7, '115245', NULL, NULL, NULL, 'Pending', NULL, 'Good employee, normally prompt and consistent', NULL),
 
 -- emp applies for sick leave to sup, recommended
-(2, '20191208 12:00:00 PM', '3', 'Sick', '20201201', '20201207', 7,'115245', '20191208 12:10:00 PM', NULL, NULL, 'Recommended','I have swine flu', 'Good Standing',NULL),
+(2, '20191208 12:00:00 PM', '3', 'Sick', '20201201', '20201207','Yes', 7,'115245', '20191208 12:10:00 PM', NULL, NULL, 'Recommended','I have swine flu', 'Good Standing',NULL),
 
 -- emp applies for vacation leave to sup, to hr, approved
-(3, '20191101 9:54:00 AM', '184164', 'Vacation', '20201201','20201210', 10,'123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved',NULL, 'Good',NULL),
+(3, '20191101 9:54:00 AM', '184164', 'Vacation', '20201201','20201210','Yes', 10,'123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved',NULL, 'Good',NULL),
 
 -- same employee applies for sick leave to sup, recommended
-(4, '20191110 9:54:00 AM', '184164', 'Sick', '20191109', '20191109', 1,'123337', '20191111 10:05:12 AM', NULL, NULL, 'Recommended', NULL,NULL, NULL),
+(4, '20191110 9:54:00 AM', '184164', 'Sick', '20191109', '20191109','Yes', 1,'123337', '20191111 10:05:12 AM', NULL, NULL, 'Recommended', NULL,NULL, NULL),
 
 -- setup for demo
 -- hr director applies to PS for vacation leave - after approval should not see your own app in hr gridview
-(5, '20191112 9:54:00 AM', '83612', 'Vacation', '20191212', '20200101', 21,'07525', NULL, NULL, NULL, 'Pending', NULL, NULL, NULL),
+(5, '20191112 9:54:00 AM', '83612', 'Vacation', '20191212', '20200101','Yes', 21,'07525', NULL, NULL, NULL, 'Pending', NULL, NULL, NULL),
 
 -- hr director applies to PS for sick leave
-(6, '20191125 12:54:00 PM', '83612', 'Sick', '20191123', '20191124', 2,'07525', NULL, NULL, NULL, 'Recommended', NULL,'No problem',NULL),
+(6, '20191125 12:54:00 PM', '83612', 'Sick', '20191123', '20191124','Yes', 2,'07525', NULL, NULL, NULL, 'Recommended', NULL,'No problem',NULL),
 
 -- HRO3 applies to HR Director for sick leave (sup)
-(7, '20191125 12:54:00 PM', '11948', 'Sick', '20201123', '20201124', 2,'83612', NULL, NULL, NULL, 'Pending', NULL,NULL,NULL),
+(7, '20191125 12:54:00 PM', '11948', 'Sick', '20201123', '20201124','Yes', 2,'83612', NULL, NULL, NULL, 'Pending', NULL,NULL,NULL),
 
 -- hr2
 -- can see and approve sick and casual ONLY
 -- can see and approve contract ONLY
-(8, '20191125 12:54:00 PM', '38137', 'Sick', '20191123', '20191124', 2,'11948', NULL, NULL, NULL, 'Recommended', 'Ebola take me','Feel Better',NULL),
+(8, '20191125 12:54:00 PM', '38137', 'Sick', '20191123', '20191124','Yes', 2,'11948', NULL, NULL, NULL, 'Recommended', 'Ebola take me','Feel Better',NULL),
 
 -- can see and approve public_services ONLY
-(9, '20191125 12:54:00 PM', '05356', 'Casual', '20191123', '20191124', 2,'01548', NULL, NULL, NULL, 'Recommended', NULL,NULL,NULL)
+(9, '20191125 12:54:00 PM', '05356', 'Casual', '20191123', '20191124','Yes', 2,'01548', NULL, NULL, NULL, 'Recommended', NULL,NULL,NULL)
 
 -- hr1
 -- can see and appprove all other types (vacation etc)

@@ -100,6 +100,7 @@ CREATE TABLE [dbo].[leavetransaction] (
   [leave_type] NVARCHAR (20) NOT NULL,
   [start_date] DATE NOT NULL,
   [end_date] DATE NOT NULL,
+  [qualified] NVARCHAR(10) NOT NULL,
   [days_taken] INT NOT NULL,
 
   [supervisor_id] NVARCHAR (10) NOT NULL,
