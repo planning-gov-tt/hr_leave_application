@@ -573,13 +573,13 @@ namespace HR_LEAVEv2.Employee
                             ,'{DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             ,'{DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             , (SELECT IIF((
-				                ( '{leaveType}'= 'Sick' AND {numDaysAppliedFor.Text} < e.sick) OR
-				                ('{leaveType}' = 'Casual' AND {numDaysAppliedFor.Text} < e.casual) OR
-				                ('{leaveType}' = 'Vacation' AND {numDaysAppliedFor.Text} < e.vacation) OR
-				                ('{leaveType}'= 'Personal' AND {numDaysAppliedFor.Text} < e.personal) OR
-				                ('{leaveType}' = 'Bereavement' AND {numDaysAppliedFor.Text} < e.bereavement) OR
-				                ('{leaveType}' = 'Maternity' AND {numDaysAppliedFor.Text} < e.maternity) OR
-				                ('{leaveType}' = 'Pre-retirement' AND {numDaysAppliedFor.Text} < e.pre_retirement)
+				                ( '{leaveType}'= 'Sick' AND {numDaysAppliedFor.Text} <= e.sick) OR
+				                ('{leaveType}' = 'Casual' AND {numDaysAppliedFor.Text} <= e.casual) OR
+				                ('{leaveType}' = 'Vacation' AND {numDaysAppliedFor.Text} <= e.vacation) OR
+				                ('{leaveType}'= 'Personal' AND {numDaysAppliedFor.Text} <= e.personal) OR
+				                ('{leaveType}' = 'Bereavement' AND {numDaysAppliedFor.Text} <= e.bereavement) OR
+				                ('{leaveType}' = 'Maternity' AND {numDaysAppliedFor.Text} <= e.maternity) OR
+				                ('{leaveType}' = 'Pre-retirement' AND {numDaysAppliedFor.Text} <= e.pre_retirement)
 				                ), 'Yes', 'No')
                               FROM [dbo].[employee] e
                               WHERE e.employee_id = {empId})
@@ -887,13 +887,13 @@ namespace HR_LEAVEv2.Employee
                             sup_comment = @SupervisorComments, 
                             hr_comment = @HrComments, 
                             qualified = (SELECT IIF((
-				                ( '{typeOfLeave.SelectedValue}'= 'Sick' AND @DaysTaken < e.sick) OR
-				                ('{typeOfLeave.SelectedValue}' = 'Casual' AND @DaysTaken < e.casual) OR
-				                ('{typeOfLeave.SelectedValue}' = 'Vacation' AND @DaysTaken < e.vacation) OR
-				                ('{typeOfLeave.SelectedValue}'= 'Personal' AND @DaysTaken < e.personal) OR
-				                ('{typeOfLeave.SelectedValue}' = 'Bereavement' AND @DaysTaken < e.bereavement) OR
-				                ('{typeOfLeave.SelectedValue}' = 'Maternity' AND @DaysTaken < e.maternity) OR
-				                ('{typeOfLeave.SelectedValue}' = 'Pre-retirement' AND @DaysTaken < e.pre_retirement)
+				                ( '{typeOfLeave.SelectedValue}'= 'Sick' AND @DaysTaken <= e.sick) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Casual' AND @DaysTaken <= e.casual) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Vacation' AND @DaysTaken <= e.vacation) OR
+				                ('{typeOfLeave.SelectedValue}'= 'Personal' AND @DaysTaken <= e.personal) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Bereavement' AND @DaysTaken <= e.bereavement) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Maternity' AND @DaysTaken <= e.maternity) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Pre-retirement' AND @DaysTaken <= e.pre_retirement)
 				                ), 'Yes', 'No')
                               FROM [dbo].[employee] e
                               WHERE e.employee_id = (SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId}))
