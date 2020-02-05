@@ -42,9 +42,9 @@
 
 
 <div class="container" style =" height:250px">
-    <div class="row" style="margin-bottom:20px; margin-top:10px;">
+    <div class="row" style="margin-bottom:10px;">
         <div class="col text-center">
-            <h4 id="leaveCountHeader">Leave Remaining</h4>
+            <h4 id="leaveCountHeader">Current Leave Balance</h4>
         </div>
     </div>
     <div class="row text-center">

@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
-
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Configuration;
+using System.Web.UI.HtmlControls;
 
 namespace HR_LEAVEv2.Employee
 {
@@ -17,6 +22,8 @@ namespace HR_LEAVEv2.Employee
             public string empType { get; set; }
             public string startDate { get; set; }
             public string endDate { get; set; }
+            public string daysTaken { get; set; }
+            public string qualified { get; set; }
             public string typeOfLeave { get; set; }
             public string supId { get; set; }
             public string supName { get; set; }
@@ -28,14 +35,21 @@ namespace HR_LEAVEv2.Employee
         };
         protected void Page_Load(object sender, EventArgs e)
         {
+            // get mode: apply, edit, view
+            string mode = Request.QueryString.HasKeys() ? Request.QueryString["mode"] : "apply";
+
             if (!IsPostBack)
             {
                 if (Session["permissions"] == null)
                     Response.Redirect("~/AccessDenied.aspx");
 
-                if (Request.QueryString.HasKeys())
+                Session["uploadedFiles"] = null;
+                Session["supervisor_id"] = null;
+                filesUploadedPanel.Visible = false;
+
+
+                if (mode != "apply")
                 {
-                    string mode = Request.QueryString["mode"];
                     string leaveId = Request.QueryString["leaveId"];
 
                     // populates page and authorizes user based on their permissions, whether the leave application was submitted to them as a supervisor or various HR criteria
@@ -49,12 +63,30 @@ namespace HR_LEAVEv2.Employee
                     // display normal leave application form
                     this.adjustPageForApplyMode();
                 }        
-            } else
-            {
-                //isPostback
-                if (ViewState["supervisor_id"] != null && ViewState["supervisor_id"].ToString() != "-1")
-                    supervisor_select.selectedSupId = ViewState["supervisor_id"].ToString();               
             }
+            else
+            {
+                if(mode == "apply")
+                {
+                    // validate dates
+                    validateDates(txtFrom.Text, txtTo.Text);
+                }
+                    
+            }
+        }
+
+        protected void clearDateErrors()
+        {
+            // date errors
+            dateComparisonValidationMsgPanel.Style.Add("display", "none");
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            invalidVacationStartDateMsgPanel.Style.Add("display", "none");
+            invalidSickLeaveStartDate.Style.Add("display", "none");
+            moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
+            startDateIsWeekend.Style.Add("display", "none");
+            endDateIsWeekend.Style.Add("display", "none");
         }
 
         protected LeaveTransactionDetails populatePage(string leaveId)
@@ -81,6 +113,8 @@ namespace HR_LEAVEv2.Employee
                             ep.employment_type , 
                             FORMAT(lt.start_date, 'd/MM/yyyy') start_date, 
                             FORMAT(lt.end_date, 'd/MM/yyyy') end_date, 
+                            lt.qualified,
+                            lt.days_taken,
                             lt.leave_type, 
                             lt.status, 
                             FORMAT(lt.created_at, 'd/MM/yyyy h:mm tt') as submitted_on,
@@ -115,6 +149,8 @@ namespace HR_LEAVEv2.Employee
                                     empType = reader["employment_type"].ToString(),
                                     startDate = reader["start_date"].ToString(),
                                     endDate = reader["end_date"].ToString(),
+                                    qualified = reader["qualified"].ToString(),
+                                    daysTaken = reader["days_taken"].ToString(),
                                     typeOfLeave = reader["leave_type"].ToString(),
                                     status = reader["status"].ToString(),
                                     submittedOn = reader["submitted_on"].ToString(),
@@ -198,15 +234,25 @@ namespace HR_LEAVEv2.Employee
                             //populate form
                             empIdTxt.Text = ltDetails.empId;
                             empNameHeader.InnerText = ltDetails.empName;
-                            txtFrom.Text = ltDetails.startDate;
-                            txtTo.Text = ltDetails.endDate;
+                            startDateInfoTxt.Text = ltDetails.startDate;
+                            endDateInfoTxt.Text = ltDetails.endDate;
+                            numDaysAppliedFor.Text = ltDetails.daysTaken;
+
+                            // store previous num days applied for in viewstate
+                            ViewState["daysTaken"] = numDaysAppliedForEditTxt.Text = ltDetails.daysTaken;
+
                             typeOfLeaveTxt.Text = ltDetails.typeOfLeave;
                             statusTxt.Text = ltDetails.status;
+                            qualifiedTxt.Text = ltDetails.qualified;
                             submittedOnTxt.Text = "Submitted on: " + ltDetails.submittedOn;
                             supervisorNameTxt.Text = ltDetails.supName;
                             empCommentsTxt.Value = ltDetails.empComment;
-                            supCommentsTxt.Value = ltDetails.supComment;
-                            hrCommentsTxt.Value = ltDetails.hrComment;
+
+                            // store previous supervisor comment in viewstate
+                            ViewState["supComment"] = supCommentsTxt.Value =  ltDetails.supComment;
+
+                            // store previous HR comment in viewstate
+                            ViewState["hrComment"] = hrCommentsTxt.Value = ltDetails.hrComment;
 
                         }
 
@@ -229,7 +275,6 @@ namespace HR_LEAVEv2.Employee
 
             //Status
             statusPanel.Visible = true;
-            statusTxt.Enabled = false;
 
             //File Upload
             fileUploadPanel.Visible = false;
@@ -247,30 +292,28 @@ namespace HR_LEAVEv2.Employee
 
 
             // Start Date
-            txtFrom.Enabled = false;
-            fromCalendarExtender.Enabled = false;
+            startDateApplyPanel.Visible = false;
+            startDateInfoPanel.Visible = true;
 
             // End Date
-            txtTo.Enabled = false;
-            toCalendarExtender.Enabled = false;
+            endDateApplyPanel.Visible = false;
+            endDateInfoPanel.Visible = true;
 
             // Type of Leave
             typeOfLeaveDropdownPanel.Visible = false;
             typeOfLeavePanel.Visible = true;
-            typeOfLeaveTxt.Enabled = false;
 
             //Supervisor Name
             supervisorSelectUserControlPanel.Visible = false;
             supervisorPanel.Visible = true;
-            supervisorNameTxt.Enabled = false;
 
             //Comments
             empCommentsTxt.Disabled = true;
             supCommentsTxt.Disabled = true;
             hrCommentsTxt.Disabled = true;
 
-            //comment edit
-            submitCommentsPanel.Visible = false;
+            //Edits
+            submitEditsPanel.Visible = false;
 
             return ltDetails;
         }
@@ -302,6 +345,8 @@ namespace HR_LEAVEv2.Employee
             //Status
             statusPanel.Visible = false;
 
+            qualifiedPanel.Visible = false;
+
             //File upload
             fileUploadPanel.Visible = true;
 
@@ -320,8 +365,8 @@ namespace HR_LEAVEv2.Employee
             //Submit Button
             submitButtonPanel.Visible = true;
 
-            //Submit Comments 
-            submitCommentsPanel.Visible = false;
+            //Submit Edits 
+            submitEditsPanel.Visible = false;
 
         }
 
@@ -332,33 +377,29 @@ namespace HR_LEAVEv2.Employee
             editModeTitle.Visible = true;
             applyModeTitle.Visible = false;
 
-            //Comments
-
             //if supervisor on leave application, then they can leave a comment
             if(Session["emp_id"].ToString() == ltDetails.supId)
                 supCommentsTxt.Disabled = false;
 
             List<string> permissions = (List<string>)Session["permissions"];
 
-            if(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
+            if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
+            {
                 hrCommentsTxt.Disabled = false;
+                numDaysAppliedForEditTxt.Visible = true;
+                numDaysAppliedFor.Visible = false;
+            }
+            else
+                numDaysAppliedFor.Visible = true;
+                
 
-            submitCommentsPanel.Visible = true;
+            submitEditsPanel.Visible = true;
 
         }
 
         protected Boolean validateDates(string startDate, string endDate)
         {
-            dateComparisonValidationMsgPanel.Style.Add("display", "none");
-            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
-            startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
-            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
-            invalidVacationStartDateMsgPanel.Style.Add("display", "none");
-            invalidSickLeaveStartDate.Style.Add("display", "none");
-            moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
-            startDateIsWeekend.Style.Add("display", "none");
-            endDateIsWeekend.Style.Add("display", "none");
-
+            clearDateErrors();
             DateTime start, end;
             start = end = DateTime.MinValue;
             Boolean isValidated = true;
@@ -392,14 +433,6 @@ namespace HR_LEAVEv2.Employee
                     isValidated = false;
                 }
 
-                // ensure start date is not a day before today once not sick leave
-                if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, DateTime.Today) < 0)
-                {
-                    invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
-                    startDateBeforeTodayValidationMsgPanel.Style.Add("display", "inline-block");
-                    isValidated = false;
-                }
-
                 // compare dates to ensure end date is not before start date
                 if (DateTime.Compare(start, end) > 0)
                 {
@@ -408,33 +441,58 @@ namespace HR_LEAVEv2.Employee
                     isValidated = false;
                 }
 
-                // if leave type is vacation: ensure start date is at least one month from today
-                if (typeOfLeave.SelectedValue.Equals("Vacation"))
+                if(!String.IsNullOrEmpty(typeOfLeave.SelectedValue))
                 {
-                    DateTime firstDateVacationCanBeTaken = DateTime.Today.AddMonths(1);
-
-                    if(DateTime.Compare(start, firstDateVacationCanBeTaken) < 0)
+                    // ensure start date is not a day before today once not sick leave
+                    if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, DateTime.Today) < 0)
                     {
-                        invalidVacationStartDateMsgPanel.Style.Add("display", "inline-block");
+                        invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+                        startDateBeforeTodayValidationMsgPanel.Style.Add("display", "inline-block");
                         isValidated = false;
+                    }
+
+                    // if leave type is vacation: ensure start date is at least one month from today
+                    if (typeOfLeave.SelectedValue.Equals("Vacation"))
+                    {
+                        DateTime firstDateVacationCanBeTaken = DateTime.Today.AddMonths(1);
+
+                        if (DateTime.Compare(start, firstDateVacationCanBeTaken) < 0)
+                        {
+                            invalidVacationStartDateMsgPanel.Style.Add("display", "inline-block");
+                            isValidated = false;
+                        }
+                    }
+
+                    // if type of leave is sick: ensure you can only apply for it retroactively
+                    if (typeOfLeave.SelectedValue.Equals("Sick"))
+                    {
+
+                        if ((end - start).Days + 1 > 2)
+                        {
+                            List<HttpPostedFile> files = null;
+                            if (Session["uploadedFiles"] != null)
+                            {
+                                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                                if (files.Count == 0)
+                                {
+                                    moreThan2DaysConsecutiveSickLeave.Style.Add("display", "inline-block");
+                                    isValidated = false;
+                                }
+                            }
+                            else
+                            {
+                                moreThan2DaysConsecutiveSickLeave.Style.Add("display", "inline-block");
+                                isValidated = false;
+                            }
+                        }
+
+                        if (DateTime.Compare(end, DateTime.Today) > 0)
+                        {
+                            invalidSickLeaveStartDate.Style.Add("display", "inline-block");
+                            isValidated = false;
+                        }
                     }
                 }
-
-                // if type of leave is sick: ensure you can only apply for it retroactively
-                if (typeOfLeave.SelectedValue.Equals("Sick"))
-                {
-                    if((end - start).Days + 1 > 2)
-                    {
-                        moreThan2DaysConsecutiveSickLeave.Style.Add("display", "inline-block");
-                        isValidated = false;
-                    }
-                    
-                    if (DateTime.Compare(end, DateTime.Today) > 0)
-                    {
-                        invalidSickLeaveStartDate.Style.Add("display", "inline-block");
-                        isValidated = false;
-                    }
-                }   
             }
 
             return isValidated;
@@ -442,7 +500,10 @@ namespace HR_LEAVEv2.Employee
 
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
+            // submit leave application errors
             invalidSupervisor.Style.Add("display", "none");
+            errorInsertingFilesToDbPanel.Style.Add("display", "none");
+            errorSubmittingLeaveApplicationPanel.Style.Add("display", "none");
 
             /* data to be submitted
              * 1. Employee id
@@ -450,26 +511,48 @@ namespace HR_LEAVEv2.Employee
              * 3. Start date
              * 4. End date
              * 5. Supervisor id
-             * 6. Comments
+             * 6. Uploaded files
+             * 7. Comments
              */
 
-            string empId, leaveType, startDate, endDate, supId, comments;
+            string empId, leaveType, startDate, endDate, supId = "-1", comments;
+
+            // employee id
             empId = Session["emp_id"].ToString();
+
+            // type of leave
             leaveType = typeOfLeave.SelectedValue;
 
-            // must convert start and end date to MM/d/yyyy format in order to insert into DB
+            // start and end date
             startDate = txtFrom.Text.ToString();
             endDate = txtTo.Text.ToString();
 
-            supId = supervisor_select.selectedSupId;
+            // supervisor id
+            if (Session["supervisor_id"] != null)
+                supId = Session["supervisor_id"].ToString();
+
+            // uploaded files
+            List<HttpPostedFile> files = null;
+
+            if (Session["uploadedFiles"] != null)
+                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+
+            // employee comments
             comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null;
 
-            ViewState["supervisor_id"] = supId;
-
             // validate form values
-            Boolean isValidated = validateDates(startDate, endDate);
+            Boolean isValidated, isLeaveApplicationInsertSuccessful, isFileUploadSuccessful, areFilesUploaded;
+            isLeaveApplicationInsertSuccessful = isFileUploadSuccessful = true;
+            areFilesUploaded = false;
+        
+            isValidated = validateDates(startDate, endDate);
             if (isValidated && supId != "-1")
             {
+                string transaction_id = string.Empty;
+
+                // used to store ids of inserted files in order to add to audit log
+                List<string> uploadedFilesIds = new List<string>();
+
                 try
                 {
                     string sql = $@"
@@ -478,14 +561,29 @@ namespace HR_LEAVEv2.Employee
                            ,[leave_type]
                            ,[start_date]
                            ,[end_date]
+                           ,[qualified]
+                           ,[days_taken]
                            ,[supervisor_id]
                            ,[status]
                            ,[emp_comment])
+                        OUTPUT INSERTED.transaction_id
                         VALUES
                            ( '{empId}'
                             ,'{leaveType}'
                             ,'{DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             ,'{DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
+                            , (SELECT IIF((
+				                ( '{leaveType}'= 'Sick' AND {numDaysAppliedFor.Text} <= e.sick) OR
+				                ('{leaveType}' = 'Casual' AND {numDaysAppliedFor.Text} <= e.casual) OR
+				                ('{leaveType}' = 'Vacation' AND {numDaysAppliedFor.Text} <= e.vacation) OR
+				                ('{leaveType}'= 'Personal' AND {numDaysAppliedFor.Text} <= e.personal) OR
+				                ('{leaveType}' = 'Bereavement' AND {numDaysAppliedFor.Text} <= e.bereavement) OR
+				                ('{leaveType}' = 'Maternity' AND {numDaysAppliedFor.Text} <= e.maternity) OR
+				                ('{leaveType}' = 'Pre-retirement' AND {numDaysAppliedFor.Text} <= e.pre_retirement)
+				                ), 'Yes', 'No')
+                              FROM [dbo].[employee] e
+                              WHERE e.employee_id = {empId})
+                            , {numDaysAppliedFor.Text}
                             ,'{supId}'
                             ,'Pending'
                             ,@Comments
@@ -501,26 +599,145 @@ namespace HR_LEAVEv2.Employee
                                 command.Parameters.AddWithValue("@Comments", comments);
                             else
                                 command.Parameters.AddWithValue("@Comments", DBNull.Value);
-                            int rowsAffected = command.ExecuteNonQuery();
-                            if (rowsAffected > 0)
-                            {
-                                submitButtonPanel.Style.Add("display", "none");
-                                successMsgPanel.Style.Add("display", "inline-block");
-                            }
-                                
+                            transaction_id = command.ExecuteScalar().ToString();
+                            isLeaveApplicationInsertSuccessful = !String.IsNullOrEmpty(transaction_id);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    isLeaveApplicationInsertSuccessful = false;
                 }
 
+                if (isLeaveApplicationInsertSuccessful && files != null)
+                {
+                    areFilesUploaded = files.Count > 0;
+                    // save uploaded file(s)
+                    foreach (HttpPostedFile uploadedFile in files)
+                    {
+                        try
+                        {
+                            // upload file to db
+                            string file_name = Path.GetFileName(uploadedFile.FileName);
+                            string file_extension = Path.GetExtension(uploadedFile.FileName);
+
+                            using (Stream fs = uploadedFile.InputStream)
+                            {
+                                //fs = File.Open(uploadedFile.FileName, FileMode.Open);
+                                using (BinaryReader br = new BinaryReader(fs))
+                                {
+                                    byte[] bytes = br.ReadBytes((Int32)fs.Length);
+                                    string sql = $@"
+                                    INSERT INTO [dbo].[filestorage]
+                                        (
+                                        [file_data]
+                                        ,[file_name]
+                                        ,[file_extension]
+                                        ,[uploaded_on])
+                                    OUTPUT INSERTED.file_id
+                                    VALUES
+                                        ( @FileData
+                                        ,@FileName
+                                        ,@FileExtension
+                                        ,@UploadedOn
+                                        );";
+                                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                                    {
+                                        connection.Open();
+                                        string fileid = string.Empty;
+                                        using (SqlCommand command = new SqlCommand(sql, connection))
+                                        {
+                                            command.Parameters.AddWithValue("@FileData", bytes);
+                                            command.Parameters.AddWithValue("@FileName", file_name);
+                                            command.Parameters.AddWithValue("@FileExtension", file_extension);
+                                            command.Parameters.AddWithValue("@UploadedOn", DateTime.Now);
+                                            fileid = command.ExecuteScalar().ToString();
+
+                                            isFileUploadSuccessful = !String.IsNullOrEmpty(fileid);
+                                        }
+
+                                        if (isFileUploadSuccessful)
+                                        {
+                                            // insert record into bridge entity which associates file(s) with a given employee
+                                            sql = $@"
+                                                INSERT INTO [dbo].[employeefiles] ([file_id],[employee_id],[leave_transaction_id])
+                                                VALUES(@FileId, @EmployeeId, @TransactionId);";
+                                            using (SqlCommand command = new SqlCommand(sql, connection))
+                                            {
+                                                command.Parameters.AddWithValue("@FileId", fileid);
+                                                command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+                                                command.Parameters.AddWithValue("@TransactionId", transaction_id);
+                                                int rowsAffected = command.ExecuteNonQuery();
+                                                isFileUploadSuccessful = rowsAffected > 0;
+                                            }
+
+                                            // add file id to add to audit log
+                                            uploadedFilesIds.Add(fileid);
+                                        }
+
+                                    }
+                                }
+                            }           
+                        }
+                        catch (Exception ex)
+                        {
+                            isFileUploadSuccessful = false;
+                        }
+                    }
+                }
+               
+
+                if (isFileUploadSuccessful)
+                {
+                    // add audit log
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    VALUES ( 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
+                                command.Parameters.AddWithValue("@AffectedEmployeeId", Session["emp_id"].ToString());
+
+                                string fileActionString = String.Empty;
+                                if (areFilesUploaded)
+                                    fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
+
+                                command.Parameters.AddWithValue("@Action", $"Submitted leave application: leave_transaction_id= {transaction_id};{fileActionString}");
+                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        throw ex;
+                    }
+
+                    submitButtonPanel.Style.Add("display", "none");
+                    successMsgPanel.Style.Add("display", "inline-block");
+                }
             }
-            else if(supId == "-1")
-            {
+
+            // ERROR FEEDBACK
+            if (!isFileUploadSuccessful)
+                errorInsertingFilesToDbPanel.Style.Add("display", "inline-block");
+            if(!isLeaveApplicationInsertSuccessful)
+                errorSubmittingLeaveApplicationPanel.Style.Add("display", "inline-block");
+            if (supId == "-1")
                 invalidSupervisor.Style.Add("display", "inline-block");
-            }
             
         }
 
@@ -534,16 +751,129 @@ namespace HR_LEAVEv2.Employee
             Response.Redirect(Request.QueryString["returnUrl"]);
         }
 
-        protected void submitCommentsBtn_Click(object sender, EventArgs e)
+        protected void datesEntered(object sender, EventArgs e)
         {
+            DateTime start, end;
+            start = end = DateTime.MinValue;
+            Boolean isStartDateFilled, isEndDateFilled;
+            isStartDateFilled = DateTime.TryParseExact(txtFrom.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start);
+            isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
+
+            if ((typeOfLeave.SelectedIndex != 0 && validateDates(txtFrom.Text, txtTo.Text)) || (isStartDateFilled && isEndDateFilled))
+                numDaysAppliedFor.Text = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1).ToString() : "0";
+                
+        }
+
+        protected void typeOfLeave_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            validateDates(txtFrom.Text, txtTo.Text);
+        }
+
+        protected void uploadBtn_Click(object sender, EventArgs e)
+        {
+            invalidFileTypePanel.Style.Add("display", "none");
+            fileUploadedTooLargePanel.Style.Add("display", "none");
+
+            if (FileUpload1.HasFiles)
+            {
+                List<string> filesTooLarge = new List<string>();
+
+                // used to store list of files added
+                List<HttpPostedFile> files = new List<HttpPostedFile>();
+
+                // used to show data about added files in bulleted list
+                DataTable dt = new DataTable();
+                dt.Columns.Add("file_name", typeof(string));
+
+                // used to check whether the files uploaded fit the size requirement specified in the web config
+                HttpRuntimeSection section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
+                int maxRequestLength = section != null ? section.MaxRequestLength : 4096;
+
+                // used to check whether the file(s) uploaded are of a certain format
+                List<string> allowedFileExtensions = new List<string>() { ".pdf", ".doc", ".docx" };
+                foreach (HttpPostedFile uploadedFile in FileUpload1.PostedFiles)
+                {
+                    if (uploadedFile.ContentLength < maxRequestLength)
+                    {
+                        if (allowedFileExtensions.Contains(Path.GetExtension(uploadedFile.FileName).ToString()))
+                        {
+                            dt.Rows.Add(Path.GetFileName(uploadedFile.FileName));
+                            files.Add(uploadedFile);
+                        }
+                        else
+                        {
+                            HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
+                            txt.InnerText = $"Could not upload '{Path.GetFileName(uploadedFile.FileName).ToString()}'. Invalid file type: '{Path.GetExtension(uploadedFile.FileName).ToString()}'";
+                            invalidFileTypePanel.Style.Add("display", "inline-block");
+                        }
+                    } else
+                        filesTooLarge.Add(Path.GetFileName(uploadedFile.FileName).ToString());
+                        
+                }
+
+                if(filesTooLarge.Count > 0)
+                {
+                    HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("fileUploadTooLargeTxt");
+                    txt.InnerText = $"Could not upload {String.Join(", ", filesTooLarge.Select(fileName=> "'" + fileName + "'").ToArray())}. File(s) too large";
+                    fileUploadedTooLargePanel.Style.Add("display", "inline-block");
+                }
+
+                if(dt.Rows.Count > 0)
+                {
+                    // hide error if it was shown
+                    moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
+
+                    // add files to session so they will persist after postback
+                    Session["uploadedFiles"] = files;
+
+                    // show files uploaded
+                    filesUploadedPanel.Visible = true;
+
+                    // populate files uploaded list
+                    filesUploadedList.DataTextField = "file_name";
+                    filesUploadedList.DataSource = dt;
+                    filesUploadedList.DataBind();
+                }  
+            }
+            else
+                filesUploadedPanel.Visible = false;
+        }
+
+        protected void clearUploadedFiles_Click(object sender, EventArgs e)
+        {
+            filesUploadedPanel.Visible = false;
+            FileUpload1.Dispose();
+            filesUploadedList.DataSource = new DataTable();
+            filesUploadedList.DataBind();
+
+            Session["uploadedFiles"] = null;
+            validateDates(txtFrom.Text, txtTo.Text);
+        }
+
+        protected void submitEditsBtn_Click(object sender, EventArgs e)
+        {
+            Boolean isSupCommentsChanged, isHrCommentsChanged, isDaysTakenChanged;
+            isSupCommentsChanged = isHrCommentsChanged = isDaysTakenChanged = false;
+
             string leaveId = Request.QueryString["leaveId"];
-            string supComment, hrComment;
-            supComment = hrComment = string.Empty;
+            string supComment, hrComment, daysTaken;
+            supComment = hrComment = daysTaken = string.Empty;
+
             if (supCommentsTxt.Disabled == false)
+            {
                 supComment = supCommentsTxt.InnerText;
+                isSupCommentsChanged = ViewState["supComment"].ToString() != supComment;
+            }
+
 
             if (hrCommentsTxt.Disabled == false)
+            {
                 hrComment = hrCommentsTxt.InnerText;
+                isHrCommentsChanged = ViewState["hrComment"].ToString() != hrComment;
+            }
+
+            daysTaken = numDaysAppliedForEditTxt.Text;
+            isDaysTakenChanged = ViewState["daysTaken"].ToString() != daysTaken;
 
             try
             {
@@ -552,29 +882,44 @@ namespace HR_LEAVEv2.Employee
                     connection.Open();
                     string sql = $@"
                         UPDATE [dbo].leavetransaction 
-                        SET sup_comment = @SupervisorComments, hr_comment = @HrComments
+                        SET 
+                            days_taken = @DaysTaken, 
+                            sup_comment = @SupervisorComments, 
+                            hr_comment = @HrComments, 
+                            qualified = (SELECT IIF((
+				                ( '{typeOfLeave.SelectedValue}'= 'Sick' AND @DaysTaken <= e.sick) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Casual' AND @DaysTaken <= e.casual) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Vacation' AND @DaysTaken <= e.vacation) OR
+				                ('{typeOfLeave.SelectedValue}'= 'Personal' AND @DaysTaken <= e.personal) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Bereavement' AND @DaysTaken <= e.bereavement) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Maternity' AND @DaysTaken <= e.maternity) OR
+				                ('{typeOfLeave.SelectedValue}' = 'Pre-retirement' AND @DaysTaken <= e.pre_retirement)
+				                ), 'Yes', 'No')
+                              FROM [dbo].[employee] e
+                              WHERE e.employee_id = (SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId}))
                         WHERE transaction_id = {leaveId};
                     ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        if(supComment != string.Empty)
+                        if (supComment != string.Empty)
                             command.Parameters.AddWithValue("@SupervisorComments", supComment);
                         else
                             command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
 
-                        if(hrComment != string.Empty)
+                        if (hrComment != string.Empty)
                             command.Parameters.AddWithValue("@HrComments", hrComment);
                         else
                             command.Parameters.AddWithValue("@HrComments", DBNull.Value);
 
+                        command.Parameters.AddWithValue("@DaysTaken", daysTaken);
                         int rowsAffected = command.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
                             // show success message
-                            successfulSubmitCommentsMsgPanel.Visible = true;
+                            successfulSubmitEditsMsgPanel.Visible = true;
 
                             // hide submit button
-                            submitCommentsBtn.Visible = false;
+                            submitEditsBtn.Visible = false;
                         }
                     }
                 }
@@ -606,22 +951,16 @@ namespace HR_LEAVEv2.Employee
                         command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
                         command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
 
-                        // hr and supervisor comment
-                        if (!String.IsNullOrEmpty(supComment) && !String.IsNullOrEmpty(hrComment))
-                            command.Parameters.AddWithValue("@Action", $"Submitted supervisor and hr comment; leave_transaction_id= {leaveId}, supervisor_comment= {supComment}, hr_comment= {hrComment}");
-                        else
-                        {
-                            // supervisor comment
-                            if (!String.IsNullOrEmpty(supComment))
-                                command.Parameters.AddWithValue("@Action", $"Submitted supervisor comment; leave_transaction_id= {leaveId}, supervisor_comment= {supComment}");
+                        List<string> actionString = new List<string>();
 
-                            // hr comment
-                            if (!String.IsNullOrEmpty(hrComment))    
-                                command.Parameters.AddWithValue("@Action", $"Submitted HR comment; leave_transaction_id= {leaveId}, hr_comment= {hrComment}");
-                        }
-                        
+                        if(isSupCommentsChanged)
+                            actionString.Add($" supervisor_comment= '{supComment}'");
+                        if(isHrCommentsChanged)
+                            actionString.Add($"hr_comment= '{hrComment}'");
+                        if(isDaysTakenChanged)
+                            actionString.Add($"days_taken= {daysTaken}");
 
-
+                        command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {String.Join(", ",actionString.ToArray())}");
                         command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
                         command.ExecuteNonQuery();
                     }
@@ -632,7 +971,18 @@ namespace HR_LEAVEv2.Employee
                 //exception logic
                 throw ex;
             }
-
         }
+
+        // to add limitations to what days taken can be
+        //protected void numDaysAppliedForEditTxt_TextChanged(object sender, EventArgs e)
+        //{
+        //    string previousDaysTaken = string.Empty;
+        //    if (ViewState["daysTaken"] != null)
+        //    {
+        //        previousDaysTaken = ViewState["daysTaken"].ToString();
+        //        if(Convert.ToInt32(numDaysAppliedForEditTxt.Text) > Convert.ToInt32(previousDaysTaken)) 
+        //    }
+                
+        //}
     }
 }

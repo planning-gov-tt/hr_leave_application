@@ -7,7 +7,6 @@ namespace HR_LEAVEv2.UserControls
 {
     public partial class supervisorSelect : System.Web.UI.UserControl
     {
-        public string selectedSupId = "-1";
         public string validationGroup { get; set; }
 
         public string empId;
@@ -19,6 +18,7 @@ namespace HR_LEAVEv2.UserControls
 
             if (!this.IsPostBack)
             {
+                Session["supervisor_id"] = String.IsNullOrEmpty(ComboBox1.SelectedValue) ? "-1" : ComboBox1.SelectedValue;
                 List<string> permissions = (List<string>)Session["permissions"];
                 if (permissions != null)
                 {
@@ -33,13 +33,14 @@ namespace HR_LEAVEv2.UserControls
 
                
                 SqlDataSource1.SelectParameters.Add("empId", Session["emp_id"].ToString());
+
             }
             
         }
 
         protected void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.selectedSupId = ComboBox1.SelectedValue;
+            Session["supervisor_id"] = ComboBox1.SelectedValue;
         }
     }
 }

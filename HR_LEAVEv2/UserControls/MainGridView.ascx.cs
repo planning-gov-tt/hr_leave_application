@@ -37,6 +37,8 @@ namespace HR_LEAVEv2.UserControls
                 lt.leave_type leave_type,
                 lt.start_date,
                 lt.end_date,
+                lt.days_taken,
+                lt.qualified,
 
                 s.employee_id supervisor_id,
                 s.last_name + ', ' + LEFT(s.first_name, 1) + '.' AS supervisor_name,
@@ -46,8 +48,7 @@ namespace HR_LEAVEv2.UserControls
                 LEFT(hr.first_name, 1) + '. ' + hr.last_name AS hr_manager_name,
                 lt.hr_manager_edit_date hr_manager_edit_date,
     
-                lt.status status,
-                lt.file_path file_path              
+                lt.status status              
             ";
 
         // general from
@@ -319,13 +320,13 @@ namespace HR_LEAVEv2.UserControls
                         AND status = '{Status}'
                     ";
                 }
-                // don't have the qualified field implemented yet
-                //if (!string.IsNullOrEmpty(Qualified))
-                //{
-                //    whereFilterGridView += $@"
-                //        AND qualified = {Qualified}
-                //    ";
-                //}
+
+                if (!string.IsNullOrEmpty(Qualified))
+                {
+                    whereFilterGridView += $@"
+                        AND qualified = '{Qualified}'
+                    ";
+                }
 
                 string sql = select + from + whereBindGridView + whereFilterGridView;
                 sqlCommand.CommandText = sql;
@@ -597,25 +598,17 @@ namespace HR_LEAVEv2.UserControls
                 {
                     // get employee id start date and end dates, leave type from gridview row
                     string employee_id = Convert.ToString(GridView.DataKeys[index].Values["employee_id"]);
-                    DateTime startDate = new DateTime();
-                    DateTime endDate = new DateTime();
+                    int daysTakenIndex = GetColumnIndexByName(row, "days_taken");
+
+                    // get difference
+                    int difference  = Convert.ToInt32(row.Cells[daysTakenIndex].Text);
+                   
                     string leaveType = "";
                     if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
                     {
-                        int indexStartDate = GetColumnIndexByName(row, "start_date");
-                        startDate = DateTime.ParseExact(row.Cells[indexStartDate].Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                        //startDate = DateTime.Parse(row.Cells[indexStartDate].Text);
-
-                        int indexEndDate = GetColumnIndexByName(row, "end_date");
-                        endDate = DateTime.ParseExact(row.Cells[indexEndDate].Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                        //endDate = DateTime.Parse(row.Cells[indexEndDate].Text);
-
                         int indexLeavetype = GetColumnIndexByName(row, "leave_type");
                         leaveType = (row.Cells[indexLeavetype].Text).ToString();
                     }
-
-                    // get difference
-                    int difference = (endDate - startDate).Days + 1;
 
                     // check leave type to match with balance type
                     Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
@@ -743,7 +736,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
-                    action = "Undid approval leave application";
+                    action = "Undid approval for leave application";
                 }
 
                 try
