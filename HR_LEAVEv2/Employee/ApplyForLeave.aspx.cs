@@ -137,6 +137,7 @@ namespace HR_LEAVEv2.Employee
 						            ''
 					            )
 				            ) as 'files'
+                            
                         FROM [dbo].[leavetransaction] lt
                         JOIN [dbo].[employee] sup ON sup.employee_id = lt.supervisor_id
                         LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id
@@ -267,7 +268,10 @@ namespace HR_LEAVEv2.Employee
                             ViewState["hrComment"] = hrCommentsTxt.Value = ltDetails.hrComment;
 
                             //populate dropdown list with file names
-                            
+                            /* Since the file name is gotten by using a join on both the employee id and the leave transaction id then the file name will always be relevant and not
+                             * a different file with the same filename
+                             * 
+                             * */
                             if (!String.IsNullOrWhiteSpace(ltDetails.files) && !String.IsNullOrEmpty(ltDetails.files))
                             {
                                 string[] fileNamesArr = ltDetails.files.Split(',');
