@@ -540,54 +540,53 @@ namespace HR_LEAVEv2.Employee
 
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
+            /**
+             * This function fulfills the following purposes:
+             * 
+             *  1. Submit Leave application
+             *      An employee can submit a leave application including the following fields
+             *      a. Start Date
+             *      b. End Date
+             *      c. Days Taken (calculated literal count of days between the start and end date inclusive, not accounting for holidays or weekends in between etc.)
+             *      d. Type of leave taken
+             *      e. Supervisor name
+             *      f. Uploaded files- for uploading any supporting documentation
+             *  2. Submit emails
+             *      a. To supervisor specified in application
+             *      b. To employee who submitted the application
+             *  3. Audit Logs
+             *      a. Adds audit logs for submitted applications
+             * 
+             * */
+
+
             // submit leave application errors
+
+            // hide error messages before rechecking criteria for new/ preexisting errors
             invalidSupervisor.Style.Add("display", "none");
             errorInsertingFilesToDbPanel.Style.Add("display", "none");
             errorSubmittingLeaveApplicationPanel.Style.Add("display", "none");
 
-            /* data to be submitted
-             * 1. Employee id
-             * 2. Leave type
-             * 3. Start date
-             * 4. End date
-             * 5. Supervisor id
-             * 6. Uploaded files
-             * 7. Comments
-             */
-
-            string empId, leaveType, startDate, endDate, supId = "-1", comments;
-
-            // employee id
-            empId = Session["emp_id"].ToString();
-
-            // type of leave
-            leaveType = typeOfLeave.SelectedValue;
-
-            // start and end date
-            startDate = txtFrom.Text.ToString();
-            endDate = txtTo.Text.ToString();
-
-            // supervisor id
-            if (Session["supervisor_id"] != null)
-                supId = Session["supervisor_id"].ToString();
+            // get values from form controls
+            string empId = Session["emp_id"].ToString(), // employee id
+                leaveType = typeOfLeave.SelectedValue, // type of leave
+                startDate = txtFrom.Text.ToString(), // start date
+                endDate = txtTo.Text.ToString(), // end date
+                supId = Session["supervisor_id"] != null ? Session["supervisor_id"].ToString() :  "-1", // supervisor id
+                comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null; // employee comments
 
             // uploaded files
-            List<HttpPostedFile> files = null;
+            List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"]: null;
 
-            if (Session["uploadedFiles"] != null)
-                files = (List<HttpPostedFile>)Session["uploadedFiles"];
-
-            // employee comments
-            comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null;
-
-            // validate form values
+            // validate form values using these booleans
             Boolean isValidated, isLeaveApplicationInsertSuccessful, isFileUploadSuccessful, areFilesUploaded;
             isLeaveApplicationInsertSuccessful = isFileUploadSuccessful = true;
             areFilesUploaded = false;
-        
+            
             isValidated = validateDates(startDate, endDate);
             if (isValidated && supId != "-1")
             {
+                // used to store id of leave transaction which is outputted by the INSERT statement. This is later used in the audit log
                 string transaction_id = string.Empty;
 
                 // used to store ids of inserted files in order to add to audit log
@@ -652,6 +651,7 @@ namespace HR_LEAVEv2.Employee
                 if (isLeaveApplicationInsertSuccessful && files != null)
                 {
                     areFilesUploaded = files.Count > 0;
+
                     // save uploaded file(s)
                     foreach (HttpPostedFile uploadedFile in files)
                     {
@@ -663,7 +663,6 @@ namespace HR_LEAVEv2.Employee
 
                             using (Stream fs = uploadedFile.InputStream)
                             {
-                                //fs = File.Open(uploadedFile.FileName, FileMode.Open);
                                 using (BinaryReader br = new BinaryReader(fs))
                                 {
                                     byte[] bytes = br.ReadBytes((Int32)fs.Length);
@@ -743,7 +742,7 @@ namespace HR_LEAVEv2.Employee
                     smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt");
                     smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
-                    // send email to supervisor
+                    // send email to supervisor to let them know an employee has submitted an email
                     try
                     {
 
@@ -776,7 +775,8 @@ namespace HR_LEAVEv2.Employee
                             throw ex;
                         }
 
-                        message.To.Add(new MailAddress(supEmail));
+                        //message.To.Add(new MailAddress("supEmail"));
+                        message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                         message.Subject = $"{Session["emp_username"].ToString()} Submitted Leave Application";
                         
                         message.Body = $@"
@@ -794,6 +794,8 @@ namespace HR_LEAVEv2.Employee
                                 }}
                             </style>
                             <div style='margin-bottom:15px;'>
+                                DO NOT REPLY <br/>
+                                <br/>
                                 {Session["emp_username"].ToString()} submitted a leave application. Details about the application can be found below: <br/>
                                 
                                 <table id='leaveDetails'>
@@ -833,7 +835,7 @@ namespace HR_LEAVEv2.Employee
                                 <br/>
                             </div>
                             <div>
-                                Check the status of your employees' leave applications under Supervisor Actions > Leave Applications. Contact HR for any further information. <br/> 
+                                Check the status of your employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/deploy/Supervisor/MyEmployeeLeaveApplications'>here</a>. Contact HR for any further information. <br/> 
                                 <br/>
                                 Regards,<br/>
                                     HR
@@ -849,7 +851,7 @@ namespace HR_LEAVEv2.Employee
                         throw ex;
                     }
 
-                    // send email to employee
+                    // send email to employee 
                     try
                     {
 
@@ -872,8 +874,9 @@ namespace HR_LEAVEv2.Employee
                                 }}
                             </style>
                             <div style='margin-bottom:15px;'>
+                                DO NOT REPLY <br/>
+                                <br/>
                                 You submitted a leave application. Details about the application can be found below: <br/>
-                                
                                 <table id='leaveDetails'>
                                     <tr>
                                         <th> Date Submitted </th>
@@ -911,7 +914,7 @@ namespace HR_LEAVEv2.Employee
                                 <br/>
                             </div>
                             <div>
-                                Check the status of your leave applications under My Account > View Leave Logs. Contact HR for any further information. <br/> 
+                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
                                 <br/>
                                 Regards,<br/>
                                     HR
