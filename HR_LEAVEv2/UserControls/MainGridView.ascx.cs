@@ -6,6 +6,8 @@ using System.Web.UI.WebControls;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net.Mail;
+using System.Net;
 
 namespace HR_LEAVEv2.UserControls
 {
@@ -556,94 +558,220 @@ namespace HR_LEAVEv2.UserControls
                 }
                 sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
             }
-            else if (gridViewType == "sup")
+            else if (gridViewType == "sup" || gridViewType == "hr")
             {
+                // get employee's email in order to send then a message notifying them of whether supervisor recommends or not recommends their leave application
+                string employeeEmail = string.Empty;
 
-                if (commandName == "notRecommended")
+                try
                 {
-                    // update status to NotRecommended
-                    status = "Not Recommended";
-                }
-                else if (commandName == "recommended")
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+
+                        string sql = $@"
+                                SELECT email FROM [dbo].[employee] WHERE employee_id = {GridView.DataKeys[index].Values["employee_id"]}
+                            ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    employeeEmail = reader["email"].ToString();
+                                }
+                            }
+                        }
+                    }
+                } catch(Exception ex)
                 {
-                    // update status to recommended
-                    status = "Recommended";
+                    throw ex;
                 }
 
-                // if sup view then update status, sup_edit_date
-                setStatement = $@"
+                MailMessage message = new MailMessage();
+                message.From = new MailAddress("mopd.hr.leave@gmail.com");
+                message.To.Add(new MailAddress(employeeEmail));
+                message.IsBodyHtml = true; //to make message body as html 
+
+                if (gridViewType == "sup")
+                {
+                    if (commandName == "notRecommended")
+                    {
+                        // update status to Not Recommended
+                        status = "Not Recommended";
+                        message.Subject = "Leave Application Not Recommended";
+                    }
+                    else if (commandName == "recommended")
+                    {
+                        // update status to Recommended
+                        status = "Recommended";
+                        message.Subject = "Leave Application Recommended";
+                    }
+
+                    // send email to employee
+                    message.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                    font-family: arial, sans-serif;
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                    border: 1px solid #dddddd;
+                                    text-align: left;
+                                    padding: 8px;
+                                }}
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                Your leave application was {status.ToLower()} by your supervisor, {Session["emp_username"].ToString()}. Details about the application can be found below: <br/>
+
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Supervisor Name </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                        <th> Qualified </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {Session["emp_username"].ToString()}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {status}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString()}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of your leave applications under My Account > View Leave Logs. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
+
+                    try
+                    {
+                        SmtpClient smtp = new SmtpClient();
+                        smtp.Port = 587;
+                        smtp.Host = "smtp.gmail.com"; //for gmail host  
+                        smtp.EnableSsl = true;
+                        smtp.UseDefaultCredentials = false;
+
+                        //uses an application password
+                        smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt");
+                        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        smtp.Send(message);
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+
+                    // if sup view then update status, sup_edit_date
+                    setStatement = $@"
                     SET
                         [status]='{status}',
                         [supervisor_edit_date] = CURRENT_TIMESTAMP 
                 ";
 
-                sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
-            }
-            else if (gridViewType == "hr")
-            {
-
-                if (commandName == "notApproved")
-                {
-                    // update status to NotApproved
-                    status = "Not Approved";
-                    setStatement = $@"
-                    SET
-                        [status]='{status}',
-                        [hr_manager_id] = '{Session["emp_id"]}', 
-                        [hr_manager_edit_date] = CURRENT_TIMESTAMP
-                    ";
                     sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
                 }
-                else // approve (subtract) or undo (add)
+                else if (gridViewType == "hr")
                 {
-                    // get employee id start date and end dates, leave type from gridview row
-                    string employee_id = Convert.ToString(GridView.DataKeys[index].Values["employee_id"]);
-                    int daysTakenIndex = GetColumnIndexByName(row, "days_taken");
 
-                    // get difference
-                    int difference  = Convert.ToInt32(row.Cells[daysTakenIndex].Text);
-                   
-                    string leaveType = "";
-                    if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
+                    if (commandName == "notApproved")
                     {
-                        int indexLeavetype = GetColumnIndexByName(row, "leave_type");
-                        leaveType = (row.Cells[indexLeavetype].Text).ToString();
+                        // update status to NotApproved
+                        status = "Not Approved";
+                        message.Subject = "Leave Application Not Approved";
+                        setStatement = $@"
+                            SET
+                                [status]='{status}',
+                                [hr_manager_id] = '{Session["emp_id"]}', 
+                                [hr_manager_edit_date] = CURRENT_TIMESTAMP
+                            ";
+                        sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
                     }
-
-                    // check leave type to match with balance type
-                    Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
-                    leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
-                    leaveBalanceColumnName.Add("Casual", "[casual]");
-                    leaveBalanceColumnName.Add("Maternity", "[maternity]");
-                    leaveBalanceColumnName.Add("Personal", "[personal]");
-                    leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
-                    leaveBalanceColumnName.Add("Sick", "[sick]");
-                    leaveBalanceColumnName.Add("Vacation", "[vacation]");
-
-                    // TODO: check if in good standing AKA Qualified (if employee has enough leave)
-
-                    // approved => subtract leave from balance
-                    string operation = "";
-                    if (commandName == "approved")
+                    else // approve (subtract) or undo (add)
                     {
-                        // update status to Approved
-                        status = "Approved";
+                        // get employee id, start date and end dates, leave type from gridview row
+                        string employee_id = Convert.ToString(GridView.DataKeys[index].Values["employee_id"]);
+                        int daysTakenIndex = GetColumnIndexByName(row, "days_taken");
 
-                        // Subtract Leave from balance
-                        operation = " - ";
-                    }
+                        // get difference
+                        int difference = Convert.ToInt32(row.Cells[daysTakenIndex].Text);
 
-                    // undo => add leave back
-                    else if (commandName == "undoApprove")
-                    {
-                        // reset status to Recommended
-                        status = "Recommended";
+                        string leaveType = "";
+                        if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
+                        {
+                            int indexLeavetype = GetColumnIndexByName(row, "leave_type");
+                            leaveType = (row.Cells[indexLeavetype].Text).ToString();
+                        }
 
-                        // Add leave back to balance
-                        operation = " + ";
-                    }
+                        // check leave type to match with balance type
+                        Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
+                        leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
+                        leaveBalanceColumnName.Add("Casual", "[casual]");
+                        leaveBalanceColumnName.Add("Maternity", "[maternity]");
+                        leaveBalanceColumnName.Add("Personal", "[personal]");
+                        leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
+                        leaveBalanceColumnName.Add("Sick", "[sick]");
+                        leaveBalanceColumnName.Add("Vacation", "[vacation]");
 
-                    string sql = $@"
+                        // TODO: check if in good standing AKA Qualified (if employee has enough leave)
+
+                        // approved => subtract leave from balance
+                        string operation = "";
+                        if (commandName == "approved")
+                        {
+                            // update status to Approved
+                            status = "Approved";
+                            message.Subject = "Leave Application Approved";
+
+                            // Subtract Leave from balance
+                            operation = " - ";
+                        }
+
+                        // undo => add leave back
+                        else if (commandName == "undoApprove")
+                        {
+                            // reset status to Recommended
+                            status = "Recommended";
+
+                            // Add leave back to balance
+                            operation = " + ";
+                        }
+
+                        string sql = $@"
                         BEGIN TRANSACTION;
 
                         -- updating the leave status
@@ -667,9 +795,96 @@ namespace HR_LEAVEv2.UserControls
                         COMMIT;
                     ";
 
-                    sqlCommand.CommandText = sql;
+                        sqlCommand.CommandText = sql;
+                    }
+
+                    // send email to employee
+                    message.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                    font-family: arial, sans-serif;
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                    border: 1px solid #dddddd;
+                                    text-align: left;
+                                    padding: 8px;
+                                }}
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                Your leave application was {status.ToLower()} by HR. Details about the application can be found below: <br/>
+
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                        <th> Qualified </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()}
+                                        </td>
+                                        <td>
+                                            {status}
+                                        </td>
+                                        <td>
+                                            {row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString()}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of your leave applications under My Account > View Leave Logs. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
+
+                    try
+                    {
+                        // send email
+                        SmtpClient smtp = new SmtpClient();
+                        smtp.Port = 587;
+                        smtp.Host = "smtp.gmail.com"; //for gmail host  
+                        smtp.EnableSsl = true;
+                        smtp.UseDefaultCredentials = false;
+
+                        //uses an application password
+                        smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt");
+                        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        smtp.Send(message);
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
                 }
             }
+            
             Boolean isQuerySuccessful;
             // execute sql
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
