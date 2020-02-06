@@ -436,6 +436,33 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.Button clearUploadedFiles;
         
         /// <summary>
+        /// filesToDownloadPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel filesToDownloadPanel;
+        
+        /// <summary>
+        /// filesToDownloadList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList filesToDownloadList;
+        
+        /// <summary>
+        /// btnDownloadFiles control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnDownloadFiles;
+        
+        /// <summary>
         /// empCommentsPanel control.
         /// </summary>
         /// <remarks>
@@ -821,6 +848,33 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.LinkButton submitEditsBtn;
+        
+        /// <summary>
+        /// noEditsMadePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noEditsMadePanel;
+        
+        /// <summary>
+        /// Span9 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span9;
+        
+        /// <summary>
+        /// Button2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button Button2;
         
         /// <summary>
         /// successfulSubmitEditsMsgPanel control.

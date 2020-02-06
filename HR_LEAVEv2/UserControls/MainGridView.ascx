@@ -7,7 +7,6 @@
     #gridViewContainer th, td{
         text-align:center;
     }
-
 </style>
 
 <%--filter fields--%>
@@ -147,7 +146,7 @@
             <asp:BoundField HeaderText="Employee" DataField="employee_name" SortExpression="employee_name" />
             <asp:BoundField HeaderText="Start Date" DataField="start_date" SortExpression="start_date" DataFormatString="{0:d/MM/yyyy}" />
             <asp:BoundField HeaderText="End Date" DataField="end_date" SortExpression="end_date"  DataFormatString="{0:d/MM/yyyy}"/>
-            <asp:BoundField HeaderText="Days Applied For" DataField="days_taken" SortExpression="days_taken" />
+            <asp:BoundField HeaderText="Days" DataField="days_taken" SortExpression="days_taken" />
             <asp:BoundField HeaderText="Leave Type" DataField="leave_type" SortExpression="leave_type" />
             <asp:BoundField HeaderText="Status" DataField="status" SortExpression="status" />
             <asp:BoundField HeaderText="Qualified" DataField="qualified" SortExpression="qualified" />

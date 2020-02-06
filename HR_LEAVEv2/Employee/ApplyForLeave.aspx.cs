@@ -32,6 +32,7 @@ namespace HR_LEAVEv2.Employee
             public string empComment { get; set; }
             public string supComment { get; set; }
             public string hrComment { get; set; }
+            public string files { get; set; }
         };
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -119,17 +120,28 @@ namespace HR_LEAVEv2.Employee
                             lt.status, 
                             FORMAT(lt.created_at, 'd/MM/yyyy h:mm tt') as submitted_on,
                             lt.supervisor_id, 
-                            e.first_name + ' ' + e.last_name as 'supervisor_name', 
+                            sup.first_name + ' ' + sup.last_name as 'supervisor_name', 
                             lt.emp_comment, 
                             lt.sup_comment, 
-                            lt.hr_comment
+                            lt.hr_comment,
+                            (SELECT 
+					            STUFF
+					            (
+						            (SELECT ', ' + fs.file_name
+						            FROM [dbo].filestorage fs 
+						            LEFT JOIN [dbo].employeefiles ef ON ef.employee_id = lt.employee_id AND ef.leave_transaction_id = lt.transaction_id 
+						            WHERE fs.file_id = ef.file_id
+						            FOR XML PATH(''))
+						            ,1
+						            ,1,
+						            ''
+					            )
+				            ) as 'files'
+                            
                         FROM [dbo].[leavetransaction] lt
-                        JOIN [dbo].[employee] e
-                        ON e.employee_id = lt.supervisor_id
-                        LEFT JOIN [dbo].employeeposition ep
-                        ON ep.employee_id = lt.employee_id
-                        JOIN  [dbo].[employee] emp
-                        ON emp.employee_id = lt.employee_id
+                        JOIN [dbo].[employee] sup ON sup.employee_id = lt.supervisor_id
+                        LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id
+                        JOIN [dbo].[employee] emp ON emp.employee_id = lt.employee_id
                         WHERE lt.transaction_id = {leaveId};
                     ";
 
@@ -158,7 +170,8 @@ namespace HR_LEAVEv2.Employee
                                     supName = reader["supervisor_name"].ToString(),
                                     empComment = reader["emp_comment"].ToString(),
                                     supComment = reader["sup_comment"].ToString(),
-                                    hrComment = reader["hr_comment"].ToString()
+                                    hrComment = reader["hr_comment"].ToString(),
+                                    files = reader["files"].ToString()
                                 };
 
                             }
@@ -253,6 +266,29 @@ namespace HR_LEAVEv2.Employee
 
                             // store previous HR comment in viewstate
                             ViewState["hrComment"] = hrCommentsTxt.Value = ltDetails.hrComment;
+
+                            //populate dropdown list with file names
+                            /* Since the file name is gotten by using a join on both the employee id and the leave transaction id then the file name will always be relevant and not
+                             * a different file with the same filename
+                             * 
+                             * */
+                            if (!String.IsNullOrWhiteSpace(ltDetails.files) && !String.IsNullOrEmpty(ltDetails.files))
+                            {
+                                string[] fileNamesArr = ltDetails.files.Split(',');
+                                DataTable dt = new DataTable();
+                                dt.Columns.Add("file_name", typeof(string));
+
+                                foreach (string fileName in fileNamesArr)
+                                {
+                                    dt.Rows.Add(fileName.Trim());
+                                }
+
+                                filesToDownloadList.DataTextField = "file_name";
+                                filesToDownloadList.DataSource = dt;
+                                filesToDownloadList.DataBind();
+                            }
+                            else
+                                filesToDownloadPanel.Visible = false;
 
                         }
 
@@ -349,6 +385,7 @@ namespace HR_LEAVEv2.Employee
 
             //File upload
             fileUploadPanel.Visible = true;
+            filesToDownloadPanel.Visible = false;
 
             //Type of Leave
             typeOfLeavePanel.Visible = false;
@@ -875,12 +912,14 @@ namespace HR_LEAVEv2.Employee
             daysTaken = numDaysAppliedForEditTxt.Text;
             isDaysTakenChanged = ViewState["daysTaken"].ToString() != daysTaken;
 
-            try
+            if(isDaysTakenChanged || isSupCommentsChanged || isHrCommentsChanged)
             {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                try
                 {
-                    connection.Open();
-                    string sql = $@"
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
                         UPDATE [dbo].leavetransaction 
                         SET 
                             days_taken = @DaysTaken, 
@@ -899,44 +938,41 @@ namespace HR_LEAVEv2.Employee
                               WHERE e.employee_id = (SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId}))
                         WHERE transaction_id = {leaveId};
                     ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        if (supComment != string.Empty)
-                            command.Parameters.AddWithValue("@SupervisorComments", supComment);
-                        else
-                            command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
-
-                        if (hrComment != string.Empty)
-                            command.Parameters.AddWithValue("@HrComments", hrComment);
-                        else
-                            command.Parameters.AddWithValue("@HrComments", DBNull.Value);
-
-                        command.Parameters.AddWithValue("@DaysTaken", daysTaken);
-                        int rowsAffected = command.ExecuteNonQuery();
-                        if (rowsAffected > 0)
+                        using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            // show success message
-                            successfulSubmitEditsMsgPanel.Visible = true;
+                            if (supComment != string.Empty)
+                                command.Parameters.AddWithValue("@SupervisorComments", supComment);
+                            else
+                                command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
 
-                            // hide submit button
-                            submitEditsBtn.Visible = false;
+                            if (hrComment != string.Empty)
+                                command.Parameters.AddWithValue("@HrComments", hrComment);
+                            else
+                                command.Parameters.AddWithValue("@HrComments", DBNull.Value);
+
+                            command.Parameters.AddWithValue("@DaysTaken", daysTaken);
+                            int rowsAffected = command.ExecuteNonQuery();
+                            if (rowsAffected > 0)
+                            {
+                                // show success message
+                                successfulSubmitEditsMsgPanel.Visible = true;
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                //exception logic
-                throw ex;
-            }
-
-            // add audit log
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                catch (Exception ex)
                 {
-                    connection.Open();
-                    string sql = $@"
+                    //exception logic
+                    throw ex;
+                }
+
+                // add audit log
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
                                     INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
                                     VALUES ( 
                                         @ActingEmployeeId, 
@@ -946,25 +982,80 @@ namespace HR_LEAVEv2.Employee
                                         @Action, 
                                         @CreatedAt);
                                 ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                        command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
 
-                        List<string> actionString = new List<string>();
+                            List<string> actionString = new List<string>();
 
-                        if(isSupCommentsChanged)
-                            actionString.Add($" supervisor_comment= '{supComment}'");
-                        if(isHrCommentsChanged)
-                            actionString.Add($"hr_comment= '{hrComment}'");
-                        if(isDaysTakenChanged)
-                            actionString.Add($"days_taken= {daysTaken}");
+                            if (isSupCommentsChanged)
+                                actionString.Add($" supervisor_comment= '{supComment}'");
+                            if (isHrCommentsChanged)
+                                actionString.Add($"hr_comment= '{hrComment}'");
+                            if (isDaysTakenChanged)
+                                actionString.Add($"days_taken= {daysTaken}");
 
-                        command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {String.Join(", ",actionString.ToArray())}");
-                        command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                        command.ExecuteNonQuery();
+                            command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {String.Join(", ", actionString.ToArray())}");
+                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                            command.ExecuteNonQuery();
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    throw ex;
+                }
+            } else
+            {
+                noEditsMadePanel.Visible = true;
+            }
+
+            // hide submit button
+            submitEditsBtn.Visible = false;
+        }
+
+        protected void btnDownloadFiles_Click(object sender, EventArgs e)
+        {
+            string file = filesToDownloadList.SelectedValue.ToString();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                            SELECT file_data FROM [dbo].[filestorage] WHERE file_name = '{file}';
+                        ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            byte[] result = null;
+                            while (reader.Read())
+                            {
+                                result = (byte[])reader["file_data"];
+                            }
+                            Response.Clear();
+                            Response.AddHeader("Cache-Control", "no-cache, must-revalidate, post-check=0, pre-check=0");
+                            Response.AddHeader("Pragma", "no-cache");
+                            Response.AddHeader("Content-Description", "File Download");
+                            Response.AddHeader("Content-Type", "application/force-download");
+                            Response.AddHeader("Content-Transfer-Encoding", "binary\n");
+                            Response.AddHeader("content-disposition", "attachment;filename=" + file);
+                            Response.BinaryWrite(result);
+                            Response.Flush();
+                            Response.Close();
+
+                        }
+                    }
+                }
+            }
+            catch (System.Threading.ThreadAbortException exf)
+            {
+                //do nothing
+                return;
             }
             catch (Exception ex)
             {
@@ -982,7 +1073,7 @@ namespace HR_LEAVEv2.Employee
         //        previousDaysTaken = ViewState["daysTaken"].ToString();
         //        if(Convert.ToInt32(numDaysAppliedForEditTxt.Text) > Convert.ToInt32(previousDaysTaken)) 
         //    }
-                
+
         //}
     }
 }

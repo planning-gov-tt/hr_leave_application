@@ -7,7 +7,11 @@
     <style>
 
         #applyForLeaveContainer div.form-group{
-            margin-top:20px;
+            margin-top:10px;
+        }
+
+        .spaced-checkboxes input{
+            margin-right:5px;
         }
     </style>
     
@@ -170,6 +174,13 @@
             <asp:Button ID="uploadBtn" runat="server" Text="Upload files" OnClick="uploadBtn_Click" CssClass="btn btn-primary"  Style="display:inline-block; "/>
             <asp:Button ID="clearUploadedFiles" runat="server" Text="Clear files" OnClick="clearUploadedFiles_Click" CssClass="btn btn-primary" Style="display:inline-block; "/>                                
         </asp:Panel>
+
+        <asp:Panel ID="filesToDownloadPanel" runat="server">
+            <asp:DropDownList ID="filesToDownloadList" runat="server"></asp:DropDownList>
+            <asp:LinkButton ID="btnDownloadFiles" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Download file" OnClick="btnDownloadFiles_Click" Style="display:inline-block; margin-left:5px;">
+                <i class="fa fa-download" aria-hidden="true"></i>
+            </asp:LinkButton>
+        </asp:Panel>
         
 
         <%--View mode: Shows the comments made by employee when submitting the leave application --%>
@@ -283,6 +294,11 @@
                 <i class="fa fa-send" aria-hidden="true"></i>
                 Submit edit(s)
             </asp:LinkButton>
+            <asp:Panel ID="noEditsMadePanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block;" role="alert" Visible="false">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <span id="Span9" runat="server">No edits made</span>
+                <asp:Button ID="Button2" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left:3px;" OnClick="returnToPreviousBtn_Click"/>
+            </asp:Panel>
             <asp:Panel ID="successfulSubmitEditsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
                 <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                 <span id="Span2" runat="server">Edits successfully made</span>
@@ -291,7 +307,6 @@
         </asp:Panel>
 
     </div>
-    </label>
 </asp:Content>
 
 

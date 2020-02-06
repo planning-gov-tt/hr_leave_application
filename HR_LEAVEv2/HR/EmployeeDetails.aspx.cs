@@ -1743,8 +1743,7 @@ namespace HR_LEAVEv2.HR
 
                 // store data about row which must be edited
                 int index = Convert.ToInt32(e.CommandArgument);
-                string st;
-                Session["startDate"] =  st = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index],"start_date")].Text.ToString();
+                Session["startDate"] = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index],"start_date")].Text.ToString();
                 Session["empRecordRowIndex"] = index;
 
                 // show modal
