@@ -911,7 +911,7 @@ namespace HR_LEAVEv2.UserControls
                                             {row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString()}
                                         </td>
                                         <td>
-                                            {row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString()}
+                                            {Session["emp_username"].ToString()}
                                         </td>
                                         <td>
                                             {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}
@@ -1010,7 +1010,7 @@ namespace HR_LEAVEv2.UserControls
                         { "leave_type", row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString() },
                         { "status", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() },
                         { "qualified",row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString() },
-                        { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Pending" ? "No" : "Yes"},
+                        { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Not Recommended" ? "Yes" : "No"},
                         { "employeeEmail", employeeEmail }
                     };
                     
@@ -1260,7 +1260,7 @@ namespace HR_LEAVEv2.UserControls
                         { "leave_type", row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString() },
                         { "status", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() },
                         { "qualified",row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString() },
-                        { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Recommended" ? "No" : "Yes"}
+                        { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Not Approved" ? "Yes" : "No"}
                     };
 
                     ViewState["notApprovedRow"] = rowData;
@@ -1896,6 +1896,8 @@ namespace HR_LEAVEv2.UserControls
                 noEditsMadePanel.Visible = true;
             }
 
+            commentsUpdatePanel.Update();
+
             if (gridViewType == "sup")
                 sendNotRecommendedEmail(comment);
             else if (gridViewType == "hr")
@@ -1907,10 +1909,11 @@ namespace HR_LEAVEv2.UserControls
             // hide modal
             ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal('hide');", true);
 
+            string comment = String.IsNullOrEmpty(commentsTxtArea.InnerText) || String.IsNullOrWhiteSpace(commentsTxtArea.InnerText) ? string.Empty : commentsTxtArea.InnerText;
             if (gridViewType == "sup")
-                sendNotRecommendedEmail(string.Empty);
+                sendNotRecommendedEmail(comment);
             else if (gridViewType == "hr")
-                sendNotApprovedEmail(string.Empty);
+                sendNotApprovedEmail(comment);
         }
     }
 }

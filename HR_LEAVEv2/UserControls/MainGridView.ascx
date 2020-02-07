@@ -226,7 +226,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                        <asp:UpdatePanel ID="commentsUpdatePanel" runat="server" UpdateMode="Conditional">
                             <ContentTemplate>
                                 <div class="modal-body text-center">
                                     <asp:HiddenField ID="previousCommentsHiddenField" runat="server" />
