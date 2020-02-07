@@ -199,7 +199,7 @@ INSERT INTO [dbo].[leavetransaction] ([transaction_id], [created_at], [employee_
 -- VIEWS: (emp, sup, hr)
 
 -- emp applies for sick leave to sup, pending
-(1, '20191208 10:00:00 AM', '1', 'Sick', '20191201', '20191207','Yes',7, '115245', NULL, NULL, NULL, 'Pending', NULL, 'Good employee, normally prompt and consistent', NULL),
+(1, '20191208 10:00:00 AM', '1', 'Sick', '20191201', '20191207','Yes',7, '115245', NULL, NULL, NULL, 'Pending', NULL, NULL, NULL),
 
 -- emp applies for sick leave to sup, recommended
 (2, '20191208 12:00:00 PM', '3', 'Sick', '20201201', '20201207','Yes', 7,'115245', '20191208 12:10:00 PM', NULL, NULL, 'Recommended','I have swine flu', 'Good Standing',NULL),
