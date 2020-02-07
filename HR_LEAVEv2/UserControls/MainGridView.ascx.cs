@@ -911,7 +911,7 @@ namespace HR_LEAVEv2.UserControls
                                             {row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString()}
                                         </td>
                                         <td>
-                                            {Session["emp_username"].ToString()}
+                                            {row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString()}
                                         </td>
                                         <td>
                                             {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}
@@ -1125,7 +1125,7 @@ namespace HR_LEAVEv2.UserControls
 
                     // message.To.Add(new MailAddress(supervisorEmail));
                     message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                    message.Subject = $"Leave Application for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()} Approved";
+                    message.Subject = $"Employee Leave Application Approved";
 
                     // send email to employee
                     message.Body = $@"
