@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Net.Mail;
 using System.Net;
+using System.Web.UI;
 
 namespace HR_LEAVEv2.UserControls
 {
@@ -824,9 +825,7 @@ namespace HR_LEAVEv2.UserControls
                 smtp.Host = "smtp.gmail.com"; //for gmail host  
                 smtp.EnableSsl = true;
                 smtp.UseDefaultCredentials = false;
-
-                //uses an application password
-                smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt");
+                smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt"); //uses an application password
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
                 // Cancel Leave
@@ -926,15 +925,15 @@ namespace HR_LEAVEv2.UserControls
                         throw ex;
                     }
 
-                    // send email to HR letting them know that supervisor recommended application
 
+                    // send email to HR letting them know that supervisor recommended application
                     message.To.Clear();
                     
                     // add all relevant emails from HR to this list
                     message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                     message.Subject = "Leave Application Recommended";
 
-                    // send email to employee
+                    // send email to relevant HR employees
                     message.Body = $@"
                             <style>
                                 #leaveDetails{{
@@ -1025,6 +1024,64 @@ namespace HR_LEAVEv2.UserControls
                 // Not Recommend
                 if (commandName == "notRecommended")
                 {
+                    // show modal to user to input comment for why they are not recommending the application. This comment is added to the db and to the email in the onclick function of the
+                    // submit comment button
+                    commentModalTransactionIdHiddenField.Value = transaction_id.ToString(); // add leave transaction id to hidden field in modal to access for db insert
+                    commentModalEmployeeIdHiddenField.Value = employee_id;// add leave transaction id to hidden field in modal to access later for audit log
+
+                    // load back comment panel with comments from db, if there
+                    string previousComment = string.Empty;
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
+                                SELECT sup_comment FROM leavetransaction WHERE transaction_id = {transaction_id}
+                            ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                using (SqlDataReader reader = command.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        previousComment = reader["sup_comment"].ToString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        throw ex;
+                    }
+
+                    commentsTxtArea.InnerText = previousCommentsHiddenField.Value = !String.IsNullOrEmpty(previousComment) ? previousComment : string.Empty;
+                    Dictionary<string, string> rowData = new Dictionary<string, string>()
+                    {
+                        { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
+                        { "supervisor_name", Session["emp_username"].ToString() },
+                        { "start_date", row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString() },
+                        { "end_date", row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString() },
+                        { "days_taken", row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString() },
+                        { "leave_type", row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString() },
+                        { "status", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() },
+                        { "qualified",row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString() },
+                        { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Pending" ? "No" : "Yes"}
+                    };
+                    
+                    ViewState["notRecommendedRow"] = rowData;
+
+                    // reset user feedback panels
+                    noEditsMadePanel.Visible = false;
+                    addCommentSuccessPanel.Visible = false;
+                    editCommentSuccessPanel.Visible = false;
+
+                    // show modal for user to enter comment
+                    ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal('show');", true);
+
+                    // populate audit log variables 
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
                     action = "Unrecommended leave application";
@@ -1440,6 +1497,231 @@ namespace HR_LEAVEv2.UserControls
 
 
             this.BindGridView();
+        }
+
+        protected void sendNotRecommendedEmail(string comment)
+
+        {
+            Dictionary<string, string> row = null;
+            if (ViewState["notRecommendedRow"] != null)
+                row = (Dictionary<string, string>)ViewState["notRecommendedRow"];
+
+            if(row["isEmailSentAlready"] == "No")
+            {
+                string emailCommentString = string.Empty;
+
+                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                    emailCommentString = $"Your supervisor left the following comment: <blockquote>\"{comment}\"</blockquote><br/><br/>";
+
+                // send email
+                MailMessage message = new MailMessage();
+                message.IsBodyHtml = true;
+                message.From = new MailAddress("mopd.hr.leave@gmail.com");
+
+                SmtpClient smtp = new SmtpClient();
+                smtp.Port = 587;
+                smtp.Host = "smtp.gmail.com"; //for gmail host  
+                smtp.EnableSsl = true;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt"); //uses an application password
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+
+                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+                message.Subject = "Leave Application Not Recommended";
+
+                // send email to employee
+                message.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                    font-family: arial, sans-serif;
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                    border: 1px solid #dddddd;
+                                    text-align: left;
+                                    padding: 8px;
+                                }}
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                DO NOT REPLY<br/>
+                                <br/>
+                                Your leave application was not recommended by your supervisor, {Session["emp_username"].ToString()}. Details about the application can be found below: <br/>
+                                {emailCommentString}
+                                <br/>
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Supervisor Name </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                        <th> Qualified </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {row["date_submitted"]}
+                                        </td>
+                                        <td>
+                                            {row["supervisor_name"]}
+                                        </td>
+                                        <td>
+                                            {row["start_date"]}
+                                        </td>
+                                        <td>
+                                            {row["end_date"]}
+                                        </td>
+                                        <td>
+                                            {row["days_taken"]}
+                                        </td>
+                                        <td>
+                                            {row["leave_type"]}
+                                        </td>
+                                        <td>
+                                            Not Recommended
+                                        </td>
+                                        <td>
+                                            {row["qualified"]}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
+                try
+                {
+                    smtp.Send(message);
+                    row["isEmailSentAlready"] = "Yes";
+                    ViewState["notRecommendedRow"] = row;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+        }
+
+        protected void submitCommentBtn_Click(object sender, EventArgs e)
+        {
+            // submit comment to leave transaction 
+
+            //get id of transaction
+            string leaveId = commentModalTransactionIdHiddenField.Value,
+                   employeeId = commentModalEmployeeIdHiddenField.Value,
+                   previousComments = previousCommentsHiddenField.Value,
+                   comment = commentsTxtArea.InnerText;
+
+            Boolean isCommentChanged = comment != previousComments;
+
+            if (isCommentChanged)
+            {
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = string.Empty;
+
+                        if(gridViewType == "sup")
+                        {
+                            sql = $@"
+                            UPDATE [dbo].leavetransaction 
+                            SET 
+                                sup_comment = @Comments
+                            WHERE transaction_id = {leaveId};";
+                        } else if (gridViewType == "hr")
+                        {
+                            sql = $@"
+                            UPDATE [dbo].leavetransaction 
+                            SET 
+                                hr_comment = @Comments
+                            WHERE transaction_id = {leaveId};";
+                        }
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@Comments", comment);
+                            int rowsAffected = command.ExecuteNonQuery();
+                            if (rowsAffected > 0)
+                            {
+                                noEditsMadePanel.Visible = false;
+
+                                // show success message
+                                if (String.IsNullOrEmpty(previousComments) || String.IsNullOrWhiteSpace(previousComments))
+                                    addCommentSuccessPanel.Visible = true;
+                                else
+                                    editCommentSuccessPanel.Visible = true;
+                                    
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    throw ex;
+                }
+
+                // add audit log
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    VALUES ( 
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
+                            command.Parameters.AddWithValue("@AffectedEmployeeId", employeeId);
+
+                            string supOrHr = gridViewType == "sup" ? "supervisor comment" : "hr comment";
+
+                            command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {supOrHr}= {comment}");
+                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    throw ex;
+                }
+            }
+            else
+            {
+                editCommentSuccessPanel.Visible = false;
+                addCommentSuccessPanel.Visible = false;
+                noEditsMadePanel.Visible = true;
+            }
+            sendNotRecommendedEmail(comment);
+        }
+
+        protected void closeCommentModal_Click(object sender, EventArgs e)
+        {
+            // hide modal
+            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal('hide');", true);
+            sendNotRecommendedEmail(string.Empty); 
         }
     }
 }
