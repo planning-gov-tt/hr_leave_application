@@ -222,7 +222,7 @@
                             <h2 class="modal-title" id="commentsModalTitle" style="display: inline; width: 150px;">
                                 Comments
                             </h2>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" runat="server" onserverclick="closeCommentModal_Click" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>

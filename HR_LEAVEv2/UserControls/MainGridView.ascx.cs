@@ -523,6 +523,9 @@ namespace HR_LEAVEv2.UserControls
             // get transaction_id associated with row
             int transaction_id = Convert.ToInt32(GridView.DataKeys[index].Values["transaction_id"]);
 
+            // get employee_id associated with row
+            string employee_id = GridView.DataKeys[index].Values["employee_id"].ToString();
+
             string status = "";
 
             string updateStatement = $@"
@@ -593,7 +596,6 @@ namespace HR_LEAVEv2.UserControls
                     {
                         // update status to NotApproved
                         status = "Not Approved";
-                        //message.Subject = "Leave Application Not Approved";
                         setStatement = $@"
                             SET
                                 [status]='{status}',
@@ -604,8 +606,6 @@ namespace HR_LEAVEv2.UserControls
                     }
                     else // approve (subtract) or undo (add)
                     {
-                        // get employee id, start date and end dates, leave type from gridview row
-                        string employee_id = Convert.ToString(GridView.DataKeys[index].Values["employee_id"]);
                         int daysTakenIndex = GetColumnIndexByName(row, "days_taken");
 
                         // get difference
@@ -677,92 +677,7 @@ namespace HR_LEAVEv2.UserControls
                     ";
 
                         sqlCommand.CommandText = sql;
-                    }
-
-                    // send email to employee
-                    //message.Body = $@"
-                    //        <style>
-                    //            #leaveDetails{{
-                    //                font-family: arial, sans-serif;
-                    //                border-collapse: collapse;
-                    //                width: 100%;
-                    //            }}
-
-                    //            #leaveDetails td,#leaveDetails th {{
-                    //                border: 1px solid #dddddd;
-                    //                text-align: left;
-                    //                padding: 8px;
-                    //            }}
-                    //        </style>
-                    //        <div style='margin-bottom:15px;'>
-                    //            Your leave application was {status.ToLower()} by HR. Details about the application can be found below: <br/>
-
-                    //            <table id='leaveDetails'>
-                    //                <tr>
-                    //                    <th> Date Submitted </th>
-                    //                    <th> Start Date </th>
-                    //                    <th> End Date </th>
-                    //                    <th> Days Taken </th>
-                    //                    <th> Leave Type </th>
-                    //                    <th> Status </th>
-                    //                    <th> Qualified </th>
-                    //                </tr>
-                    //                <tr>
-                    //                    <td>
-                    //                        {row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString()}
-                    //                    </td>
-                    //                    <td>
-                    //                        {row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString()}
-                    //                    </td>
-                    //                    <td>
-                    //                        {row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString()}
-                    //                    </td>
-                    //                    <td>
-                    //                        {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()}
-                    //                    </td>
-                    //                    <td>
-                    //                        {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()}
-                    //                    </td>
-                    //                    <td>
-                    //                        {status}
-                    //                    </td>
-                    //                    <td>
-                    //                        {row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString()}
-                    //                    </td>
-                    //                </tr>
-                    //            </table>
-                    //            <br/>
-                    //        </div>
-                    //        <div>
-                    //            Check the status of your leave applications under My Account > View Leave Logs. Contact HR for any further information. <br/> 
-                    //            <br/>
-                    //            Regards,<br/>
-                    //                HR
-                    //        </div>
-
-
-                    //    ";
-
-                    //try
-                    //{
-                    //    // send email
-                    //    SmtpClient smtp = new SmtpClient();
-                    //    smtp.Port = 587;
-                    //    smtp.Host = "smtp.gmail.com"; //for gmail host  
-                    //    smtp.EnableSsl = true;
-                    //    smtp.UseDefaultCredentials = false;
-
-                    //    //uses an application password
-                    //    smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt");
-                    //    smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                    //    smtp.Send(message);
-
-
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    throw ex;
-                    //}
+                    }     
                 }
             }
             
@@ -781,8 +696,6 @@ namespace HR_LEAVEv2.UserControls
             // add audit logs
             if (isQuerySuccessful)
             {
-                // get employee_id associated with row
-                string employee_id = GridView.DataKeys[index].Values["employee_id"].ToString();
                 string actingEmployeeID, affectedEmployeeId;
                 string action;
 
@@ -806,6 +719,34 @@ namespace HR_LEAVEv2.UserControls
                                 while (reader.Read())
                                 {
                                     employeeEmail = reader["email"].ToString();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+                // get supervisors's email associated with leave application
+                string supervisorEmail = string.Empty;
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+
+                        string sql = $@"
+                                SELECT email FROM [dbo].[employee] WHERE employee_id = {GridView.DataKeys[index].Values["supervisor_id"].ToString()}
+                            ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    supervisorEmail = reader["email"].ToString();
                                 }
                             }
                         }
@@ -1061,6 +1002,7 @@ namespace HR_LEAVEv2.UserControls
                     Dictionary<string, string> rowData = new Dictionary<string, string>()
                     {
                         { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
+                        { "employee_name", row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString() },
                         { "supervisor_name", Session["emp_username"].ToString() },
                         { "start_date", row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString() },
                         { "end_date", row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString() },
@@ -1068,7 +1010,8 @@ namespace HR_LEAVEv2.UserControls
                         { "leave_type", row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString() },
                         { "status", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() },
                         { "qualified",row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString() },
-                        { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Pending" ? "No" : "Yes"}
+                        { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Pending" ? "No" : "Yes"},
+                        { "employeeEmail", employeeEmail }
                     };
                     
                     ViewState["notRecommendedRow"] = rowData;
@@ -1079,7 +1022,7 @@ namespace HR_LEAVEv2.UserControls
                     editCommentSuccessPanel.Visible = false;
 
                     // show modal for user to enter comment
-                    ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal('show');", true);
+                    ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal({'show':true, 'backdrop':'static', 'keyboard':false});", true);
 
                     // populate audit log variables 
                     actingEmployeeID = Session["emp_id"].ToString();
@@ -1178,35 +1121,6 @@ namespace HR_LEAVEv2.UserControls
                     }
 
                     // send email to supervisor letting them know that HR approved application for employee
-
-                    // get employee's email associated with leave application
-                    string supervisorEmail = string.Empty;
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-
-                            string sql = $@"
-                                SELECT email FROM [dbo].[employee] WHERE employee_id = {GridView.DataKeys[index].Values["supervisor_id"].ToString()}
-                            ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                using (SqlDataReader reader = command.ExecuteReader())
-                                {
-                                    while (reader.Read())
-                                    {
-                                        supervisorEmail = reader["email"].ToString();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
-                    }
-
                     message.To.Clear();
 
                     // message.To.Add(new MailAddress(supervisorEmail));
@@ -1301,6 +1215,64 @@ namespace HR_LEAVEv2.UserControls
                 // Not Approve
                 if (commandName == "notApproved")
                 {
+                    // show modal to user to input comment for why they are not recommending the application. This comment is added to the db and to the email in the onclick function of the
+                    // submit comment button
+                    commentModalTransactionIdHiddenField.Value = transaction_id.ToString(); // add leave transaction id to hidden field in modal to access for db insert
+                    commentModalEmployeeIdHiddenField.Value = employee_id;// add leave transaction id to hidden field in modal to access later for audit log
+
+                    // load back comment panel with comments from db, if there
+                    string previousComment = string.Empty;
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
+                                SELECT hr_comment FROM leavetransaction WHERE transaction_id = {transaction_id}
+                            ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                using (SqlDataReader reader = command.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        previousComment = reader["hr_comment"].ToString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        throw ex;
+                    }
+
+                    commentsTxtArea.InnerText = previousCommentsHiddenField.Value = !String.IsNullOrEmpty(previousComment) ? previousComment : string.Empty;
+                    Dictionary<string, string> rowData = new Dictionary<string, string>()
+                    {
+                        { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
+                        { "employee_name", row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString() },
+                        { "supervisor_name", row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString() },
+                        { "start_date", row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString() },
+                        { "end_date", row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString() },
+                        { "days_taken", row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString() },
+                        { "leave_type", row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString() },
+                        { "status", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() },
+                        { "qualified",row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString() },
+                        { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Recommended" ? "No" : "Yes"}
+                    };
+
+                    ViewState["notApprovedRow"] = rowData;
+
+                    // reset user feedback panels
+                    noEditsMadePanel.Visible = false;
+                    addCommentSuccessPanel.Visible = false;
+                    editCommentSuccessPanel.Visible = false;
+
+                    // show modal for user to enter comment
+                    ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal({'show':true, 'backdrop':'static', 'keyboard':false});", true);
+
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
                     action = "Unapproved leave application";
@@ -1499,19 +1471,20 @@ namespace HR_LEAVEv2.UserControls
             this.BindGridView();
         }
 
-        protected void sendNotRecommendedEmail(string comment)
-
+        protected void sendNotApprovedEmail(string comment)
         {
             Dictionary<string, string> row = null;
-            if (ViewState["notRecommendedRow"] != null)
-                row = (Dictionary<string, string>)ViewState["notRecommendedRow"];
+            if (ViewState["notApprovedRow"] != null)
+                row = (Dictionary<string, string>)ViewState["notApprovedRow"];
 
-            if(row["isEmailSentAlready"] == "No")
+            Boolean isEmployeeEmailSent = false,
+                    isSupervisorEmailSent = false;
+            if (row != null && row["isEmailSentAlready"] == "No")
             {
                 string emailCommentString = string.Empty;
 
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
-                    emailCommentString = $"Your supervisor left the following comment: <blockquote>\"{comment}\"</blockquote><br/><br/>";
+                    emailCommentString = $"HR has left the following comment: <blockquote style='font-size: 1.1em;'>\"{comment}\"</blockquote>";
 
                 // send email
                 MailMessage message = new MailMessage();
@@ -1526,8 +1499,10 @@ namespace HR_LEAVEv2.UserControls
                 smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt"); //uses an application password
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
+                // employee email
+                //message.To.Add(new MailAddress(row["employeeEmail"]));
                 message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                message.Subject = "Leave Application Not Recommended";
+                message.Subject = "Leave Application Not Approved";
 
                 // send email to employee
                 message.Body = $@"
@@ -1547,9 +1522,215 @@ namespace HR_LEAVEv2.UserControls
                             <div style='margin-bottom:15px;'>
                                 DO NOT REPLY<br/>
                                 <br/>
+                                Your leave application was not approved by HR. Details about the application can be found below: <br/>
+                                {emailCommentString}
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Supervisor Name </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                        <th> Qualified </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {row["date_submitted"]}
+                                        </td>
+                                        <td>
+                                            {row["supervisor_name"]}
+                                        </td>
+                                        <td>
+                                            {row["start_date"]}
+                                        </td>
+                                        <td>
+                                            {row["end_date"]}
+                                        </td>
+                                        <td>
+                                            {row["days_taken"]}
+                                        </td>
+                                        <td>
+                                            {row["leave_type"]}
+                                        </td>
+                                        <td>
+                                            Not Approved
+                                        </td>
+                                        <td>
+                                            {row["qualified"]}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
+                try
+                {
+                    smtp.Send(message);
+                    isEmployeeEmailSent = true;
+                }
+                catch (Exception ex)
+                {
+                    isEmployeeEmailSent = false;
+                }
+
+                message.To.Clear();
+                // supervisor email
+                //message.To.Add(new MailAddress(row["supervisorEmail"]));
+                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+                message.Subject = "Employee Leave Application Not Approved";
+
+                // send email to employee
+                message.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                    font-family: arial, sans-serif;
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                    border: 1px solid #dddddd;
+                                    text-align: left;
+                                    padding: 8px;
+                                }}
+
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                DO NOT REPLY<br/>
+                                <br/>
+                                The leave application of {row["employee_name"]} was not approved by HR. Details about the application can be found below: <br/>
+                                {emailCommentString}
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Employee Name </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                        <th> Qualified </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {row["date_submitted"]}
+                                        </td>
+                                        <td>
+                                            {row["employee_name"]}
+                                        </td>                       
+                                        <td>
+                                            {row["start_date"]}
+                                        </td>
+                                        <td>
+                                            {row["end_date"]}
+                                        </td>
+                                        <td>
+                                            {row["days_taken"]}
+                                        </td>
+                                        <td>
+                                            {row["leave_type"]}
+                                        </td>
+                                        <td>
+                                            Not Approved
+                                        </td>
+                                        <td>
+                                            {row["qualified"]}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/deploy/Supervisor/MyEmployeeLeaveApplications.aspx'>here</a>. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
+                try
+                {
+                    smtp.Send(message);
+                    isSupervisorEmailSent = true;
+                }
+                catch (Exception ex)
+                {
+                    isSupervisorEmailSent = false;
+                }
+
+                if(isEmployeeEmailSent && isSupervisorEmailSent)
+                {
+                    row["isEmailSentAlready"] = "Yes";
+                    ViewState["notApprovedRow"] = row;
+                }
+
+            }
+        }
+
+        protected void sendNotRecommendedEmail(string comment)
+
+        {
+            Dictionary<string, string> row = null;
+            if (ViewState["notRecommendedRow"] != null)
+                row = (Dictionary<string, string>)ViewState["notRecommendedRow"];
+
+            if(row != null && row["isEmailSentAlready"] == "No")
+            {
+                string emailCommentString = string.Empty;
+
+                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                    emailCommentString = $"Your supervisor left the following comment: <blockquote style='font-size:1.1em;'>\"{comment}\"</blockquote>";
+
+                // send email
+                MailMessage message = new MailMessage();
+                message.IsBodyHtml = true;
+                message.From = new MailAddress("mopd.hr.leave@gmail.com");
+
+                SmtpClient smtp = new SmtpClient();
+                smtp.Port = 587;
+                smtp.Host = "smtp.gmail.com"; //for gmail host  
+                smtp.EnableSsl = true;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt"); //uses an application password
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+
+                // employee email
+                //message.To.Add(new MailAddress(row["employeeEmail"]));
+                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+                message.Subject = "Leave Application Not Recommended";
+
+                // send email to employee
+                message.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                    font-family: arial, sans-serif;
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                    border: 1px solid #dddddd;
+                                    text-align: left;
+                                    padding: 8px;
+                                }}
+
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                DO NOT REPLY<br/>
+                                <br/>
                                 Your leave application was not recommended by your supervisor, {Session["emp_username"].ToString()}. Details about the application can be found below: <br/>
                                 {emailCommentString}
-                                <br/>
                                 <table id='leaveDetails'>
                                     <tr>
                                         <th> Date Submitted </th>
@@ -1714,14 +1895,22 @@ namespace HR_LEAVEv2.UserControls
                 addCommentSuccessPanel.Visible = false;
                 noEditsMadePanel.Visible = true;
             }
-            sendNotRecommendedEmail(comment);
+
+            if (gridViewType == "sup")
+                sendNotRecommendedEmail(comment);
+            else if (gridViewType == "hr")
+                sendNotApprovedEmail(comment);
         }
 
         protected void closeCommentModal_Click(object sender, EventArgs e)
         {
             // hide modal
             ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal('hide');", true);
-            sendNotRecommendedEmail(string.Empty); 
+
+            if (gridViewType == "sup")
+                sendNotRecommendedEmail(string.Empty);
+            else if (gridViewType == "hr")
+                sendNotApprovedEmail(string.Empty);
         }
     }
 }
