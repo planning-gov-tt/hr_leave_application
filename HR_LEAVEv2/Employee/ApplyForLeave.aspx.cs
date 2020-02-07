@@ -777,7 +777,7 @@ namespace HR_LEAVEv2.Employee
 
                         //message.To.Add(new MailAddress("supEmail"));
                         message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                        message.Subject = $"{Session["emp_username"].ToString()} Submitted Leave Application";
+                        message.Subject = $"Employee Submitted Leave Application";
                         
                         message.Body = $@"
                             <style>
