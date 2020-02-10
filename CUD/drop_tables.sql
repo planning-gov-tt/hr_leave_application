@@ -4,6 +4,7 @@ GO
 
 DROP TABLE [dbo].[employeeposition];
 DROP TABLE [dbo].[employeefiles];
+DROP TABLE [dbo].[notifications];
 DROP TABLE [dbo].[auditlog];
 DROP TABLE [dbo].[employmenttype];
 DROP TABLE [dbo].[position];

@@ -200,5 +200,16 @@ CREATE TABLE [dbo].[employeefiles](
   FOREIGN KEY ([leave_transaction_id]) REFERENCES [dbo].[leavetransaction] ([transaction_id]),
   FOREIGN KEY([employee_id]) REFERENCES [dbo].[employee] ([employee_id]),
   FOREIGN KEY([file_id]) REFERENCES [dbo].[filestorage] ([file_id])
+);
+
+CREATE TABLE [dbo].notifications(
+  [id] INT IDENTITY(1, 1) PRIMARY KEY,
+  [notification_header] NVARCHAR(100) NOT NULL,
+  [notification] NVARCHAR(250) NOT NULL,
+  [is_read] NVARCHAR(5) NOT NULL,
+  [employee_id] NVARCHAR(10) NOT NULL,
+  [created_at] DATETIME NOT NULL,
+
+  FOREIGN KEY([employee_id]) REFERENCES [dbo].[employee] ([employee_id])
 
 );
