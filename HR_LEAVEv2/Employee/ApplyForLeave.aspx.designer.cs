@@ -517,13 +517,13 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.HtmlControls.HtmlTextArea hrCommentsTxt;
         
         /// <summary>
-        /// UpdatePanel1 control.
+        /// applyModeFeedbackUpdatePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
+        protected global::System.Web.UI.UpdatePanel applyModeFeedbackUpdatePanel;
         
         /// <summary>
         /// invalidSupervisor control.

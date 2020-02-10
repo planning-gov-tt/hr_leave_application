@@ -204,7 +204,7 @@
 
         <%--Apply mode: Shows any necessary validation messages to user --%>
         <div class="row" id="validationRow">
-            <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+            <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" UpdateMode="Conditional" runat="server">
                 <ContentTemplate>
                     <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
