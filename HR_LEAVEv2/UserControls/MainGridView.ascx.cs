@@ -767,7 +767,7 @@ namespace HR_LEAVEv2.UserControls
                 // Recommend
                 if (commandName == "recommended")
                 {
-                    sendRecommendedEmail(row);
+                    sendRecommendedNotifications(row, employee_id);
 
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -815,6 +815,7 @@ namespace HR_LEAVEv2.UserControls
                     {
                         { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
                         { "employee_name", row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString() },
+                        { "employee_id", employee_id},
                         { "supervisor_name", Session["emp_username"].ToString() },
                         { "start_date", row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString() },
                         { "end_date", row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString() },
@@ -846,7 +847,7 @@ namespace HR_LEAVEv2.UserControls
                 if (commandName == "approved")
                 {
 
-                    sendApprovedEmail(row);
+                    sendApprovedNotifications(row, employee_id, GridView.DataKeys[index].Values["supervisor_id"].ToString());
 
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -893,9 +894,11 @@ namespace HR_LEAVEv2.UserControls
                     Dictionary<string, string> rowData = new Dictionary<string, string>()
                     {
                         { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
+                        { "employee_id", employee_id},
                         { "employee_name", row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString() },
                         { "supervisor_name", row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString() },
-                        { "supervisoEmail", supervisorEmail },
+                        { "supervisor_id", GridView.DataKeys[index].Values["supervisor_id"].ToString()},
+                        { "supervisorEmail", supervisorEmail },
                         { "start_date", row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString() },
                         { "end_date", row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString() },
                         { "days_taken", row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString() },
@@ -1113,8 +1116,11 @@ namespace HR_LEAVEv2.UserControls
             this.BindGridView();
         }
 
-        protected void sendApprovedEmail(GridViewRow row)
+        protected void sendApprovedNotifications(GridViewRow row, string employee_id, string supervisor_id)
         {
+
+            // send email
+
             MailMessage message = new MailMessage();
             message.IsBodyHtml = true;
             message.From = new MailAddress("mopd.hr.leave@gmail.com");
@@ -1293,9 +1299,60 @@ namespace HR_LEAVEv2.UserControls
             {
                 throw ex;
             }
+
+            // send in application notifications
+            // send notif to employee
+            string notif_header = $"Leave Application Approved",
+                   notification = $"Your leave application to {row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave was approved.";
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{employee_id}', '{DateTime.Now}');
+                            ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        int rowsAffected = command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+            // send notif to supervisor
+            notif_header = $"Leave Application Approved for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}";
+            notification = $"The leave application of {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave was approved.";
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{supervisor_id}', '{DateTime.Now}');
+                            ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        int rowsAffected = command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
 
-        protected void sendNotApprovedEmail(string comment)
+        protected void sendNotApprovedNotifications(string comment)
         {
             Dictionary<string, string> row = null;
             if (ViewState["notApprovedRow"] != null)
@@ -1306,6 +1363,8 @@ namespace HR_LEAVEv2.UserControls
 
             if (row != null && row["isEmailSentAlready"] == "No")
             {
+
+                // send email notifications
                 string emailCommentString = string.Empty;
 
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
@@ -1499,11 +1558,73 @@ namespace HR_LEAVEv2.UserControls
                     ViewState["notApprovedRow"] = row;
                 }
 
+
+                // send in application notifications
+
+                // send notif to employee
+                string notif_header = $"Leave Application Not Approved",
+                       notification = $"Your leave application to {row["supervisor_name"]} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not approved.";
+
+                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                    notification += $"HR said \"{comment}\".";
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+
+                        string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{row["employee_id"]}', '{DateTime.Now}');
+                            ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            int rowsAffected = command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+
+                // send notif to supervisor
+                notif_header = $"Leave Application Not Approved for {row["employee_name"]}";
+                notification = $"The leave application of {row["employee_name"]} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not approved.";
+
+                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                    notification += $"HR said \"{comment}\".";
+
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+
+                        string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{row["supervisor_id"]}', '{DateTime.Now}');
+                            ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            int rowsAffected = command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
             }
         }
 
-        protected void sendRecommendedEmail(GridViewRow row)
+        protected void sendRecommendedNotifications(GridViewRow row, string employee_id)
         {
+
+
+            // send email notifications
             MailMessage message = new MailMessage();
             message.IsBodyHtml = true;
             message.From = new MailAddress("mopd.hr.leave@gmail.com");
@@ -1690,17 +1811,51 @@ namespace HR_LEAVEv2.UserControls
             {
                 throw ex;
             }
+
+
+            // send in application notifications
+
+            // send notif to employee
+            string notif_header = $"Leave Application Recommended",
+                   notification = $"Your leave application to {Session["emp_username"].ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave was recommended";
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{employee_id}', '{DateTime.Now}');
+                            ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        int rowsAffected = command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            // TODO: send notifs to relevant HRs - iterate through each relevant HR id and send notifs
+
         }
 
-        protected void sendNotRecommendedEmail(string comment)
+        protected void sendNotRecommendedNotifications(string comment)
 
         {
+
             Dictionary<string, string> row = null;
             if (ViewState["notRecommendedRow"] != null)
                 row = (Dictionary<string, string>)ViewState["notRecommendedRow"];
 
             if(row != null && row["isEmailSentAlready"] == "No")
             {
+                // send email
+
+
                 string emailCommentString = string.Empty;
 
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
@@ -1797,6 +1952,35 @@ namespace HR_LEAVEv2.UserControls
                     smtp.Send(message);
                     row["isEmailSentAlready"] = "Yes";
                     ViewState["notRecommendedRow"] = row;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+
+                // send in application notifs
+                // send notif to employee
+                string notif_header = $"Leave Application Not Recommended",
+                       notification = $"Your leave application to {Session["emp_username"].ToString()} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not recommended.";
+
+                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                    notification += $"Your supervisor said \"{comment}\".";
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+
+                        string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{row["employee_id"]}', '{DateTime.Now}');
+                            ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            int rowsAffected = command.ExecuteNonQuery();
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1911,9 +2095,14 @@ namespace HR_LEAVEv2.UserControls
             commentsUpdatePanel.Update();
 
             if (gridViewType == "sup")
-                sendNotRecommendedEmail(comment);
+                sendNotRecommendedNotifications(comment);
             else if (gridViewType == "hr")
-                sendNotApprovedEmail(comment);
+                sendNotApprovedNotifications(comment);
+        }
+
+        private void sendNotApprovedEmail(string comment)
+        {
+            throw new NotImplementedException();
         }
 
         protected void closeCommentModal_Click(object sender, EventArgs e)
@@ -1923,9 +2112,9 @@ namespace HR_LEAVEv2.UserControls
 
             string comment = String.IsNullOrEmpty(commentsTxtArea.InnerText) || String.IsNullOrWhiteSpace(commentsTxtArea.InnerText) ? string.Empty : commentsTxtArea.InnerText;
             if (gridViewType == "sup")
-                sendNotRecommendedEmail(comment);
+                sendNotRecommendedNotifications(comment);
             else if (gridViewType == "hr")
-                sendNotApprovedEmail(comment);
+                sendNotApprovedNotifications(comment);
         }
     }
 }

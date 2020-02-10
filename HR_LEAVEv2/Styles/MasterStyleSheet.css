@@ -166,7 +166,7 @@ a, a:active, a:focus, button, button:active, button:focus{
 }
 /*end style to remove outline*/
 
-/* styles for cards */
+/* styles for employee cards */
 .custom-card{
     border:1px solid black; 
     height:300px; 
@@ -201,7 +201,19 @@ a, a:active, a:focus, button, button:active, button:focus{
     width:100%;
 }
 
-/* end styles for cards */
+/* end styles for employee cards */
+
+/* styles for notification cards */
+
+.custom-notif-card{
+    border:1px solid black; 
+    height:300px; 
+    width:230px;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+/* end styles for notif cards */
 
 /* styles for calendar picker icon */
 .calendar-icon{

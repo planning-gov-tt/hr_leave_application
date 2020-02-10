@@ -40,6 +40,15 @@ namespace HR_LEAVEv2 {
         protected global::System.Web.UI.WebControls.Panel hr3Panel;
         
         /// <summary>
+        /// num_notifications control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label num_notifications;
+        
+        /// <summary>
         /// ddlSelectUser control.
         /// </summary>
         /// <remarks>

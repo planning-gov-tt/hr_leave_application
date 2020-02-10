@@ -265,12 +265,22 @@
                         <span id="Span7" runat="server">Error inserting files into database</span>
                     </asp:Panel>
 
+                    <asp:Panel ID="errorSendingEmailNotifications" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="Span11" runat="server">Error sending email notifications</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="errorSendingInHouseNotifications" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="Span12" runat="server">Error sending in-application notifications</span>
+                    </asp:Panel>
+
                     <asp:Panel ID="errorSubmittingLeaveApplicationPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span8" runat="server">Error submitting leave application</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none;" role="alert">
+                    <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin:0 5px;" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span id="successMsg" runat="server">Application successfully submitted</span>
                         <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />

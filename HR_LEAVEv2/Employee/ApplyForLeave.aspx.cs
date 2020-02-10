@@ -10,6 +10,7 @@ using System.Net.Mail;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.Employee
 {
@@ -539,8 +540,13 @@ namespace HR_LEAVEv2.Employee
             return isValidated;
         }
 
-        protected void sendEmailNotification()
+        protected void sendNotifications()
         {
+
+            Boolean isEmailNotifsSentSuccessfully = false,
+                    isInAppNotifsSentSuccessfully = false;
+
+            // send email notifications
             MailMessage message = new MailMessage();
             message.IsBodyHtml = true; //to make message body as html 
             message.From = new MailAddress("mopd.hr.leave@gmail.com");
@@ -658,10 +664,11 @@ namespace HR_LEAVEv2.Employee
                         ";
 
                 smtp.Send(message);
+                isEmailNotifsSentSuccessfully = true;
             }
             catch (Exception ex)
             {
-                throw ex;
+                isEmailNotifsSentSuccessfully = false;
             }
 
             // send email to employee 
@@ -737,12 +744,104 @@ namespace HR_LEAVEv2.Employee
                         ";
 
                 smtp.Send(message);
+                isEmailNotifsSentSuccessfully = isEmailNotifsSentSuccessfully && true;
             }
             catch (Exception ex)
             {
-                throw ex;
+                isEmailNotifsSentSuccessfully = false;
             }
+
+
+            // send inhouse notifications
+            // send employee notif
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('Submitted Leave Application',@Notification, 'No', '{Session["emp_id"].ToString()}', '{DateTime.Now}');
+                            ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Notification", $"You submitted a leave application to {Session["supervisor_name"].ToString()} for {numDaysAppliedFor.Text} day(s) {typeOfLeave.SelectedValue} leave");
+                        int rowsAffected = command.ExecuteNonQuery();
+                        isInAppNotifsSentSuccessfully = rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                isInAppNotifsSentSuccessfully = false;
+            }
+            //send supervisor notif
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('Submitted Leave Application',@Notification, 'No', '{Session["supervisor_id"].ToString()}', '{DateTime.Now}');
+                            ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Notification", $"{Session["emp_username"].ToString()} submitted a leave application for {numDaysAppliedFor.Text} day(s) {typeOfLeave.SelectedValue} leave");
+                        int rowsAffected = command.ExecuteNonQuery();
+                        isInAppNotifsSentSuccessfully = rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                isInAppNotifsSentSuccessfully = false;
+            }
+
+            //resetNumNotifications();
+
+            // user feedback
+            if (!isEmailNotifsSentSuccessfully)
+                errorSendingEmailNotifications.Style.Add("display", "inline-block");
+            if(!isInAppNotifsSentSuccessfully)
+                errorSendingInHouseNotifications.Style.Add("display", "inline-block");
         }
+
+        //protected void resetNumNotifications()
+        //{
+        //    // set number of notifications
+        //    string count = string.Empty;
+        //    try
+        //    {
+        //        string sql = $@"
+        //                SELECT COUNT([is_read]) AS 'num_notifs' FROM [dbo].[notifications] where [is_read] = 'No' AND [employee_id] = '{Session["emp_id"]}';
+        //            ";
+
+        //        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+        //        {
+        //            connection.Open();
+        //            using (SqlCommand command = new SqlCommand(sql, connection))
+        //            {
+        //                using (SqlDataReader reader = command.ExecuteReader())
+        //                {
+        //                    while (reader.Read())
+        //                    {
+        //                        count = reader["num_notifs"].ToString();
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+
+        //    Label num_notifs = (Label)Master.FindControl("num_notifications");
+        //    num_notifs.Text = count;
+        //}
 
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
@@ -772,6 +871,8 @@ namespace HR_LEAVEv2.Employee
             invalidSupervisor.Style.Add("display", "none");
             errorInsertingFilesToDbPanel.Style.Add("display", "none");
             errorSubmittingLeaveApplicationPanel.Style.Add("display", "none");
+            errorSendingEmailNotifications.Style.Add("display", "none");
+            errorSendingInHouseNotifications.Style.Add("display", "none");
 
             // get values from form controls
             string empId = Session["emp_id"].ToString(), // employee id
@@ -975,7 +1076,7 @@ namespace HR_LEAVEv2.Employee
                     successMsgPanel.Style.Add("display", "inline-block");
 
                     applyModeFeedbackUpdatePanel.Update();
-                    sendEmailNotification();
+                    sendNotifications();
                 }
             }
 
