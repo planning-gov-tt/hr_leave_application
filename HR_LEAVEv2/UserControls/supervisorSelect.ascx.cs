@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.UserControls
 {
@@ -41,6 +39,7 @@ namespace HR_LEAVEv2.UserControls
         protected void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             Session["supervisor_id"] = ComboBox1.SelectedValue;
+            Session["supervisor_name"] = ComboBox1.SelectedItem.Text;
         }
     }
 }

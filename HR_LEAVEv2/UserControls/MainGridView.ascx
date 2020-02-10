@@ -213,4 +213,62 @@
 
         </Columns>
     </asp:GridView>
+
+    <%--Modal--%>
+            <div class="modal fade" id="commentsModal" tabindex="-1" role="dialog" aria-labelledby="commentsModalTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document" style="width: 50%;">
+                    <div class="modal-content">
+                        <div class="modal-header text-center">
+                            <h2 class="modal-title" id="commentsModalTitle" style="display: inline; width: 150px;">
+                                Comments
+                            </h2>
+                            <button type="button" class="close" runat="server" onserverclick="closeCommentModal_Click" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <asp:UpdatePanel ID="commentsUpdatePanel" runat="server" UpdateMode="Conditional">
+                            <ContentTemplate>
+                                <div class="modal-body text-center">
+                                    <asp:HiddenField ID="previousCommentsHiddenField" runat="server" />
+                                    <asp:HiddenField ID="commentModalTransactionIdHiddenField" runat="server" />
+                                    <asp:HiddenField ID="commentModalEmployeeIdHiddenField" runat="server" />
+                                    <asp:Label ID="Label1" runat="server" Text="Enter comment:" Font-Size="Medium"></asp:Label>
+                                    <textarea id="commentsTxtArea" runat="server" cols="20" rows="4" class="form-control" style="width: 45%; margin: 0 auto; font-size: 1.05em;"></textarea>
+
+                                    <%--No Comment added--%>
+                                    <asp:Panel ID="noEditsMadePanel" runat="server" Style="display: inline-block; margin-top: 30px;" role="alert" Visible="false">
+                                        <span class="alert alert-info">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            <span id="Span1" runat="server">No changes made to comments</span>
+                                        </span>
+                                    </asp:Panel>
+
+                                    <%--Successful addition of comment--%>
+                                    <asp:Panel ID="addCommentSuccessPanel" runat="server" Style="display: inline-block; margin-top:30px;" Visible="false" role="alert">
+                                        <span class="alert alert-success">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                            <span id="Span9" runat="server">Comments successfully added to leave application</span>
+                                        </span>
+                                    </asp:Panel>
+
+                                    <%--Successful edit of comment--%>
+                                    <asp:Panel ID="editCommentSuccessPanel" runat="server" Style="display: inline-block; margin-top:30px;" Visible="false" role="alert">
+                                        <span class="alert alert-success">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                            <span id="Span2" runat="server">Comments successfully edited</span>
+                                        </span>
+                                    </asp:Panel>
+                                </div>
+                                <div class="modal-footer">
+                                    <asp:LinkButton runat="server" ID="submitCommentBtn" class="btn btn-primary" CausesValidation="false" OnClick="submitCommentBtn_Click">
+                                         <i class="fa fa-send" aria-hidden="true"></i>
+                                         Submit
+                                    </asp:LinkButton>
+                                    <asp:Button ID="closeCommentModal" runat="server" Text="Close" CssClass="btn btn-secondary" OnClick="closeCommentModal_Click"/>
+                                </div>
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+                    </div>
+                </div>
+            </div>
 </div>

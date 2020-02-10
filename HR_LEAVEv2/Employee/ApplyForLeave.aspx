@@ -162,9 +162,9 @@
         </div>
 
         <%--Apply mode: Allows user to upload docs--%>
-        <asp:Panel ID="fileUploadPanel" runat="server" Style="display:inline" CssClass="row form-group">
+        <asp:Panel ID="fileUploadPanel" runat="server" Style="margin:0 auto; text-align:center" CssClass="row form-group">
             <label for="FileUpload1" style="font-size:1.2em; display:inline;">Upload Files:</label>
-            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin: auto; display: inline-block" AllowMultiple="true"/> 
+            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin:0 auto; display: inline-block" AllowMultiple="true"/> 
             <br />
             <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align:left; margin: 0 auto; display:inline-block;">
                 <div>Files uploaded:</div>
@@ -204,7 +204,7 @@
 
         <%--Apply mode: Shows any necessary validation messages to user --%>
         <div class="row" id="validationRow">
-            <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+            <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" UpdateMode="Conditional" runat="server">
                 <ContentTemplate>
                     <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
