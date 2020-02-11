@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Net.Mail;
 using System.Net;
+using HR_LEAVEv2.Classes;
 using System.Web.UI;
 
 namespace HR_LEAVEv2.UserControls
@@ -930,6 +931,8 @@ namespace HR_LEAVEv2.UserControls
                     affectedEmployeeId = employee_id;
                     action = "Undid approval for leave application";
                 }
+
+                resetNumNotifications();
 
                 try
                 {
@@ -1990,6 +1993,18 @@ namespace HR_LEAVEv2.UserControls
 
         }
 
+        protected void resetNumNotifications()
+        {
+            // set number of notifications
+            Util util = new Util();
+
+            Label num_notifs = (Label)Page.Master.FindControl("num_notifications");
+            num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
+
+            UpdatePanel up = (UpdatePanel)Page.Master.FindControl("notificationsUpdatePanel");
+            up.Update();
+        }
+
         protected void submitCommentBtn_Click(object sender, EventArgs e)
         {
             // submit comment to leave transaction 
@@ -2098,11 +2113,8 @@ namespace HR_LEAVEv2.UserControls
                 sendNotRecommendedNotifications(comment);
             else if (gridViewType == "hr")
                 sendNotApprovedNotifications(comment);
-        }
 
-        private void sendNotApprovedEmail(string comment)
-        {
-            throw new NotImplementedException();
+            resetNumNotifications();
         }
 
         protected void closeCommentModal_Click(object sender, EventArgs e)

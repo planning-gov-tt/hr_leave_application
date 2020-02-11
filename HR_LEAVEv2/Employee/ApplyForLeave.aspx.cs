@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HR_LEAVEv2.Classes;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -439,6 +440,18 @@ namespace HR_LEAVEv2.Employee
 
         }
 
+        protected void resetNumNotifications()
+        {
+            // set number of notifications
+            Util util = new Util();
+
+            Label num_notifs = (Label)Master.FindControl("num_notifications");
+            num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
+
+            System.Web.UI.UpdatePanel up = (System.Web.UI.UpdatePanel)Master.FindControl("notificationsUpdatePanel");
+            up.Update();
+        }
+
         protected Boolean validateDates(string startDate, string endDate)
         {
             clearDateErrors();
@@ -809,40 +822,6 @@ namespace HR_LEAVEv2.Employee
                 errorSendingInHouseNotifications.Style.Add("display", "inline-block");
         }
 
-        //protected void resetNumNotifications()
-        //{
-        //    // set number of notifications
-        //    string count = string.Empty;
-        //    try
-        //    {
-        //        string sql = $@"
-        //                SELECT COUNT([is_read]) AS 'num_notifs' FROM [dbo].[notifications] where [is_read] = 'No' AND [employee_id] = '{Session["emp_id"]}';
-        //            ";
-
-        //        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-        //        {
-        //            connection.Open();
-        //            using (SqlCommand command = new SqlCommand(sql, connection))
-        //            {
-        //                using (SqlDataReader reader = command.ExecuteReader())
-        //                {
-        //                    while (reader.Read())
-        //                    {
-        //                        count = reader["num_notifs"].ToString();
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-
-        //    Label num_notifs = (Label)Master.FindControl("num_notifications");
-        //    num_notifs.Text = count;
-        //}
-
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
             /**
@@ -1077,6 +1056,7 @@ namespace HR_LEAVEv2.Employee
 
                     applyModeFeedbackUpdatePanel.Update();
                     sendNotifications();
+                    resetNumNotifications();
                 }
             }
 

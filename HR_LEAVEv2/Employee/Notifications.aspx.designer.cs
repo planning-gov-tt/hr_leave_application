@@ -13,6 +13,24 @@ namespace HR_LEAVEv2.Employee {
     public partial class Notifications {
         
         /// <summary>
+        /// notifsPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel notifsPanel;
+        
+        /// <summary>
+        /// deleteAllNotifsBtn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton deleteAllNotifsBtn;
+        
+        /// <summary>
         /// ListView1 control.
         /// </summary>
         /// <remarks>

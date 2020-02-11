@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HR_LEAVEv2.Classes;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -17,40 +18,20 @@ namespace HR_LEAVEv2.Employee
             {
                 bindListView();
             }
+           
         }
 
         protected void resetNumNotifications()
         {
             // set number of notifications
-            string count = string.Empty;
-            try
-            {
-                string sql = $@"
-                        SELECT COUNT([is_read]) AS 'num_notifs' FROM [dbo].[notifications] where [is_read] = 'No' AND [employee_id] = '{Session["emp_id"]}';
-                    ";
-
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                count = reader["num_notifs"].ToString();
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            Util util = new Util();
 
             Label num_notifs = (Label)Master.FindControl("num_notifications");
-            num_notifs.Text = count;
+            num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
+            System.Web.UI.UpdatePanel up = (System.Web.UI.UpdatePanel)Master.FindControl("notificationsUpdatePanel");
+            up.Update();
+
+            deleteAllNotifsBtn.Visible = num_notifs.Text != "0";
         }
 
         protected void bindListView()
@@ -64,7 +45,7 @@ namespace HR_LEAVEv2.Employee
                            IIF([is_read] = 'No', 'Unread', 'Read') AS status,
                            IIF([is_read] = 'No', 'label-primary', 'label-default') AS bootstrap_class,
                            [is_read], 
-                           [created_at] 
+                           FORMAT([created_at],  'h:mmtt MMM dd yyyy') AS created_at
                     FROM [dbo].[notifications] 
                     WHERE [employee_id] = '{Session["emp_id"].ToString()}'
                     ORDER BY [created_at] DESC;
@@ -167,6 +148,31 @@ namespace HR_LEAVEv2.Employee
                 string sql = $@"
                     DELETE FROM [dbo].[notifications] 
                     WHERE [id] = '{id}';
+                ";
+
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.ExecuteNonQuery();
+                        bindListView();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        protected void deleteAllNotifsBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string sql = $@"
+                    DELETE FROM [dbo].[notifications] 
+                    WHERE [employee_id] = '{Session["emp_id"]}';
                 ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
