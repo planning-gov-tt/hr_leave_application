@@ -159,6 +159,11 @@
                         <a href="<%= ResolveClientUrl("~/Employee/Notifications.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Notifications">
                             <i class="fa fa-bell navbar-link-icon"></i>
                             <span class="navbar-link-text">Notifications</span>
+                            <asp:UpdatePanel ID="notificationsUpdatePanel" runat="server" UpdateMode="Conditional" Style="display:inline;">
+                                <ContentTemplate>
+                                    <asp:Label ID="num_notifications" runat="server" class="badge" style="color:#7386D5; background-color:#fff" ></asp:Label>
+                                </ContentTemplate>
+                            </asp:UpdatePanel>                        
                         </a>
                     </li>
                     <li>

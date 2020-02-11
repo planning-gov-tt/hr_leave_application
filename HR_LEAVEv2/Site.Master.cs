@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.UI;
-
 using System.Configuration;
 using System.Data.SqlClient;
 
@@ -60,8 +59,7 @@ namespace HR_LEAVEv2
             // load drop down list
             if (!IsPostBack)
             {
-                string CS = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
-                using (SqlConnection con = new SqlConnection(CS))
+                using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
                     SqlCommand cmd = new SqlCommand(
                         $@"
@@ -77,6 +75,36 @@ namespace HR_LEAVEv2
                     ddlSelectUser.DataBind();
                 }
                 ddlSelectUser.SelectedValue = Session["emp_email"].ToString();
+
+                // set number of notifications
+                string count = string.Empty;
+                try
+                {
+                    string sql = $@"
+                        SELECT COUNT([is_read]) AS 'num_notifs' FROM [dbo].[notifications] where [is_read] = 'No' AND [employee_id] = '{Session["emp_id"]}';
+                    ";
+
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    count = reader["num_notifs"].ToString();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+                num_notifications.Text = count;
             }
 
         }
