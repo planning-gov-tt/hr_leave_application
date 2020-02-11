@@ -17,6 +17,7 @@ namespace HR_LEAVEv2.Employee
 {
     public partial class ApplyForLeave : System.Web.UI.Page
     {
+        Util util = new Util();
 
         // this class is used to store the loaded data from the db in the process of populating fields on the page when accessing this page from 'view' mode
         protected class LeaveTransactionDetails
@@ -482,7 +483,6 @@ namespace HR_LEAVEv2.Employee
         protected void resetNumNotifications()
         {
             // set number of notifications
-            Util util = new Util();
 
             Label num_notifs = (Label)Master.FindControl("num_notifications");
             num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
@@ -737,71 +737,16 @@ namespace HR_LEAVEv2.Employee
                 //message.To.Add(new MailAddress("supEmail"));
                 message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                 message.Subject = $"{Session["emp_username"].ToString()} Submitted Leave Application";
-
-                message.Body = $@"
-                            <style>
-                                #leaveDetails{{
-                                  font-family: arial, sans-serif;
-                                  border-collapse: collapse;
-                                  width: 100%;
-                                }}
-
-                                #leaveDetails td,#leaveDetails th {{
-                                  border: 1px solid #dddddd;
-                                  text-align: left;
-                                  padding: 8px;
-                                }}
-                            </style>
-                            <div style='margin-bottom:15px;'>
-                                DO NOT REPLY <br/>
-                                <br/>
-                                {Session["emp_username"].ToString()} submitted a leave application. Details about the application can be found below: <br/>
-                                
-                                <table id='leaveDetails'>
-                                    <tr>
-                                        <th> Date Submitted </th>
-                                        <th> Employee Name </th>
-                                        <th> Start Date </th>
-                                        <th> End Date </th>
-                                        <th> Days Taken </th>
-                                        <th> Leave Type </th>
-                                        <th> Status </th>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {DateTime.Now.ToString("d/MM/yyyy h:mm tt")}
-                                        </td>
-                                        <td>
-                                            {Session["emp_username"].ToString()}
-                                        </td>
-                                        <td>
-                                            {txtFrom.Text.ToString()}
-                                        </td>
-                                        <td>
-                                            {txtTo.Text.ToString()}
-                                        </td>
-                                        <td>
-                                            {numDaysAppliedFor.Text}
-                                        </td>
-                                        <td>
-                                            {typeOfLeave.SelectedValue}
-                                        </td>
-                                        <td>
-                                            Pending
-                                        </td>
-                                    </tr>
-                                </table>
-                                <br/>
-                            </div>
-                            <div>
-                                Check the status of your employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/deploy/Supervisor/MyEmployeeLeaveApplications'>here</a>. Contact HR for any further information. <br/> 
-                                <br/>
-                                Regards,<br/>
-                                    HR
-                            </div>
-
-
-                        ";
+                message.Body = util.getSupervisorViewEmployeeSubmittedLeaveApplication(
+                    new Util.EmailDetails {
+                        employee_name = Session["emp_username"].ToString(),
+                        date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
+                        start_date = txtFrom.Text.ToString(),
+                        end_date = txtTo.Text.ToString(),
+                        days_taken = numDaysAppliedFor.Text,
+                        type_of_leave = typeOfLeave.SelectedValue
+                        }
+                    );
 
                 smtp.Send(message);
                 isEmailNotifsSentSuccessfully = true;
@@ -819,70 +764,17 @@ namespace HR_LEAVEv2.Employee
                 message.To.Add(new MailAddress(Session["emp_email"].ToString()));
                 message.Subject = "Submitted Leave Application";
 
-                message.Body = $@"
-                            <style>
-                                #leaveDetails{{
-                                  font-family: arial, sans-serif;
-                                  border-collapse: collapse;
-                                  width: 100%;
-                                }}
-
-                                #leaveDetails td,#leaveDetails th {{
-                                  border: 1px solid #dddddd;
-                                  text-align: left;
-                                  padding: 8px;
-                                }}
-                            </style>
-                            <div style='margin-bottom:15px;'>
-                                DO NOT REPLY <br/>
-                                <br/>
-                                You submitted a leave application. Details about the application can be found below: <br/>
-                                <table id='leaveDetails'>
-                                    <tr>
-                                        <th> Date Submitted </th>
-                                        <th> Supervisor Name </th>
-                                        <th> Start Date </th>
-                                        <th> End Date </th>
-                                        <th> Days Taken </th>
-                                        <th> Leave Type </th>
-                                        <th> Status </th>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {DateTime.Now.ToString("d/MM/yyyy h:mm tt")}
-                                        </td>
-                                        <td>
-                                            {Session["supervisor_name"].ToString()}
-                                        </td>
-                                        <td>
-                                            {txtFrom.Text.ToString()}
-                                        </td>
-                                        <td>
-                                            {txtTo.Text.ToString()}
-                                        </td>
-                                        <td>
-                                            {numDaysAppliedFor.Text}
-                                        </td>
-                                        <td>
-                                            {typeOfLeave.SelectedValue}
-                                        </td>
-                                        <td>
-                                            Pending
-                                        </td>
-                                    </tr>
-                                </table>
-                                <br/>
-                            </div>
-                            <div>
-                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
-                                <br/>
-                                Regards,<br/>
-                                    HR
-                            </div>
-
-
-                        ";
-
+                message.Body = util.getEmployeeViewEmployeeSubmittedLeaveApplication(
+                    new Util.EmailDetails
+                    {
+                        supervisor_name = Session["supervisor_name"].ToString(),
+                        date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
+                        start_date = txtFrom.Text.ToString(),
+                        end_date = txtTo.Text.ToString(),
+                        days_taken = numDaysAppliedFor.Text,
+                        type_of_leave = typeOfLeave.SelectedValue
+                    }
+                    );
                 smtp.Send(message);
                 isEmailNotifsSentSuccessfully = isEmailNotifsSentSuccessfully && true;
             }
