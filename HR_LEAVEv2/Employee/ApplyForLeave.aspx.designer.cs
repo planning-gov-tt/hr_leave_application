@@ -400,6 +400,24 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.FileUpload FileUpload1;
         
         /// <summary>
+        /// uploadFilesBtn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton uploadFilesBtn;
+        
+        /// <summary>
+        /// clearAllFilesBtn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton clearAllFilesBtn;
+        
+        /// <summary>
         /// filesUploadedPanel control.
         /// </summary>
         /// <remarks>
@@ -409,31 +427,13 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.Panel filesUploadedPanel;
         
         /// <summary>
-        /// filesUploadedList control.
+        /// filesUploadedListView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.BulletedList filesUploadedList;
-        
-        /// <summary>
-        /// uploadBtn control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button uploadBtn;
-        
-        /// <summary>
-        /// clearUploadedFiles control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button clearUploadedFiles;
+        protected global::System.Web.UI.WebControls.ListView filesUploadedListView;
         
         /// <summary>
         /// filesToDownloadPanel control.
@@ -524,6 +524,24 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.UpdatePanel applyModeFeedbackUpdatePanel;
+        
+        /// <summary>
+        /// invalidLeaveTypePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidLeaveTypePanel;
+        
+        /// <summary>
+        /// invalidLeaveTypeTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidLeaveTypeTxt;
         
         /// <summary>
         /// invalidSupervisor control.

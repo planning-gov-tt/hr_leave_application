@@ -128,14 +128,6 @@
             <%--apply mode--%>
             <asp:Panel ID="typeOfLeaveDropdownPanel" runat="server" Style="display:inline;">
                 <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Height="27px" Style="display: inline;" AutoPostBack ="true" OnSelectedIndexChanged="typeOfLeave_SelectedIndexChanged">
-                    <asp:ListItem Value=""></asp:ListItem>
-                    <asp:ListItem Value="Sick"></asp:ListItem>
-                    <asp:ListItem Value="Personal"></asp:ListItem>
-                    <asp:ListItem Value="Casual"></asp:ListItem>
-                    <asp:ListItem Value="Vacation"></asp:ListItem>
-                    <asp:ListItem Value="Maternity"></asp:ListItem>
-                    <asp:ListItem Value="Pre-retirement"></asp:ListItem>
-                    <asp:ListItem Value="Bereavement"></asp:ListItem>
                 </asp:DropDownList>
                 <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </asp:Panel>
@@ -165,14 +157,55 @@
         <asp:Panel ID="fileUploadPanel" runat="server" Style="margin:0 auto; text-align:center" CssClass="row form-group">
             <label for="FileUpload1" style="font-size:1.2em; display:inline;">Upload Files:</label>
             <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin:0 auto; display: inline-block" AllowMultiple="true"/> 
+            <asp:LinkButton ID="uploadFilesBtn" runat="server" OnClick="uploadBtn_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Upload files">
+                <i class="fa fa-upload" aria-hidden="true"></i>
+            </asp:LinkButton>
+            <asp:LinkButton ID="clearAllFilesBtn" runat="server" OnClick="clearUploadedFiles_Click" CssClass="btn btn-sm btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Clear all uploaded files">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </asp:LinkButton>
             <br />
-            <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align:left; margin: 0 auto; display:inline-block;">
-                <div>Files uploaded:</div>
-                <asp:BulletedList ID="filesUploadedList" runat="server" BulletStyle="NotSet" Style="display:inline-block; text-align:left;"></asp:BulletedList>
+            <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align: left; margin: 0 auto; display: inline-block;">
+                Files Uploaded:
+                <asp:ListView ID="filesUploadedListView" runat="server" GroupItemCount="10">
+                    <GroupTemplate>
+                        <div id="itemPlaceholderContainer" runat="server">
+                            <div id="itemPlaceholder" runat="server"></div>
+                        </div>
+                    </GroupTemplate>
+
+                    <ItemTemplate>
+                        <div>
+                            <span>
+                                <asp:LinkButton ID="clearIndividualFileBtn" OnClick="clearIndividualFileBtn_Click" data-id='<%#Eval("file_name") %>' runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </asp:LinkButton>
+                            </span>
+                            <span> <%#Eval("file_name") %></span>
+                        </div>
+                    </ItemTemplate>
+
+                    <AlternatingItemTemplate>
+                        <div style="margin-top:5px;">
+                            <span>
+                                <asp:LinkButton ID="clearIndividualFileBtn" OnClick="clearIndividualFileBtn_Click" data-id='<%#Eval("file_name") %>' runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </asp:LinkButton>
+                            </span>
+                            <span> <%#Eval("file_name") %></span>
+                        </div>
+                    </AlternatingItemTemplate>
+
+
+                    <LayoutTemplate>
+                        <div id="groupPlaceholderContainer" runat="server">
+                            <div id="groupPlaceholder" runat="server"></div>
+                        </div>
+                    </LayoutTemplate>
+
+                </asp:ListView>
+                <%--<asp:BulletedList ID="filesUploadedList" runat="server" BulletStyle="NotSet" Style="display: inline-block; text-align: left;"></asp:BulletedList>--%>
             </asp:Panel>
-            <br />
-            <asp:Button ID="uploadBtn" runat="server" Text="Upload files" OnClick="uploadBtn_Click" CssClass="btn btn-primary"  Style="display:inline-block; "/>
-            <asp:Button ID="clearUploadedFiles" runat="server" Text="Clear files" OnClick="clearUploadedFiles_Click" CssClass="btn btn-primary" Style="display:inline-block; "/>                                
+            <br />                            
         </asp:Panel>
 
         <asp:Panel ID="filesToDownloadPanel" runat="server">
@@ -206,6 +239,10 @@
         <div class="row" id="validationRow">
             <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" UpdateMode="Conditional" runat="server">
                 <ContentTemplate>
+                    <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="invalidLeaveTypeTxt" runat="server"></span>
+                    </asp:Panel>
                     <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span3" runat="server">Could not verify supervisor</span>

@@ -66,6 +66,44 @@ namespace HR_LEAVEv2.Employee
                         this.adjustPageForEditMode(ltDetails);
                 } else
                 {
+                    // populate dropdown containing leave types
+                    try
+                    {
+                        string sql = $@"
+                        SELECT elt.leave_type
+                        FROM dbo.employee e
+
+                        JOIN dbo.employeeposition ep
+                        ON e.employee_id = ep.employee_id
+
+                        JOIN dbo.emptypeleavetype elt
+                        ON elt.employment_type = ep.employment_type
+
+                        WHERE e.employee_id = '{Session["emp_id"].ToString()}'
+                        ORDER BY elt.leave_type DESC;
+                    ";
+
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                DataTable dt = new DataTable();
+                                SqlDataAdapter da = new SqlDataAdapter(command);
+                                da.Fill(dt);
+
+                                typeOfLeave.DataTextField = typeOfLeave.DataValueField  = "leave_type";
+                                typeOfLeave.DataSource = dt;
+                                typeOfLeave.DataBind();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+
+
                     // display normal leave application form
                     this.adjustPageForApplyMode();
                 }        
@@ -74,8 +112,9 @@ namespace HR_LEAVEv2.Employee
             {
                 if(mode == "apply")
                 {
+                    clearFilesErrors();
                     // validate dates
-                    if(!validateDates(txtFrom.Text, txtTo.Text))
+                    if(!validateDates(txtFrom.Text, txtTo.Text) || !validateLeave(typeOfLeave.SelectedValue))
                         applyModeFeedbackUpdatePanel.Update();
                 }
                     
@@ -491,7 +530,6 @@ namespace HR_LEAVEv2.Employee
                 // compare dates to ensure end date is not before start date
                 if (DateTime.Compare(start, end) > 0)
                 {
-                    invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
                     dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
                     isValidated = false;
                 }
@@ -501,7 +539,6 @@ namespace HR_LEAVEv2.Employee
                     // ensure start date is not a day before today once not sick leave
                     if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, DateTime.Today) < 0)
                     {
-                        invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                         startDateBeforeTodayValidationMsgPanel.Style.Add("display", "inline-block");
                         isValidated = false;
                     }
@@ -551,6 +588,96 @@ namespace HR_LEAVEv2.Employee
             }
 
             return isValidated;
+        }
+
+        protected Boolean validateLeave(string typeOfLeaveSelected)
+        {
+            invalidLeaveTypePanel.Style.Add("display", "none");
+            invalidLeaveTypeTxt.InnerText = string.Empty;
+
+            string isValid = string.Empty,
+                   errTxt = string.Empty; 
+
+            if (!String.IsNullOrEmpty(typeOfLeaveSelected) || !String.IsNullOrWhiteSpace(typeOfLeaveSelected))
+            {
+                // validate choice of leave
+                string empType = string.Empty;
+
+                DateTime startDate = DateTime.MinValue;
+                try
+                {
+                    string sql = $@"
+                        SELECT ep.employment_type, ep.start_date,
+	                        IIF('{typeOfLeaveSelected}' IN (SELECT [leave_type] FROM [HRLeaveTestDb].[dbo].[emptypeleavetype] elt WHERE elt.employment_type = ep.employment_type), 
+		                        'Yes', 
+		                        'No'
+	                        ) AS 'isLeaveTypeValid'
+
+                        FROM dbo.employee e
+                        JOIN dbo.employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE e.employee_id = '{Session["emp_id"].ToString()}';
+                    ";
+
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    empType = reader["employment_type"].ToString();
+                                    startDate = Convert.ToDateTime(reader["start_date"].ToString());
+                                    isValid = reader["isLeaveTypeValid"].ToString();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+                isValid = String.IsNullOrEmpty(isValid) || String.IsNullOrWhiteSpace(isValid) ? "No" : isValid;
+                empType = String.IsNullOrEmpty(empType) || String.IsNullOrWhiteSpace(empType) ? "unregistered" : empType;
+
+                if (isValid == "Yes" && empType == "Contract")
+                {
+                    DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
+
+                    if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                    {
+                        if (typeOfLeaveSelected == "Vacation")
+                            errTxt = "Cannot apply for Vacation leave within first 11 months of contract";
+                    }
+                    else
+                    {
+                        if (typeOfLeaveSelected == "Personal")
+                            errTxt = "Cannot apply for Personal leave after first 11 months of contract";
+                    }
+
+                }
+                else if (isValid == "No")
+                {
+                    errTxt = $"Cannot apply for {typeOfLeaveSelected} leave as {empType} worker";
+                }
+
+                
+            } else
+            {
+                isValid = "No";
+                errTxt = "Type of Leave not selected";
+            }
+
+            if (!String.IsNullOrEmpty(errTxt))
+            {
+                invalidLeaveTypeTxt.InnerText = errTxt;
+                invalidLeaveTypePanel.Style.Add("display", "inline-block");
+            }
+            return isValid == "Yes" && String.IsNullOrEmpty(errTxt);
         }
 
         protected void sendNotifications()
@@ -822,6 +949,15 @@ namespace HR_LEAVEv2.Employee
                 errorSendingInHouseNotifications.Style.Add("display", "inline-block");
         }
 
+        protected void clearSubmitLeaveApplicationErrors()
+        {
+            invalidSupervisor.Style.Add("display", "none");
+            errorInsertingFilesToDbPanel.Style.Add("display", "none");
+            errorSubmittingLeaveApplicationPanel.Style.Add("display", "none");
+            errorSendingEmailNotifications.Style.Add("display", "none");
+            errorSendingInHouseNotifications.Style.Add("display", "none");
+        }
+
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
             /**
@@ -847,11 +983,7 @@ namespace HR_LEAVEv2.Employee
             // submit leave application errors
 
             // hide error messages before rechecking criteria for new/ preexisting errors
-            invalidSupervisor.Style.Add("display", "none");
-            errorInsertingFilesToDbPanel.Style.Add("display", "none");
-            errorSubmittingLeaveApplicationPanel.Style.Add("display", "none");
-            errorSendingEmailNotifications.Style.Add("display", "none");
-            errorSendingInHouseNotifications.Style.Add("display", "none");
+            clearSubmitLeaveApplicationErrors();
 
             // get values from form controls
             string empId = Session["emp_id"].ToString(), // employee id
@@ -869,7 +1001,7 @@ namespace HR_LEAVEv2.Employee
             isLeaveApplicationInsertSuccessful = isFileUploadSuccessful = true;
             areFilesUploaded = false;
             
-            isValidated = validateDates(startDate, endDate);
+            isValidated = validateDates(startDate, endDate) && validateLeave(leaveType);
             if (isValidated && supId != "-1")
             {
                 // used to store id of leave transaction which is outputted by the INSERT statement. This is later used in the audit log
@@ -1096,13 +1228,17 @@ namespace HR_LEAVEv2.Employee
         protected void typeOfLeave_SelectedIndexChanged(object sender, EventArgs e)
         {
             validateDates(txtFrom.Text, txtTo.Text);
+            validateLeave(typeOfLeave.SelectedValue);            
+        }
+
+        protected void clearFilesErrors()
+        {
+            invalidFileTypePanel.Style.Add("display", "none");
+            fileUploadedTooLargePanel.Style.Add("display", "none");
         }
 
         protected void uploadBtn_Click(object sender, EventArgs e)
         {
-            invalidFileTypePanel.Style.Add("display", "none");
-            fileUploadedTooLargePanel.Style.Add("display", "none");
-
             if (FileUpload1.HasFiles)
             {
                 List<string> filesTooLarge = new List<string>();
@@ -1134,6 +1270,7 @@ namespace HR_LEAVEv2.Employee
                             HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
                             txt.InnerText = $"Could not upload '{Path.GetFileName(uploadedFile.FileName).ToString()}'. Invalid file type: '{Path.GetExtension(uploadedFile.FileName).ToString()}'";
                             invalidFileTypePanel.Style.Add("display", "inline-block");
+                            break;
                         }
                     } else
                         filesTooLarge.Add(Path.GetFileName(uploadedFile.FileName).ToString());
@@ -1159,21 +1296,31 @@ namespace HR_LEAVEv2.Employee
                     filesUploadedPanel.Visible = true;
 
                     // populate files uploaded list
-                    filesUploadedList.DataTextField = "file_name";
-                    filesUploadedList.DataSource = dt;
-                    filesUploadedList.DataBind();
+                    filesUploadedListView.DataSource = dt;
+                    filesUploadedListView.DataBind();
                 }  
             }
             else
-                filesUploadedPanel.Visible = false;
+            {
+                List<HttpPostedFile> files = null;
+
+                if (Session["uploadedFiles"] != null)
+                    files = (List<HttpPostedFile>)Session["uploadedFiles"];
+
+                if(Session["uploadedFiles"] == null || files == null || files.Count <=0)
+                    filesUploadedPanel.Visible = false;
+            }
+                
         }
 
         protected void clearUploadedFiles_Click(object sender, EventArgs e)
         {
+
             filesUploadedPanel.Visible = false;
             FileUpload1.Dispose();
-            filesUploadedList.DataSource = new DataTable();
-            filesUploadedList.DataBind();
+
+            filesUploadedListView.DataSource = new DataTable();
+            filesUploadedListView.DataBind();
 
             Session["uploadedFiles"] = null;
             validateDates(txtFrom.Text, txtTo.Text);
@@ -1354,6 +1501,38 @@ namespace HR_LEAVEv2.Employee
                 //exception logic
                 throw ex;
             }
+        }
+
+        protected void clearIndividualFileBtn_Click(object sender, EventArgs e)
+        {
+            LinkButton btn = sender as LinkButton;
+            string file_name = btn.Attributes["data-id"].ToString();
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("file_name", typeof(string));
+
+            // go through all files and create new datatable
+            List<HttpPostedFile> files = null;
+            if (Session["uploadedFiles"] != null)
+            {
+                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                
+                HttpPostedFile fileToRemove = files.SingleOrDefault<HttpPostedFile>(file => Path.GetFileName(file.FileName).ToString() == file_name);
+                if(fileToRemove != null)
+                {
+                    files.Remove(fileToRemove);
+                }
+                
+                foreach(HttpPostedFile file in files)
+                {
+                    dt.Rows.Add(Path.GetFileName(file.FileName).ToString());
+                }
+
+                filesUploadedListView.DataSource = dt;
+                filesUploadedListView.DataBind();
+
+            }
+
         }
 
         // to add limitations to what days taken can be
