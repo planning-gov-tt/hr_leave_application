@@ -1522,12 +1522,18 @@ namespace HR_LEAVEv2.Employee
                 {
                     files.Remove(fileToRemove);
                 }
-                
-                foreach(HttpPostedFile file in files)
-                {
-                    dt.Rows.Add(Path.GetFileName(file.FileName).ToString());
-                }
 
+                if (files.Count > 0)
+                {
+                    foreach (HttpPostedFile file in files)
+                    {
+                        dt.Rows.Add(Path.GetFileName(file.FileName).ToString());
+                    }
+                }
+                else
+                    filesUploadedPanel.Visible = false;
+
+                Session["uploadedFiles"] = files;
                 filesUploadedListView.DataSource = dt;
                 filesUploadedListView.DataBind();
 
