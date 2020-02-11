@@ -112,6 +112,7 @@ namespace HR_LEAVEv2.Employee
             {
                 if(mode == "apply")
                 {
+                    clearFilesErrors();
                     // validate dates
                     if(!validateDates(txtFrom.Text, txtTo.Text) || !validateLeave(typeOfLeave.SelectedValue))
                         applyModeFeedbackUpdatePanel.Update();
@@ -948,6 +949,15 @@ namespace HR_LEAVEv2.Employee
                 errorSendingInHouseNotifications.Style.Add("display", "inline-block");
         }
 
+        protected void clearSubmitLeaveApplicationErrors()
+        {
+            invalidSupervisor.Style.Add("display", "none");
+            errorInsertingFilesToDbPanel.Style.Add("display", "none");
+            errorSubmittingLeaveApplicationPanel.Style.Add("display", "none");
+            errorSendingEmailNotifications.Style.Add("display", "none");
+            errorSendingInHouseNotifications.Style.Add("display", "none");
+        }
+
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
             /**
@@ -973,11 +983,7 @@ namespace HR_LEAVEv2.Employee
             // submit leave application errors
 
             // hide error messages before rechecking criteria for new/ preexisting errors
-            invalidSupervisor.Style.Add("display", "none");
-            errorInsertingFilesToDbPanel.Style.Add("display", "none");
-            errorSubmittingLeaveApplicationPanel.Style.Add("display", "none");
-            errorSendingEmailNotifications.Style.Add("display", "none");
-            errorSendingInHouseNotifications.Style.Add("display", "none");
+            clearSubmitLeaveApplicationErrors();
 
             // get values from form controls
             string empId = Session["emp_id"].ToString(), // employee id
@@ -1225,11 +1231,14 @@ namespace HR_LEAVEv2.Employee
             validateLeave(typeOfLeave.SelectedValue);            
         }
 
-        protected void uploadBtn_Click(object sender, EventArgs e)
+        protected void clearFilesErrors()
         {
             invalidFileTypePanel.Style.Add("display", "none");
             fileUploadedTooLargePanel.Style.Add("display", "none");
+        }
 
+        protected void uploadBtn_Click(object sender, EventArgs e)
+        {
             if (FileUpload1.HasFiles)
             {
                 List<string> filesTooLarge = new List<string>();
@@ -1261,6 +1270,7 @@ namespace HR_LEAVEv2.Employee
                             HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
                             txt.InnerText = $"Could not upload '{Path.GetFileName(uploadedFile.FileName).ToString()}'. Invalid file type: '{Path.GetExtension(uploadedFile.FileName).ToString()}'";
                             invalidFileTypePanel.Style.Add("display", "inline-block");
+                            break;
                         }
                     } else
                         filesTooLarge.Add(Path.GetFileName(uploadedFile.FileName).ToString());
@@ -1286,21 +1296,31 @@ namespace HR_LEAVEv2.Employee
                     filesUploadedPanel.Visible = true;
 
                     // populate files uploaded list
-                    filesUploadedList.DataTextField = "file_name";
-                    filesUploadedList.DataSource = dt;
-                    filesUploadedList.DataBind();
+                    filesUploadedListView.DataSource = dt;
+                    filesUploadedListView.DataBind();
                 }  
             }
             else
-                filesUploadedPanel.Visible = false;
+            {
+                List<HttpPostedFile> files = null;
+
+                if (Session["uploadedFiles"] != null)
+                    files = (List<HttpPostedFile>)Session["uploadedFiles"];
+
+                if(Session["uploadedFiles"] == null || files == null || files.Count <=0)
+                    filesUploadedPanel.Visible = false;
+            }
+                
         }
 
         protected void clearUploadedFiles_Click(object sender, EventArgs e)
         {
+
             filesUploadedPanel.Visible = false;
             FileUpload1.Dispose();
-            filesUploadedList.DataSource = new DataTable();
-            filesUploadedList.DataBind();
+
+            filesUploadedListView.DataSource = new DataTable();
+            filesUploadedListView.DataBind();
 
             Session["uploadedFiles"] = null;
             validateDates(txtFrom.Text, txtTo.Text);
@@ -1481,6 +1501,38 @@ namespace HR_LEAVEv2.Employee
                 //exception logic
                 throw ex;
             }
+        }
+
+        protected void clearIndividualFileBtn_Click(object sender, EventArgs e)
+        {
+            LinkButton btn = sender as LinkButton;
+            string file_name = btn.Attributes["data-id"].ToString();
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("file_name", typeof(string));
+
+            // go through all files and create new datatable
+            List<HttpPostedFile> files = null;
+            if (Session["uploadedFiles"] != null)
+            {
+                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                
+                HttpPostedFile fileToRemove = files.SingleOrDefault<HttpPostedFile>(file => Path.GetFileName(file.FileName).ToString() == file_name);
+                if(fileToRemove != null)
+                {
+                    files.Remove(fileToRemove);
+                }
+                
+                foreach(HttpPostedFile file in files)
+                {
+                    dt.Rows.Add(Path.GetFileName(file.FileName).ToString());
+                }
+
+                filesUploadedListView.DataSource = dt;
+                filesUploadedListView.DataBind();
+
+            }
+
         }
 
         // to add limitations to what days taken can be
