@@ -206,6 +206,10 @@
         <div class="row" id="validationRow">
             <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" UpdateMode="Conditional" runat="server">
                 <ContentTemplate>
+                    <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="invalidLeaveTypeTxt" runat="server"></span>
+                    </asp:Panel>
                     <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span3" runat="server">Could not verify supervisor</span>

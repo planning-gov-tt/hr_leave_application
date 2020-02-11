@@ -66,6 +66,44 @@ namespace HR_LEAVEv2.Employee
                         this.adjustPageForEditMode(ltDetails);
                 } else
                 {
+                    // populate dropdown containing leave types
+                    try
+                    {
+                        string sql = $@"
+                        SELECT elt.leave_type
+                        FROM dbo.employee e
+
+                        JOIN dbo.employeeposition ep
+                        ON e.employee_id = ep.employee_id
+
+                        JOIN dbo.emptypeleavetype elt
+                        ON elt.employment_type = ep.employment_type
+
+                        WHERE e.employee_id = '{Session["emp_id"].ToString()}'
+                        ORDER BY elt.leave_type DESC;
+                    ";
+
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                DataTable dt = new DataTable();
+                                SqlDataAdapter da = new SqlDataAdapter(command);
+                                da.Fill(dt);
+
+                                typeOfLeave.DataTextField = typeOfLeave.DataValueField  = "leave_type";
+                                typeOfLeave.DataSource = dt;
+                                typeOfLeave.DataBind();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+
+
                     // display normal leave application form
                     this.adjustPageForApplyMode();
                 }        
@@ -75,7 +113,7 @@ namespace HR_LEAVEv2.Employee
                 if(mode == "apply")
                 {
                     // validate dates
-                    if(!validateDates(txtFrom.Text, txtTo.Text))
+                    if(!validateDates(txtFrom.Text, txtTo.Text) || !validateLeave(typeOfLeave.SelectedValue))
                         applyModeFeedbackUpdatePanel.Update();
                 }
                     
@@ -491,7 +529,6 @@ namespace HR_LEAVEv2.Employee
                 // compare dates to ensure end date is not before start date
                 if (DateTime.Compare(start, end) > 0)
                 {
-                    invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
                     dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
                     isValidated = false;
                 }
@@ -501,7 +538,6 @@ namespace HR_LEAVEv2.Employee
                     // ensure start date is not a day before today once not sick leave
                     if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, DateTime.Today) < 0)
                     {
-                        invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                         startDateBeforeTodayValidationMsgPanel.Style.Add("display", "inline-block");
                         isValidated = false;
                     }
@@ -551,6 +587,96 @@ namespace HR_LEAVEv2.Employee
             }
 
             return isValidated;
+        }
+
+        protected Boolean validateLeave(string typeOfLeaveSelected)
+        {
+            invalidLeaveTypePanel.Style.Add("display", "none");
+            invalidLeaveTypeTxt.InnerText = string.Empty;
+
+            string isValid = string.Empty,
+                   errTxt = string.Empty; 
+
+            if (!String.IsNullOrEmpty(typeOfLeaveSelected) || !String.IsNullOrWhiteSpace(typeOfLeaveSelected))
+            {
+                // validate choice of leave
+                string empType = string.Empty;
+
+                DateTime startDate = DateTime.MinValue;
+                try
+                {
+                    string sql = $@"
+                        SELECT ep.employment_type, ep.start_date,
+	                        IIF('{typeOfLeaveSelected}' IN (SELECT [leave_type] FROM [HRLeaveTestDb].[dbo].[emptypeleavetype] elt WHERE elt.employment_type = ep.employment_type), 
+		                        'Yes', 
+		                        'No'
+	                        ) AS 'isLeaveTypeValid'
+
+                        FROM dbo.employee e
+                        JOIN dbo.employeeposition ep
+                        ON e.employee_id = ep.employee_id
+                        WHERE e.employee_id = '{Session["emp_id"].ToString()}';
+                    ";
+
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    empType = reader["employment_type"].ToString();
+                                    startDate = Convert.ToDateTime(reader["start_date"].ToString());
+                                    isValid = reader["isLeaveTypeValid"].ToString();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+                isValid = String.IsNullOrEmpty(isValid) || String.IsNullOrWhiteSpace(isValid) ? "No" : isValid;
+                empType = String.IsNullOrEmpty(empType) || String.IsNullOrWhiteSpace(empType) ? "unregistered" : empType;
+
+                if (isValid == "Yes" && empType == "Contract")
+                {
+                    DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
+
+                    if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                    {
+                        if (typeOfLeaveSelected == "Vacation")
+                            errTxt = "Cannot apply for Vacation leave within first 11 months of contract";
+                    }
+                    else
+                    {
+                        if (typeOfLeaveSelected == "Personal")
+                            errTxt = "Cannot apply for Personal leave after first 11 months of contract";
+                    }
+
+                }
+                else if (isValid == "No")
+                {
+                    errTxt = $"Cannot apply for {typeOfLeaveSelected} leave as {empType} worker";
+                }
+
+                
+            } else
+            {
+                isValid = "No";
+                errTxt = "Type of Leave not selected";
+            }
+
+            if (!String.IsNullOrEmpty(errTxt))
+            {
+                invalidLeaveTypeTxt.InnerText = errTxt;
+                invalidLeaveTypePanel.Style.Add("display", "inline-block");
+            }
+            return isValid == "Yes" && String.IsNullOrEmpty(errTxt);
         }
 
         protected void sendNotifications()
@@ -869,7 +995,7 @@ namespace HR_LEAVEv2.Employee
             isLeaveApplicationInsertSuccessful = isFileUploadSuccessful = true;
             areFilesUploaded = false;
             
-            isValidated = validateDates(startDate, endDate);
+            isValidated = validateDates(startDate, endDate) && validateLeave(leaveType);
             if (isValidated && supId != "-1")
             {
                 // used to store id of leave transaction which is outputted by the INSERT statement. This is later used in the audit log
@@ -1096,6 +1222,7 @@ namespace HR_LEAVEv2.Employee
         protected void typeOfLeave_SelectedIndexChanged(object sender, EventArgs e)
         {
             validateDates(txtFrom.Text, txtTo.Text);
+            validateLeave(typeOfLeave.SelectedValue);            
         }
 
         protected void uploadBtn_Click(object sender, EventArgs e)
