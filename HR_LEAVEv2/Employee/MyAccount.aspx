@@ -41,6 +41,10 @@
             </div>
             <div class="tab-pane fade" id="editInfo" role="tabpanel" aria-labelledby="editInfoTab">
                 <h3>Edit Account</h3>
+                <div class="alert alert-info text-center" role="alert" style="display:inline-block; margin:15px auto">
+                    <i class="fa fa-cogs"></i>
+                    Under development
+                </div>
             </div>
         </div>
     </div>

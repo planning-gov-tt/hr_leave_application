@@ -191,9 +191,9 @@
             </asp:UpdatePanel>
         </asp:Panel>
 
-        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-bottom: 15px;">
+        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-bottom: 15px;" CausesValidation="false">
                 <i class="fa fa-times" aria-hidden="true"></i>
-                Clear Form
+                <span runat="server" id ="clearFormTxt">Clear Form</span>
         </asp:LinkButton>
 
         <%--Employee Information--%>

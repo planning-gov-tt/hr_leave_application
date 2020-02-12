@@ -78,7 +78,6 @@
                     <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox>
                     <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
                     <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
-                    <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
                 </asp:Panel>
                 
             </div>
@@ -92,7 +91,6 @@
                     <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox>
                     <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
                     <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" Format="d/MM/yyyy" />
-                    <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
                 </asp:Panel>
 
             </div>
@@ -129,7 +127,6 @@
             <asp:Panel ID="typeOfLeaveDropdownPanel" runat="server" Style="display:inline;">
                 <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Height="27px" Style="display: inline;" AutoPostBack ="true" OnSelectedIndexChanged="typeOfLeave_SelectedIndexChanged">
                 </asp:DropDownList>
-                <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </asp:Panel>
 
             <%--view mode, edit mode--%>
@@ -328,7 +325,7 @@
                                  <i class="fa fa-times" aria-hidden="true"></i>
                                  Cancel
                         </asp:LinkButton>
-                        <asp:LinkButton ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click" ValidationGroup="applyForLeave">
+                        <asp:LinkButton ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click">
                                  <i class="fa fa-send" aria-hidden="true"></i>
                                  Submit
                         </asp:LinkButton>

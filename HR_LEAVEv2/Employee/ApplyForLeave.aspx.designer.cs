@@ -184,15 +184,6 @@ namespace HR_LEAVEv2.Employee {
         protected global::AjaxControlToolkit.CalendarExtender fromCalendarExtender;
         
         /// <summary>
-        /// fromCalendarRequiredValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator fromCalendarRequiredValidator;
-        
-        /// <summary>
         /// endDateInfoPanel control.
         /// </summary>
         /// <remarks>
@@ -236,15 +227,6 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::AjaxControlToolkit.CalendarExtender toCalendarExtender;
-        
-        /// <summary>
-        /// toCalendarRequiredValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator toCalendarRequiredValidator;
         
         /// <summary>
         /// numDaysAppliedForPanel control.
@@ -317,15 +299,6 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList typeOfLeave;
-        
-        /// <summary>
-        /// typeOfLeaveRequiredValidator control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator typeOfLeaveRequiredValidator;
         
         /// <summary>
         /// typeOfLeavePanel control.

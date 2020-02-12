@@ -8,7 +8,7 @@
         </asp:LinkButton>
         <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="10" Style="text-align:left;">
             <EmptyDataTemplate>
-                <div class="alert alert-info text-center" role="alert" style="width: 30%; margin: auto">
+                <div class="alert alert-info text-center" role="alert" style="display:inline-block; margin:0 auto">
                     <i class="fa fa-info-circle"></i>
                     No notifications available
                 </div>

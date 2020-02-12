@@ -89,6 +89,9 @@ namespace HR_LEAVEv2.HR
             editModeTitle.Visible = true;
             createModeTitle.Visible = false;
 
+            // clear form btn text
+            clearFormTxt.InnerText = "Reset Form";
+
             //employee name
             empNamePanel.Visible = true;
 
@@ -124,6 +127,9 @@ namespace HR_LEAVEv2.HR
             //title
             editModeTitle.Visible = false;
             createModeTitle.Visible = true;
+
+            // clear form btn text
+            clearFormTxt.InnerText = "Clear Form";
 
             //employee name
             empNamePanel.Visible = false;

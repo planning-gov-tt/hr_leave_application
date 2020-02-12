@@ -134,6 +134,7 @@
     <Content Include="HR\AllEmployeeLeaveApplications.aspx" />
     <Content Include="HR\AllEmployees.aspx" />
     <Content Include="HR\EmployeeDetails.aspx" />
+    <Content Include="HR\Reports.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -170,6 +171,7 @@
     <Content Include="Styles\MasterStyleSheet.css" />
     <Content Include="Supervisor\MyEmployeeLeaveApplications.aspx" />
     <Content Include="Supervisor\MyEmployees.aspx" />
+    <Content Include="Supervisor\Reports.aspx" />
     <Content Include="UserControls\LeaveCountUserControlBS4.ascx" />
     <Content Include="UserControls\MainGridView.ascx" />
     <Content Include="UserControls\supervisorSelect.ascx" />
@@ -274,6 +276,13 @@
     <Compile Include="HR\EmployeeDetails.aspx.designer.cs">
       <DependentUpon>EmployeeDetails.aspx</DependentUpon>
     </Compile>
+    <Compile Include="HR\Reports.aspx.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="HR\Reports.aspx.designer.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
@@ -302,6 +311,13 @@
     </Compile>
     <Compile Include="Supervisor\MyEmployees.aspx.designer.cs">
       <DependentUpon>MyEmployees.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Supervisor\Reports.aspx.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Supervisor\Reports.aspx.designer.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
     </Compile>
     <Compile Include="UserControls\LeaveCountUserControlBS4.ascx.cs">
       <DependentUpon>LeaveCountUserControlBS4.ascx</DependentUpon>

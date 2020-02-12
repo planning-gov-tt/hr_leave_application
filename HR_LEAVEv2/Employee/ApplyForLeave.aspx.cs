@@ -1091,7 +1091,6 @@ namespace HR_LEAVEv2.Employee
                 errorSubmittingLeaveApplicationPanel.Style.Add("display", "inline-block");
             if (supId == "-1")
                 invalidSupervisor.Style.Add("display", "inline-block");
-            
         }
 
         protected void refreshForm(object sender, EventArgs e)
@@ -1134,6 +1133,7 @@ namespace HR_LEAVEv2.Employee
             if (FileUpload1.HasFiles)
             {
                 List<string> filesTooLarge = new List<string>();
+                List<string> invalidFiles = new List<string>();
 
                 // used to store list of files added
                 List<HttpPostedFile> files = new List<HttpPostedFile>();
@@ -1154,19 +1154,28 @@ namespace HR_LEAVEv2.Employee
                     {
                         if (allowedFileExtensions.Contains(Path.GetExtension(uploadedFile.FileName).ToString()))
                         {
-                            dt.Rows.Add(Path.GetFileName(uploadedFile.FileName));
+                            dt.Rows.Add(Path.GetFileName(uploadedFile.FileName).ToString());
                             files.Add(uploadedFile);
                         }
                         else
-                        {
-                            HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
-                            txt.InnerText = $"Could not upload '{Path.GetFileName(uploadedFile.FileName).ToString()}'. Invalid file type: '{Path.GetExtension(uploadedFile.FileName).ToString()}'";
-                            invalidFileTypePanel.Style.Add("display", "inline-block");
-                            break;
-                        }
-                    } else
+                            invalidFiles.Add(Path.GetFileName(uploadedFile.FileName).ToString());
+                    }
+                    else
+                    {
                         filesTooLarge.Add(Path.GetFileName(uploadedFile.FileName).ToString());
+
+                        if(!allowedFileExtensions.Contains(Path.GetExtension(uploadedFile.FileName).ToString()))
+                            invalidFiles.Add(Path.GetFileName(uploadedFile.FileName).ToString());
+                    }
                         
+                    
+                }
+
+                if(invalidFiles.Count > 0)
+                {
+                    HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
+                    txt.InnerText = $"Could not upload {String.Join(", ", invalidFiles.Select(fileName => "'" + fileName + "'").ToArray())}. Invalid file types: {String.Join(", ", invalidFiles.Select(fileName => "'" + Path.GetExtension(fileName).ToString() + "'").ToArray())}";
+                    invalidFileTypePanel.Style.Add("display", "inline-block");
                 }
 
                 if(filesTooLarge.Count > 0)
@@ -1423,7 +1432,11 @@ namespace HR_LEAVEv2.Employee
                     }
                 }
                 else
+                {
                     filesUploadedPanel.Visible = false;
+                    validateDates(txtFrom.Text, txtTo.Text);
+                }
+                    
 
                 Session["uploadedFiles"] = files;
                 filesUploadedListView.DataSource = dt;
