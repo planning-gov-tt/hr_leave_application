@@ -6,6 +6,7 @@ namespace HR_LEAVEv2.Classes
 {
     public class Util
     {
+
         public class EmailDetails
         {
             public string employee_id { get; set; }
@@ -23,6 +24,16 @@ namespace HR_LEAVEv2.Classes
 
         public string resetNumNotifications(string employee_id)
         {
+            /* What this function does:
+             *     This function is used to reset the num_notifications Label control on the Master.aspx page. It returns the current number of notifications unread 
+             *     for the employee associated with the employee_id passed
+             *     
+             * Where it is used:
+             *     This function is used anywhere notifications are created: Employee applied for leave, Supervisor recommends/not recommends LA, HR approves/ not approves LA
+             *     as well as in Notifications.cs when a user reads/ unreads or clears notifications
+             * 
+             * */
+
             // set number of notifications
             string count = string.Empty;
             try
@@ -54,7 +65,10 @@ namespace HR_LEAVEv2.Classes
             return count;
         }
 
-        // supervisor view: approved LA
+        /*
+         * supervisor view: approved LA
+         * Get the email body for the email sent to a supervisor when their employee's LA is approved
+         **/
         public string getSupervisorViewLeaveApplicationApproved(EmailDetails details)
         {
             return $@"
@@ -127,7 +141,10 @@ namespace HR_LEAVEv2.Classes
                     ";
         }
 
-        // employee view: approved LA
+        /*
+         * employee view: approved LA
+         * Get the email body for the email sent to an employee when their LA is approved
+         **/
         public string getEmployeeViewLeaveApplicationApproved(EmailDetails details)
         {
             return $@"
@@ -200,7 +217,10 @@ namespace HR_LEAVEv2.Classes
                         ";
         }
 
-        // supervisor view: not approved LA
+        /*
+         * supervisor view: not approved LA
+         * Get the email body for the email sent to a supervisor when their employee's LA is not approved
+         **/
         public string getSupervisorViewLeaveApplicationNotApproved(EmailDetails details)
         {
            return $@"
@@ -274,7 +294,10 @@ namespace HR_LEAVEv2.Classes
                 ";
         }
 
-        // employee view: not approved LA
+        /*
+         * employee view: not approved LA
+         * Get the email body for the email sent to an employee when their LA is not approved
+         **/
         public string getEmployeeViewLeaveApplicationNotApproved(EmailDetails details)
         {
             return $@"
@@ -347,7 +370,10 @@ namespace HR_LEAVEv2.Classes
                 ";
         }
 
-        // HR view: recommended LA
+        /*
+         * HR view: recommended LA
+         * Get the email body for the email sent to HR when a LA is recommended by an employee's supervisor
+         **/
         public string getHRViewLeaveApplicationRecommended(EmailDetails details)
         {
             return $@"
@@ -424,7 +450,10 @@ namespace HR_LEAVEv2.Classes
                 ";
         }
 
-        // employee view: recommended LA
+        /*
+         * employee view: recommended LA
+         * Get the email body for the email sent to an employee when a LA is recommended by their supervisor
+         **/
         public string getEmployeeViewLeaveApplicationRecommended(EmailDetails details)
         {
             return $@"
@@ -498,7 +527,10 @@ namespace HR_LEAVEv2.Classes
 
         }
 
-        // employee view: not recommended LA
+        /*
+         * employee view: not recommended LA
+         * Get the email body for the email sent to an employee when a LA is not recommended by their supervisor
+         **/
         public string getEmployeeViewLeaveApplicationNotRecommended(EmailDetails details)
         {
             return $@"
@@ -570,7 +602,10 @@ namespace HR_LEAVEv2.Classes
             ";
         }
 
-        // supervisor view: submitted LA
+        /*
+         * supervisor view: submitted LA
+         * Get the email body for the email sent to a supervisor when an employee submits a LA
+         **/
         public string getSupervisorViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
             return $@"
@@ -639,7 +674,10 @@ namespace HR_LEAVEv2.Classes
                         ";
         }
 
-        // employee view: submitted LA
+        /*
+         * employee view: submitted LA
+         * Get the email body for the email sent to an employee they submit a LA
+         **/
         public string getEmployeeViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
            return $@"
