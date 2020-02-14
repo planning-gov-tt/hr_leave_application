@@ -853,6 +853,15 @@ namespace HR_LEAVEv2.Employee
             errorSendingInHouseNotifications.Style.Add("display", "none");
         }
 
+        //protected void disableForm()
+        //{
+        //    // start date and end date
+        //    txtFrom.Enabled = txtTo.Enabled = typeOfLeave.Enabled = false;
+
+        //    // employee comments
+        //    empCommentsTxt.Disabled = true;
+        //}
+
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
             /**

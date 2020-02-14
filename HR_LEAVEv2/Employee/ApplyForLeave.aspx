@@ -125,7 +125,7 @@
 
             <%--apply mode--%>
             <asp:Panel ID="typeOfLeaveDropdownPanel" runat="server" Style="display:inline;">
-                <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Height="27px" Style="display: inline;" AutoPostBack ="true" OnSelectedIndexChanged="typeOfLeave_SelectedIndexChanged">
+                <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Height="35px" Style="display: inline;" AutoPostBack ="true" OnSelectedIndexChanged="typeOfLeave_SelectedIndexChanged">
                 </asp:DropDownList>
             </asp:Panel>
 
@@ -153,7 +153,7 @@
         <%--Apply mode: Allows user to upload docs--%>
         <asp:Panel ID="fileUploadPanel" runat="server" Style="margin:0 auto; text-align:center" CssClass="row form-group">
             <label for="FileUpload1" style="font-size:1.2em; display:inline;">Upload Files:</label>
-            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin:0 auto; display: inline-block" AllowMultiple="true"/> 
+            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin:0 auto; display: inline-block; background-color: lightgrey" AllowMultiple="true"/> 
             <asp:LinkButton ID="uploadFilesBtn" runat="server" OnClick="uploadBtn_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Upload files">
                 <i class="fa fa-upload" aria-hidden="true"></i>
             </asp:LinkButton>

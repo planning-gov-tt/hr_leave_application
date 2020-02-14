@@ -1245,6 +1245,9 @@ namespace HR_LEAVEv2.UserControls
 
         protected void sendNotApprovedNotifications(string comment)
         {
+            // sanitize comments
+            comment = comment.Replace("'", "''");
+
             Dictionary<string, string> row = null;
             if (ViewState["notApprovedRow"] != null)
                 row = (Dictionary<string, string>)ViewState["notApprovedRow"];
@@ -1346,7 +1349,7 @@ namespace HR_LEAVEv2.UserControls
                        notification = $"Your leave application to {row["supervisor_name"]} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not approved.";
 
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
-                    notification += $"HR said \"{comment}\".";
+                    notification += $"HR said \" {comment} \"";
                 try
                 {
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -1509,6 +1512,8 @@ namespace HR_LEAVEv2.UserControls
         protected void sendNotRecommendedNotifications(string comment)
 
         {
+            // sanitize comments
+            comment = comment.Replace("'", "''");
 
             Dictionary<string, string> row = null;
             if (ViewState["notRecommendedRow"] != null)
@@ -1574,7 +1579,7 @@ namespace HR_LEAVEv2.UserControls
                        notification = $"Your leave application to {Session["emp_username"].ToString()} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not recommended.";
 
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
-                    notification += $"Your supervisor said \"{comment}\".";
+                    notification += $"Your supervisor said \" {comment} \"";
                 try
                 {
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))

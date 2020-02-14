@@ -1682,11 +1682,12 @@ namespace HR_LEAVEv2.HR
 
         protected Boolean isTableEmpty()
         {
-            foreach (TableRow row in GridView1.Rows)
+            if(GridView1.Rows.Count > 0)
             {
-                if (!row.CssClass.Contains("hidden"))
+                foreach (TableRow row in GridView1.Rows)
                 {
-                    return false;
+                    if (!row.CssClass.Contains("hidden"))
+                        return false;
                 }
             }
             return true;
@@ -1734,8 +1735,8 @@ namespace HR_LEAVEv2.HR
             // this function executes after all data is bound for the Gridview containing employment records
             // it checks to see if all rows are hidden which means to the user that all records are deleted
             // if the above condition is true then it hides the header row of the gridview
-
-            GridView1.HeaderRow.Visible = !isTableEmpty();
+            if(GridView1.HeaderRow != null)
+                GridView1.HeaderRow.Visible = !isTableEmpty();
 
         }
 
