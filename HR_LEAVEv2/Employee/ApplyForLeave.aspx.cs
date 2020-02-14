@@ -67,6 +67,8 @@ namespace HR_LEAVEv2.Employee
                         this.adjustPageForEditMode(ltDetails);
                 } else
                 {
+                    typeOfLeave.DataSource = null;
+                    typeOfLeave.DataBind();
                     // populate dropdown containing leave types
                     try
                     {
@@ -74,8 +76,8 @@ namespace HR_LEAVEv2.Employee
                         SELECT elt.leave_type
                         FROM dbo.employee e
 
-                        JOIN dbo.employeeposition ep
-                        ON e.employee_id = ep.employee_id
+                        LEFT JOIN dbo.employeeposition ep
+                        ON e.employee_id = ep.employee_id AND ep.actual_end_date IS NULL
 
                         JOIN dbo.emptypeleavetype elt
                         ON elt.employment_type = ep.employment_type
@@ -761,7 +763,8 @@ namespace HR_LEAVEv2.Employee
             {
 
                 message.To.Clear();
-                message.To.Add(new MailAddress(Session["emp_email"].ToString()));
+                //message.To.Add(new MailAddress(Session["emp_email"].ToString()));
+                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                 message.Subject = "Submitted Leave Application";
 
                 message.Body = util.getEmployeeViewEmployeeSubmittedLeaveApplication(
@@ -817,7 +820,7 @@ namespace HR_LEAVEv2.Employee
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('Submitted Leave Application',@Notification, 'No', '{Session["supervisor_id"].ToString()}', '{DateTime.Now}');
+                                VALUES('{Session["emp_username"].ToString()} Submitted Leave Application',@Notification, 'No', '{Session["supervisor_id"].ToString()}', '{DateTime.Now}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
