@@ -1245,9 +1245,6 @@ namespace HR_LEAVEv2.UserControls
 
         protected void sendNotApprovedNotifications(string comment)
         {
-            // sanitize comments
-            comment = comment.Replace("'", "''");
-
             Dictionary<string, string> row = null;
             if (ViewState["notApprovedRow"] != null)
                 row = (Dictionary<string, string>)ViewState["notApprovedRow"];
@@ -1358,10 +1355,11 @@ namespace HR_LEAVEv2.UserControls
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{row["employee_id"]}', '{DateTime.Now}');
+                                VALUES('{notif_header}', @Notification , 'No', '{row["employee_id"]}', '{DateTime.Now}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
+                            command.Parameters.AddWithValue("@Notification", notification);
                             int rowsAffected = command.ExecuteNonQuery();
                         }
                     }
@@ -1512,8 +1510,6 @@ namespace HR_LEAVEv2.UserControls
         protected void sendNotRecommendedNotifications(string comment)
 
         {
-            // sanitize comments
-            comment = comment.Replace("'", "''");
 
             Dictionary<string, string> row = null;
             if (ViewState["notRecommendedRow"] != null)
@@ -1588,10 +1584,11 @@ namespace HR_LEAVEv2.UserControls
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{row["employee_id"]}', '{DateTime.Now}');
+                                VALUES('{notif_header}', @Notification, 'No', '{row["employee_id"]}', '{DateTime.Now}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
+                            command.Parameters.AddWithValue("@Notification", notification);
                             int rowsAffected = command.ExecuteNonQuery();
                         }
                     }

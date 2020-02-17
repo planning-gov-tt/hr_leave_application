@@ -141,7 +141,7 @@
             <label for="supervisor_select" style="font-size:1.2em; display:inline;">Supervisor:</label>
             <%--apply mode--%>
             <asp:Panel ID="supervisorSelectUserControlPanel" runat="server" Style="display:inline;">
-                <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server" validationGroup="applyForLeave"/>
+                <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server"/>
             </asp:Panel>
 
             <%--view mode--%>

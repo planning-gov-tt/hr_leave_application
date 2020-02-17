@@ -11,9 +11,10 @@
     MaxLength="0"  Height="27px"
     OnSelectedIndexChanged="ComboBox1_SelectedIndexChanged">
 </ajaxToolkit:ComboBox>
-<asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="getSupervisors" SelectCommandType="StoredProcedure">
-    <SelectParameters>
-        <asp:Parameter DefaultValue="-1" Name="supervisorId" Type="String" />
-    </SelectParameters>
+<asp:SqlDataSource ID="SqlDataSource1" 
+    runat="server" 
+    ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" 
+    ProviderName="System.Data.SqlClient" 
+    SelectCommand="getSupervisors" 
+    SelectCommandType="StoredProcedure">
 </asp:SqlDataSource>
-<asp:RequiredFieldValidator ID="comboBoxRequiredValidator" runat="server" ControlToValidate="ComboBox1" Display="Dynamic" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
