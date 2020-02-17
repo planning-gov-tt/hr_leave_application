@@ -770,7 +770,7 @@ namespace HR_LEAVEv2.UserControls
                 // Recommend
                 if (commandName == "recommended")
                 {
-                    sendRecommendedNotifications(row, employee_id);
+                    sendRecommendedNotifications(row, employee_id, employeeEmail);
 
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -850,7 +850,7 @@ namespace HR_LEAVEv2.UserControls
                 if (commandName == "approved")
                 {
 
-                    sendApprovedNotifications(row, employee_id, GridView.DataKeys[index].Values["supervisor_id"].ToString());
+                    sendApprovedNotifications(row, employee_id, GridView.DataKeys[index].Values["supervisor_id"].ToString(),employeeEmail, supervisorEmail);
 
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -1121,7 +1121,7 @@ namespace HR_LEAVEv2.UserControls
             this.BindGridView();
         }
 
-        protected void sendApprovedNotifications(GridViewRow row, string employee_id, string supervisor_id)
+        protected void sendApprovedNotifications(GridViewRow row, string employee_id, string supervisor_id, string employeeEmail, string supervisorEmail)
         {
 
             // send email
@@ -1140,8 +1140,8 @@ namespace HR_LEAVEv2.UserControls
 
             // send email to employee notifying them that their leave application was approved
 
-            //message.To.Add(new MailAddress("employeeEmail"));  // hard coded to Tristan.Sankar@planning.gov.tt for testing
-            message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+            message.To.Add(new MailAddress(employeeEmail));  // hard coded to Tristan.Sankar@planning.gov.tt for testing
+            //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
             message.Subject = "Leave Application Approved";
             message.Body = util.getEmployeeViewLeaveApplicationApproved(
                     new Util.EmailDetails
@@ -1167,7 +1167,7 @@ namespace HR_LEAVEv2.UserControls
             // send email to supervisor letting them know that HR approved application for employee
             message.To.Clear();
 
-            // message.To.Add(new MailAddress(supervisorEmail));
+            message.To.Add(new MailAddress(supervisorEmail));
             message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
             message.Subject = $"Leave Application Approved for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}";
             message.Body = util.getSupervisorViewLeaveApplicationApproved(
@@ -1274,8 +1274,8 @@ namespace HR_LEAVEv2.UserControls
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
                 // send email to employee
-                //message.To.Add(new MailAddress(row["employeeEmail"]));
-                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+                message.To.Add(new MailAddress(row["employeeEmail"]));
+                //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                 message.Subject = "Leave Application Not Approved";
                 message.Body = util.getEmployeeViewLeaveApplicationNotApproved(
                     new Util.EmailDetails
@@ -1305,8 +1305,8 @@ namespace HR_LEAVEv2.UserControls
                 message.To.Clear();
 
                 // send supervisor email
-                //message.To.Add(new MailAddress(row["supervisorEmail"]));
-                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+                message.To.Add(new MailAddress(row["supervisorEmail"]));
+                //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                 message.Subject = $"Leave Application Not Approved for {row["employee_name"]}";
                 message.Body = util.getSupervisorViewLeaveApplicationNotApproved(
                     new Util.EmailDetails
@@ -1401,7 +1401,7 @@ namespace HR_LEAVEv2.UserControls
             }
         }
 
-        protected void sendRecommendedNotifications(GridViewRow row, string employee_id)
+        protected void sendRecommendedNotifications(GridViewRow row, string employee_id, string employeeEmail)
         {
 
 
@@ -1420,8 +1420,8 @@ namespace HR_LEAVEv2.UserControls
 
             // send email to employee notifying them that their supervisor recommended their leave to HR
 
-            //message.To.Add(new MailAddress("employeeEmail")); 
-            message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt")); // hard coded to Tristan.Sankar@planning.gov.tt for testing
+            message.To.Add(new MailAddress(employeeEmail)); 
+            //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt")); // hard coded to Tristan.Sankar@planning.gov.tt for testing
             message.Subject = "Leave Application Recommended";
             message.Body = util.getEmployeeViewLeaveApplicationRecommended(
                     new Util.EmailDetails
@@ -1539,8 +1539,8 @@ namespace HR_LEAVEv2.UserControls
 
                 // send email to employee
 
-                //message.To.Add(new MailAddress(row["employeeEmail"]));
-                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+                message.To.Add(new MailAddress(row["employeeEmail"]));
+                //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                 message.Subject = "Leave Application Not Recommended";
 
                 message.Body = util.getEmployeeViewLeaveApplicationNotRecommended(
