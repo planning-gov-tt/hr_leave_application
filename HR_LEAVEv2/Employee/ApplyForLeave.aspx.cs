@@ -116,9 +116,8 @@ namespace HR_LEAVEv2.Employee
                 if(mode == "apply")
                 {
                     clearFilesErrors();
-                    // validate dates
-                    if(!validateDates(txtFrom.Text, txtTo.Text) || !validateLeave(typeOfLeave.SelectedValue))
-                        applyModeFeedbackUpdatePanel.Update();
+                    validateDates(txtFrom.Text, txtTo.Text);
+                    validateLeave(typeOfLeave.SelectedValue);
                 }
                     
             }
@@ -735,9 +734,9 @@ namespace HR_LEAVEv2.Employee
                 {
                     throw ex;
                 }
-
-                message.To.Add(new MailAddress(supEmail));
-                //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+                testlabel.Text = $"supEmail:{supEmail}";
+                //message.To.Add(new MailAddress(supEmail));
+                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                 message.Subject = $"{Session["emp_username"].ToString()} Submitted Leave Application";
                 message.Body = util.getSupervisorViewEmployeeSubmittedLeaveApplication(
                     new Util.EmailDetails {
@@ -761,10 +760,10 @@ namespace HR_LEAVEv2.Employee
             // send email to employee 
             try
             {
-
+                testlabel.Text += $"  empEmail:{Session["emp_email"].ToString()}";
                 message.To.Clear();
-                message.To.Add(new MailAddress(Session["emp_email"].ToString()));
-                //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+                //message.To.Add(new MailAddress(Session["emp_email"].ToString()));
+                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                 message.Subject = "Submitted Leave Application";
 
                 message.Body = util.getEmployeeViewEmployeeSubmittedLeaveApplication(
@@ -1085,50 +1084,9 @@ namespace HR_LEAVEv2.Employee
                         throw ex;
                     }
 
-                    //string hostName = Dns.GetHostName(); // Retrive the Name of HOST  
-                    //string hostIP = Dns.GetHostEntry(hostName).AddressList[0].ToString();
-                    //try
-                    //{
-                    //    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    //    {
-                    //        connection.Open();
-                    //        string sql = $@"
-                    //                INSERT INTO [dbo].[auditlog] ([machine_name], [ipv6_address], [acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                    //                VALUES ( 
-                    //                    @HostName,
-                    //                    @,
-                    //                    @ActingEmployeeId, 
-                    //                    (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                    //                    @AffectedEmployeeId,
-                    //                    (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                    //                    @Action, 
-                    //                    @CreatedAt);
-                    //            ";
-                    //        using (SqlCommand command = new SqlCommand(sql, connection))
-                    //        {
-                    //            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                    //            command.Parameters.AddWithValue("@AffectedEmployeeId", Session["emp_id"].ToString());
-
-                    //            string fileActionString = String.Empty;
-                    //            if (areFilesUploaded)
-                    //                fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
-
-                    //            command.Parameters.AddWithValue("@Action", $"Submitted leave application: leave_transaction_id= {transaction_id};{fileActionString}");
-                    //            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                    //            command.ExecuteNonQuery();
-                    //        }
-                    //    }
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    //exception logic
-                    //    throw ex;
-                    //}
-
                     submitButtonPanel.Style.Add("display", "none");
                     successMsgPanel.Style.Add("display", "inline-block");
 
-                    applyModeFeedbackUpdatePanel.Update();
                     sendNotifications();
                     resetNumNotifications();
                 }

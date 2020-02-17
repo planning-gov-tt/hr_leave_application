@@ -14,6 +14,13 @@
             margin-right:5px;
         }
     </style>
+    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+        <ContentTemplate>
+            <asp:Label ID="testlabel" runat="server" Text="test"></asp:Label>
+        </ContentTemplate>
+        
+    </asp:UpdatePanel>
+    
     
     <%--View mode: Allows user to return to last page they were on before they clicked on a details button for a leave application--%>
     <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to previous page" OnClick="returnToPreviousBtn_Click">
@@ -200,7 +207,6 @@
                     </LayoutTemplate>
 
                 </asp:ListView>
-                <%--<asp:BulletedList ID="filesUploadedList" runat="server" BulletStyle="NotSet" Style="display: inline-block; text-align: left;"></asp:BulletedList>--%>
             </asp:Panel>
             <br />                            
         </asp:Panel>
@@ -234,7 +240,7 @@
 
         <%--Apply mode: Shows any necessary validation messages to user --%>
         <div class="row" id="validationRow">
-            <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" UpdateMode="Conditional" runat="server">
+            <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server">
                 <ContentTemplate>
                     <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
