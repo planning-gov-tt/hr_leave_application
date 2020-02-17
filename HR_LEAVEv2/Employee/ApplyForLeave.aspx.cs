@@ -734,7 +734,7 @@ namespace HR_LEAVEv2.Employee
                 {
                     throw ex;
                 }
-                testlabel.Text = $"supEmail:{supEmail}";
+                
                 //message.To.Add(new MailAddress(supEmail));
                 message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
                 message.Subject = $"{Session["emp_username"].ToString()} Submitted Leave Application";
@@ -760,7 +760,6 @@ namespace HR_LEAVEv2.Employee
             // send email to employee 
             try
             {
-                testlabel.Text += $"  empEmail:{Session["emp_email"].ToString()}";
                 message.To.Clear();
                 //message.To.Add(new MailAddress(Session["emp_email"].ToString()));
                 message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));

@@ -14,13 +14,6 @@
             margin-right:5px;
         }
     </style>
-    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
-        <ContentTemplate>
-            <asp:Label ID="testlabel" runat="server" Text="test"></asp:Label>
-        </ContentTemplate>
-        
-    </asp:UpdatePanel>
-    
     
     <%--View mode: Allows user to return to last page they were on before they clicked on a details button for a leave application--%>
     <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to previous page" OnClick="returnToPreviousBtn_Click">
