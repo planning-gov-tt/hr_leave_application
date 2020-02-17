@@ -1,5 +1,5 @@
---USE [HRLeave]; -- chris local db
- USE [HRLeaveTestDb]; -- dbserver
+--USE [HRLeaveTestDb]; -- testing db
+USE [HRLeaveDevDb]; -- development db
 GO
 
 
@@ -29,7 +29,7 @@ CREATE TABLE [dbo].[rolepermission] (
 );
 
 
--- 'user' is a resered word, so using 'employee' instead
+-- 'user' is a reserved word, so using 'employee' instead
 CREATE TABLE [dbo].[employee] (
   [employee_id] NVARCHAR (10) PRIMARY KEY, -- employee's file number
   [ihris_id] NVARCHAR (10) NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE [dbo].[position] (
 
 
 CREATE TABLE [dbo].[employmenttype] (
-  type_id NVARCHAR (15) PRIMARY KEY
+  [type_id] NVARCHAR (15) PRIMARY KEY
 );
 
 
@@ -172,6 +172,8 @@ CREATE TABLE [dbo].[employeeposition] (
 
 CREATE TABLE [dbo].[auditlog] (
   [log_id] INT IDENTITY (1, 1) PRIMARY KEY,
+  --[machine_name] NVARCHAR (100) NOT NULL,
+  --[ipv6_address] NVARCHAR(50) NOT NULL,
   [acting_employee_id] NVARCHAR (10) NOT NULL,
   [acting_employee_name] NVARCHAR (60)NOT NULL,
   [affected_employee_id] NVARCHAR (10) NOT NULL,
@@ -202,7 +204,7 @@ CREATE TABLE [dbo].[employeefiles](
   FOREIGN KEY([file_id]) REFERENCES [dbo].[filestorage] ([file_id])
 );
 
-CREATE TABLE [dbo].notifications(
+CREATE TABLE [dbo].[notifications](
   [id] INT IDENTITY(1, 1) PRIMARY KEY,
   [notification_header] NVARCHAR(100) NOT NULL,
   [notification] NVARCHAR(250) NOT NULL,
@@ -211,5 +213,14 @@ CREATE TABLE [dbo].notifications(
   [created_at] DATETIME NOT NULL,
 
   FOREIGN KEY([employee_id]) REFERENCES [dbo].[employee] ([employee_id])
+
+);
+CREATE TABLE [dbo].[emptypeleavetype](
+  [id] INT IDENTITY(1, 1) PRIMARY KEY,
+  [employment_type] NVARCHAR(15) NOT NULL,
+  [leave_type] NVARCHAR(20) NOT NULL,
+
+  FOREIGN KEY([employment_type]) REFERENCES [dbo].[employmenttype] ([type_id]),
+  FOREIGN KEY([leave_type]) REFERENCES [dbo].[leavetype] ([type_id])
 
 );

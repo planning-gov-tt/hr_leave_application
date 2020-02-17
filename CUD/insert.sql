@@ -1,5 +1,5 @@
---USE [HRLeave]; -- chris local db
- USE [HRLeaveTestDb]; -- dbserver
+--USE [HRLeaveTestDb]; -- testing db
+USE [HRLeaveDevDb]; -- development db
 GO
 
 
@@ -68,14 +68,15 @@ INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name
 ('3', '3', 'PLANNING\ Christopher Sahadeo', 'Christopher', 'Sahadeo', 'Christopher.Sahadeo@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
 ('184164', '184164', 'PLANNING\ Dale Cudjoe', 'Dale', 'Cudjoe', 'Dale.Cudjoe@planning.gov.tt', 15, 5, 0, 14, 2, 0, 0),
 ('157778', '157778', 'PLANNING\ Nandani Ramsaran', 'Nandani', 'Ramsaran', 'Nandani.Ramsaran@planning.gov.tt', 10, 5, 0, 14, 2, 0, 0),
-('161720', '161720', 'PLANNING\ Rishi Jaimungalsingh', 'Rishi', 'Jaimungalsingh', 'Rishi.Jaimungalsingh@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
+('161720', '161720', 'PLANNING\ Rishi Boodoo', 'Rishi', 'Boodoo', 'Rishi.Boodoo@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
 ('159118', '159118', 'PLANNING\ Carlisle McKay', 'Carlisle', 'McKay', 'Carlisle.McKay@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
 ('15067', '15067', 'PLANNING\ Rohini Singh', 'Rohini', 'Singh', 'Rohini.Singh@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
 ('123337', '123337', 'PLANNING\ Kene Bryan', 'Kene', 'Bryan', 'Kene.Bryan@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0), -- Director
 ('140480', '140480', 'PLANNING\ Kelly DeLandro', 'Kelly', 'DeLandro', 'Kelly.DeLandro@planning.gov.tt', 9, 5, 0, 14, 2, 0, 0), -- Director
 -- Pele
+('34521', '34521', 'PLANNING\ Pele StHill', 'Pele', 'St.Hill', 'Pele.StHill@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
 -- Deneyse
-
+('12454', '12454', 'PLANNING\ Deneyse Outar', 'Deneyse', 'Outar', 'Deneyse.Outar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
 -- HR
 ('83612', '83612', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'Melanie.Noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- Director
 ('11948', '11948', 'PLANNING\ Charmaine Carmichael', 'Charmaine', 'Carmichael', 'Charmaine.Carmichael@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- HRO3
@@ -101,19 +102,34 @@ INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name
 
 INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 -- IT
+-- Tristan Sankar
 ('1', 'emp'),
+--Clint Ramoutar
+('115245', 'emp'),
 ('115245', 'sup'),
+--Christopher Sahadeo
 ('3', 'emp'),
+-- Dale Cudjoe
+('184164', 'sup'),
+-- Nandani
+('157778', 'emp'),
+-- Rishi
+('161720', 'emp'),
+-- Carlisle
+('159118', 'sup'),
+--Rohini
+('15067', 'emp'),
+--Kene Bryan
+('123337', 'sup'),
+-- Pele 
+('34521', 'emp'),
+-- Deneyse
+('12454', 'emp'),
+
+-- Minister
 ('4', 'emp'),
 ('4', 'sup'),
 ('4', 'hr1'),
-('184164', 'sup'),
-('157778', 'emp'),
-('161720', 'emp'),
-('159118', 'sup'),
-('15067', 'emp'),
-('123337', 'sup'),
-
 -- HR
 ('83612', 'hr1'),
 
@@ -241,7 +257,8 @@ SET IDENTITY_INSERT [dbo].[department] ON;
 INSERT INTO [dbo].[department] ([dept_id], [dept_abbr], [dept_name]) VALUES
 (1, 'IT', 'Information Technology'),
 (2, 'HR', 'Human Resources'),
-(3, 'AC', 'Accounts');
+(3, 'AC', 'Accounts'),
+(4, 'PA', 'Public Administration');
 
 SET IDENTITY_INSERT [dbo].[department] OFF;
 
@@ -255,7 +272,7 @@ INSERT INTO [dbo].[position] ([pos_id], [pos_name], [pos_description], [vacation
 (4, 'Director', NULL, 25),
 (5, 'Associate Professional', NULL, 0),
 (6, 'System''s Specialist', NULL, 30),
-(7, 'HR Staff', NULL, 30),
+(7, 'HRO', NULL, 30),
 (8, 'Permanent Secretary', NULL, 40),
 (9, 'Minister', NULL, 40);
 
@@ -270,30 +287,88 @@ INSERT INTO [dbo].[employmenttype] ([type_id]) VALUES
 SET IDENTITY_INSERT [dbo].[employeeposition] ON;
 
 INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start_date], [expected_end_date], [actual_end_date], [employment_type], [dept_id]) VALUES
+-- Tristan Sankar
 (1, '1', 5, '20190927', '20200927', NULL, 'Contract', 1),
+-- Christopher Sahadeo
 (2, '3', 5, '20190927', '20200927', NULL, 'Public Service', 1),
 
--- multiple periods of employment for one person
+-- multiple periods of employment for one person- Clint
 (3, '115245', 6, '20101005', '20131005', '20131007', 'Contract', 1),
 (4, '115245', 6, '20131015', '20161015', '20161018', 'Contract', 1),
 (5, '115245', 6, '20171120', '20201120', NULL, 'Contract', 1),
 
 -- contract and public servant
+--Pauline Solozano
 (7, '38137', 7, '20160927', '20201225', NULL, 'Contract', 2),
+--Usha Balkaran
 (8, '05356', 7, '20160927', '20201225', NULL, 'Public Service', 2),
 
 --more seed data
+--Dale Cudjoe
 (9, '184164', 6, '20180927', '20210927', NULL, 'Contract', 1),
+--Charmaine Carmichael
 (10, '11948', 7, '20191025', '20221025', NULL, 'Public Service', 2),
 
---supervisor for HR 2's 
-(11, '83612', 7, '20180927', '20210927', NULL, 'Contract', 2),
+--HR Director- Melanie Noel
+(11, '83612', 4, '20180927', '20210927', NULL, 'Public Service', 2),
 
 --PS
-(12, '07525', 8, '20191025', '20221025', NULL, 'Public Service', 1),
+(12, '07525', 8, '20191025', '20221025', NULL, 'Public Service', 4),
 
 --Minister
-(13, '4', 9, '20191025', '20221025', NULL, 'Public Service', 1)
+(13, '4', 9, '20191025', '20221025', NULL, 'Public Service', 4),
+
+-- Nazmoon Khan
+(14, '01548', 7, '20180927', '20210927', NULL, 'Public Service', 2),
+
+--Nandani 
+(15, '157778', 1, '20180927', '20210927', NULL, 'Contract', 1),
+
+--Kene Bryan 
+(16, '123337', 4, '20180927', '20210927', NULL, 'Contract', 1),
+
+--Rishi Boodoo
+(17, '161720', 1, '20180927', '20210927', NULL, 'Contract', 1),
+
+--Carlisle Mckay
+(18, '159118', 6, '20180927', '20210927', NULL, 'Contract', 1),
+
+--Rohini Singh
+(19, '15067', 6, '20180927', '20210927', NULL, 'Contract', 1),
+
+--Kelly DeLandro
+(20, '140480', 1, '20180927', '20210927', NULL, 'Contract', 1),
+
+--Pele St Hill
+(21, '34521', 1, '20180927', '20210927', NULL, 'Contract', 1),
+
+--Deneyse Outar
+(22, '12454', 2, '20180927', '20210927', NULL, 'Contract', 1)
 ;
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;
+
+SET IDENTITY_INSERT [dbo].[emptypeleavetype] ON;
+
+INSERT INTO [dbo].[emptypeleavetype] ([id], [employment_type], [leave_type]) VALUES
+(1, 'Contract', 'Bereavement'),
+(2, 'Contract', 'Compensatory'),
+(3, 'Contract', 'Leave Renewal'),
+(4, 'Contract', 'Maternity'),
+(5, 'Contract', 'No Pay'),
+(6, 'Contract', 'Personal'),
+(7, 'Contract', 'Pre-retirement'),
+(8, 'Contract', 'Sick'),
+(9, 'Contract', 'Vacation'),
+(10, 'Public Service', 'Bereavement'),
+(11, 'Public Service', 'Compensatory'),
+(12, 'Public Service', 'Leave Renewal'),
+(13, 'Public Service', 'Maternity'),
+(14, 'Public Service', 'No Pay'),
+(15, 'Public Service', 'Casual'),
+(16, 'Public Service', 'Pre-retirement'),
+(17, 'Public Service', 'Sick'),
+(18, 'Public Service', 'Vacation')
+;
+
+SET IDENTITY_INSERT [dbo].[emptypeleavetype] OFF;
