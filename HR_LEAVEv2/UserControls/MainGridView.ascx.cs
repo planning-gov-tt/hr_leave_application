@@ -937,42 +937,8 @@ namespace HR_LEAVEv2.UserControls
 
                 resetNumNotifications();
 
-                try
-                {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
-                        string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
-                        {
-                            command.Parameters.AddWithValue("@ActingEmployeeId", actingEmployeeID);
-                            command.Parameters.AddWithValue("@AffectedEmployeeId", affectedEmployeeId);
-
-                            /*
-                             * Add id of leave transaction recommended
-                             * */
-
-                            command.Parameters.AddWithValue("@Action", $"{action}; ID= {transaction_id}");
-
-                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                            command.ExecuteNonQuery();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //exception logic
-                    throw ex;
-                }
+                string actionStr = $"{action}; ID= {transaction_id}";
+                util.addAuditLog(actingEmployeeID, affectedEmployeeId, actionStr);
             }
         }
 
@@ -1551,39 +1517,9 @@ namespace HR_LEAVEv2.UserControls
                 }
 
                 // add audit log
-                try
-                {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
-                        string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
-                        {
-                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                            command.Parameters.AddWithValue("@AffectedEmployeeId", employeeId);
-
-                            string supOrHr = gridViewType == "sup" ? "supervisor comment" : "hr comment";
-
-                            command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {supOrHr}= {comment}");
-                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                            command.ExecuteNonQuery();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //exception logic
-                    throw ex;
-                }
+                string supOrHr = gridViewType == "sup" ? "supervisor comment" : "hr comment";
+                string action = $"Edited leave application; leave_transaction_id= {leaveId}, {supOrHr}= {comment}";
+                util.addAuditLog(Session["emp_id"].ToString(), employeeId, action);
             }
             else
             {

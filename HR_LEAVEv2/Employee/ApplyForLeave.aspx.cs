@@ -1014,45 +1014,18 @@ namespace HR_LEAVEv2.Employee
                 if (isFileUploadSuccessful)
                 {
                     // add audit log
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-                            string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                                command.Parameters.AddWithValue("@AffectedEmployeeId", Session["emp_id"].ToString());
+                    string fileActionString = String.Empty;
+                    if (areFilesUploaded)
+                        fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
 
-                                string fileActionString = String.Empty;
-                                if (areFilesUploaded)
-                                    fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
+                    string action = $"Submitted leave application: leave_transaction_id= {transaction_id};{fileActionString}";
+                    Boolean res = util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), action);
 
-                                command.Parameters.AddWithValue("@Action", $"Submitted leave application: leave_transaction_id= {transaction_id};{fileActionString}");
-                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                                command.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        throw ex;
-                    }
-
+                    // show feedback
                     submitButtonPanel.Style.Add("display", "none");
                     successMsgPanel.Style.Add("display", "inline-block");
 
+                    // send notifs
                     sendNotifications();
                     resetNumNotifications();
                 }
@@ -1281,46 +1254,17 @@ namespace HR_LEAVEv2.Employee
                 }
 
                 // add audit log
-                try
-                {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
-                        string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
-                        {
-                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                            command.Parameters.AddWithValue("@AffectedEmployeeId", empIdHiddenTxt.Value);
+                List<string> actionString = new List<string>();
 
-                            List<string> actionString = new List<string>();
+                if (isSupCommentsChanged)
+                    actionString.Add($" supervisor_comment= '{supComment}'");
+                if (isHrCommentsChanged)
+                    actionString.Add($"hr_comment= '{hrComment}'");
+                if (isDaysTakenChanged)
+                    actionString.Add($"days_taken= {daysTaken}");
+                string action = $"Edited leave application; leave_transaction_id= {leaveId}, {String.Join(", ", actionString.ToArray())}";
 
-                            if (isSupCommentsChanged)
-                                actionString.Add($" supervisor_comment= '{supComment}'");
-                            if (isHrCommentsChanged)
-                                actionString.Add($"hr_comment= '{hrComment}'");
-                            if (isDaysTakenChanged)
-                                actionString.Add($"days_taken= {daysTaken}");
-
-                            command.Parameters.AddWithValue("@Action", $"Edited leave application; leave_transaction_id= {leaveId}, {String.Join(", ", actionString.ToArray())}");
-                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                            command.ExecuteNonQuery();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //exception logic
-                    throw ex;
-                }
+                util.addAuditLog(Session["emp_id"].ToString(), empIdHiddenTxt.Value, action);
             } else
             {
                 noEditsMadePanel.Visible = true;
