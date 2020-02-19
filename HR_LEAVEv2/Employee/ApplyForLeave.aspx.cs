@@ -17,6 +17,7 @@ namespace HR_LEAVEv2.Employee
 {
     public partial class ApplyForLeave : System.Web.UI.Page
     {
+        Util util = new Util();
 
         // this class is used to store the loaded data from the db in the process of populating fields on the page when accessing this page from 'view' mode
         protected class LeaveTransactionDetails
@@ -66,6 +67,8 @@ namespace HR_LEAVEv2.Employee
                         this.adjustPageForEditMode(ltDetails);
                 } else
                 {
+                    typeOfLeave.DataSource = null;
+                    typeOfLeave.DataBind();
                     // populate dropdown containing leave types
                     try
                     {
@@ -73,8 +76,8 @@ namespace HR_LEAVEv2.Employee
                         SELECT elt.leave_type
                         FROM dbo.employee e
 
-                        JOIN dbo.employeeposition ep
-                        ON e.employee_id = ep.employee_id
+                        LEFT JOIN dbo.employeeposition ep
+                        ON e.employee_id = ep.employee_id AND ep.actual_end_date IS NULL
 
                         JOIN dbo.emptypeleavetype elt
                         ON elt.employment_type = ep.employment_type
@@ -113,9 +116,8 @@ namespace HR_LEAVEv2.Employee
                 if(mode == "apply")
                 {
                     clearFilesErrors();
-                    // validate dates
-                    if(!validateDates(txtFrom.Text, txtTo.Text) || !validateLeave(typeOfLeave.SelectedValue))
-                        applyModeFeedbackUpdatePanel.Update();
+                    validateDates(txtFrom.Text, txtTo.Text);
+                    validateLeave(typeOfLeave.SelectedValue);
                 }
                     
             }
@@ -290,7 +292,7 @@ namespace HR_LEAVEv2.Employee
                             }
 
                             //populate form
-                            empIdTxt.Text = ltDetails.empId;
+                            empIdHiddenTxt.Value = ltDetails.empId;
                             empNameHeader.InnerText = ltDetails.empName;
                             startDateInfoTxt.Text = ltDetails.startDate;
                             endDateInfoTxt.Text = ltDetails.endDate;
@@ -482,7 +484,6 @@ namespace HR_LEAVEv2.Employee
         protected void resetNumNotifications()
         {
             // set number of notifications
-            Util util = new Util();
 
             Label num_notifs = (Label)Master.FindControl("num_notifications");
             num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
@@ -687,209 +688,68 @@ namespace HR_LEAVEv2.Employee
                     isInAppNotifsSentSuccessfully = false;
 
             // send email notifications
-            MailMessage message = new MailMessage();
-            message.IsBodyHtml = true; //to make message body as html 
-            message.From = new MailAddress("mopd.hr.leave@gmail.com");
-
-            SmtpClient smtp = new SmtpClient();
-            smtp.Port = 587;
-            smtp.Host = "smtp.gmail.com"; //for gmail host  
-            smtp.EnableSsl = true;
-            smtp.UseDefaultCredentials = false;
-
-            //uses an application password
-            smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt");
-            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
             // send email to supervisor to let them know an employee has submitted an email
+            // get supervisor's email in order to send then a message notifying them that an employee has submitted an application
+            string supEmail = string.Empty;
+
             try
             {
-
-                // get supervisor's email in order to send then a message notifying them that an employee has submitted an application
-                string supEmail = string.Empty;
-
-                try
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
+                    connection.Open();
 
-                        string sql = $@"
-                                SELECT email FROM [dbo].[employee] WHERE employee_id = {Session["supervisor_id"].ToString()}
-                            ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
+                    string sql = $@"
+                            SELECT email FROM [dbo].[employee] WHERE employee_id = {Session["supervisor_id"].ToString()}
+                        ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            using (SqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
-                                {
-                                    supEmail = reader["email"].ToString();
-                                }
+                                supEmail = reader["email"].ToString();
                             }
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
-                //message.To.Add(new MailAddress("supEmail"));
-                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                message.Subject = $"{Session["emp_username"].ToString()} Submitted Leave Application";
-
-                message.Body = $@"
-                            <style>
-                                #leaveDetails{{
-                                  font-family: arial, sans-serif;
-                                  border-collapse: collapse;
-                                  width: 100%;
-                                }}
-
-                                #leaveDetails td,#leaveDetails th {{
-                                  border: 1px solid #dddddd;
-                                  text-align: left;
-                                  padding: 8px;
-                                }}
-                            </style>
-                            <div style='margin-bottom:15px;'>
-                                DO NOT REPLY <br/>
-                                <br/>
-                                {Session["emp_username"].ToString()} submitted a leave application. Details about the application can be found below: <br/>
-                                
-                                <table id='leaveDetails'>
-                                    <tr>
-                                        <th> Date Submitted </th>
-                                        <th> Employee Name </th>
-                                        <th> Start Date </th>
-                                        <th> End Date </th>
-                                        <th> Days Taken </th>
-                                        <th> Leave Type </th>
-                                        <th> Status </th>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {DateTime.Now.ToString("d/MM/yyyy h:mm tt")}
-                                        </td>
-                                        <td>
-                                            {Session["emp_username"].ToString()}
-                                        </td>
-                                        <td>
-                                            {txtFrom.Text.ToString()}
-                                        </td>
-                                        <td>
-                                            {txtTo.Text.ToString()}
-                                        </td>
-                                        <td>
-                                            {numDaysAppliedFor.Text}
-                                        </td>
-                                        <td>
-                                            {typeOfLeave.SelectedValue}
-                                        </td>
-                                        <td>
-                                            Pending
-                                        </td>
-                                    </tr>
-                                </table>
-                                <br/>
-                            </div>
-                            <div>
-                                Check the status of your employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/deploy/Supervisor/MyEmployeeLeaveApplications'>here</a>. Contact HR for any further information. <br/> 
-                                <br/>
-                                Regards,<br/>
-                                    HR
-                            </div>
-
-
-                        ";
-
-                smtp.Send(message);
-                isEmailNotifsSentSuccessfully = true;
             }
             catch (Exception ex)
             {
-                isEmailNotifsSentSuccessfully = false;
+                throw ex;
             }
+                
+
+            MailMessage message= util.getSupervisorViewEmployeeSubmittedLeaveApplication(
+                new Util.EmailDetails {
+                    employee_name = Session["emp_username"].ToString(),
+                    date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
+                    start_date = txtFrom.Text.ToString(),
+                    end_date = txtTo.Text.ToString(),
+                    days_taken = numDaysAppliedFor.Text,
+                    type_of_leave = typeOfLeave.SelectedValue,
+                    subject = $"{Session["emp_username"].ToString()} Submitted Leave Application",
+                    recipient = supEmail
+                }
+                );
+
+            isEmailNotifsSentSuccessfully = util.sendMail(message);
 
             // send email to employee 
-            try
-            {
-
-                message.To.Clear();
-                message.To.Add(new MailAddress(Session["emp_email"].ToString()));
-                message.Subject = "Submitted Leave Application";
-
-                message.Body = $@"
-                            <style>
-                                #leaveDetails{{
-                                  font-family: arial, sans-serif;
-                                  border-collapse: collapse;
-                                  width: 100%;
-                                }}
-
-                                #leaveDetails td,#leaveDetails th {{
-                                  border: 1px solid #dddddd;
-                                  text-align: left;
-                                  padding: 8px;
-                                }}
-                            </style>
-                            <div style='margin-bottom:15px;'>
-                                DO NOT REPLY <br/>
-                                <br/>
-                                You submitted a leave application. Details about the application can be found below: <br/>
-                                <table id='leaveDetails'>
-                                    <tr>
-                                        <th> Date Submitted </th>
-                                        <th> Supervisor Name </th>
-                                        <th> Start Date </th>
-                                        <th> End Date </th>
-                                        <th> Days Taken </th>
-                                        <th> Leave Type </th>
-                                        <th> Status </th>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {DateTime.Now.ToString("d/MM/yyyy h:mm tt")}
-                                        </td>
-                                        <td>
-                                            {Session["supervisor_name"].ToString()}
-                                        </td>
-                                        <td>
-                                            {txtFrom.Text.ToString()}
-                                        </td>
-                                        <td>
-                                            {txtTo.Text.ToString()}
-                                        </td>
-                                        <td>
-                                            {numDaysAppliedFor.Text}
-                                        </td>
-                                        <td>
-                                            {typeOfLeave.SelectedValue}
-                                        </td>
-                                        <td>
-                                            Pending
-                                        </td>
-                                    </tr>
-                                </table>
-                                <br/>
-                            </div>
-                            <div>
-                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
-                                <br/>
-                                Regards,<br/>
-                                    HR
-                            </div>
-
-
-                        ";
-
-                smtp.Send(message);
-                isEmailNotifsSentSuccessfully = isEmailNotifsSentSuccessfully && true;
-            }
-            catch (Exception ex)
-            {
-                isEmailNotifsSentSuccessfully = false;
-            }
+            message = util.getEmployeeViewEmployeeSubmittedLeaveApplication(
+                new Util.EmailDetails
+                {
+                    supervisor_name = Session["supervisor_name"].ToString(),
+                    date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
+                    start_date = txtFrom.Text.ToString(),
+                    end_date = txtTo.Text.ToString(),
+                    days_taken = numDaysAppliedFor.Text,
+                    type_of_leave = typeOfLeave.SelectedValue,
+                    subject = "Submitted Leave Application",
+                    recipient = Session["emp_email"].ToString()
+                }
+                );
+            isEmailNotifsSentSuccessfully = isEmailNotifsSentSuccessfully && util.sendMail(message);
 
 
             // send inhouse notifications
@@ -925,7 +785,7 @@ namespace HR_LEAVEv2.Employee
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('Submitted Leave Application',@Notification, 'No', '{Session["supervisor_id"].ToString()}', '{DateTime.Now}');
+                                VALUES('{Session["emp_username"].ToString()} Submitted Leave Application',@Notification, 'No', '{Session["supervisor_id"].ToString()}', '{DateTime.Now}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -939,8 +799,6 @@ namespace HR_LEAVEv2.Employee
             {
                 isInAppNotifsSentSuccessfully = false;
             }
-
-            //resetNumNotifications();
 
             // user feedback
             if (!isEmailNotifsSentSuccessfully)
@@ -957,6 +815,15 @@ namespace HR_LEAVEv2.Employee
             errorSendingEmailNotifications.Style.Add("display", "none");
             errorSendingInHouseNotifications.Style.Add("display", "none");
         }
+
+        //protected void disableForm()
+        //{
+        //    // start date and end date
+        //    txtFrom.Enabled = txtTo.Enabled = typeOfLeave.Enabled = false;
+
+        //    // employee comments
+        //    empCommentsTxt.Disabled = true;
+        //}
 
         protected void submitLeaveApplication_Click(object sender, EventArgs e)
         {
@@ -1186,7 +1053,6 @@ namespace HR_LEAVEv2.Employee
                     submitButtonPanel.Style.Add("display", "none");
                     successMsgPanel.Style.Add("display", "inline-block");
 
-                    applyModeFeedbackUpdatePanel.Update();
                     sendNotifications();
                     resetNumNotifications();
                 }
@@ -1199,7 +1065,6 @@ namespace HR_LEAVEv2.Employee
                 errorSubmittingLeaveApplicationPanel.Style.Add("display", "inline-block");
             if (supId == "-1")
                 invalidSupervisor.Style.Add("display", "inline-block");
-            
         }
 
         protected void refreshForm(object sender, EventArgs e)
@@ -1242,6 +1107,7 @@ namespace HR_LEAVEv2.Employee
             if (FileUpload1.HasFiles)
             {
                 List<string> filesTooLarge = new List<string>();
+                List<string> invalidFiles = new List<string>();
 
                 // used to store list of files added
                 List<HttpPostedFile> files = new List<HttpPostedFile>();
@@ -1262,19 +1128,28 @@ namespace HR_LEAVEv2.Employee
                     {
                         if (allowedFileExtensions.Contains(Path.GetExtension(uploadedFile.FileName).ToString()))
                         {
-                            dt.Rows.Add(Path.GetFileName(uploadedFile.FileName));
+                            dt.Rows.Add(Path.GetFileName(uploadedFile.FileName).ToString());
                             files.Add(uploadedFile);
                         }
                         else
-                        {
-                            HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
-                            txt.InnerText = $"Could not upload '{Path.GetFileName(uploadedFile.FileName).ToString()}'. Invalid file type: '{Path.GetExtension(uploadedFile.FileName).ToString()}'";
-                            invalidFileTypePanel.Style.Add("display", "inline-block");
-                            break;
-                        }
-                    } else
+                            invalidFiles.Add(Path.GetFileName(uploadedFile.FileName).ToString());
+                    }
+                    else
+                    {
                         filesTooLarge.Add(Path.GetFileName(uploadedFile.FileName).ToString());
+
+                        if(!allowedFileExtensions.Contains(Path.GetExtension(uploadedFile.FileName).ToString()))
+                            invalidFiles.Add(Path.GetFileName(uploadedFile.FileName).ToString());
+                    }
                         
+                    
+                }
+
+                if(invalidFiles.Count > 0)
+                {
+                    HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
+                    txt.InnerText = $"Could not upload {String.Join(", ", invalidFiles.Select(fileName => "'" + fileName + "'").ToArray())}. Invalid file types: {String.Join(", ", invalidFiles.Select(fileName => "'" + Path.GetExtension(fileName).ToString() + "'").ToArray())}";
+                    invalidFileTypePanel.Style.Add("display", "inline-block");
                 }
 
                 if(filesTooLarge.Count > 0)
@@ -1424,7 +1299,7 @@ namespace HR_LEAVEv2.Employee
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
                             command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                            command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
+                            command.Parameters.AddWithValue("@AffectedEmployeeId", empIdHiddenTxt.Value);
 
                             List<string> actionString = new List<string>();
 
@@ -1531,7 +1406,11 @@ namespace HR_LEAVEv2.Employee
                     }
                 }
                 else
+                {
                     filesUploadedPanel.Visible = false;
+                    validateDates(txtFrom.Text, txtTo.Text);
+                }
+                    
 
                 Session["uploadedFiles"] = files;
                 filesUploadedListView.DataSource = dt;

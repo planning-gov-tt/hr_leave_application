@@ -106,7 +106,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
+                                    <a href="<%= ResolveClientUrl("~/Supervisor/Reports.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
                                         <i class="fa fa-pie-chart navbar-link-icon"></i>
                                         <span class="navbar-link-text">Reports</span>
                                     </a>
@@ -139,7 +139,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
+                                    <a href="<%= ResolveClientUrl("~/HR/Reports.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
                                         <i class="fa fa-pie-chart navbar-link-icon"></i>
                                         <span class="navbar-link-text">Reports</span>
                                     </a>

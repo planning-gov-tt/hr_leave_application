@@ -15,28 +15,28 @@
         }
     </style>
     
-    <%--View mode: Allows user to return to last page they were on before they clicked on a details button for a leave application--%>
+    <%--View mode, Edit mode: Allows user to return to last page they were on before --%>
     <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to previous page" OnClick="returnToPreviousBtn_Click">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
     </asp:LinkButton>
 
-    <%--apply mode--%>
+    <%--Apply mode--%>
     <asp:Panel ID="applyModeTitle" runat="server">
         <h1 style="margin: 0 auto;"><%: Title %></h1>
     </asp:Panel>
 
-    <%--view mode--%>
+    <%--View mode--%>
     <asp:Panel ID="viewModeTitle" runat="server">
         <h1>View Leave Application</h1>
     </asp:Panel>
 
-    <%--edit mode--%>
+    <%--Edit mode--%>
     <asp:Panel ID="editModeTitle" runat="server">
         <h1>Edit Leave Application</h1>
     </asp:Panel>
 
-    <%--Edit mode: id of employee--%>
-    <asp:TextBox ID="empIdTxt" runat="server" Visible ="false"></asp:TextBox>
+    <%--Edit mode: id of employee used to fill audit log column, "affected_employee_id"--%>
+    <asp:HiddenField ID="empIdHiddenTxt" runat="server"></asp:HiddenField>
 
     <%--View mode, Edit mode: shows name of employee who submitted the leave application--%>
     <asp:Panel ID="empNamePanel" runat="server">
@@ -78,7 +78,6 @@
                     <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox>
                     <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
                     <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
-                    <asp:RequiredFieldValidator ID="fromCalendarRequiredValidator" runat="server" ControlToValidate="txtFrom" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
                 </asp:Panel>
                 
             </div>
@@ -92,7 +91,6 @@
                     <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox>
                     <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
                     <ajaxToolkit:CalendarExtender ID="toCalendarExtender" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" Format="d/MM/yyyy" />
-                    <asp:RequiredFieldValidator ID="toCalendarRequiredValidator" runat="server" ControlToValidate="txtTo" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
                 </asp:Panel>
 
             </div>
@@ -127,9 +125,8 @@
 
             <%--apply mode--%>
             <asp:Panel ID="typeOfLeaveDropdownPanel" runat="server" Style="display:inline;">
-                <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Height="27px" Style="display: inline;" AutoPostBack ="true" OnSelectedIndexChanged="typeOfLeave_SelectedIndexChanged">
+                <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Height="35px" Style="display: inline;" AutoPostBack ="true" OnSelectedIndexChanged="typeOfLeave_SelectedIndexChanged">
                 </asp:DropDownList>
-                <asp:RequiredFieldValidator ID="typeOfLeaveRequiredValidator" runat="server" ControlToValidate="typeOfLeave" Display="Dynamic" ErrorMessage="Required" ForeColor="Red" ValidationGroup="applyForLeave"></asp:RequiredFieldValidator>
             </asp:Panel>
 
             <%--view mode, edit mode--%>
@@ -144,7 +141,7 @@
             <label for="supervisor_select" style="font-size:1.2em; display:inline;">Supervisor:</label>
             <%--apply mode--%>
             <asp:Panel ID="supervisorSelectUserControlPanel" runat="server" Style="display:inline;">
-                <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server" validationGroup="applyForLeave"/>
+                <TWebControl:SupervisorSelectUserControl ID="supervisor_select" runat="server"/>
             </asp:Panel>
 
             <%--view mode--%>
@@ -156,7 +153,7 @@
         <%--Apply mode: Allows user to upload docs--%>
         <asp:Panel ID="fileUploadPanel" runat="server" Style="margin:0 auto; text-align:center" CssClass="row form-group">
             <label for="FileUpload1" style="font-size:1.2em; display:inline;">Upload Files:</label>
-            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin:0 auto; display: inline-block" AllowMultiple="true"/> 
+            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin:0 auto; display: inline-block; background-color: lightgrey" AllowMultiple="true"/> 
             <asp:LinkButton ID="uploadFilesBtn" runat="server" OnClick="uploadBtn_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Upload files">
                 <i class="fa fa-upload" aria-hidden="true"></i>
             </asp:LinkButton>
@@ -203,7 +200,6 @@
                     </LayoutTemplate>
 
                 </asp:ListView>
-                <%--<asp:BulletedList ID="filesUploadedList" runat="server" BulletStyle="NotSet" Style="display: inline-block; text-align: left;"></asp:BulletedList>--%>
             </asp:Panel>
             <br />                            
         </asp:Panel>
@@ -237,7 +233,7 @@
 
         <%--Apply mode: Shows any necessary validation messages to user --%>
         <div class="row" id="validationRow">
-            <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" UpdateMode="Conditional" runat="server">
+            <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server">
                 <ContentTemplate>
                     <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -328,7 +324,7 @@
                                  <i class="fa fa-times" aria-hidden="true"></i>
                                  Cancel
                         </asp:LinkButton>
-                        <asp:LinkButton ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click" ValidationGroup="applyForLeave">
+                        <asp:LinkButton ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click">
                                  <i class="fa fa-send" aria-hidden="true"></i>
                                  Submit
                         </asp:LinkButton>

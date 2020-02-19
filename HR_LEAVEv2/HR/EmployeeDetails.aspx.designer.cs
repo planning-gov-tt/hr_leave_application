@@ -400,6 +400,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.LinkButton clearFormBtn;
         
         /// <summary>
+        /// clearFormTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl clearFormTxt;
+        
+        /// <summary>
         /// empBasicInfoPanel control.
         /// </summary>
         /// <remarks>

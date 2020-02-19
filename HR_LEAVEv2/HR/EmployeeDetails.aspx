@@ -191,9 +191,9 @@
             </asp:UpdatePanel>
         </asp:Panel>
 
-        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-bottom: 15px;">
+        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-bottom: 15px;" CausesValidation="false">
                 <i class="fa fa-times" aria-hidden="true"></i>
-                Clear Form
+                <span runat="server" id ="clearFormTxt">Clear Form</span>
         </asp:LinkButton>
 
         <%--Employee Information--%>
@@ -391,7 +391,7 @@
                             </div>
                             <div class="form-group" style="margin-top: 45px;">
                                 <label for="deptList">Department</label>
-                                <asp:DropDownList ID="deptList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource2" DataValueField="dept_id" DataTextField="dept_name" Style="display: inline-block; margin-right: 15%;"></asp:DropDownList>
+                                <asp:DropDownList ID="deptList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource2" DataValueField="dept_id" DataTextField="dept_name" Style="display: inline-block; margin-right: 7%;"></asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSource2" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [dept_id], [dept_name] FROM [department] ORDER BY [dept_name]"></asp:SqlDataSource>
 
                                 <label for="positionList">Position</label>
@@ -399,7 +399,7 @@
                                 <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [pos_id], [pos_name] FROM [position] ORDER BY [pos_name]"></asp:SqlDataSource>
                             </div>
                             <div class="form-group text-center" style="margin-top: 45px;">
-                                <span style="margin-right: 15%;">
+                                <span style="margin-right: 7%;">
                                     <label for="txtStartDate">Start date</label>
                                     <asp:TextBox ID="txtStartDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
                                     <i id="startDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>

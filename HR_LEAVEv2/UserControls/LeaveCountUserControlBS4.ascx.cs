@@ -74,25 +74,37 @@ namespace HR_LEAVEv2.UserControls
                             }
                         }     
                     }
-                        
+
+                    if(empDetails == null)
+                    {
+                        empDetails = new EmployeeDetails()
+                        {
+                            sick = "0",
+                            casual = "0",
+                            personal = "0",
+                            vacation = "0",
+                            employmentType = string.Empty,
+                            start_date = string.Empty
+                        };
+                    }
 
                     ViewState["sick"] = empDetails.sick;
                     ViewState["vacation"] = empDetails.vacation;
                     ViewState["personal"] = empDetails.personal;
                     ViewState["casual"] = empDetails.casual;
 
-                    
 
-                    if(empDetails.employmentType == "Contract")
+
+                    if (empDetails.employmentType == "Contract")
                     {
                         /* contract employees
-                         * for a new employee: 
-                         *  vacation = 20 
-                         *  personal = 5
-                         * 
-                         * During the first 11 months of contract, employee only has access to the 5 personal days. 
-                         * After the 11 months, they have access to their:
-                         *          vacation days - days used from personal
+                            * for a new employee: 
+                            *  vacation = 20 
+                            *  personal = 5
+                            * 
+                            * During the first 11 months of contract, employee only has access to the 5 personal days. 
+                            * After the 11 months, they have access to their:
+                            *          vacation days - days used from personal
                         */
 
                         // is employee in first 11 months of contract?
@@ -106,26 +118,27 @@ namespace HR_LEAVEv2.UserControls
                         {
                             int personal = Convert.ToInt16(empDetails.personal);
 
-                            if(personal > 0)
+                            if (personal > 0)
                             {
                                 // subtract personal days used from vacation
                                 int updatedVacation = Convert.ToInt16(empDetails.vacation);
                                 updatedVacation = updatedVacation - (5 - personal);
 
-                                if(updatedVacation != Convert.ToInt16(empDetails.vacation))
+                                if (updatedVacation != Convert.ToInt16(empDetails.vacation))
                                 {
                                     // update vacation and personal in db
                                     try
                                     {
-                                       string updateVacationSql = $@"
-                                            UPDATE [dbo].employee 
-                                            SET vacation = '{updatedVacation}', personal = '0'
-                                            WHERE employee_id = '{Session["emp_id"]}';
-                                        ";
+                                        string updateVacationSql = $@"
+                                        UPDATE [dbo].employee 
+                                        SET vacation = '{updatedVacation}', personal = '0'
+                                        WHERE employee_id = '{Session["emp_id"]}';
+                                    ";
                                         using (SqlCommand cmd = new SqlCommand(updateVacationSql, con))
                                         {
                                             int rowsAffected = cmd.ExecuteNonQuery();
-                                            if(rowsAffected > 0) { 
+                                            if (rowsAffected > 0)
+                                            {
                                                 ViewState["vacation"] = updatedVacation.ToString();
                                             }
                                         }
@@ -141,15 +154,16 @@ namespace HR_LEAVEv2.UserControls
                             // display vacation 
                             vacationPanel.Visible = true;
                         }
-                            
-                    } else if(empDetails.employmentType == "Public Service")
+
+                    }
+                    else if (empDetails.employmentType == "Public Service")
                     {
                         // public service employees
                         casualPanel.Visible = true;
                         vacationPanel.Visible = true;
                     }
+                } 
 
-                }
             }
         }
 
