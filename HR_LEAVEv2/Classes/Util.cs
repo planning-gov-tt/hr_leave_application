@@ -75,8 +75,8 @@ namespace HR_LEAVEv2.Classes
             message.IsBodyHtml = true;
             message.Subject = subject;
             message.From = new MailAddress("hr.leave@planning.gov.tt");
-            //message.To.Add(new MailAddress(recipient));
-            message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+            message.To.Add(new MailAddress(recipient));
+            //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
             return message;
         }
 
