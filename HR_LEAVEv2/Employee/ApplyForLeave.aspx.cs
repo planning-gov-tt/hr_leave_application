@@ -292,7 +292,7 @@ namespace HR_LEAVEv2.Employee
                             }
 
                             //populate form
-                            empIdTxt.Text = ltDetails.empId;
+                            empIdHiddenTxt.Value = ltDetails.empId;
                             empNameHeader.InnerText = ltDetails.empName;
                             startDateInfoTxt.Text = ltDetails.startDate;
                             endDateInfoTxt.Text = ltDetails.endDate;
@@ -688,101 +688,68 @@ namespace HR_LEAVEv2.Employee
                     isInAppNotifsSentSuccessfully = false;
 
             // send email notifications
-            MailMessage message = new MailMessage();
-            message.IsBodyHtml = true; //to make message body as html 
-            message.From = new MailAddress("mopd.hr.leave@gmail.com");
-
-            SmtpClient smtp = new SmtpClient();
-            smtp.Port = 587;
-            smtp.Host = "smtp.gmail.com"; //for gmail host  
-            smtp.EnableSsl = true;
-            smtp.UseDefaultCredentials = false;
-
-            //uses an application password
-            smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt");
-            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
             // send email to supervisor to let them know an employee has submitted an email
+            // get supervisor's email in order to send then a message notifying them that an employee has submitted an application
+            string supEmail = string.Empty;
+
             try
             {
-
-                // get supervisor's email in order to send then a message notifying them that an employee has submitted an application
-                string supEmail = string.Empty;
-
-                try
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
+                    connection.Open();
 
-                        string sql = $@"
-                                SELECT email FROM [dbo].[employee] WHERE employee_id = {Session["supervisor_id"].ToString()}
-                            ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
+                    string sql = $@"
+                            SELECT email FROM [dbo].[employee] WHERE employee_id = {Session["supervisor_id"].ToString()}
+                        ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            using (SqlDataReader reader = command.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
-                                {
-                                    supEmail = reader["email"].ToString();
-                                }
+                                supEmail = reader["email"].ToString();
                             }
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-                
-                //message.To.Add(new MailAddress(supEmail));
-                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                message.Subject = $"{Session["emp_username"].ToString()} Submitted Leave Application";
-                message.Body = util.getSupervisorViewEmployeeSubmittedLeaveApplication(
-                    new Util.EmailDetails {
-                        employee_name = Session["emp_username"].ToString(),
-                        date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
-                        start_date = txtFrom.Text.ToString(),
-                        end_date = txtTo.Text.ToString(),
-                        days_taken = numDaysAppliedFor.Text,
-                        type_of_leave = typeOfLeave.SelectedValue
-                        }
-                    );
-
-                smtp.Send(message);
-                isEmailNotifsSentSuccessfully = true;
             }
             catch (Exception ex)
             {
-                isEmailNotifsSentSuccessfully = false;
+                throw ex;
             }
+                
+
+            MailMessage message= util.getSupervisorViewEmployeeSubmittedLeaveApplication(
+                new Util.EmailDetails {
+                    employee_name = Session["emp_username"].ToString(),
+                    date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
+                    start_date = txtFrom.Text.ToString(),
+                    end_date = txtTo.Text.ToString(),
+                    days_taken = numDaysAppliedFor.Text,
+                    type_of_leave = typeOfLeave.SelectedValue,
+                    subject = $"{Session["emp_username"].ToString()} Submitted Leave Application",
+                    recipient = supEmail
+                }
+                );
+
+            isEmailNotifsSentSuccessfully = util.sendMail(message);
 
             // send email to employee 
-            try
-            {
-                message.To.Clear();
-                //message.To.Add(new MailAddress(Session["emp_email"].ToString()));
-                message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                message.Subject = "Submitted Leave Application";
-
-                message.Body = util.getEmployeeViewEmployeeSubmittedLeaveApplication(
-                    new Util.EmailDetails
-                    {
-                        supervisor_name = Session["supervisor_name"].ToString(),
-                        date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
-                        start_date = txtFrom.Text.ToString(),
-                        end_date = txtTo.Text.ToString(),
-                        days_taken = numDaysAppliedFor.Text,
-                        type_of_leave = typeOfLeave.SelectedValue
-                    }
-                    );
-                smtp.Send(message);
-                isEmailNotifsSentSuccessfully = isEmailNotifsSentSuccessfully && true;
-            }
-            catch (Exception ex)
-            {
-                isEmailNotifsSentSuccessfully = false;
-            }
+            message = util.getEmployeeViewEmployeeSubmittedLeaveApplication(
+                new Util.EmailDetails
+                {
+                    supervisor_name = Session["supervisor_name"].ToString(),
+                    date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
+                    start_date = txtFrom.Text.ToString(),
+                    end_date = txtTo.Text.ToString(),
+                    days_taken = numDaysAppliedFor.Text,
+                    type_of_leave = typeOfLeave.SelectedValue,
+                    subject = "Submitted Leave Application",
+                    recipient = Session["emp_email"].ToString()
+                }
+                );
+            isEmailNotifsSentSuccessfully = isEmailNotifsSentSuccessfully && util.sendMail(message);
 
 
             // send inhouse notifications
@@ -1332,7 +1299,7 @@ namespace HR_LEAVEv2.Employee
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
                             command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                            command.Parameters.AddWithValue("@AffectedEmployeeId", empIdTxt.Text);
+                            command.Parameters.AddWithValue("@AffectedEmployeeId", empIdHiddenTxt.Value);
 
                             List<string> actionString = new List<string>();
 

@@ -38,40 +38,6 @@ namespace HR_LEAVEv2
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            //MailMessage message = new MailMessage();
-            //message.IsBodyHtml = true; //to make message body as html 
-            //message.From = new MailAddress("mopd.hr.leave@gmail.com");
-
-            //SmtpClient smtp = new SmtpClient();
-            //smtp.Port = 587;
-            //smtp.Host = "smtp.gmail.com"; //for gmail host  
-            //smtp.EnableSsl = true;
-            //smtp.UseDefaultCredentials = false;
-
-            ////uses an application password
-            //smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt");
-            //smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-
-            //try
-            //{
-            //    message.To.Add(new MailAddress("tristan.sankar@planning.gov.tt"));
-            //    message.Subject = "request";
-            //    message.Body = "hr leave app email test";
-            //    try
-            //    {
-            //        smtp.Send(message);
-            //    }
-            //    catch (SmtpFailedRecipientException ex)
-            //    {
-            //        throw ex;
-            //    }
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw ex;
-            //}
-
             List<string> permissions = (List<string>)Session["permissions"];
 
             if (permissions != null)

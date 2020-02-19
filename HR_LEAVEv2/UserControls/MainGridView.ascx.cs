@@ -899,6 +899,7 @@ namespace HR_LEAVEv2.UserControls
                         { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
                         { "employee_id", employee_id},
                         { "employee_name", row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString() },
+                        { "employeeEmail", employeeEmail },
                         { "supervisor_name", row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString() },
                         { "supervisor_id", GridView.DataKeys[index].Values["supervisor_id"].ToString()},
                         { "supervisorEmail", supervisorEmail },
@@ -1124,26 +1125,8 @@ namespace HR_LEAVEv2.UserControls
         protected void sendApprovedNotifications(GridViewRow row, string employee_id, string supervisor_id, string employeeEmail, string supervisorEmail)
         {
 
-            // send email
-
-            MailMessage message = new MailMessage();
-            message.IsBodyHtml = true;
-            message.From = new MailAddress("mopd.hr.leave@gmail.com");
-
-            SmtpClient smtp = new SmtpClient();
-            smtp.Port = 587;
-            smtp.Host = "smtp.gmail.com"; //for gmail host  
-            smtp.EnableSsl = true;
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt"); //uses an application password
-            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-
             // send email to employee notifying them that their leave application was approved
-
-            message.To.Add(new MailAddress(employeeEmail));  // hard coded to Tristan.Sankar@planning.gov.tt for testing
-            //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-            message.Subject = "Leave Application Approved";
-            message.Body = util.getEmployeeViewLeaveApplicationApproved(
+            MailMessage message = util.getEmployeeViewLeaveApplicationApproved(
                     new Util.EmailDetails
                     {
                         supervisor_name = row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString(),
@@ -1152,25 +1135,15 @@ namespace HR_LEAVEv2.UserControls
                         end_date = row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString(),
                         days_taken = row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString(),
                         type_of_leave = row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString(),
-                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString()
+                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString(),
+                        recipient = employeeEmail,
+                        subject = "Leave Application Approved"
                     }
             );
-            try
-            {
-                smtp.Send(message);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            util.sendMail(message);
 
             // send email to supervisor letting them know that HR approved application for employee
-            message.To.Clear();
-
-            message.To.Add(new MailAddress(supervisorEmail));
-            message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-            message.Subject = $"Leave Application Approved for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}";
-            message.Body = util.getSupervisorViewLeaveApplicationApproved(
+            message = util.getSupervisorViewLeaveApplicationApproved(
                     new Util.EmailDetails
                     {
                         employee_name = row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString(),
@@ -1179,17 +1152,12 @@ namespace HR_LEAVEv2.UserControls
                         end_date = row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString(),
                         days_taken = row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString(),
                         type_of_leave = row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString(),
-                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString()
+                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString(),
+                        recipient = supervisorEmail,
+                        subject = $"Leave Application Approved for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}"
                     }
                     );
-            try
-            {
-                smtp.Send(message);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            util.sendMail(message);
 
             // send in application notifications
             // send notif to employee
@@ -1256,28 +1224,13 @@ namespace HR_LEAVEv2.UserControls
             {
 
                 // send email notifications
-                string emailCommentString = string.Empty;
 
+                string emailCommentString = string.Empty;
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
                     emailCommentString = $"HR has left the following comment: <blockquote style='font-size: 1.1em;'>\"{comment}\"</blockquote>";
 
-                MailMessage message = new MailMessage();
-                message.IsBodyHtml = true;
-                message.From = new MailAddress("mopd.hr.leave@gmail.com");
-
-                SmtpClient smtp = new SmtpClient();
-                smtp.Port = 587;
-                smtp.Host = "smtp.gmail.com"; //for gmail host  
-                smtp.EnableSsl = true;
-                smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt"); //uses an application password
-                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-
                 // send email to employee
-                message.To.Add(new MailAddress(row["employeeEmail"]));
-                //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                message.Subject = "Leave Application Not Approved";
-                message.Body = util.getEmployeeViewLeaveApplicationNotApproved(
+                MailMessage message = util.getEmployeeViewLeaveApplicationNotApproved(
                     new Util.EmailDetails
                     {
                         supervisor_name = row["supervisor_name"],
@@ -1287,28 +1240,16 @@ namespace HR_LEAVEv2.UserControls
                         days_taken = row["days_taken"],
                         type_of_leave = row["leave_type"],
                         qualified = row["qualified"],
-                        comment = emailCommentString
+                        comment = emailCommentString,
+                        subject = "Leave Application Not Approved",
+                        recipient = row["employeeEmail"]
                     }
                 );
+                isEmployeeEmailSent = util.sendMail(message);
 
-                try
-                {
-                    smtp.Send(message);
-                    isEmployeeEmailSent = true;
-                }
-                catch (Exception ex)
-                {
-                    isEmployeeEmailSent = false;
-                }
-
-                // clear email address of employee 
-                message.To.Clear();
 
                 // send supervisor email
-                message.To.Add(new MailAddress(row["supervisorEmail"]));
-                //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                message.Subject = $"Leave Application Not Approved for {row["employee_name"]}";
-                message.Body = util.getSupervisorViewLeaveApplicationNotApproved(
+                message = util.getSupervisorViewLeaveApplicationNotApproved(
                     new Util.EmailDetails
                     {
                         employee_name = row["employee_name"],
@@ -1318,20 +1259,13 @@ namespace HR_LEAVEv2.UserControls
                         days_taken = row["days_taken"],
                         type_of_leave = row["leave_type"],
                         qualified = row["qualified"],
-                        comment = emailCommentString
+                        comment = emailCommentString,
+                        subject = $"Leave Application Not Approved for {row["employee_name"]}",
+                        recipient = row["supervisorEmail"]
                     }
                 );
-     
-                try
-                {
-                    smtp.Send(message);
-                    isSupervisorEmailSent = true;
-                }
-                catch (Exception ex)
-                {
-                    isSupervisorEmailSent = false;
-                }
-
+                isSupervisorEmailSent = util.sendMail(message);
+               
                 if(isEmployeeEmailSent && isSupervisorEmailSent)
                 {
                     row["isEmailSentAlready"] = "Yes";
@@ -1403,27 +1337,10 @@ namespace HR_LEAVEv2.UserControls
 
         protected void sendRecommendedNotifications(GridViewRow row, string employee_id, string employeeEmail)
         {
-
-
             // send email notifications
-            MailMessage message = new MailMessage();
-            message.IsBodyHtml = true;
-            message.From = new MailAddress("mopd.hr.leave@gmail.com");
-
-            SmtpClient smtp = new SmtpClient();
-            smtp.Port = 587;
-            smtp.Host = "smtp.gmail.com"; //for gmail host  
-            smtp.EnableSsl = true;
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt"); //uses an application password
-            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
             // send email to employee notifying them that their supervisor recommended their leave to HR
-
-            message.To.Add(new MailAddress(employeeEmail)); 
-            //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt")); // hard coded to Tristan.Sankar@planning.gov.tt for testing
-            message.Subject = "Leave Application Recommended";
-            message.Body = util.getEmployeeViewLeaveApplicationRecommended(
+            MailMessage message = util.getEmployeeViewLeaveApplicationRecommended(
                     new Util.EmailDetails
                     {
                         supervisor_name = Session["emp_username"].ToString(),
@@ -1432,28 +1349,15 @@ namespace HR_LEAVEv2.UserControls
                         end_date = row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString(),
                         days_taken = row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString(),
                         type_of_leave = row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString(),
-                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString()
+                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString(),
+                        subject = "Leave Application Recommended",
+                        recipient = employeeEmail
                     }
             );
-
-            try
-            {
-                smtp.Send(message);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
- 
-            message.To.Clear();
+            util.sendMail(message);
 
             // send email to relevant HR officers letting them know that supervisor recommended application
-
-            // add all relevant emails from HR to this list
-            // INSERT CODE HERE and comment out below line
-            message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-            message.Subject = $"Leave Application Recommended for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}";
-            message.Body = util.getHRViewLeaveApplicationRecommended(
+            message = util.getHRViewLeaveApplicationRecommended(
                     new Util.EmailDetails
                     {
                         supervisor_name = Session["emp_username"].ToString(),
@@ -1463,19 +1367,12 @@ namespace HR_LEAVEv2.UserControls
                         end_date = row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString(),
                         days_taken = row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString(),
                         type_of_leave = row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString(),
-                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString()
+                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString(),
+                        subject = $"Leave Application Recommended for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}",
+                        recipient = "Tristan.Sankar@planning.gov.tt" // add all relevant emails from HR to recipient list
                     }
             );
-
-            try
-            {
-                smtp.Send(message);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
+            util.sendMail(message);
 
             // send in application notifications
 
@@ -1510,7 +1407,6 @@ namespace HR_LEAVEv2.UserControls
         protected void sendNotRecommendedNotifications(string comment)
 
         {
-
             Dictionary<string, string> row = null;
             if (ViewState["notRecommendedRow"] != null)
                 row = (Dictionary<string, string>)ViewState["notRecommendedRow"];
@@ -1525,25 +1421,9 @@ namespace HR_LEAVEv2.UserControls
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
                     emailCommentString = $"Your supervisor left the following comment: <blockquote style='font-size:1.1em;'>\"{comment}\"</blockquote>";
 
-                MailMessage message = new MailMessage();
-                message.IsBodyHtml = true;
-                message.From = new MailAddress("mopd.hr.leave@gmail.com");
-
-                SmtpClient smtp = new SmtpClient();
-                smtp.Port = 587;
-                smtp.Host = "smtp.gmail.com"; //for gmail host  
-                smtp.EnableSsl = true;
-                smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential("mopd.hr.leave@gmail.com", "kxeainpwpvdbxnxt"); //uses an application password
-                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-
                 // send email to employee
 
-                message.To.Add(new MailAddress(row["employeeEmail"]));
-                //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
-                message.Subject = "Leave Application Not Recommended";
-
-                message.Body = util.getEmployeeViewLeaveApplicationNotRecommended(
+                MailMessage message = util.getEmployeeViewLeaveApplicationNotRecommended(
                     new Util.EmailDetails
                     {
                         supervisor_name = row["supervisor_name"],
@@ -1553,20 +1433,19 @@ namespace HR_LEAVEv2.UserControls
                         days_taken = row["days_taken"],
                         type_of_leave = row["leave_type"],
                         qualified = row["qualified"],
-                        comment = emailCommentString
+                        comment = emailCommentString,
+                        subject = "Leave Application Not Recommended",
+                        recipient = row["employeeEmail"]
                     }
                 );
 
-                try
+                if (util.sendMail(message))
                 {
-                    smtp.Send(message);
                     row["isEmailSentAlready"] = "Yes";
                     ViewState["notRecommendedRow"] = row;
                 }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
+                else
+                    ViewState["notRecommendedRow"] = null;
 
 
                 // send in application notifs

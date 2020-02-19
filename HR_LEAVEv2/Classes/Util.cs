@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Net;
+using System.Net.Mail;
 
 namespace HR_LEAVEv2.Classes
 {
@@ -20,6 +22,8 @@ namespace HR_LEAVEv2.Classes
             public string supervisor_id { get; set; }
             public string supervisor_name { get; set; }
             public string comment { get; set; }
+            public string recipient { get; set; }
+            public string subject { get; set; }
         }
 
         public string resetNumNotifications(string employee_id)
@@ -65,13 +69,47 @@ namespace HR_LEAVEv2.Classes
             return count;
         }
 
+        public MailMessage getNewMailMessage(string subject, string recipient)
+        {
+            MailMessage message = new MailMessage();
+            message.IsBodyHtml = true;
+            message.Subject = subject;
+            message.From = new MailAddress("hr.leave@planning.gov.tt");
+            //message.To.Add(new MailAddress(recipient));
+            message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+            return message;
+        }
+
+        public Boolean sendMail(MailMessage message)
+        {
+            SmtpClient smtp = new SmtpClient();
+            smtp.Port = 25;
+            smtp.Host = "10.240.32.231"; //for PLANNING host 
+            //smtp.EnableSsl = true;
+            //smtp.UseDefaultCredentials = false;
+            //smtp.Credentials = new NetworkCredential("hr.leave@planning.gov.tt", "p@ssword1");
+            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /*
          * supervisor view: approved LA
          * Get the email body for the email sent to a supervisor when their employee's LA is approved
          **/
-        public string getSupervisorViewLeaveApplicationApproved(EmailDetails details)
+        public MailMessage getSupervisorViewLeaveApplicationApproved(EmailDetails details)
         {
-            return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                         <style>
                             #leaveDetails{{
                                 font-family: arial, sans-serif;
@@ -139,15 +177,17 @@ namespace HR_LEAVEv2.Classes
 
 
                     ";
+            return msg;
         }
 
         /*
          * employee view: approved LA
          * Get the email body for the email sent to an employee when their LA is approved
          **/
-        public string getEmployeeViewLeaveApplicationApproved(EmailDetails details)
+        public MailMessage getEmployeeViewLeaveApplicationApproved(EmailDetails details)
         {
-            return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                             <style>
                                 #leaveDetails{{
                                     font-family: arial, sans-serif;
@@ -215,15 +255,17 @@ namespace HR_LEAVEv2.Classes
 
 
                         ";
+            return msg;
         }
 
         /*
          * supervisor view: not approved LA
          * Get the email body for the email sent to a supervisor when their employee's LA is not approved
          **/
-        public string getSupervisorViewLeaveApplicationNotApproved(EmailDetails details)
+        public MailMessage getSupervisorViewLeaveApplicationNotApproved(EmailDetails details)
         {
-           return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                     <style>
                         #leaveDetails{{
                             font-family: arial, sans-serif;
@@ -292,15 +334,17 @@ namespace HR_LEAVEv2.Classes
 
 
                 ";
+            return msg;
         }
 
         /*
          * employee view: not approved LA
          * Get the email body for the email sent to an employee when their LA is not approved
          **/
-        public string getEmployeeViewLeaveApplicationNotApproved(EmailDetails details)
+        public MailMessage getEmployeeViewLeaveApplicationNotApproved(EmailDetails details)
         {
-            return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                     <style>
                         #leaveDetails{{
                             font-family: arial, sans-serif;
@@ -368,15 +412,17 @@ namespace HR_LEAVEv2.Classes
 
 
                 ";
+            return msg;
         }
 
         /*
          * HR view: recommended LA
          * Get the email body for the email sent to HR when a LA is recommended by an employee's supervisor
          **/
-        public string getHRViewLeaveApplicationRecommended(EmailDetails details)
+        public MailMessage getHRViewLeaveApplicationRecommended(EmailDetails details)
         {
-            return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                     <style>
                         #leaveDetails{{
                             font-family: arial, sans-serif;
@@ -448,15 +494,17 @@ namespace HR_LEAVEv2.Classes
 
 
                 ";
+            return msg;
         }
 
         /*
          * employee view: recommended LA
          * Get the email body for the email sent to an employee when a LA is recommended by their supervisor
          **/
-        public string getEmployeeViewLeaveApplicationRecommended(EmailDetails details)
+        public MailMessage getEmployeeViewLeaveApplicationRecommended(EmailDetails details)
         {
-            return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                     <style>
                         #leaveDetails{{
                             font-family: arial, sans-serif;
@@ -524,16 +572,17 @@ namespace HR_LEAVEv2.Classes
 
 
                 ";
-
+            return msg;
         }
 
         /*
          * employee view: not recommended LA
          * Get the email body for the email sent to an employee when a LA is not recommended by their supervisor
          **/
-        public string getEmployeeViewLeaveApplicationNotRecommended(EmailDetails details)
+        public MailMessage getEmployeeViewLeaveApplicationNotRecommended(EmailDetails details)
         {
-            return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                     <style>
                         #leaveDetails{{
                             font-family: arial, sans-serif;
@@ -600,15 +649,17 @@ namespace HR_LEAVEv2.Classes
                             HR
                     </div>
             ";
+            return msg;
         }
 
         /*
          * supervisor view: submitted LA
          * Get the email body for the email sent to a supervisor when an employee submits a LA
          **/
-        public string getSupervisorViewEmployeeSubmittedLeaveApplication(EmailDetails details)
+        public MailMessage getSupervisorViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
-            return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                             <style>
                                 #leaveDetails{{
                                   font-family: arial, sans-serif;
@@ -672,15 +723,17 @@ namespace HR_LEAVEv2.Classes
 
 
                         ";
+            return msg;
         }
 
         /*
          * employee view: submitted LA
          * Get the email body for the email sent to an employee they submit a LA
          **/
-        public string getEmployeeViewEmployeeSubmittedLeaveApplication(EmailDetails details)
+        public MailMessage getEmployeeViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
-           return $@"
+            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            msg.Body = $@"
                             <style>
                                 #leaveDetails{{
                                   font-family: arial, sans-serif;
@@ -743,6 +796,9 @@ namespace HR_LEAVEv2.Classes
 
 
                         ";
+            return msg;
         }
+
+
     }
 }

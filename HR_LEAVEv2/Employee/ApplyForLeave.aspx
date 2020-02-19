@@ -15,28 +15,28 @@
         }
     </style>
     
-    <%--View mode: Allows user to return to last page they were on before they clicked on a details button for a leave application--%>
+    <%--View mode, Edit mode: Allows user to return to last page they were on before --%>
     <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to previous page" OnClick="returnToPreviousBtn_Click">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
     </asp:LinkButton>
 
-    <%--apply mode--%>
+    <%--Apply mode--%>
     <asp:Panel ID="applyModeTitle" runat="server">
         <h1 style="margin: 0 auto;"><%: Title %></h1>
     </asp:Panel>
 
-    <%--view mode--%>
+    <%--View mode--%>
     <asp:Panel ID="viewModeTitle" runat="server">
         <h1>View Leave Application</h1>
     </asp:Panel>
 
-    <%--edit mode--%>
+    <%--Edit mode--%>
     <asp:Panel ID="editModeTitle" runat="server">
         <h1>Edit Leave Application</h1>
     </asp:Panel>
 
-    <%--Edit mode: id of employee--%>
-    <asp:TextBox ID="empIdTxt" runat="server" Visible ="false"></asp:TextBox>
+    <%--Edit mode: id of employee used to fill audit log column, "affected_employee_id"--%>
+    <asp:HiddenField ID="empIdHiddenTxt" runat="server"></asp:HiddenField>
 
     <%--View mode, Edit mode: shows name of employee who submitted the leave application--%>
     <asp:Panel ID="empNamePanel" runat="server">
