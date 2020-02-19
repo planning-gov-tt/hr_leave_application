@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HR_LEAVEv2.Classes;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -11,6 +12,7 @@ namespace HR_LEAVEv2.HR
 {
     public partial class EmployeeDetails : System.Web.UI.Page
     {
+        Util util = new Util();
 
         // the following enum is used when getting or setting data in datatables 
         // as related to the employment records
@@ -642,44 +644,14 @@ namespace HR_LEAVEv2.HR
             if (isInsertSuccessful)
             {
                 // add audit log
-                try
-                {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
-                        string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
-                        {
-                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                            command.Parameters.AddWithValue("@AffectedEmployeeId", emp_id);
 
-                            /*
-                             * Add info about new employee created such as:
-                             * Leave balances: Vacation, Sick, Personal, Casual
-                             * Employee permissions
-                             * */
-                            string action = $"Created new Employee; {String.Join(", ", currentLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())} ; Permissions: {String.Join(",", authorizations.ToArray())}";
-                            command.Parameters.AddWithValue("@Action", action);
-
-                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                            command.ExecuteNonQuery();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //exception logic
-                    throw ex;
-                }
+                /*
+                * Add info about new employee created such as:
+                * Leave balances: Vacation, Sick, Personal, Casual
+                * Employee permissions
+                * */
+                string action = $"Created new Employee; {String.Join(", ", currentLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())} ; Permissions: {String.Join(",", authorizations.ToArray())}";
+                util.addAuditLog(Session["emp_id"].ToString(), emp_id, action);
             }
             else
             {
@@ -1072,49 +1044,17 @@ namespace HR_LEAVEv2.HR
                             isRolesEditSuccessful = false;
                         }
                     }
-                    
+
 
                     // add audit log for deleting roles
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-                            string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
 
-                                /*
-                                 * Add info about edits made to employee such as:
-                                 * Employee ID
-                                 * Roles deleted
-                                 * */
-
-
-                                string action = $"Edited roles; Roles Deleted= {String.Join(", ", deletedRoles.ToArray())}";
-                                command.Parameters.AddWithValue("@Action", action);
-
-                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                                command.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        throw ex;
-                    }
+                    /*
+                    * Add info about edits made to employee such as:
+                    * Employee ID
+                    * Roles deleted
+                    * */
+                    string action = $"Edited roles; Roles Deleted= {String.Join(", ", deletedRoles.ToArray())}";
+                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
                 }
 
                 // previous roles holds the employee's previous roles. The following code looks at the previous roles and checks which roles were added to the employee
@@ -1163,44 +1103,13 @@ namespace HR_LEAVEv2.HR
                     }
 
                     // add audit log for roles added
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-                            string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
-
-                                /*
-                                 * Add info about edits made to employee such as:
-                                 * Employee ID
-                                 * Roles added
-                                 * */
-                                string action = $"Edited roles; Roles Added= {String.Join(", ", addedRoles.ToArray())}";
-                                command.Parameters.AddWithValue("@Action", action);
-
-                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                                command.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        throw ex;
-                    }
+                    /*
+                    * Add info about edits made to employee such as:
+                    * Employee ID
+                    * Roles added
+                    * */
+                    string action = $"Edited roles; Roles Added= {String.Join(", ", addedRoles.ToArray())}";
+                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
                 }
 
                 // there was a change made to the roles
@@ -1260,44 +1169,13 @@ namespace HR_LEAVEv2.HR
                 }
 
                 // add audit log for leave balances edited
-                try
-                {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
-                        string sql = $@"
-                                    INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                                    VALUES ( 
-                                        @ActingEmployeeId, 
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                        @AffectedEmployeeId,
-                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                        @Action, 
-                                        @CreatedAt);
-                                ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
-                        {
-                            command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                            command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
-
-                            /*
-                             * Add info about edits made to employee such as:
-                             * Employee ID
-                             * Leave Balance edited and the value which it was changed to
-                             * */
-                            string action = $"Edited leave balances; {String.Join(", ", editedLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())}";
-                            command.Parameters.AddWithValue("@Action", action);
-
-                            command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                            command.ExecuteNonQuery();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //exception logic
-                    throw ex;
-                }
+                /*
+                * Add info about edits made to employee such as:
+                * Employee ID
+                * Leave Balance edited and the value which it was changed to
+                * */
+                string action = $"Edited leave balances; {String.Join(", ", editedLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())}";
+                util.addAuditLog(Session["emp_id"].ToString(), empId, action);
 
                 // leave balances were changed
                 isLeaveBalancesChanged = true;
@@ -1354,44 +1232,13 @@ namespace HR_LEAVEv2.HR
                 // add audit log for deleted records
                 if(deletedRecords.Count > 0)
                 {
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-                            string sql = $@"
-                            INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                            VALUES ( 
-                                @ActingEmployeeId, 
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                @AffectedEmployeeId,
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                @Action, 
-                                @CreatedAt);
-                        ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
-
-                                /*
-                                    * Add info about edits made to employee such as:
-                                    * Employee ID
-                                    * ID of Employment Records deleted
-                                    * */
-                                string action = $"Deleted employment records; {String.Join(", ", deletedRecords.Select(lb =>  "id =" + lb).ToArray())}";
-                                command.Parameters.AddWithValue("@Action", action);
-
-                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                                command.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        throw ex;
-                    }
+                    /*
+                    * Add info about edits made to employee such as:
+                    * Employee ID
+                    * ID of Employment Records deleted
+                    * */
+                    string action = $"Deleted employment records; {String.Join(", ", deletedRecords.Select(lb => "id =" + lb).ToArray())}";
+                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
                 }
 
                 // a list to contain the ids of added employment records. This list is used to create audit logs for addition of records
@@ -1462,44 +1309,13 @@ namespace HR_LEAVEv2.HR
                 // add audit log for added records
                 if(addedRecords.Count > 0)
                 {
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-                            string sql = $@"
-                            INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                            VALUES ( 
-                                @ActingEmployeeId, 
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                @AffectedEmployeeId,
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                @Action, 
-                                @CreatedAt);
-                        ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
-
-                                /*
-                                    * Add info about edits made to employee such as:
-                                    * Employee ID
-                                    * ID of Employment Records added
-                                    * */
-                                string action = $"Added employment records; {String.Join(", ", addedRecords.Select(lb => "id =" + lb).ToArray())}";
-                                command.Parameters.AddWithValue("@Action", action);
-
-                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                                command.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        throw ex;
-                    }
+                    /*
+                    * Add info about edits made to employee such as:
+                    * Employee ID
+                    * ID of Employment Records added
+                    * */
+                    string action = $"Added employment records; {String.Join(", ", addedRecords.Select(lb => "id =" + lb).ToArray())}";
+                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
                 }
 
                 List<string> editedRecords = new List<string>();
@@ -1546,44 +1362,13 @@ namespace HR_LEAVEv2.HR
                 // add audit log for edited records
                 if (editedRecords.Count > 0)
                 {
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-                            string sql = $@"
-                            INSERT INTO [dbo].[auditlog] ([acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
-                            VALUES ( 
-                                @ActingEmployeeId, 
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
-                                @AffectedEmployeeId,
-                                (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
-                                @Action, 
-                                @CreatedAt);
-                        ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                command.Parameters.AddWithValue("@ActingEmployeeId", Session["emp_id"].ToString());
-                                command.Parameters.AddWithValue("@AffectedEmployeeId", empId);
-
-                                /*
-                                    * Add info about edits made to employee such as:
-                                    * Employee ID
-                                    * ID of Employment Records edited and the end date added
-                                    * */
-                                string action = $"Edited employment records; {String.Join("; ", editedRecords.ToArray())}";
-                                command.Parameters.AddWithValue("@Action", action);
-
-                                command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
-                                command.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        throw ex;
-                    }
+                    /*
+                    * Add info about edits made to employee such as:
+                    * Employee ID
+                    * ID of Employment Records edited and the end date added
+                    * */
+                    string action = $"Edited employment records; {String.Join("; ", editedRecords.ToArray())}";
+                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
                 }
 
                 if (deletedRecords.Count > 0 || addedRecords.Count > 0 || editedRecords.Count > 0)

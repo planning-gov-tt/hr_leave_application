@@ -69,14 +69,64 @@ namespace HR_LEAVEv2.Classes
             return count;
         }
 
+        public Boolean addAuditLog(string actingEmployeeId, string affectedEmployeeId, string action)
+        {
+            string hostName = getLocalHostName();
+            string ipv6Address = getIpv6Address(hostName);
+            // add audit log
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                                    INSERT INTO [dbo].[auditlog] ([machine_name], [ipv6_address], [acting_employee_id], [acting_employee_name], [affected_employee_id], [affected_employee_name], [action], [created_at])
+                                    VALUES ( 
+                                        '{hostName}',
+                                        '{ipv6Address}',
+                                        @ActingEmployeeId, 
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @ActingEmployeeId), 
+                                        @AffectedEmployeeId,
+                                        (SELECT first_name + ' ' + last_name FROM dbo.employee WHERE employee_id = @AffectedEmployeeId), 
+                                        @Action, 
+                                        @CreatedAt);
+                                ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@ActingEmployeeId", actingEmployeeId);
+                        command.Parameters.AddWithValue("@AffectedEmployeeId", affectedEmployeeId);
+                        command.Parameters.AddWithValue("@Action", action);
+                        command.Parameters.AddWithValue("@CreatedAt", DateTime.Now.ToString("MM-dd-yyyy h:mm tt"));
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public string getLocalHostName()
+        {
+            return Dns.GetHostName();
+        }
+
+        public string getIpv6Address(string hostName)
+        {
+            return Dns.GetHostEntry(hostName).AddressList[0].ToString();
+        }
+
         public MailMessage getNewMailMessage(string subject, string recipient)
         {
             MailMessage message = new MailMessage();
             message.IsBodyHtml = true;
             message.Subject = subject;
             message.From = new MailAddress("hr.leave@planning.gov.tt");
-            message.To.Add(new MailAddress(recipient));
-            //message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
+            //message.To.Add(new MailAddress(recipient));
+            message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
             return message;
         }
 
