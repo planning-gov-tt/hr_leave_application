@@ -1,5 +1,5 @@
---USE [HRLeaveTestDb]; -- testing db
-USE [HRLeaveDevDb]; -- development db
+USE [HRLeaveTestDb]; -- testing db
+--USE [HRLeaveDevDb]; -- development db
 GO
 
 
@@ -71,12 +71,15 @@ INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name
 ('161720', '161720', 'PLANNING\ Rishi Boodoo', 'Rishi', 'Boodoo', 'Rishi.Boodoo@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
 ('159118', '159118', 'PLANNING\ Carlisle McKay', 'Carlisle', 'McKay', 'Carlisle.McKay@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
 ('15067', '15067', 'PLANNING\ Rohini Singh', 'Rohini', 'Singh', 'Rohini.Singh@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
+('42352', '42352', 'PLANNING\ Melissa Bynoe', 'Melissa', 'Bynoe', 'Melissa.Bynoe@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
 ('123337', '123337', 'PLANNING\ Kene Bryan', 'Kene', 'Bryan', 'Kene.Bryan@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0), -- Director
 ('140480', '140480', 'PLANNING\ Kelly DeLandro', 'Kelly', 'DeLandro', 'Kelly.DeLandro@planning.gov.tt', 9, 5, 0, 14, 2, 0, 0), -- Director
--- Pele
+--Pele
 ('34521', '34521', 'PLANNING\ Pele StHill', 'Pele', 'St.Hill', 'Pele.StHill@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
--- Deneyse
+--Deneyse
 ('12454', '12454', 'PLANNING\ Deneyse Outar', 'Deneyse', 'Outar', 'Deneyse.Outar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
+--Stacy
+('67689', '67689', 'PLANNING\ StacyAnn Drakes', 'StacyAnn', 'Drakes', 'StacyAnn.Drakes@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
 -- HR
 ('83612', '83612', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'Melanie.Noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- Director
 ('11948', '11948', 'PLANNING\ Charmaine Carmichael', 'Charmaine', 'Carmichael', 'Charmaine.Carmichael@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- HRO3
@@ -125,7 +128,12 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 ('34521', 'emp'),
 -- Deneyse
 ('12454', 'emp'),
-
+--Melissa
+('42352', 'emp'),
+-- Kelly
+('140480', 'emp'),
+-- Stacy
+('67689', 'emp'),
 -- Minister
 ('4', 'emp'),
 ('4', 'sup'),
@@ -163,24 +171,67 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 
 
 INSERT INTO [dbo].[assignment] ([supervisee_id], [supervisor_id]) VALUES
+--Tristan, Clint
 ('1', '115245'),
+
+--Clint, Carlisle
 ('115245', '159118'),
+
+--Chris, Clint
 ('3', '115245'),
+
+--Dale, Kene
 ('184164', '123337'),
+
+--Nandani, Dale
 ('157778', '184164'),
+
+--Rishi, Dale
 ('161720', '184164'),
+
+--Carlisle, Kene
 ('159118', '123337'),
+
+--Rohini, Carlisle
 ('15067', '159118'),
+
+--Kene, PS
 ('123337', '07525'),
+
+--Kelly, Kene
 ('140480', '123337'),
+
+--Clint, Kene
+('115245', '123337'),
+
+--Melissa Bynoe, Carlisle
+('42352', '159118'),
+
+--Melanie Noel, PS
 ('83612', '07525'),
+
+-- Charmaine Carmichael, Melanie Noel
 ('11948', '83612'),
+
+--Christine Bowen, Nazmoon Khan
 ('01511', '01548'),
+
+--Sharline, Nazmoon Khan
 ('13888', '01548'),
+
+--Kathy-Ann Williams, Sharline
 ('87465', '13888'),
+
+--Suzette,  Kathy-Ann Williams
 ('09246', '87465'),
+
+--Nazmoon Khan, Melanie Noel
 ('01548', '83612'),
+
+-- Pauline Solozano, Charmaine Carmichael
 ('38137', '11948'),
+
+--Usha Balkaran, Nazmoon Khan
 ('05356', '01548')
 ;
 
@@ -343,7 +394,13 @@ INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start
 (21, '34521', 1, '20180927', '20210927', NULL, 'Contract', 1),
 
 --Deneyse Outar
-(22, '12454', 2, '20180927', '20210927', NULL, 'Contract', 1)
+(22, '12454', 2, '20180927', '20210927', NULL, 'Contract', 1),
+
+--Melissa Bynoe
+(23, '42352', 1, '20180927', '20210927', NULL, 'Contract', 1),
+
+--StacyAnn Drakes
+(24, '67689', 1, '20180927', '20210927', NULL, 'Contract', 1)
 ;
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;

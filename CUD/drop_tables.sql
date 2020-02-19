@@ -1,5 +1,5 @@
---USE [HRLeaveTestDb]; -- testing db
-USE [HRLeaveDevDb]; -- development db
+USE [HRLeaveTestDb]; -- testing db
+--USE [HRLeaveDevDb]; -- development db
 GO
 
 DROP TABLE [dbo].[employeeposition];
