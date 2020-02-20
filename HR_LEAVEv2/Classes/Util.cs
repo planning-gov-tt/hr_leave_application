@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Net;
@@ -119,13 +120,17 @@ namespace HR_LEAVEv2.Classes
             return Dns.GetHostEntry(hostName).AddressList[0].ToString();
         }
 
-        public MailMessage getNewMailMessage(string subject, string recipient)
+        public MailMessage getNewMailMessage(string subject, List<string> recipients)
         {
             MailMessage message = new MailMessage();
             message.IsBodyHtml = true;
             message.Subject = subject;
             message.From = new MailAddress("hr.leave@planning.gov.tt");
-            //message.To.Add(new MailAddress(recipient));
+            //foreach(string recipient in recipients)
+            //{
+            //    message.To.Add(new MailAddress(recipient));
+            //}
+
             message.To.Add(new MailAddress("Tristan.Sankar@planning.gov.tt"));
             return message;
         }
@@ -158,7 +163,7 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getSupervisorViewLeaveApplicationApproved(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
                         <style>
                             #leaveDetails{{
@@ -236,7 +241,7 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getEmployeeViewLeaveApplicationApproved(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
                             <style>
                                 #leaveDetails{{
@@ -314,7 +319,7 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getSupervisorViewLeaveApplicationNotApproved(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
                     <style>
                         #leaveDetails{{
@@ -393,7 +398,7 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getEmployeeViewLeaveApplicationNotApproved(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
                     <style>
                         #leaveDetails{{
@@ -471,7 +476,8 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getHRViewLeaveApplicationRecommended(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            List<string> recipients = new List<string>(details.recipient.Split(';'));
+            MailMessage msg = getNewMailMessage(details.subject, recipients);
             msg.Body = $@"
                     <style>
                         #leaveDetails{{
@@ -553,7 +559,7 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getEmployeeViewLeaveApplicationRecommended(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
                     <style>
                         #leaveDetails{{
@@ -631,7 +637,7 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getEmployeeViewLeaveApplicationNotRecommended(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
                     <style>
                         #leaveDetails{{
@@ -708,7 +714,7 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getSupervisorViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
                             <style>
                                 #leaveDetails{{
@@ -782,7 +788,7 @@ namespace HR_LEAVEv2.Classes
          **/
         public MailMessage getEmployeeViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
-            MailMessage msg = getNewMailMessage(details.subject, details.recipient);
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
                             <style>
                                 #leaveDetails{{

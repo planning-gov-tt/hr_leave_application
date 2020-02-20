@@ -7,7 +7,6 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Net.Mail;
-using System.Net;
 using HR_LEAVEv2.Classes;
 using System.Web.UI;
 
@@ -1323,6 +1322,72 @@ namespace HR_LEAVEv2.UserControls
             util.sendMail(message);
 
             // send email to relevant HR officers letting them know that supervisor recommended application
+
+            // get relevant HR officers info: id, emails
+            Dictionary<string,string> hr_info = new Dictionary<string, string>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                                    SELECT hr_e.employee_id, hr_e.email 
+                                    FROM
+                                    ((((SELECT er.employee_id 
+                                    FROM dbo.employeerole er
+                                    WHERE er.role_id = 'hr2')
+
+                                    INTERSECT
+
+                                    (SELECT er.employee_id 
+                                    FROM dbo.employeerole er
+
+                                    JOIN dbo.employee e 
+                                    ON e.employee_id = '{employee_id}'
+
+                                    LEFT JOIN dbo.employeeposition ep
+                                    ON ep.employee_id = e.employee_id AND ep.actual_end_date IS NULL
+
+                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')))
+
+                                    UNION
+
+                                    (SELECT er.employee_id 
+                                    FROM dbo.employeerole er
+                                    WHERE er.role_id = 'hr1'))
+
+                                    INTERSECT
+
+                                    (SELECT er.employee_id 
+                                    FROM dbo.employeerole er
+
+                                    LEFT JOIN dbo.employeeposition hr_ep
+                                    ON hr_ep.employee_id = er.employee_id AND hr_ep.actual_end_date IS NULL
+                                    WHERE hr_ep.dept_id = 2)) hr_ids
+
+                                    JOIN dbo.employee hr_e
+                                    ON hr_e.employee_id = hr_ids.employee_id
+                                ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using(SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                hr_info[reader["employee_id"].ToString()] = reader["email"].ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            string[] hr_emails = new string[hr_info.Count];
+            hr_info.Values.CopyTo(hr_emails, 0);
+
             message = util.getHRViewLeaveApplicationRecommended(
                     new Util.EmailDetails
                     {
@@ -1335,7 +1400,7 @@ namespace HR_LEAVEv2.UserControls
                         type_of_leave = row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString(),
                         qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString(),
                         subject = $"Leave Application Recommended for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}",
-                        recipient = "Tristan.Sankar@planning.gov.tt" // add all relevant emails from HR to recipient list
+                        recipient = $"{ String.Join(";", hr_emails) }" // add all relevant emails from HR to recipient list
                     }
             );
             util.sendMail(message);
@@ -1366,7 +1431,32 @@ namespace HR_LEAVEv2.UserControls
                 throw ex;
             }
 
-            // TODO: send notifs to relevant HRs - iterate through each relevant HR id and send notifs
+            // send notif(s) to HR
+            foreach (string id in hr_info.Keys)
+            {
+                notif_header = $"Leave application recommended for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}";
+                notification = $"{Session["emp_username"].ToString()} recommended the leave application of {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave";
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+
+                        string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{id}', '{DateTime.Now}');
+                            ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            int rowsAffected = command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
 
         }
 
