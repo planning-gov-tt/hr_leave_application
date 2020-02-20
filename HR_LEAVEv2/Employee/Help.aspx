@@ -3,7 +3,10 @@
     <h1><%: Title %></h1>
     <div class="container-fluid text-center" style="margin-top:25px;">
         <div class="row">
-            We can help you
+            <a href="https://docs.google.com/document/d/17OFFcpy91zsR7eO4l3uqwuIz6uVKsb7IAUjrD2Gumh8/edit?usp=sharing" target="_blank" class="btn btn-primary">
+                <i class="fa fa-external-link" aria-hidden="true"></i>
+                Open User Manual
+            </a> 
         </div>
     </div>
 </asp:Content>
