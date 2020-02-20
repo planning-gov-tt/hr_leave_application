@@ -27,11 +27,11 @@ namespace HR_LEAVEv2.Employee
             Util util = new Util();
 
             Label num_notifs = (Label)Master.FindControl("num_notifications");
-            num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
+            int numUnread = Convert.ToInt32(util.resetNumNotifications(Session["emp_id"].ToString()));
+            markAllAsRead.Visible = numUnread > 0;
+            num_notifs.Text = numUnread.ToString();
             System.Web.UI.UpdatePanel up = (System.Web.UI.UpdatePanel)Master.FindControl("notificationsUpdatePanel");
             up.Update();
-
-            deleteAllNotifsBtn.Visible = num_notifs.Text != "0";
         }
 
         protected void bindListView()
@@ -60,6 +60,10 @@ namespace HR_LEAVEv2.Employee
 
                         DataTable dt = new DataTable();
                         ad.Fill(dt);
+
+                        DataRow[] numRead = dt.Select("is_read = 'Yes'");
+                        markAllAsUnread.Visible = numRead.Length > 0;
+                        deleteAllNotifsBtn.Visible = dt.Rows.Count > 0;
 
                         ListView1.DataSource = dt;
                         ListView1.DataBind();
@@ -172,6 +176,58 @@ namespace HR_LEAVEv2.Employee
             {
                 string sql = $@"
                     DELETE FROM [dbo].[notifications] 
+                    WHERE [employee_id] = '{Session["emp_id"]}';
+                ";
+
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.ExecuteNonQuery();
+                        bindListView();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        protected void markAllAsRead_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string sql = $@"
+                    UPDATE [dbo].[notifications] 
+                    SET [is_read] = 'Yes'
+                    WHERE [employee_id] = '{Session["emp_id"]}';
+                ";
+
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.ExecuteNonQuery();
+                        bindListView();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        protected void markAllAsUnread_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string sql = $@"
+                    UPDATE [dbo].[notifications] 
+                    SET [is_read] = 'No'
                     WHERE [employee_id] = '{Session["emp_id"]}';
                 ";
 
