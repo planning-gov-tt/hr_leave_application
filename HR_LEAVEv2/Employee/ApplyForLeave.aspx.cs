@@ -38,6 +38,9 @@ namespace HR_LEAVEv2.Employee
             public string hrComment { get; set; }
             public string files { get; set; }
         };
+
+        const int MAX_DAYS_PAST_BALANCE = 10;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             // get mode: apply, edit, view
@@ -663,18 +666,44 @@ namespace HR_LEAVEv2.Employee
             invalidLeaveTypeTxt.InnerText = string.Empty;
 
             string isValid = string.Empty,
-                   errTxt = string.Empty; 
+                   errTxt = string.Empty;
 
             if (!String.IsNullOrEmpty(typeOfLeaveSelected) || !String.IsNullOrWhiteSpace(typeOfLeaveSelected))
             {
                 // validate choice of leave
-                string empType = string.Empty;
-
+                string empType = string.Empty,
+                    leaveBalanceToGet = string.Empty;
+                int leaveBalance= 0;
                 DateTime startDate = DateTime.MinValue;
+
+                switch(typeOfLeaveSelected) {
+                    case "Personal":
+                        leaveBalanceToGet = "personal";
+                        break;
+                    case "Vacation":
+                        leaveBalanceToGet = "vacation";
+                        break;
+                    case "Casual":
+                        leaveBalanceToGet = "casual";
+                        break;
+                    case "Sick":
+                        leaveBalanceToGet = "sick";
+                        break;
+                    case "Bereavement":
+                        leaveBalanceToGet = "bereavement";
+                        break;
+                    case "Maternity":
+                        leaveBalanceToGet = "maternity";
+                        break;
+                    case "Pre-retirement":
+                        leaveBalanceToGet = "pre_retirement";
+                        break;
+                }
+
                 try
                 {
                     string sql = $@"
-                        SELECT ep.employment_type, ep.start_date,
+                        SELECT ep.employment_type, ep.start_date, e.{leaveBalanceToGet} as 'leave_balance', 
 	                        IIF('{typeOfLeaveSelected}' IN (SELECT [leave_type] FROM [HRLeaveTestDb].[dbo].[emptypeleavetype] elt WHERE elt.employment_type = ep.employment_type), 
 		                        'Yes', 
 		                        'No'
@@ -698,6 +727,8 @@ namespace HR_LEAVEv2.Employee
                                     empType = reader["employment_type"].ToString();
                                     startDate = Convert.ToDateTime(reader["start_date"].ToString());
                                     isValid = reader["isLeaveTypeValid"].ToString();
+                                    leaveBalance = Convert.ToInt32(reader["leave_balance"].ToString());
+
                                 }
                             }
                         }
@@ -708,7 +739,13 @@ namespace HR_LEAVEv2.Employee
                     throw ex;
                 }
 
-                isValid = String.IsNullOrEmpty(isValid) || String.IsNullOrWhiteSpace(isValid) ? "No" : isValid;
+                int daysTaken = Convert.ToInt32(numDaysAppliedFor.Text);
+                if (String.IsNullOrEmpty(isValid) || String.IsNullOrWhiteSpace(isValid))
+                    isValid = "No";
+                else if (daysTaken >= (leaveBalance + MAX_DAYS_PAST_BALANCE))
+                    isValid = "No- Too much days";
+
+
                 empType = String.IsNullOrEmpty(empType) || String.IsNullOrWhiteSpace(empType) ? "unregistered" : empType;
 
                 if (isValid == "Yes" && empType == "Contract")
@@ -731,7 +768,10 @@ namespace HR_LEAVEv2.Employee
                 {
                     errTxt = $"Cannot apply for {typeOfLeaveSelected} leave as {empType} worker";
                 }
-
+                else if (isValid == "No- Too much days")
+                {
+                    errTxt = "Not eligible for amount of leave applied for";
+                }
                 
             } else
             {
@@ -1131,6 +1171,8 @@ namespace HR_LEAVEv2.Employee
                 List<string> holidays = getHolidaysInLeavePeriod(start, end);
                 if (holidays.Count > 0)
                     numDaysAppliedFor.Text = $"{ Convert.ToInt32(numDaysAppliedFor.Text) - holidays.Count}";
+
+                validateLeave(typeOfLeave.SelectedValue);
             }
                 
                 
