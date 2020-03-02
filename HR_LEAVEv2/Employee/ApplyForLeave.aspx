@@ -99,7 +99,7 @@
             <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-right: 5px; cursor: pointer"
                 data-toggle="tooltip"
                 data-placement="left"
-                title="This count is a literal count and does not take into consideration holidays and weekends. Consult with HR to find out the exact amount of days taken"></i>
+                title="This count is a literal count and does not take into consideration all holidays and weekends. Consult with HR to find out the exact amount of days taken"></i>
             <label for="numDaysAppliedFor" style="font-size: 1.2em">Days applied for:</label>
             <asp:Label ID="numDaysAppliedFor" runat="server" Text="0" Style="font-size: 1.05em"></asp:Label>
             <asp:TextBox ID="numDaysAppliedForEditTxt" runat="server" Width ="35px" Visible="false" ></asp:TextBox>
@@ -235,6 +235,18 @@
         <div class="row" id="validationRow">
             <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server">
                 <ContentTemplate>
+                    <asp:Panel ID="holidayInAppliedTimePeriodPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin:0 auto; margin-bottom:5px; width:450px;" role="alert">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        <span id="holidayInAppliedTimeTxt" runat="server"></span>
+                    </asp:Panel>
+                    <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="startDateIsHolidayTxt" runat="server"></span>
+                    </asp:Panel>
+                    <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="endDateIsHolidayTxt" runat="server"></span>
+                    </asp:Panel>
                     <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidLeaveTypeTxt" runat="server"></span>

@@ -135,6 +135,9 @@ namespace HR_LEAVEv2.Employee
             moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
             startDateIsWeekend.Style.Add("display", "none");
             endDateIsWeekend.Style.Add("display", "none");
+            holidayInAppliedTimePeriodPanel.Style.Add("display", "none");
+            startDateIsHoliday.Style.Add("display", "none");
+            endDateIsHoliday.Style.Add("display", "none");
         }
 
         protected LeaveTransactionDetails populatePage(string leaveId)
@@ -492,6 +495,44 @@ namespace HR_LEAVEv2.Employee
             up.Update();
         }
 
+        public IEnumerable<DateTime> EachCalendarDay(DateTime startDate, DateTime endDate)
+        {
+            for (var date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1)) yield
+            return date;
+        }
+
+        protected List<string> getHolidaysInLeavePeriod(DateTime start, DateTime end)
+        {
+            Dictionary<string, DateTime> publicHolidays = new Dictionary<string, DateTime>() {
+                    { "New Years", new DateTime(DateTime.Now.Year, 1, 1) },
+                    { "New Years Day", new DateTime(DateTime.Now.Year + 1, 1, 1) },
+                    { "Shouter Baptist Day", new DateTime(DateTime.Now.Year, 3, 30) },
+                    { "Good Friday", new DateTime(DateTime.Now.Year, 4, 10) },
+                    { "Easter Monday", new DateTime(DateTime.Now.Year, 4, 13) },
+                    { "Indian Arrival Day", new DateTime(DateTime.Now.Year, 5, 30) },
+                    { "Corpus Christi", new DateTime(DateTime.Now.Year, 6, 11) },
+                    { "Labour Day", new DateTime(DateTime.Now.Year, 6, 19) },
+                    { "Emancipation Day", new DateTime(DateTime.Now.Year, 8, 1) },
+                    { "Independence Day", new DateTime(DateTime.Now.Year, 8, 31) },
+                    { "Republic Day", new DateTime(DateTime.Now.Year, 9, 24) },
+                    { "Christmas Day", new DateTime(DateTime.Now.Year, 12, 25) },
+                    { "Boxing Day", new DateTime(DateTime.Now.Year, 12, 26) },
+                };
+
+            List<string> holidaysInBetween = new List<string>();
+            //todo: inform user if there are holidays in between their dates
+            foreach (DateTime day in EachCalendarDay(start, end))
+            {
+                foreach (KeyValuePair<string, DateTime> holiday in publicHolidays)
+                {
+                    if (DateTime.Compare(day, holiday.Value) == 0)
+                        holidaysInBetween.Add(holiday.Key);
+                }
+            }
+
+            return holidaysInBetween;
+        }
+
         protected Boolean validateDates(string startDate, string endDate)
         {
             clearDateErrors();
@@ -514,8 +555,32 @@ namespace HR_LEAVEv2.Employee
 
             if (isValidated)
             {
+                //todo: inform user if there are holidays in between their dates
+
+                List<string> holidaysInBetween = getHolidaysInLeavePeriod(start, end);
+                if (holidaysInBetween.Count > 0)
+                {
+                    holidayInAppliedTimeTxt.InnerText = $"The following public holiday(s) occur during your leave period: {String.Join(", ", holidaysInBetween.ToArray())}";
+                    holidayInAppliedTimePeriodPanel.Style.Add("display", "block");
+                }
+
+                //ensure start date is not a holiday
+                holidaysInBetween = getHolidaysInLeavePeriod(start, start);
+                if(holidaysInBetween.Count > 0)
+                {
+                    startDateIsHolidayTxt.InnerText = $"Start date cannot be on {holidaysInBetween.ElementAt(0)}";
+                    startDateIsHoliday.Style.Add("display", "inline-block");
+                }
+                //ensure end date is not a holiday
+                holidaysInBetween = getHolidaysInLeavePeriod(end, end);
+                if (holidaysInBetween.Count > 0)
+                {
+                    endDateIsHolidayTxt.InnerText = $"End date cannot be on {holidaysInBetween.ElementAt(0)}";
+                    endDateIsHoliday.Style.Add("display", "inline-block");
+                }
+
                 //ensure start date is not a weekend
-                if(start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
+                if (start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
                 {
                     startDateIsWeekend.Style.Add("display", "inline-block");
                     isValidated = false;
@@ -559,6 +624,8 @@ namespace HR_LEAVEv2.Employee
                     // if type of leave is sick: ensure you can only apply for it retroactively
                     if (typeOfLeave.SelectedValue.Equals("Sick"))
                     {
+
+                        //todo: if sick days span a weekend, warn user
 
                         if ((end - start).Days + 1 > 2)
                         {
@@ -1059,7 +1126,14 @@ namespace HR_LEAVEv2.Employee
             isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
 
             if ((typeOfLeave.SelectedIndex != 0 && validateDates(txtFrom.Text, txtTo.Text)) || (isStartDateFilled && isEndDateFilled))
+            {
                 numDaysAppliedFor.Text = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1).ToString() : "0";
+
+                List<string> holidays = getHolidaysInLeavePeriod(start, end);
+                if (holidays.Count > 0)
+                    numDaysAppliedFor.Text = $"{ Convert.ToInt32(numDaysAppliedFor.Text) - holidays.Count}";
+            }
+                
                 
         }
 

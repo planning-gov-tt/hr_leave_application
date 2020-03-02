@@ -499,6 +499,60 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.UpdatePanel applyModeFeedbackUpdatePanel;
         
         /// <summary>
+        /// holidayInAppliedTimePeriodPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel holidayInAppliedTimePeriodPanel;
+        
+        /// <summary>
+        /// holidayInAppliedTimeTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl holidayInAppliedTimeTxt;
+        
+        /// <summary>
+        /// startDateIsHoliday control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel startDateIsHoliday;
+        
+        /// <summary>
+        /// startDateIsHolidayTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl startDateIsHolidayTxt;
+        
+        /// <summary>
+        /// endDateIsHoliday control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel endDateIsHoliday;
+        
+        /// <summary>
+        /// endDateIsHolidayTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl endDateIsHolidayTxt;
+        
+        /// <summary>
         /// invalidLeaveTypePanel control.
         /// </summary>
         /// <remarks>
