@@ -54,8 +54,8 @@
                     <td align="center">
                         <div class="custom-card" style="position: relative;">
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
-                            <h3 style="margin-top: 10px;">
-                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h3>
+                            <h4 style="margin-top: 10px;">
+                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h4>
                             <div class="custom-card-body">
                                 <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
@@ -85,8 +85,8 @@
                     <td align="center">
                         <div class="custom-card" style="margin-left: 20px; margin-right: 20px; position: relative;">
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
-                            <h3 style="margin-top: 10px;">
-                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h3>
+                            <h4 style="margin-top: 10px;">
+                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h4>
                             <div class="custom-card-body">
                                 <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
