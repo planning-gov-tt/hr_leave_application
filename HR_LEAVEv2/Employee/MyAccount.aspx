@@ -21,9 +21,9 @@
                 <li class="nav-item" id="viewLeaveLogsItem">
                     <a class="nav-link" id="viewLeaveLogsTab" data-toggle="tab" href="#viewLeaveLogs" role="tab" aria-controls="viewLeaveLogs" aria-selected="false">View Leave Logs</a>
                 </li>
-                <li class="nav-item" id="editInfoItem">
+               <%-- <li class="nav-item" id="editInfoItem">
                     <a class="nav-link" id="editInfoTab" data-toggle="tab" href="#editInfo" role="tab" aria-controls="editInfo" aria-selected="false">Edit Account Info</a>
-                </li>
+                </li>--%>
             </ul>
         </div>
         <%-- Tab content --%>
@@ -39,13 +39,13 @@
                     <TWebControl:GridViewWebControl ID="GridViewWebControlEmp" gridViewType="emp" runat="server"></TWebControl:GridViewWebControl>
                 </div>
             </div>
-            <div class="tab-pane fade" id="editInfo" role="tabpanel" aria-labelledby="editInfoTab">
+           <%-- <div class="tab-pane fade" id="editInfo" role="tabpanel" aria-labelledby="editInfoTab">
                 <h3>Edit Account</h3>
                 <div class="alert alert-info text-center" role="alert" style="display:inline-block; margin:15px auto">
                     <i class="fa fa-cogs"></i>
                     Under development
                 </div>
-            </div>
+            </div>--%>
         </div>
     </div>
 
