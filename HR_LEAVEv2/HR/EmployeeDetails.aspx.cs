@@ -395,17 +395,17 @@ namespace HR_LEAVEv2.HR
 
             this.clearErrors();
 
-            // IDs, email
-            string emp_id, ihris_id, email, firstname, lastname, username;
-
-            emp_id = employeeIdInput.Text;
-            ihris_id = ihrisNumInput.Text;
-            email = adEmailInput.Text;
-
-            // get first name, last name and username from active directory
             Auth auth = new Auth();
-            string nameFromAd = auth.getUserInfoFromActiveDirectory(email);
-            firstname = lastname = username = string.Empty;
+
+            // IDs, email
+            string emp_id = employeeIdInput.Text, // Employee ID
+                ihris_id = ihrisNumInput.Text,    // IHRIS ID
+                email = adEmailInput.Text,        // AD Email
+                firstname = string.Empty,         // Employee first name
+                lastname = string.Empty,          // Employee last name
+                username = string.Empty,          // Employee username
+                nameFromAd = auth.getUserInfoFromActiveDirectory(email); // get first name, last name from active directory
+
 
             if (!String.IsNullOrEmpty(nameFromAd))
             {
@@ -414,21 +414,22 @@ namespace HR_LEAVEv2.HR
                 firstname = name[0];
                 lastname = name[1];
 
-                //set username
+                // set username
                 username = $"PLANNING\\ {firstname} {lastname}";
             }
 
             // Leave Balances 
-            Dictionary<string, string> currentLeaveBalances = new Dictionary<string, string>();
-
-            // get data from leave 
-            currentLeaveBalances["vacation"] = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
-            currentLeaveBalances["personal"] = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
-            currentLeaveBalances["casual"] = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
-            currentLeaveBalances["sick"] = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
-            currentLeaveBalances["bereavement"] = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
-            currentLeaveBalances["maternity"] = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
-            currentLeaveBalances["preRetirement"] = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
+            Dictionary<string, string> currentLeaveBalances = new Dictionary<string, string>()
+            {
+                { "vacation", String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text},
+                { "personal", String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text},
+                { "casual", String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text},
+                { "sick", String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text},
+                { "bereavement", String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text},
+                { "maternity", String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text},
+                { "preRetirement", String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text}
+            };
+           
 
             // Roles
             List<string> authorizations = new List<string>() { "emp" };
