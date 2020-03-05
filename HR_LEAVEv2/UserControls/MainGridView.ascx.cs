@@ -1274,7 +1274,7 @@ namespace HR_LEAVEv2.UserControls
                 notification = $"The leave application of {row["employee_name"]} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not approved.";
 
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
-                    notification += $"HR said \"{comment}\".";
+                    notification += $"HR said \" {comment} \".";
 
                 try
                 {
@@ -1284,10 +1284,11 @@ namespace HR_LEAVEv2.UserControls
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{row["supervisor_id"]}', '{DateTime.Now}');
+                                VALUES('{notif_header}', @Notification, 'No', '{row["supervisor_id"]}', '{DateTime.Now}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
+                            command.Parameters.AddWithValue("@Notification", notification);
                             int rowsAffected = command.ExecuteNonQuery();
                         }
                     }
