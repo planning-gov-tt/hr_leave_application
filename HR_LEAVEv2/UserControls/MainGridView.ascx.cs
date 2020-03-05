@@ -1333,37 +1333,52 @@ namespace HR_LEAVEv2.UserControls
                     string sql = $@"
                                     SELECT hr_e.employee_id, hr_e.email 
                                     FROM
-                                    ((((SELECT er.employee_id 
-                                    FROM dbo.employeerole er
-                                    WHERE er.role_id = 'hr2')
+                                    (
+	                                    (
+		                                    -- this block is a list of all the relevant hr 2s and all hr 1s
+		                                    (
+			                                    -- this block gets all hr 2 personnel that deal with the same employment type as the employee in question
+			                                    SELECT er.employee_id 
+			                                    FROM dbo.employeerole er
+			                                    WHERE er.role_id = 'hr2'
 
-                                    INTERSECT
+			                                    INTERSECT
 
-                                    (SELECT er.employee_id 
-                                    FROM dbo.employeerole er
+			                                    SELECT er.employee_id 
+			                                    FROM dbo.employeerole er
 
-                                    JOIN dbo.employee e 
-                                    ON e.employee_id = '{employee_id}'
+			                                    JOIN dbo.employee e 
+			                                    ON e.employee_id = '1'
 
-                                    LEFT JOIN dbo.employeeposition ep
-                                    ON ep.employee_id = e.employee_id AND ep.actual_end_date IS NULL
+			                                    LEFT JOIN dbo.employeeposition ep
+			                                    ON ep.employee_id = e.employee_id AND ep.actual_end_date IS NULL
 
-                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')))
+			                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')
+		                                    )
 
-                                    UNION
 
-                                    (SELECT er.employee_id 
-                                    FROM dbo.employeerole er
-                                    WHERE er.role_id = 'hr1'))
+		                                    UNION 
 
-                                    INTERSECT
+		                                    (
+			                                    -- this block gets all hr 1 personnel
+			                                    SELECT er.employee_id 
+			                                    FROM dbo.employeerole er
+			                                    WHERE er.role_id = 'hr1'
+		                                    )
+	                                    )
 
-                                    (SELECT er.employee_id 
-                                    FROM dbo.employeerole er
+	                                    INTERSECT
 
-                                    LEFT JOIN dbo.employeeposition hr_ep
-                                    ON hr_ep.employee_id = er.employee_id AND hr_ep.actual_end_date IS NULL
-                                    WHERE hr_ep.dept_id = 2)) hr_ids
+	                                    (
+		                                    -- this block gets all active hr personnel
+		                                    SELECT er.employee_id 
+		                                    FROM dbo.employeerole er
+
+		                                    LEFT JOIN dbo.employeeposition hr_ep
+		                                    ON hr_ep.employee_id = er.employee_id AND hr_ep.actual_end_date IS NULL
+		                                    WHERE hr_ep.dept_id = 2
+	                                    )
+                                    ) hr_ids
 
                                     JOIN dbo.employee hr_e
                                     ON hr_e.employee_id = hr_ids.employee_id
