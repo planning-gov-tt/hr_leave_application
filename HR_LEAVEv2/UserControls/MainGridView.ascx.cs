@@ -692,7 +692,6 @@ namespace HR_LEAVEv2.UserControls
                 int rowsAffected = sqlCommand.ExecuteNonQuery();
 
                 isQuerySuccessful = rowsAffected > 0;
-                BindGridView(); // preserve the sort direction in the viewstate
             }
 
             // add audit logs
@@ -782,7 +781,7 @@ namespace HR_LEAVEv2.UserControls
                     // show modal to user to input comment for why they are not recommending the application. This comment is added to the db and to the email in the onclick function of the
                     // submit comment button
                     commentModalTransactionIdHiddenField.Value = transaction_id.ToString(); // add leave transaction id to hidden field in modal to access for db insert
-                    commentModalEmployeeIdHiddenField.Value = employee_id;// add leave transaction id to hidden field in modal to access later for audit log
+                    commentModalEmployeeIdHiddenField.Value = employee_id; // add leave transaction id to hidden field in modal to access later for audit log
 
                     // load back comment panel with comments from db, if there
                     string previousComment = string.Empty;
@@ -939,6 +938,8 @@ namespace HR_LEAVEv2.UserControls
                 string actionStr = $"{action}; ID= {transaction_id}";
                 util.addAuditLog(actingEmployeeID, affectedEmployeeId, actionStr);
             }
+
+            BindGridView();
         }
 
         protected void GridView_Sorting(object sender, GridViewSortEventArgs e)
