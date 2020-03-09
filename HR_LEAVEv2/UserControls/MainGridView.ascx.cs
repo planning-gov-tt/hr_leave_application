@@ -63,7 +63,7 @@ namespace HR_LEAVEv2.UserControls
                 INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
                 INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
                 LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
-                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>=ep.start_date AND ep.actual_end_date IS NULL
+                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>= ep.start_date AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
             ";
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -1332,9 +1332,6 @@ namespace HR_LEAVEv2.UserControls
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
                     connection.Open();
-                    /* The following sql script breaks down to 
-                     * 
-                     * */
                     string sql = $@"
                                     SELECT hr_e.employee_id, hr_e.email 
                                     FROM
@@ -1356,7 +1353,7 @@ namespace HR_LEAVEv2.UserControls
 			                                    ON e.employee_id = '1'
 
 			                                    LEFT JOIN dbo.employeeposition ep
-			                                    ON ep.employee_id = e.employee_id AND ep.actual_end_date IS NULL
+			                                    ON ep.employee_id = e.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 
 			                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')
 		                                    )
@@ -1380,7 +1377,7 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
-		                                    ON hr_ep.employee_id = er.employee_id AND hr_ep.actual_end_date IS NULL
+		                                    ON hr_ep.employee_id = er.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 		                                    WHERE hr_ep.dept_id = 2
 	                                    )
                                     ) hr_ids
