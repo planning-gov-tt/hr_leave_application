@@ -1356,6 +1356,7 @@ namespace HR_LEAVEv2.UserControls
 			                                    ON e.employee_id = '1'
 
 			                                    LEFT JOIN dbo.employeeposition ep
+                                          
 			                                    ON ep.employee_id = e.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 
 			                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')
@@ -1380,7 +1381,9 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
+
 		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.actual_end_date IS NULL OR GETDATE() < hr_ep.actual_end_date)
+
 		                                    WHERE hr_ep.dept_id = 2
 	                                    )
                                     ) hr_ids
