@@ -274,7 +274,7 @@ namespace HR_LEAVEv2.UserControls
                 if (!string.IsNullOrEmpty(SubmittedTo))
                 {
                     whereFilterGridView += $@"
-                        AND lt.created_at <= '{DateTime.ParseExact(SubmittedTo, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
+                        AND lt.created_at < dateadd(day,1,'{DateTime.ParseExact(SubmittedTo, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}')
                     ";
                 }
                 if (!string.IsNullOrEmpty(StartDate))
@@ -286,7 +286,7 @@ namespace HR_LEAVEv2.UserControls
                 if (!string.IsNullOrEmpty(EndDate))
                 {
                     whereFilterGridView += $@"
-                        AND lt.end_date <= '{DateTime.ParseExact(EndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
+                        AND lt.end_date < dateadd(day,1,'{DateTime.ParseExact(EndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}') 
                     ";
                 }
                 if (!string.IsNullOrEmpty(SupervisorName_ID))
