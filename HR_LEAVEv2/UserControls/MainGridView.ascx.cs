@@ -694,7 +694,7 @@ namespace HR_LEAVEv2.UserControls
                 isQuerySuccessful = rowsAffected > 0;
             }
 
-            // add audit logs
+            // send notifications and add audit logs
             if (isQuerySuccessful)
             {
                 string actingEmployeeID, affectedEmployeeId;
@@ -938,6 +938,9 @@ namespace HR_LEAVEv2.UserControls
                 string actionStr = $"{action}; ID= {transaction_id}";
                 util.addAuditLog(actingEmployeeID, affectedEmployeeId, actionStr);
             }
+
+            // show submit comment button
+            submitCommentBtn.Visible = true;
 
             BindGridView();
         }
@@ -1377,7 +1380,7 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
-		                                    ON hr_ep.employee_id = er.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.actual_end_date IS NULL OR GETDATE() < hr_ep.actual_end_date)
 		                                    WHERE hr_ep.dept_id = 2
 	                                    )
                                     ) hr_ids
@@ -1642,6 +1645,7 @@ namespace HR_LEAVEv2.UserControls
             else if (gridViewType == "hr")
                 sendNotApprovedNotifications(comment);
 
+            submitCommentBtn.Visible = false;
             resetNumNotifications();
         }
 
