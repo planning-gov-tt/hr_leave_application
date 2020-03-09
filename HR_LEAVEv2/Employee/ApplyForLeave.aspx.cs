@@ -52,8 +52,7 @@ namespace HR_LEAVEv2.Employee
                     Response.Redirect("~/AccessDenied.aspx");
 
                 Session["uploadedFiles"] = null;
-                Session["supervisor_id"] = null;
-                Session["supervisor_name"] = null;
+                supervisorDataSource.SelectParameters.Add("empId", Session["emp_id"].ToString());
                 filesUploadedPanel.Visible = false;
 
 
@@ -120,9 +119,15 @@ namespace HR_LEAVEv2.Employee
                     clearFilesErrors();
                     validateDates(txtFrom.Text, txtTo.Text);
                     validateLeave(typeOfLeave.SelectedValue);
+                    validateSupervisor(supervisorSelect.SelectedValue != "" ? supervisorSelect.SelectedValue : "-1");
                 }
                     
             }
+        }
+
+        protected void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            validateSupervisor(supervisorSelect.SelectedValue);
         }
 
         protected void clearDateErrors()
@@ -563,7 +568,7 @@ namespace HR_LEAVEv2.Employee
                 if (holidaysInBetween.Count > 0)
                 {
                     holidayInAppliedTimeTxt.InnerText = $"The following public holiday(s) occur during your leave period: {String.Join(", ", holidaysInBetween.ToArray())}";
-                    holidayInAppliedTimePeriodPanel.Style.Add("display", "block");
+                    holidayInAppliedTimePeriodPanel.Style.Add("display", "inline-block");
                 }
 
                 //ensure start date is not a holiday
@@ -787,6 +792,15 @@ namespace HR_LEAVEv2.Employee
             return isValid == "Yes" && String.IsNullOrEmpty(errTxt);
         }
 
+        protected Boolean validateSupervisor(string supId)
+        {
+            invalidSupervisor.Style.Add("display", "none");
+            if (supId == "-1")
+                invalidSupervisor.Style.Add("display", "inline-block");
+
+            return supId != "-1";
+        }
+
         protected void sendNotifications()
         {
 
@@ -806,7 +820,7 @@ namespace HR_LEAVEv2.Employee
                     connection.Open();
 
                     string sql = $@"
-                            SELECT email FROM [dbo].[employee] WHERE employee_id = {Session["supervisor_id"].ToString()}
+                            SELECT email FROM [dbo].[employee] WHERE employee_id = {supervisorSelect.SelectedValue.ToString()}
                         ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -845,7 +859,7 @@ namespace HR_LEAVEv2.Employee
             message = util.getEmployeeViewEmployeeSubmittedLeaveApplication(
                 new Util.EmailDetails
                 {
-                    supervisor_name = Session["supervisor_name"].ToString(),
+                    supervisor_name = supervisorSelect.SelectedItem.Text,
                     date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
                     start_date = txtFrom.Text.ToString(),
                     end_date = txtTo.Text.ToString(),
@@ -872,7 +886,7 @@ namespace HR_LEAVEv2.Employee
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        command.Parameters.AddWithValue("@Notification", $"You submitted a leave application to {Session["supervisor_name"].ToString()} for {numDaysAppliedFor.Text} day(s) {typeOfLeave.SelectedValue} leave");
+                        command.Parameters.AddWithValue("@Notification", $"You submitted a leave application to {supervisorSelect.SelectedItem.Text} for {numDaysAppliedFor.Text} day(s) {typeOfLeave.SelectedValue} leave");
                         int rowsAffected = command.ExecuteNonQuery();
                         isInAppNotifsSentSuccessfully = rowsAffected > 0;
                     }
@@ -891,7 +905,7 @@ namespace HR_LEAVEv2.Employee
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{Session["emp_username"].ToString()} Submitted Leave Application',@Notification, 'No', '{Session["supervisor_id"].ToString()}', '{DateTime.Now}');
+                                VALUES('{Session["emp_username"].ToString()} Submitted Leave Application',@Notification, 'No', '{supervisorSelect.SelectedValue.ToString()}', '{DateTime.Now}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -963,7 +977,7 @@ namespace HR_LEAVEv2.Employee
                 leaveType = typeOfLeave.SelectedValue, // type of leave
                 startDate = txtFrom.Text.ToString(), // start date
                 endDate = txtTo.Text.ToString(), // end date
-                supId = Session["supervisor_id"] != null ? Session["supervisor_id"].ToString() :  "-1", // supervisor id
+                supId = supervisorSelect.SelectedValue != "" ? supervisorSelect.SelectedValue : "-1", // supervisor id
                 comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null; // employee comments
 
             // uploaded files
@@ -974,8 +988,8 @@ namespace HR_LEAVEv2.Employee
             isLeaveApplicationInsertSuccessful = isFileUploadSuccessful = true;
             areFilesUploaded = false;
             
-            isValidated = validateDates(startDate, endDate) && validateLeave(leaveType);
-            if (isValidated && supId != "-1")
+            isValidated = validateDates(startDate, endDate) && validateLeave(leaveType) && validateSupervisor(supId);
+            if (isValidated)
             {
                 // used to store id of leave transaction which is outputted by the INSERT statement. This is later used in the audit log
                 string transaction_id = string.Empty;
@@ -1142,8 +1156,7 @@ namespace HR_LEAVEv2.Employee
                 errorInsertingFilesToDbPanel.Style.Add("display", "inline-block");
             if(!isLeaveApplicationInsertSuccessful)
                 errorSubmittingLeaveApplicationPanel.Style.Add("display", "inline-block");
-            if (supId == "-1")
-                invalidSupervisor.Style.Add("display", "inline-block");
+                
         }
 
         protected void refreshForm(object sender, EventArgs e)
