@@ -63,7 +63,7 @@ namespace HR_LEAVEv2.UserControls
                 INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
                 INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
                 LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
-                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>=ep.start_date AND ep.actual_end_date IS NULL
+                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>= ep.start_date AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
             ";
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -274,7 +274,7 @@ namespace HR_LEAVEv2.UserControls
                 if (!string.IsNullOrEmpty(SubmittedTo))
                 {
                     whereFilterGridView += $@"
-                        AND lt.created_at <= '{DateTime.ParseExact(SubmittedTo, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
+                        AND lt.created_at < dateadd(day,1,'{DateTime.ParseExact(SubmittedTo, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}')
                     ";
                 }
                 if (!string.IsNullOrEmpty(StartDate))
@@ -286,7 +286,7 @@ namespace HR_LEAVEv2.UserControls
                 if (!string.IsNullOrEmpty(EndDate))
                 {
                     whereFilterGridView += $@"
-                        AND lt.end_date <= '{DateTime.ParseExact(EndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
+                        AND lt.end_date < dateadd(day,1,'{DateTime.ParseExact(EndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}') 
                     ";
                 }
                 if (!string.IsNullOrEmpty(SupervisorName_ID))
@@ -692,10 +692,9 @@ namespace HR_LEAVEv2.UserControls
                 int rowsAffected = sqlCommand.ExecuteNonQuery();
 
                 isQuerySuccessful = rowsAffected > 0;
-                BindGridView(); // preserve the sort direction in the viewstate
             }
 
-            // add audit logs
+            // send notifications and add audit logs
             if (isQuerySuccessful)
             {
                 string actingEmployeeID, affectedEmployeeId;
@@ -782,7 +781,7 @@ namespace HR_LEAVEv2.UserControls
                     // show modal to user to input comment for why they are not recommending the application. This comment is added to the db and to the email in the onclick function of the
                     // submit comment button
                     commentModalTransactionIdHiddenField.Value = transaction_id.ToString(); // add leave transaction id to hidden field in modal to access for db insert
-                    commentModalEmployeeIdHiddenField.Value = employee_id;// add leave transaction id to hidden field in modal to access later for audit log
+                    commentModalEmployeeIdHiddenField.Value = employee_id; // add leave transaction id to hidden field in modal to access later for audit log
 
                     // load back comment panel with comments from db, if there
                     string previousComment = string.Empty;
@@ -939,6 +938,11 @@ namespace HR_LEAVEv2.UserControls
                 string actionStr = $"{action}; ID= {transaction_id}";
                 util.addAuditLog(actingEmployeeID, affectedEmployeeId, actionStr);
             }
+
+            // show submit comment button
+            submitCommentBtn.Visible = true;
+
+            BindGridView();
         }
 
         protected void GridView_Sorting(object sender, GridViewSortEventArgs e)
@@ -1274,7 +1278,7 @@ namespace HR_LEAVEv2.UserControls
                 notification = $"The leave application of {row["employee_name"]} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not approved.";
 
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
-                    notification += $"HR said \"{comment}\".";
+                    notification += $"HR said \" {comment} \".";
 
                 try
                 {
@@ -1284,10 +1288,11 @@ namespace HR_LEAVEv2.UserControls
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{row["supervisor_id"]}', '{DateTime.Now}');
+                                VALUES('{notif_header}', @Notification, 'No', '{row["supervisor_id"]}', '{DateTime.Now}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
+                            command.Parameters.AddWithValue("@Notification", notification);
                             int rowsAffected = command.ExecuteNonQuery();
                         }
                     }
@@ -1351,7 +1356,8 @@ namespace HR_LEAVEv2.UserControls
 			                                    ON e.employee_id = '1'
 
 			                                    LEFT JOIN dbo.employeeposition ep
-			                                    ON ep.employee_id = e.employee_id AND ep.actual_end_date IS NULL
+                                          
+			                                    ON ep.employee_id = e.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 
 			                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')
 		                                    )
@@ -1375,7 +1381,9 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
-		                                    ON hr_ep.employee_id = er.employee_id AND hr_ep.actual_end_date IS NULL
+
+		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.actual_end_date IS NULL OR GETDATE() < hr_ep.actual_end_date)
+
 		                                    WHERE hr_ep.dept_id = 2
 	                                    )
                                     ) hr_ids
@@ -1640,6 +1648,7 @@ namespace HR_LEAVEv2.UserControls
             else if (gridViewType == "hr")
                 sendNotApprovedNotifications(comment);
 
+            submitCommentBtn.Visible = false;
             resetNumNotifications();
         }
 
@@ -1656,3 +1665,6 @@ namespace HR_LEAVEv2.UserControls
         }
     }
 }
+
+
+

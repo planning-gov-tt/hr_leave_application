@@ -44,17 +44,6 @@ namespace HR_LEAVEv2.Supervisor
             try
             {
                 string sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
-                        FROM [dbo].[employee] e
-                        JOIN [dbo].assignment a
-                        ON e.employee_id = a.supervisee_id
-                        LEFT JOIN [dbo].employeeposition ep
-                        ON e.employee_id = ep.employee_id
-                        WHERE ep.actual_end_date IS NULL AND a.supervisor_id = {Session["emp_id"].ToString()}
-                        ORDER BY email ASC;
-                    ";
-
-                sql = $@"
                         SELECT
                             DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
                             FROM dbo.employee e
@@ -64,7 +53,7 @@ namespace HR_LEAVEv2.Supervisor
                             (
                                 select ep.employee_id
                                 from dbo.employeeposition ep
-                                where ep.actual_end_date IS NULL
+                                where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
                                 group by ep.employee_id
                                 having count(*) > 0
                             ) 
@@ -116,7 +105,7 @@ namespace HR_LEAVEv2.Supervisor
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
-                                    where ep.actual_end_date IS NULL
+                                    where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
                                     group by ep.employee_id
                                     having count(*) > 0
                                 ) 

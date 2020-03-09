@@ -79,7 +79,7 @@ namespace HR_LEAVEv2.Employee
                         FROM dbo.employee e
 
                         LEFT JOIN dbo.employeeposition ep
-                        ON e.employee_id = ep.employee_id AND ep.actual_end_date IS NULL
+                        ON e.employee_id = ep.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 
                         JOIN dbo.emptypeleavetype elt
                         ON elt.employment_type = ep.employment_type
