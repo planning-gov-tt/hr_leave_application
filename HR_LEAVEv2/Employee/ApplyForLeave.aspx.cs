@@ -39,6 +39,7 @@ namespace HR_LEAVEv2.Employee
             public string files { get; set; }
         };
 
+        // used for determining how much days is too much days to apply for based on a user's leave balance
         const int MAX_DAYS_PAST_BALANCE = 10;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -643,6 +644,7 @@ namespace HR_LEAVEv2.Employee
                                 if (files.Count == 0)
                                 {
                                     moreThan2DaysConsecutiveSickLeave.Style.Add("display", "inline-block");
+                                    submitHardCopyOfMedicalDisclaimerPanel.Style.Add("display", "none");
                                     isValidated = false;
                                 }
                             }
@@ -1262,8 +1264,14 @@ namespace HR_LEAVEv2.Employee
 
                 if(dt.Rows.Count > 0)
                 {
-                    // hide error if it was shown
-                    moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
+                    if(typeOfLeave.SelectedValue == "Sick")
+                    {
+                        // hide error if it was shown
+                        moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
+
+                        // show disclaimer
+                        submitHardCopyOfMedicalDisclaimerPanel.Style.Add("display", "inline-block");
+                    }
 
                     // add files to session so they will persist after postback
                     Session["uploadedFiles"] = files;

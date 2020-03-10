@@ -245,16 +245,20 @@
             <textarea runat="server" class="form-control" id="hrCommentsTxt" rows="4" style="width:45%; margin:0 auto;font-size:1.05em;"></textarea>
         </asp:Panel>
 
-        <div class="row" id="infoRow">
+        <div class="row" id="infoRow" style="margin-bottom:5px;">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
-                    <asp:Panel ID="daysTakenDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display:inline-block; margin:0px 5px; margin-bottom:5px; width:450px;" role="alert">
+                    <asp:Panel ID="daysTakenDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display:inline-block; margin:0px 5px; width:450px;" role="alert">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
                         <span id="Span10" runat="server">Disclaimer: days applied for may not be completely accurate and is subject to change. Consult HR for further information</span>
                     </asp:Panel>
-                    <asp:Panel ID="holidayInAppliedTimePeriodPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin:0px 5px; width:450px;" role="alert">
+                    <asp:Panel ID="holidayInAppliedTimePeriodPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin:0px 5px;width:450px;" role="alert">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
                         <span id="holidayInAppliedTimeTxt" runat="server"></span>
+                    </asp:Panel>
+                    <asp:Panel ID="submitHardCopyOfMedicalDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin:0px 5px;width:450px;" role="alert">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        <span id="Span13" runat="server">A hard copy of your medical leave must also be submitted to HR</span>
                     </asp:Panel>
                 </ContentTemplate>
             </asp:UpdatePanel>
@@ -264,14 +268,6 @@
         <div class="row" id="validationRow">
             <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server">
                 <ContentTemplate>
-                    <%--<asp:Panel ID="daysTakenDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="margin:0 auto; margin-bottom:5px; width:450px;" role="alert">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                        <span id="Span10" runat="server">Disclaimer: days applied for may not be completely accurate and is subject to change. Consult HR for further information</span>
-                    </asp:Panel>
-                    <asp:Panel ID="holidayInAppliedTimePeriodPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin:0 auto; margin-bottom:5px; width:450px;" role="alert">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                        <span id="holidayInAppliedTimeTxt" runat="server"></span>
-                    </asp:Panel>--%>
                     <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="startDateIsHolidayTxt" runat="server"></span>
