@@ -463,6 +463,9 @@ namespace HR_LEAVEv2.Employee
             //Submit Edits 
             submitEditsPanel.Visible = false;
 
+            //disclaimer about days taken
+            daysTakenDisclaimerPanel.Style.Add("display", "inline-block");
+
         }
 
         protected void adjustPageForEditMode(LeaveTransactionDetails ltDetails)
@@ -675,41 +678,48 @@ namespace HR_LEAVEv2.Employee
             string isValid = string.Empty,
                    errTxt = string.Empty;
 
+            List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null;
             if (!String.IsNullOrEmpty(typeOfLeaveSelected) || !String.IsNullOrWhiteSpace(typeOfLeaveSelected))
             {
-                // validate choice of leave
-                string empType = string.Empty,
-                    leaveBalanceToGet = string.Empty;
-                int leaveBalance= 0;
-                DateTime startDate = DateTime.MinValue;
-
-                switch(typeOfLeaveSelected) {
-                    case "Personal":
-                        leaveBalanceToGet = "personal";
-                        break;
-                    case "Vacation":
-                        leaveBalanceToGet = "vacation";
-                        break;
-                    case "Casual":
-                        leaveBalanceToGet = "casual";
-                        break;
-                    case "Sick":
-                        leaveBalanceToGet = "sick";
-                        break;
-                    case "Bereavement":
-                        leaveBalanceToGet = "bereavement";
-                        break;
-                    case "Maternity":
-                        leaveBalanceToGet = "maternity";
-                        break;
-                    case "Pre-retirement":
-                        leaveBalanceToGet = "pre_retirement";
-                        break;
-                }
-
-                try
+                if(typeOfLeaveSelected == "No Pay")
                 {
-                    string sql = $@"
+                    isValid = "Yes";
+                } else
+                {
+                    // validate choice of leave
+                    string empType = string.Empty,
+                        leaveBalanceToGet = string.Empty;
+                    int leaveBalance = 0;
+                    DateTime startDate = DateTime.MinValue;
+
+                    switch (typeOfLeaveSelected)
+                    {
+                        case "Personal":
+                            leaveBalanceToGet = "personal";
+                            break;
+                        case "Vacation":
+                            leaveBalanceToGet = "vacation";
+                            break;
+                        case "Casual":
+                            leaveBalanceToGet = "casual";
+                            break;
+                        case "Sick":
+                            leaveBalanceToGet = "sick";
+                            break;
+                        case "Bereavement":
+                            leaveBalanceToGet = "bereavement";
+                            break;
+                        case "Maternity":
+                            leaveBalanceToGet = "maternity";
+                            break;
+                        case "Pre-retirement":
+                            leaveBalanceToGet = "pre_retirement";
+                            break;
+                    }
+
+                    try
+                    {
+                        string sql = $@"
                         SELECT ep.employment_type, ep.start_date, e.{leaveBalanceToGet} as 'leave_balance', 
 	                        IIF('{typeOfLeaveSelected}' IN (SELECT [leave_type] FROM [HRLeaveTestDb].[dbo].[emptypeleavetype] elt WHERE elt.employment_type = ep.employment_type), 
 		                        'Yes', 
@@ -722,64 +732,67 @@ namespace HR_LEAVEv2.Employee
                         WHERE e.employee_id = '{Session["emp_id"].ToString()}';
                     ";
 
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
-                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                         {
-                            using (SqlDataReader reader = command.ExecuteReader())
+                            connection.Open();
+                            using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                while (reader.Read())
+                                using (SqlDataReader reader = command.ExecuteReader())
                                 {
-                                    empType = reader["employment_type"].ToString();
-                                    startDate = Convert.ToDateTime(reader["start_date"].ToString());
-                                    isValid = reader["isLeaveTypeValid"].ToString();
-                                    leaveBalance = Convert.ToInt32(reader["leave_balance"].ToString());
+                                    while (reader.Read())
+                                    {
+                                        empType = reader["employment_type"].ToString();
+                                        startDate = Convert.ToDateTime(reader["start_date"].ToString());
+                                        isValid = reader["isLeaveTypeValid"].ToString();
+                                        leaveBalance = Convert.ToInt32(reader["leave_balance"].ToString());
 
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-
-                int daysTaken = Convert.ToInt32(numDaysAppliedFor.Text);
-                if (String.IsNullOrEmpty(isValid) || String.IsNullOrWhiteSpace(isValid))
-                    isValid = "No";
-                else if (daysTaken >= (leaveBalance + MAX_DAYS_PAST_BALANCE))
-                    isValid = "No- Too much days";
-
-
-                empType = String.IsNullOrEmpty(empType) || String.IsNullOrWhiteSpace(empType) ? "unregistered" : empType;
-
-                if (isValid == "Yes" && empType == "Contract")
-                {
-                    DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
-
-                    if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                    catch (Exception ex)
                     {
-                        if (typeOfLeaveSelected == "Vacation")
-                            errTxt = "Cannot apply for Vacation leave within first 11 months of contract";
-                    }
-                    else
-                    {
-                        if (typeOfLeaveSelected == "Personal")
-                            errTxt = "Cannot apply for Personal leave after first 11 months of contract";
+                        throw ex;
                     }
 
+                    int daysTaken = Convert.ToInt32(numDaysAppliedFor.Text);
+                    if (String.IsNullOrEmpty(isValid) || String.IsNullOrWhiteSpace(isValid))
+                        isValid = "No";
+                    else if (daysTaken >= (leaveBalance + MAX_DAYS_PAST_BALANCE) && files == null)
+                        isValid = "No- Too much days";
+                        
+
+
+                    empType = String.IsNullOrEmpty(empType) || String.IsNullOrWhiteSpace(empType) ? "unregistered" : empType;
+
+                    if (isValid == "Yes" && empType == "Contract")
+                    {
+                        DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
+
+                        if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                        {
+                            if (typeOfLeaveSelected == "Vacation")
+                                errTxt = "Cannot apply for Vacation leave within first 11 months of contract";
+                        }
+                        else
+                        {
+                            if (typeOfLeaveSelected == "Personal")
+                                errTxt = "Cannot apply for Personal leave after first 11 months of contract";
+                        }
+
+                    }
+                    else if (isValid == "No")
+                    {
+                        errTxt = $"Cannot apply for {typeOfLeaveSelected} leave as {empType} worker";
+                    }
+                    else if (isValid == "No- Too much days")
+                    {
+                        errTxt = "Not eligible for amount of leave applied for";
+                    }
+
                 }
-                else if (isValid == "No")
-                {
-                    errTxt = $"Cannot apply for {typeOfLeaveSelected} leave as {empType} worker";
-                }
-                else if (isValid == "No- Too much days")
-                {
-                    errTxt = "Not eligible for amount of leave applied for";
-                }
-                
+
             } else
             {
                 isValid = "No";
@@ -791,6 +804,7 @@ namespace HR_LEAVEv2.Employee
                 invalidLeaveTypeTxt.InnerText = errTxt;
                 invalidLeaveTypePanel.Style.Add("display", "inline-block");
             }
+
             return isValid == "Yes" && String.IsNullOrEmpty(errTxt);
         }
 
@@ -1025,7 +1039,8 @@ namespace HR_LEAVEv2.Employee
 				                ('{leaveType}'= 'Personal' AND {numDaysAppliedFor.Text} <= e.personal) OR
 				                ('{leaveType}' = 'Bereavement' AND {numDaysAppliedFor.Text} <= e.bereavement) OR
 				                ('{leaveType}' = 'Maternity' AND {numDaysAppliedFor.Text} <= e.maternity) OR
-				                ('{leaveType}' = 'Pre-retirement' AND {numDaysAppliedFor.Text} <= e.pre_retirement)
+				                ('{leaveType}' = 'Pre-retirement' AND {numDaysAppliedFor.Text} <= e.pre_retirement) OR
+                                ('{leaveType}' = 'No Pay')
 				                ), 'Yes', 'No')
                               FROM [dbo].[employee] e
                               WHERE e.employee_id = {empId})
@@ -1282,6 +1297,9 @@ namespace HR_LEAVEv2.Employee
                     // populate files uploaded list
                     filesUploadedListView.DataSource = dt;
                     filesUploadedListView.DataBind();
+
+                    // validate leave
+                    validateLeave(typeOfLeave.SelectedValue);
                 }  
             }
             else
@@ -1308,6 +1326,7 @@ namespace HR_LEAVEv2.Employee
 
             Session["uploadedFiles"] = null;
             validateDates(txtFrom.Text, txtTo.Text);
+            validateLeave(typeOfLeave.SelectedValue);
         }
 
         protected void submitEditsBtn_Click(object sender, EventArgs e)
@@ -1478,21 +1497,23 @@ namespace HR_LEAVEv2.Employee
                     files.Remove(fileToRemove);
                 }
 
+                
                 if (files.Count > 0)
                 {
                     foreach (HttpPostedFile file in files)
                     {
                         dt.Rows.Add(Path.GetFileName(file.FileName).ToString());
                     }
+                    Session["uploadedFiles"] = files;
                 }
                 else
                 {
+                    Session["uploadedFiles"] = null;
                     filesUploadedPanel.Visible = false;
                     validateDates(txtFrom.Text, txtTo.Text);
+                    validateLeave(typeOfLeave.SelectedValue);
                 }
-                    
 
-                Session["uploadedFiles"] = files;
                 filesUploadedListView.DataSource = dt;
                 filesUploadedListView.DataBind();
 
