@@ -492,7 +492,7 @@ namespace HR_LEAVEv2.UserControls
                                 btnUndoApprove.Visible = false;
                         }
                        
-                        btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = false;
+                        btnNotApproved.Visible = btnApproved.Visible = false;
                     }
                     else if (leaveStatus == "Not Recommended")
                     {

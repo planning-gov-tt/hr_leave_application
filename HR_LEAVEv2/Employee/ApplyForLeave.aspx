@@ -219,6 +219,7 @@
         </asp:Panel>
 
         <asp:Panel ID="filesToDownloadPanel" runat="server">
+            <label for="filesToDownloadList" style="font-size:1.2em; display:inline;">Previously uploaded files:</label>
             <asp:DropDownList ID="filesToDownloadList" runat="server"></asp:DropDownList>
             <asp:LinkButton ID="btnDownloadFiles" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Download file" OnClick="btnDownloadFiles_Click" Style="display:inline-block; margin-left:5px;">
                 <i class="fa fa-download" aria-hidden="true"></i>
