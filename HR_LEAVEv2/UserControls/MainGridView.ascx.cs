@@ -608,75 +608,98 @@ namespace HR_LEAVEv2.UserControls
                     }
                     else // approve (subtract) or undo (add)
                     {
-                        int daysTakenIndex = GetColumnIndexByName(row, "days_taken");
-
-                        // get difference
-                        int difference = Convert.ToInt32(row.Cells[daysTakenIndex].Text);
-
                         string leaveType = "";
                         if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
                         {
                             int indexLeavetype = GetColumnIndexByName(row, "leave_type");
                             leaveType = (row.Cells[indexLeavetype].Text).ToString();
                         }
+                        string sql = string.Empty;
 
-                        // check leave type to match with balance type
-                        Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
-                        leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
-                        leaveBalanceColumnName.Add("Casual", "[casual]");
-                        leaveBalanceColumnName.Add("Maternity", "[maternity]");
-                        leaveBalanceColumnName.Add("Personal", "[personal]");
-                        leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
-                        leaveBalanceColumnName.Add("Sick", "[sick]");
-                        leaveBalanceColumnName.Add("Vacation", "[vacation]");
-
-                        // TODO: check if in good standing AKA Qualified (if employee has enough leave)
-
-                        // approved => subtract leave from balance
-                        string operation = "";
-                        if (commandName == "approved")
+                        if (leaveType == "No Pay")
                         {
-                            // update status to Approved
-                            status = "Approved";
-                            //message.Subject = "Leave Application Approved";
+                            // if command is approve update status to Approved
+                            // if command is undo reset status to Recommended
+                            status = commandName == "approved" ? "Approved" : "Recommended";
 
-                            // Subtract Leave from balance
-                            operation = " - ";
+                            sql = $@"
+                                -- updating the leave status
+                                UPDATE 
+                                    [dbo].[leavetransaction]
+                                SET
+                                    [status]='{status}', 
+                                    [hr_manager_id] = '{Session["emp_id"]}', 
+                                    [hr_manager_edit_date] = CURRENT_TIMESTAMP 
+                                WHERE 
+                                    [transaction_id] = {transaction_id};
+                            ";
                         }
-
-                        // undo => add leave back
-                        else if (commandName == "undoApprove")
+                        else
                         {
-                            // reset status to Recommended
-                            status = "Recommended";
+                            int daysTakenIndex = GetColumnIndexByName(row, "days_taken");
 
-                            // Add leave back to balance
-                            operation = " + ";
+                            // get difference
+                            int difference = Convert.ToInt32(row.Cells[daysTakenIndex].Text);
+
+                            // check leave type to match with balance type
+                            Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
+                            leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
+                            leaveBalanceColumnName.Add("Casual", "[casual]");
+                            leaveBalanceColumnName.Add("Maternity", "[maternity]");
+                            leaveBalanceColumnName.Add("Personal", "[personal]");
+                            leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
+                            leaveBalanceColumnName.Add("Sick", "[sick]");
+                            leaveBalanceColumnName.Add("Vacation", "[vacation]");
+
+                            // TODO: check if in good standing AKA Qualified (if employee has enough leave)
+
+                            // approved => subtract leave from balance
+                            string operation = "";
+                            if (commandName == "approved")
+                            {
+                                // update status to Approved
+                                status = "Approved";
+                                //message.Subject = "Leave Application Approved";
+
+                                // Subtract Leave from balance
+                                operation = " - ";
+                            }
+
+                            // undo => add leave back
+                            else if (commandName == "undoApprove")
+                            {
+                                // reset status to Recommended
+                                status = "Recommended";
+
+                                // Add leave back to balance
+                                operation = " + ";
+                            }
+
+                            sql = $@"
+                                BEGIN TRANSACTION;
+
+                                -- updating the leave status
+                                UPDATE 
+                                    [dbo].[leavetransaction]
+                                SET
+                                    [status]='{status}', 
+                                    [hr_manager_id] = '{Session["emp_id"]}', 
+                                    [hr_manager_edit_date] = CURRENT_TIMESTAMP 
+                                WHERE 
+                                    [transaction_id] = {transaction_id};
+
+                                -- updating employee leave balance
+                                UPDATE 
+                                    [dbo].[employee]
+                                SET
+                                    {leaveBalanceColumnName[leaveType]} = {leaveBalanceColumnName[leaveType]} {operation} {difference}
+                                WHERE
+                                    [employee_id] = '{employee_id}'
+
+                                COMMIT;
+                            ";
                         }
-
-                        string sql = $@"
-                        BEGIN TRANSACTION;
-
-                        -- updating the leave status
-                        UPDATE 
-                            [dbo].[leavetransaction]
-                        SET
-                            [status]='{status}', 
-                            [hr_manager_id] = '{Session["emp_id"]}', 
-                            [hr_manager_edit_date] = CURRENT_TIMESTAMP 
-                        WHERE 
-                            [transaction_id] = {transaction_id};
-
-                        -- updating employee leave balance
-                        UPDATE 
-                            [dbo].[employee]
-                        SET
-                            {leaveBalanceColumnName[leaveType]} = {leaveBalanceColumnName[leaveType]} {operation} {difference}
-                        WHERE
-                            [employee_id] = '{employee_id}'
-
-                        COMMIT;
-                    ";
+                        
 
                         sqlCommand.CommandText = sql;
                     }     

@@ -185,7 +185,7 @@
                     </GroupTemplate>
 
                     <ItemTemplate>
-                        <div>
+                        <div style="margin-top:5px;">
                             <span>
                                 <asp:LinkButton ID="clearIndividualFileBtn" OnClick="clearIndividualFileBtn_Click" data-id='<%#Eval("file_name") %>' runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
                                     <i class="fa fa-times" aria-hidden="true"></i>
@@ -248,7 +248,7 @@
         <div class="row" id="infoRow" style="margin-bottom:5px;">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
-                    <asp:Panel ID="daysTakenDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display:inline-block; margin:0px 5px; width:450px;" role="alert">
+                    <asp:Panel ID="daysTakenDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display:none; margin:0px 5px; width:450px;" role="alert">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
                         <span id="Span10" runat="server">Disclaimer: days applied for may not be completely accurate and is subject to change. Consult HR for further information</span>
                     </asp:Panel>
@@ -309,7 +309,7 @@
                         <span id="Span6" runat="server">No files currently uploaded. More than 2 days of consecutive sick leave requires a medical leave of absence.</span>
                     </asp:Panel>
 
-                     <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidVacationStartDateMsg" runat="server">You must request vacation leave at least a month before the start date</span>
                     </asp:Panel>
@@ -318,7 +318,7 @@
                         <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
                     </asp:Panel>
 
-                      <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidLeaveTypeTxt" runat="server"></span>
                     </asp:Panel>
@@ -357,7 +357,7 @@
                         <span id="Span8" runat="server">Error submitting leave application</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin:0 5px;" role="alert">
+                    <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0 5px;" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span id="successMsg" runat="server">Application successfully submitted</span>
                         <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />
