@@ -618,8 +618,8 @@ namespace HR_LEAVEv2.UserControls
 
                         if (leaveType == "No Pay")
                         {
-                            // if command is approve update status to Approved
-                            // if command is undo reset status to Recommended
+                            // if command is approve, update status to Approved
+                            // if command is undo, reset status to Recommended
                             status = commandName == "approved" ? "Approved" : "Recommended";
 
                             sql = $@"
@@ -694,7 +694,7 @@ namespace HR_LEAVEv2.UserControls
                                 SET
                                     {leaveBalanceColumnName[leaveType]} = {leaveBalanceColumnName[leaveType]} {operation} {difference}
                                 WHERE
-                                    [employee_id] = '{employee_id}'
+                                    [employee_id] = '{employee_id}';
 
                                 COMMIT;
                             ";

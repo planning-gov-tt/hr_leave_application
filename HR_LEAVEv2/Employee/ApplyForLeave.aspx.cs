@@ -1404,47 +1404,83 @@ namespace HR_LEAVEv2.Employee
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                     {
                         connection.Open();
-                        string sql = $@"
-                            UPDATE [dbo].leavetransaction 
-                            SET 
-                                days_taken = @DaysTaken, 
-                                sup_comment = @SupervisorComments, 
-                                hr_comment = @HrComments, 
-                                qualified = (SELECT IIF((
-				                    ( '{typeOfLeave.SelectedValue}'= 'Sick' AND @DaysTaken <= e.sick) OR
-				                    ('{typeOfLeave.SelectedValue}' = 'Casual' AND @DaysTaken <= e.casual) OR
-				                    ('{typeOfLeave.SelectedValue}' = 'Vacation' AND @DaysTaken <= e.vacation) OR
-				                    ('{typeOfLeave.SelectedValue}'= 'Personal' AND @DaysTaken <= e.personal) OR
-				                    ('{typeOfLeave.SelectedValue}' = 'Bereavement' AND @DaysTaken <= e.bereavement) OR
-				                    ('{typeOfLeave.SelectedValue}' = 'Maternity' AND @DaysTaken <= e.maternity) OR
-				                    ('{typeOfLeave.SelectedValue}' = 'Pre-retirement' AND @DaysTaken <= e.pre_retirement) OR
-                                    ('{typeOfLeave.SelectedValue}' = 'No Pay')
-				                    ), 'Yes', 'No')
-                                  FROM [dbo].[employee] e
-                                  WHERE e.employee_id = (SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId}))
-                            WHERE transaction_id = {leaveId};
+                        string sql = string.Empty,
+                            comments = string.Empty,
+                            updateLeaveBalance = string.Empty;
+
+                        if (!isSupCommentsChanged && isHrCommentsChanged)
+                            comments = $"hr_comment = @HrComments,";
+                        if (isSupCommentsChanged && !isHrCommentsChanged)
+                            comments = $"sup_comment = @SupervisorComments,";
+                        if (isSupCommentsChanged && isHrCommentsChanged)
+                            comments = $"sup_comment = @SupervisorComments, hr_comment = @HrComments,";
+
+                        Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
+                        leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
+                        leaveBalanceColumnName.Add("Casual", "[casual]");
+                        leaveBalanceColumnName.Add("Maternity", "[maternity]");
+                        leaveBalanceColumnName.Add("Personal", "[personal]");
+                        leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
+                        leaveBalanceColumnName.Add("Sick", "[sick]");
+                        leaveBalanceColumnName.Add("Vacation", "[vacation]");
+
+                        if (statusTxt.Text == "Approved" && isDaysTakenChanged && typeOfLeaveTxt.Text != "No Pay")
+                        {
+                            int difference = Convert.ToInt32(daysTaken) - Convert.ToInt32(ViewState["daysTaken"].ToString());
+                            updateLeaveBalance = $@"                          
+                                -- updating employee leave balance
+                                UPDATE 
+                                    [dbo].[employee]
+                                SET
+                                    {leaveBalanceColumnName[typeOfLeaveTxt.Text]} = {leaveBalanceColumnName[typeOfLeaveTxt.Text]} - ({difference})
+                                WHERE
+                                    [employee_id] = '{empIdHiddenTxt.Value}';
+                            ";
+                        }
+
+                        sql = $@"
+                            BEGIN TRANSACTION;
+                                UPDATE [dbo].leavetransaction 
+                                SET 
+                                    [hr_manager_id] = '{Session["emp_id"]}', 
+                                    [hr_manager_edit_date] = CURRENT_TIMESTAMP,
+                                    days_taken = @DaysTaken, 
+                                    {comments} 
+                                    qualified = (SELECT IIF((
+				                        ( '{typeOfLeaveTxt.Text}'= 'Sick' AND @DaysTaken <= e.sick) OR
+				                        ('{typeOfLeaveTxt.Text}' = 'Casual' AND @DaysTaken <= e.casual) OR
+				                        ('{typeOfLeaveTxt.Text}' = 'Vacation' AND @DaysTaken  <= e.vacation) OR
+				                        ('{typeOfLeaveTxt.Text}'= 'Personal' AND @DaysTaken <= e.personal) OR
+				                        ('{typeOfLeaveTxt.Text}' = 'Bereavement' AND @DaysTaken <= e.bereavement) OR
+				                        ('{typeOfLeaveTxt.Text}' = 'Maternity' AND @DaysTaken <= e.maternity) OR
+				                        ('{typeOfLeaveTxt.Text}' = 'Pre-retirement' AND @DaysTaken <= e.pre_retirement) OR
+                                        ('{typeOfLeaveTxt.Text}' = 'No Pay')
+				                        ), 'Yes', 'No')
+                                        FROM [dbo].[employee] e
+                                        WHERE e.employee_id = (SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId}))
+                                WHERE transaction_id = {leaveId};
+                                
+                                {updateLeaveBalance}                                
+
+                            COMMIT;
                         ";
 
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            if (supComment != string.Empty)
+                            if (!String.IsNullOrEmpty(supComment) && !String.IsNullOrWhiteSpace(supComment))
                                 command.Parameters.AddWithValue("@SupervisorComments", supComment);
                             else
                                 command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
 
-                            if (hrComment != string.Empty)
+                            if (!String.IsNullOrEmpty(hrComment) && !String.IsNullOrWhiteSpace(hrComment))
                                 command.Parameters.AddWithValue("@HrComments", hrComment);
                             else
                                 command.Parameters.AddWithValue("@HrComments", DBNull.Value);
 
                             command.Parameters.AddWithValue("@DaysTaken", daysTaken);
+
                             int rowsAffected = command.ExecuteNonQuery();
                             isEditSuccessful = rowsAffected > 0;
-                            //if (rowsAffected > 0)
-                            //{
-                            //    // show success message
-                            //    successfulSubmitEditsMsgPanel.Visible = true;
-                            //}
                         }
                     }
                 }
@@ -1530,8 +1566,10 @@ namespace HR_LEAVEv2.Employee
                     }
                 }
 
-                if(isEditSuccessful)
+                if (isEditSuccessful)
                     successfulSubmitEditsMsgPanel.Visible = true;
+                else
+                    errorEditingApplicationPanel.Visible = true;
 
                 // add audit log
                 List<string> actionString = new List<string>();

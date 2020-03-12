@@ -338,6 +338,7 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span3" runat="server">Could not verify supervisor</span>
                     </asp:Panel>
+
                     <asp:Panel ID="errorInsertingFilesToDbPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span7" runat="server">Error inserting files into database</span>
@@ -392,6 +393,14 @@
                 <span id="Span2" runat="server">Edits successfully made</span>
                 <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left:3px;" OnClick="returnToPreviousBtn_Click"/>
             </asp:Panel>
+
+            <asp:Panel ID="errorEditingApplicationPanel" runat="server" CssClass="row alert alert-danger" Style="display: inline-block;" role="alert" Visible="false">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="Span14" runat="server">Error editing application</span>
+                <asp:Button ID="Button3" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left:3px;" OnClick="returnToPreviousBtn_Click"/>
+            </asp:Panel>
+
+
         </asp:Panel>
 
     </div>
