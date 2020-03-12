@@ -380,8 +380,8 @@
         </div>
         <asp:Panel ID="submitEditsPanel" runat="server" CssClass="row" Style="margin-top: 15px;">
             <asp:LinkButton ID="submitEditsBtn" runat="server" CssClass="btn btn-success" OnClick="submitEditsBtn_Click" ValidationGroup="editGroup">
-                <i class="fa fa-send" aria-hidden="true"></i>
-                Submit edit(s)
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                Save edit(s)
             </asp:LinkButton>
             <asp:Panel ID="noEditsMadePanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block;" role="alert" Visible="false">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
