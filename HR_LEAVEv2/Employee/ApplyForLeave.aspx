@@ -219,6 +219,7 @@
         </asp:Panel>
 
         <asp:Panel ID="filesToDownloadPanel" runat="server">
+            <label for="filesToDownloadList" style="font-size:1.2em; display:inline;">Previously uploaded files:</label>
             <asp:DropDownList ID="filesToDownloadList" runat="server"></asp:DropDownList>
             <asp:LinkButton ID="btnDownloadFiles" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Download file" OnClick="btnDownloadFiles_Click" Style="display:inline-block; margin-left:5px;">
                 <i class="fa fa-download" aria-hidden="true"></i>
@@ -337,6 +338,7 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span3" runat="server">Could not verify supervisor</span>
                     </asp:Panel>
+
                     <asp:Panel ID="errorInsertingFilesToDbPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span7" runat="server">Error inserting files into database</span>
@@ -378,8 +380,8 @@
         </div>
         <asp:Panel ID="submitEditsPanel" runat="server" CssClass="row" Style="margin-top: 15px;">
             <asp:LinkButton ID="submitEditsBtn" runat="server" CssClass="btn btn-success" OnClick="submitEditsBtn_Click" ValidationGroup="editGroup">
-                <i class="fa fa-send" aria-hidden="true"></i>
-                Submit edit(s)
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                Save edit(s)
             </asp:LinkButton>
             <asp:Panel ID="noEditsMadePanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block;" role="alert" Visible="false">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
@@ -391,6 +393,14 @@
                 <span id="Span2" runat="server">Edits successfully made</span>
                 <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left:3px;" OnClick="returnToPreviousBtn_Click"/>
             </asp:Panel>
+
+            <asp:Panel ID="errorEditingApplicationPanel" runat="server" CssClass="row alert alert-danger" Style="display: inline-block;" role="alert" Visible="false">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span id="Span14" runat="server">Error editing application</span>
+                <asp:Button ID="Button3" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left:3px;" OnClick="returnToPreviousBtn_Click"/>
+            </asp:Panel>
+
+
         </asp:Panel>
 
     </div>
