@@ -16,7 +16,7 @@ namespace HR_LEAVEv2.HR
 
         // the following enum is used when getting or setting data in datatables 
         // as related to the employment records
-        enum add_emp_records_columns
+        enum emp_records_columns
         {
             record_id = 0,
             employment_type = 1,
@@ -184,7 +184,6 @@ namespace HR_LEAVEv2.HR
                     // compare dates to ensure end date is not before start date
                     if (DateTime.Compare(start, end) > 0)
                     {
-                        invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
                         dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
                         isValidated = false;
                     }
@@ -201,10 +200,41 @@ namespace HR_LEAVEv2.HR
             return isValidated;
         }
 
-        protected void showFormBtn_Click(object sender, EventArgs e)
+        protected void showEmplomentRecordForm()
         {
             addEmpRecordForm.Visible = true;
             showFormBtn.Visible = false;
+        }
+
+        protected void hideEmploymentRecordForm()
+        {
+            this.resetAddEmploymentRecordFormFields();
+            addEmpRecordForm.Visible = false;
+            showFormBtn.Visible = true;
+            addNewRecordBtn.Visible = true;
+            editRecordBtn.Visible = false;
+            actualEndDateSpan.Style.Add("display", "none");
+        }
+
+        // fix issue with highlighting records
+
+        protected void removeHighlightFromEditedRecord()
+        {
+            if (ViewState["frontend_record_being_edited"] != null)
+            {
+                int index = Convert.ToInt32(ViewState["frontend_record_being_edited"].ToString());
+                if (GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "record_id")].Text.ToString() != "-1")
+                {
+                    GridView1.Rows[index].CssClass = GridView1.Rows[index].CssClass.Replace("highlighted-record", "");
+                }
+                ViewState["frontend_record_being_edited"] = null;
+                ViewState["record_being_edited"] = null;
+            }
+        }
+
+        protected void showFormBtn_Click(object sender, EventArgs e)
+        {
+            showEmplomentRecordForm();
         }
 
         protected void addNewRecordBtn_Click(object sender, EventArgs e)
@@ -266,10 +296,10 @@ namespace HR_LEAVEv2.HR
                 // check that row is not a duplicate row by comparing employment_type, dept_id, pos_id and start_date
                 foreach(DataRow dr in dt.Rows)
                 {
-                    string dtEmpType = dr.ItemArray[(int)add_emp_records_columns.employment_type].ToString(),
-                           dtDeptId = dr.ItemArray[(int)add_emp_records_columns.dept_id].ToString(),
-                           dtPosId = dr.ItemArray[(int)add_emp_records_columns.pos_id].ToString(),
-                           dtStartDate = ((DateTime)dr.ItemArray[(int)add_emp_records_columns.start_date]).ToString("d/MM/yyyy");
+                    string dtEmpType = dr.ItemArray[(int)emp_records_columns.employment_type].ToString(),
+                           dtDeptId = dr.ItemArray[(int)emp_records_columns.dept_id].ToString(),
+                           dtPosId = dr.ItemArray[(int)emp_records_columns.pos_id].ToString(),
+                           dtStartDate = ((DateTime)dr.ItemArray[(int)emp_records_columns.start_date]).ToString("d/MM/yyyy");
 
                     if (dtEmpType == emp_type && dtDeptId == dept_id && dtPosId == position_id && dtStartDate == startDate)
                     {
@@ -298,17 +328,17 @@ namespace HR_LEAVEv2.HR
         {
             txtStartDate.Text = String.Empty;
             txtEndDate.Text = String.Empty;
-            empTypeList.SelectedIndex = 0;
-            deptList.SelectedIndex = 0;
-            positionList.SelectedIndex = 0;
+            txtActualEndDate.Text = String.Empty;
+
+            empTypeList.DataBind();
+            deptList.DataBind();
+            positionList.DataBind();
         }
 
         protected void cancelNewRecordBtn_Click(object sender, EventArgs e)
         {
-            //reset fields
-            this.resetAddEmploymentRecordFormFields();
-            addEmpRecordForm.Visible = false;
-            showFormBtn.Visible = true;
+            hideEmploymentRecordForm();
+            removeHighlightFromEditedRecord();
         }
 
         protected void bindGridview()
@@ -381,7 +411,7 @@ namespace HR_LEAVEv2.HR
                 int indexOfRowInDt = getIndexOfRelevantRowInBackendDataTable(rowToBeDeleted);
                 if(indexOfRowInDt != -1)
                 {
-                    dt.Rows[indexOfRowInDt].SetField<string>((int)add_emp_records_columns.isChanged, "1");
+                    dt.Rows[indexOfRowInDt].SetField<string>((int)emp_records_columns.isChanged, "1");
                     ViewState["Gridview1_dataSource"] = dt;
                 }
                 
@@ -585,7 +615,7 @@ namespace HR_LEAVEv2.HR
                         foreach (DataRow dr in dt.Rows)
                         {
                             // if row is not deleted
-                            if(dr.ItemArray[(int)add_emp_records_columns.isChanged].ToString() == "0")
+                            if(dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
                             {
                                 try
                                 {
@@ -613,11 +643,11 @@ namespace HR_LEAVEv2.HR
                                         using (SqlCommand command = new SqlCommand(sql, connection))
                                         {
                                             command.Parameters.AddWithValue("@EmployeeId", emp_id);
-                                            command.Parameters.AddWithValue("@EmploymentType", dr.ItemArray[(int)add_emp_records_columns.employment_type]);
-                                            command.Parameters.AddWithValue("@DeptId", dr.ItemArray[(int)add_emp_records_columns.dept_id]);
-                                            command.Parameters.AddWithValue("@PositionId", dr.ItemArray[(int)add_emp_records_columns.pos_id]);
-                                            command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)add_emp_records_columns.start_date]);
-                                            command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)add_emp_records_columns.expected_end_date]);
+                                            command.Parameters.AddWithValue("@EmploymentType", dr.ItemArray[(int)emp_records_columns.employment_type]);
+                                            command.Parameters.AddWithValue("@DeptId", dr.ItemArray[(int)emp_records_columns.dept_id]);
+                                            command.Parameters.AddWithValue("@PositionId", dr.ItemArray[(int)emp_records_columns.pos_id]);
+                                            command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)emp_records_columns.start_date]);
+                                            command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
 
                                             int rowsAffected = command.ExecuteNonQuery();
                                             if (rowsAffected > 0)
@@ -706,6 +736,8 @@ namespace HR_LEAVEv2.HR
             fullFormSubmitSuccessPanel.Style.Add("display", "none");
 
             //EMPLOYMENT RECORD
+
+            // ADD
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");
             invalidEndDateValidationMsgPanel.Style.Add("display", "none");
             dateComparisonValidationMsgPanel.Style.Add("display", "none");
@@ -713,11 +745,21 @@ namespace HR_LEAVEv2.HR
             endDateIsWeekendPanel.Style.Add("display", "none");
             duplicateRecordPanel.Style.Add("display", "none");
 
+            // EDIT
+            recordEditEndDateInvalidPanel.Style.Add("display", "none");
+            recordEditEndDateOnWeekend.Style.Add("display", "none");
+            recordEditEndDateBeforeStartDate.Style.Add("display", "none");
+            editEmploymentRecordSuccessful.Style.Add("display", "none");
+            editUnsuccessful.Style.Add("display", "none");
+            noEditsToRecordsMade.Style.Add("display", "none");
+            multipleActiveRecordsPanel.Style.Add("display", "none");
+
             // END EMPLOYMENT RECORD
             invalidEndDatePanel.Style.Add("display", "none");
             emptyEndDatePanel.Style.Add("display", "none");
             endDateBeforeStartDatePanel.Style.Add("display", "none");
             actualEndDateIsWeekendPanel.Style.Add("display", "none");
+            multipleActiveRecordsEndRecordPanel.Style.Add("display", "none");
         }
 
         protected void populatePage(string empId)
@@ -778,14 +820,40 @@ namespace HR_LEAVEv2.HR
             // the following code ensures that the current HR can view and edit the information presented based on the employee's employment type
             if(dataTable != null && dataTable.Rows.Count > 0)
             {
-                // the first row in the dataTable is used because the data is ordered by start date such that the first record will show the most recent employment record. This
-                // will therefore contain the most recent and accurate employment type: Contract or Public Service. Using this, the permissions are used for authorization
-                string empType = dataTable.Rows[0].ItemArray[(int)add_emp_records_columns.employment_type].ToString();
+                string empType = string.Empty;
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
+                            SELECT ep.employment_type
+                            FROM [dbo].[employeeposition] ep
+                            WHERE ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                         ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                           using(SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    empType = reader["employment_type"].ToString();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    throw ex;
+                }
+
                 if (!permissions.Contains("hr1_permissions"))
                 {
                     // the HR 2, HR 3 must have permissions to view data for the same employment type as for the employee who submitted the application
                     //check if hr can view applications from the relevant employment type 
-                    if ((empType == "Contract" && !permissions.Contains("contract_permissions")) || (empType == "Public Service" && !permissions.Contains("public_officer_permissions")))
+                    if (String.IsNullOrEmpty(empType) || (empType == "Contract" && !permissions.Contains("contract_permissions")) || (empType == "Public Service" && !permissions.Contains("public_officer_permissions")))
                         Response.Redirect("~/AccessDenied.aspx");
                 }
             }
@@ -1199,13 +1267,13 @@ namespace HR_LEAVEv2.HR
                 foreach (DataRow dr in dt.Rows)
                 {
                     // once the row does not represent a newly added row and the 'isChanged' field is '1' (representing a deleted row)
-                    if (dr.ItemArray[(int)add_emp_records_columns.record_id].ToString() != "-1" && dr.ItemArray[(int)add_emp_records_columns.isChanged].ToString() == "1")
+                    if (dr.ItemArray[(int)emp_records_columns.record_id].ToString() != "-1" && dr.ItemArray[(int)emp_records_columns.isChanged].ToString() == "1")
                     {
                         try
                         {
                             string sql = $@"
                                 DELETE FROM [dbo].[employeeposition]
-                                WHERE employee_id = '{empId}' AND id = '{dr.ItemArray[(int)add_emp_records_columns.record_id]}'
+                                WHERE employee_id = '{empId}' AND id = '{dr.ItemArray[(int)emp_records_columns.record_id]}'
                             ";
 
                             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -1226,7 +1294,7 @@ namespace HR_LEAVEv2.HR
 
                         // add id of deleted record to deletedRecords list. This is used to create an audit log for the deletion of employment records
                         if (isEmpRecordDeleteSuccessful)
-                            deletedRecords.Add(dr.ItemArray[(int)add_emp_records_columns.record_id].ToString());
+                            deletedRecords.Add(dr.ItemArray[(int)emp_records_columns.record_id].ToString());
                     }
                 }
 
@@ -1250,7 +1318,7 @@ namespace HR_LEAVEv2.HR
                 {
 
                     // only if the record id is '-1' and isChanged is '0' (representing a undeleted row) or isChanged is '2' (representing an edited row) then insert it
-                    if (dr.ItemArray[(int)add_emp_records_columns.record_id].ToString() == "-1" && dr.ItemArray[(int)add_emp_records_columns.isChanged].ToString() != "-1")
+                    if (dr.ItemArray[(int)emp_records_columns.record_id].ToString() == "-1" && dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "-1")
                     {
                         // insert new record
                         try
@@ -1280,11 +1348,11 @@ namespace HR_LEAVEv2.HR
                                 using (SqlCommand command = new SqlCommand(sql, connection))
                                 {
                                     command.Parameters.AddWithValue("@EmployeeId", empId);
-                                    command.Parameters.AddWithValue("@EmploymentType", dr.ItemArray[(int)add_emp_records_columns.employment_type]);
-                                    command.Parameters.AddWithValue("@DeptId", dr.ItemArray[(int)add_emp_records_columns.dept_id]);
-                                    command.Parameters.AddWithValue("@PositionId", dr.ItemArray[(int)add_emp_records_columns.pos_id]);
-                                    command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)add_emp_records_columns.start_date]);
-                                    command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)add_emp_records_columns.expected_end_date]);
+                                    command.Parameters.AddWithValue("@EmploymentType", dr.ItemArray[(int)emp_records_columns.employment_type]);
+                                    command.Parameters.AddWithValue("@DeptId", dr.ItemArray[(int)emp_records_columns.dept_id]);
+                                    command.Parameters.AddWithValue("@PositionId", dr.ItemArray[(int)emp_records_columns.pos_id]);
+                                    command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)emp_records_columns.start_date]);
+                                    command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
 
                                     string new_record_id = command.ExecuteScalar().ToString();
                                     isEmpRecordInsertSuccessful = !String.IsNullOrWhiteSpace(new_record_id);
@@ -1293,7 +1361,7 @@ namespace HR_LEAVEv2.HR
                                     if (isEmpRecordInsertSuccessful)
                                     {
                                         addedRecords.Add(new_record_id); // adding id of inserted record in added records list
-                                        dr.SetField<string>((int)add_emp_records_columns.record_id, new_record_id); // add new id of inserted record into datatable
+                                        dr.SetField<string>((int)emp_records_columns.record_id, new_record_id); // add new id of inserted record into datatable
                                     }
                                         
                                 }
@@ -1320,19 +1388,26 @@ namespace HR_LEAVEv2.HR
                 }
 
                 List<string> editedRecords = new List<string>();
+                // TODO:
+                // check to see which fields in record changed in order to update appropriately
                 //edit records data from gridview
                 foreach (DataRow dr in dt.Rows)
                 {
 
                     // only if the record id is not '-1' and isChanged is '2' (representing a edited row) then update it
-                    if (dr.ItemArray[(int)add_emp_records_columns.record_id].ToString() != "-1" && dr.ItemArray[(int)add_emp_records_columns.isChanged].ToString() == "2")
+                    if (dr.ItemArray[(int)emp_records_columns.record_id].ToString() != "-1" && dr.ItemArray[(int)emp_records_columns.isChanged].ToString() == "2")
                     {
                         // edit record
                         try
                         {
                             string sql = $@"
                                 UPDATE [dbo].[employeeposition]
-                                SET actual_end_date = @ActualEndDate
+                                SET position_id= '{dr.ItemArray[(int)emp_records_columns.pos_id].ToString()}', 
+                                    start_date= @StartDate, 
+                                    expected_end_date= @ExpectedEndDate, 
+                                    actual_end_date = @ActualEndDate, 
+                                    employment_type= '{dr.ItemArray[(int)emp_records_columns.employment_type].ToString()}', 
+                                    dept_id= {dr.ItemArray[(int)emp_records_columns.dept_id].ToString()}
                                 WHERE id= @RecordId;
                             ";
 
@@ -1341,14 +1416,50 @@ namespace HR_LEAVEv2.HR
                                 connection.Open();
                                 using (SqlCommand command = new SqlCommand(sql, connection))
                                 {
-                                    command.Parameters.AddWithValue("@ActualEndDate", DateTime.ParseExact(dr.ItemArray[(int)add_emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"));
-                                    command.Parameters.AddWithValue("@RecordId", dr.ItemArray[(int)add_emp_records_columns.record_id]);
+                                    command.Parameters.AddWithValue("@StartDate", Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date].ToString()).ToString("MM/d/yyyy"));
+
+                                    if (Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.expected_end_date].ToString()) != DateTime.MinValue)
+                                        command.Parameters.AddWithValue("@ExpectedEndDate", Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.expected_end_date].ToString()).ToString("MM/d/yyyy"));
+                                    else
+                                        command.Parameters.AddWithValue("@ExpectedEndDate", DBNull.Value);
+
+                                    if (!String.IsNullOrEmpty(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString()))
+                                        command.Parameters.AddWithValue("@ActualEndDate", DateTime.ParseExact(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"));
+                                    else
+                                        command.Parameters.AddWithValue("@ActualEndDate", DBNull.Value);
+
+                                    command.Parameters.AddWithValue("@RecordId", dr.ItemArray[(int)emp_records_columns.record_id]);
 
                                     int rowsAffected = command.ExecuteNonQuery();
                                     isEmpRecordEditEndDateSuccessful = rowsAffected > 0;
 
                                     if (isEmpRecordEditEndDateSuccessful)
-                                        editedRecords.Add($"id= {dr.ItemArray[(int)add_emp_records_columns.record_id].ToString()}, actual_end_date= '{dr.ItemArray[(int)add_emp_records_columns.actual_end_date].ToString()}'");
+                                    {
+                                        List<string> editedFields = new List<string>();
+
+                                        if (ViewState["isRecordPositionChanged"] != null)
+                                            editedFields.Add($"position = {dr.ItemArray[(int)emp_records_columns.pos_name].ToString()}");
+                                        if (ViewState["isRecordDeptChanged"] != null)
+                                            editedFields.Add($"dept = {dr.ItemArray[(int)emp_records_columns.dept_name].ToString()}");
+                                        if (ViewState["isRecordEmpTypeChanged"] != null)
+                                            editedFields.Add($"employment_type = {dr.ItemArray[(int)emp_records_columns.employment_type].ToString()}");
+                                        if (ViewState["isRecordStartDateChanged"] != null)
+                                            editedFields.Add($"start_date = {Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).ToString("d/MM/yyyy")}");
+                                        if (ViewState["isRecordExpectedEndDateChanged"] != null)
+                                            editedFields.Add($"expected_end_date = {Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.expected_end_date]).ToString("d/MM/yyyy")}");
+                                        if (ViewState["isRecordActualEndDateChanged"] != null)
+                                            editedFields.Add($"actual_end_date = {dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString()}");
+
+                                        editedRecords.Add($"id= {dr.ItemArray[(int)emp_records_columns.record_id].ToString()}, {String.Join(", ", editedFields.ToArray())}");
+
+                                        ViewState["isRecordPositionChanged"] = null;
+                                        ViewState["isRecordDeptChanged"] = null;
+                                        ViewState["isRecordEmpTypeChanged"] = null;
+                                        ViewState["isRecordStartDateChanged"] = null;
+                                        ViewState["isRecordExpectedEndDateChanged"] = null;
+                                        ViewState["isRecordActualEndDateChanged"] = null;
+                                    }
+                                        
                                 }
                             }
                         }
@@ -1385,9 +1496,10 @@ namespace HR_LEAVEv2.HR
 
             // reset page so it is ready for new edits
             populatePage(empId);
+            hideEmploymentRecordForm();
 
             // USER FEEDBACK--------------------------------------------------------------------------------------------------------------------------
-            if(!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged)
+            if (!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged)
             {
                 noChangesMadePanel.Style.Add("display", "inline-block");
             }
@@ -1504,7 +1616,7 @@ namespace HR_LEAVEv2.HR
                 // highlight new records
                 i = GetColumnIndexByName(e.Row, "record_id");
                 if (e.Row.Cells[i].Text.ToString() == "-1" && this.isEditMode) // row is a new record if record_id = -1
-                    e.Row.CssClass = "new-record";
+                    e.Row.CssClass = "highlighted-record";
 
                 //hide end employment record button if actual_end_date is already populated
                 i = GetColumnIndexByName(e.Row, "actual_end_date");
@@ -1542,7 +1654,64 @@ namespace HR_LEAVEv2.HR
                 // show modal
                 ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('show');", true);
             }
+
+            if(e.CommandName == "editEmpRecord")
+            {
+                clearErrors();
+                //check if record was being edited before
+                if(ViewState["record_being_edited"] != null)
+                {
+                    removeHighlightFromEditedRecord();
+                    actualEndDateSpan.Style.Add("display", "none");
+                    resetAddEmploymentRecordFormFields();
+                }
+
+                showEmplomentRecordForm();
+
+                // show edit button and hide add new record button
+                addNewRecordBtn.Visible = false;
+                editRecordBtn.Visible = true;
+
+                int index = Convert.ToInt32(e.CommandArgument);
+
+                empTypeList.DataBind();
+                deptList.DataBind();
+                positionList.DataBind();
+
+                // POPULATE FIELDS
+
+                // employment type
+                empTypeList.Items.FindByText(GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "employment_type")].Text.ToString()).Selected = true;
+                // dept
+                deptList.Items.FindByText(GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "dept_name")].Text.ToString()).Selected = true;
+                // position
+                positionList.Items.FindByText(GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "pos_name")].Text.ToString()).Selected = true;
+                // start date
+                txtStartDate.Text = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "start_date")].Text.ToString();
+                // expected end date (if any)
+                txtEndDate.Text = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "expected_end_date")].Text.ToString();
+                // actual end date (if any)
+                string actualEndDate = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "actual_end_date")].Text.ToString();
+                if (!String.IsNullOrEmpty(actualEndDate) && !String.IsNullOrWhiteSpace(actualEndDate) && actualEndDate != "&nbsp;")
+                {
+                    actualEndDateSpan.Style.Add("display", "inline");
+                    txtActualEndDate.Text = actualEndDate;
+                }
+                GridView1.Rows[index].CssClass = "highlighted-record";
+
+                if(ViewState["Gridview1_frontend_dataSource"] != null)
+                {
+                    DataTable frontEndDt = ViewState["Gridview1_frontend_dataSource"] as DataTable;
+                    DataRow rowToBeEdited = frontEndDt.Rows[index];
+                    int indexToBeEdited = getIndexOfRelevantRowInBackendDataTable(rowToBeEdited);
+                    if (indexToBeEdited != -1)
+                        ViewState["record_being_edited"] = indexToBeEdited;
+
+                    ViewState["frontend_record_being_edited"] = index;
+                }
                 
+            }
+
         }
 
         protected void submitEndEmpRecordBtn_Click(object sender, EventArgs e)
@@ -1592,10 +1761,11 @@ namespace HR_LEAVEv2.HR
                 isValidated = false;
             }
                 
-
+            
             if(isValidated && Session["empRecordRowIndex"] != null)
             {
                 // edit datatable and rebind gridview
+
 
                 /** Since there exists a frontend datatable which contains only records which are not deleted, there may be a discrepancy between the indexes in the frontend datatable
                  *  and the backend datatable. As such the following code is necessary in order to find the suitable index in the backend datatable such as to edit the actual_end_date value
@@ -1611,21 +1781,230 @@ namespace HR_LEAVEv2.HR
                     DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
 
                     int indexInDt = getIndexOfRelevantRowInBackendDataTable(rowToFindInBackEnd);
-                    dt.Rows[indexInDt].SetField<string>((int)add_emp_records_columns.isChanged, "2");
-                    dt.Rows[indexInDt].SetField<string>((int)add_emp_records_columns.actual_end_date, end.ToString("d/MM/yyyy"));
-                    ViewState["Gridview1_dataSource"] = dt;
-                    this.bindGridview();
 
-                    ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('hide');", true);
+                    if(isActualEndDateValid(end.ToString("d/MM/yyyy"), indexInDt))
+                    {
+                        dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.isChanged, "2");
+                        dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.actual_end_date, end.ToString("d/MM/yyyy"));
+                        ViewState["Gridview1_dataSource"] = dt;
+                        this.bindGridview();
+
+                        Session["startDate"] = null;
+                        Session["empRecordRowIndex"] = null;
+                        ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('hide');", true);
+                    }
+                    else
+                    {
+                        multipleActiveRecordsEndRecordPanel.Style.Add("display", "inline-block");
+                    }
+                    
+                }
+            }
+            
+        }
+
+        protected Boolean isActualEndDateValid(string proposedEndDate, int index)
+        {
+            if(ViewState["Gridview1_dataSource"] != null)
+            {
+                int numActiveRows = 0;
+                DataTable dtSource = ViewState["Gridview1_dataSource"] as DataTable;
+                DataTable dt = dtSource.Copy();
+                dt.Rows[index][(int)emp_records_columns.actual_end_date] = proposedEndDate;
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    if(dr[(int)emp_records_columns.isChanged].ToString() != "1")
+                    {
+                        string actualEndDate = dr[(int)emp_records_columns.actual_end_date].ToString();
+                        if (String.IsNullOrEmpty(actualEndDate) || String.IsNullOrWhiteSpace(actualEndDate) || actualEndDate == "&nbsp;")
+                            numActiveRows++;
+                        else
+                        {
+                            // if today is before the actual end date
+                            if (DateTime.Compare(DateTime.Now, DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0)
+                                numActiveRows++;
+                        }
+                    }
+                    
                 }
 
-                Session["startDate"] = null;
-                Session["empRecordRowIndex"] = null;
+                return numActiveRows <= 1;
             }
 
+            return false;
             
+        }
 
-            
+        protected void editRecordBtn_Click(object sender, EventArgs e)
+        {
+            clearErrors();
+            if (ViewState["record_being_edited"] != null)
+            {
+
+                string position_id = positionList.SelectedValue, 
+                    position_name = positionList.SelectedItem.Text, 
+                    startDate = txtStartDate.Text.ToString(), 
+                    expectedEndDate = txtEndDate.Text.ToString(), 
+                    actualEndDate = txtActualEndDate.Text.ToString(), 
+                    emp_type = empTypeList.SelectedValue,
+                    dept_id = deptList.SelectedValue, 
+                    dept_name = deptList.SelectedItem.Text;
+
+                Boolean isValidated = validateDates(startDate, expectedEndDate);
+
+                int index = Convert.ToInt32(ViewState["record_being_edited"].ToString());
+                if (index != -1 && ViewState["Gridview1_dataSource"] != null)
+                {
+                    DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+
+                    DateTime end;
+                    // validate actual end date
+                    string previousActualEndDate = dt.Rows[index][(int)emp_records_columns.actual_end_date].ToString();
+                    if (!String.IsNullOrEmpty(actualEndDate) && !String.IsNullOrWhiteSpace(actualEndDate) && actualEndDate != "&nbsp;")
+                    {
+                        // validate end date is a date
+                        if (!DateTime.TryParseExact(txtActualEndDate.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
+                        {
+                            recordEditEndDateInvalidPanel.Style.Add("display", "inline-block");
+                            isValidated = false;
+                        }
+                        else
+                        {
+                            // end date is valid
+
+                            // ensure end date is not weekend
+                            if (end.DayOfWeek == DayOfWeek.Saturday || end.DayOfWeek == DayOfWeek.Sunday)
+                            {
+                                recordEditEndDateOnWeekend.Style.Add("display", "inline-block");
+                                isValidated = false;
+                            }
+
+                            // compare dates to ensure end date is not before start date
+                            if (!String.IsNullOrEmpty(startDate))
+                            {
+                                if (DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end) > 0)
+                                {
+                                    recordEditEndDateBeforeStartDate.Style.Add("display", "inline-block");
+                                    isValidated = false;
+                                }
+                            }
+                            else
+                                isValidated = false;
+                        }
+                    }
+
+
+                    if (isValidated)
+                    {
+
+                        // check if any values are changed and edit relevant values in datatable
+                        Boolean isPositionChanged = dt.Rows[index].ItemArray[(int)emp_records_columns.pos_id].ToString() != position_id,
+                            isDeptChanged = dt.Rows[index].ItemArray[(int)emp_records_columns.dept_id].ToString() != dept_id,
+                            isEmpTypeChanged = dt.Rows[index].ItemArray[(int)emp_records_columns.employment_type].ToString() != emp_type,
+                            isStartDateChanged = Convert.ToDateTime(dt.Rows[index].ItemArray[(int)emp_records_columns.start_date]).ToString("d/MM/yyyy") != startDate,
+                            isExpectedEndDateChanged = Convert.ToDateTime(dt.Rows[index].ItemArray[(int)emp_records_columns.expected_end_date]).ToString("d/MM/yyyy") != expectedEndDate,
+                            isActualEndDateChanged = previousActualEndDate != actualEndDate,
+                            isEditActualEndDateSuccessful = true;
+
+                        if (isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isActualEndDateChanged)
+                        {
+                            List<string> editsMade = new List<string>();
+                            try
+                            {
+                                if (isPositionChanged)
+                                {
+                                    dt.Rows[index][(int)emp_records_columns.pos_id] = position_id;
+                                    dt.Rows[index][(int)emp_records_columns.pos_name] = position_name;
+                                    ViewState["isRecordPositionChanged"] = true;
+                                    editsMade.Add("Position");
+                                }
+                                if (isDeptChanged)
+                                {
+                                    dt.Rows[index][(int)emp_records_columns.dept_id] = dept_id;
+                                    dt.Rows[index][(int)emp_records_columns.dept_name] = dept_name;
+                                    ViewState["isRecordDeptChanged"] = true;
+                                    editsMade.Add("Department");
+                                }
+                                if (isEmpTypeChanged)
+                                {
+                                    dt.Rows[index][(int)emp_records_columns.employment_type] = emp_type;
+                                    ViewState["isRecordEmpTypeChanged"] = true;
+                                    editsMade.Add("Employment Type");
+                                }
+                                    
+
+                                if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrWhiteSpace(startDate) && isStartDateChanged)
+                                {
+                                    dt.Rows[index][(int)emp_records_columns.start_date] = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    ViewState["isRecordStartDateChanged"] = true;
+                                    editsMade.Add("Start Date");
+                                }
+                                else if(isStartDateChanged && (String.IsNullOrEmpty(startDate) || String.IsNullOrWhiteSpace(startDate) || startDate == "&nbsp;"))
+                                    invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+
+                                if (isExpectedEndDateChanged)
+                                {
+                                    ViewState["isRecordExpectedEndDateChanged"] = true;
+                                    editsMade.Add("Expected End Date");
+
+                                    if (!String.IsNullOrEmpty(expectedEndDate) && !String.IsNullOrWhiteSpace(expectedEndDate) && expectedEndDate != "&nbsp;")
+                                        dt.Rows[index][(int)emp_records_columns.expected_end_date] = DateTime.ParseExact(expectedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    else 
+                                        dt.Rows[index][(int)emp_records_columns.expected_end_date] = DateTime.MinValue;
+                                }
+
+                                if (isActualEndDateChanged)
+                                {
+                                    // does edit make employee have more than one record that is active (end date is not null and today is before end date) or (end date is null)
+                                    if (isActualEndDateValid(actualEndDate, index))
+                                    {
+                                        ViewState["isRecordActualEndDateChanged"] = true;
+                                        editsMade.Add("Actual End Date");
+
+                                        if (!String.IsNullOrEmpty(actualEndDate) && !String.IsNullOrWhiteSpace(actualEndDate) && actualEndDate != "&nbsp;")
+                                            dt.Rows[index][(int)emp_records_columns.actual_end_date] = actualEndDate;
+                                        else
+                                            dt.Rows[index][(int)emp_records_columns.actual_end_date] = string.Empty;
+                                    }
+                                    else
+                                    {
+                                        isEditActualEndDateSuccessful = false;
+                                        multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                                    }
+                                        
+                                }
+
+                                
+                                if(!(isActualEndDateChanged && !isEditActualEndDateSuccessful && !(isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged)))
+                                {
+                                    dt.Rows[index].SetField<string>((int)emp_records_columns.isChanged, "2");
+
+                                    ViewState["Gridview1_dataSource"] = dt;
+                                    bindGridview();
+
+                                    editEmpRecordSuccTxt.InnerText = $"{String.Join(", ", editsMade.ToArray())} edits successfully made to employment record. Don't forget to save your changes";
+                                    editEmploymentRecordSuccessful.Style.Add("display", "inline-block");
+                                } else
+                                    noEditsToRecordsMade.Style.Add("display", "inline-block");
+
+                            }
+                            catch (Exception exc)
+                            {
+                                editUnsuccessful.Style.Add("display", "inline-block");
+                            }
+                        } else
+                            noEditsToRecordsMade.Style.Add("display", "inline-block");
+                    }
+                }
+            }
+        }
+
+        protected void closeEndEmpRecordModalBtn_Click(object sender, EventArgs e)
+        {
+            Session["startDate"] = null;
+            Session["empRecordRowIndex"] = null;
+            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('hide');", true);
         }
     }
 }

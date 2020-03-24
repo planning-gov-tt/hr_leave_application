@@ -197,7 +197,7 @@
                     <i class="fa fa-check" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnEditLeaveRequest" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request" Visible="<%# btnSupVisible || btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnEditLeaveRequest"  CssClass="btn btn-warning content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request" Visible="<%# btnSupVisible || btnHrVisible %>" runat="server"
                         CommandName="editLeaveRequest"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                     <i class="fa fa-pencil" aria-hidden="true"></i>
