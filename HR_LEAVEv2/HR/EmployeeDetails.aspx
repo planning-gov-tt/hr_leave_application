@@ -470,7 +470,15 @@
                                     <span id="Span22" runat="server">Actual end date is on the weekend</span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="multipleActiveRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                <asp:Panel ID="multipleActiveRecordsAddRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span25" runat="server">
+                                        Record not added since this would result in two employment records being marked active simultaneously. Edit employment records accordingly 
+                                        to ensure only one active record
+                                    </span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="multipleActiveRecordsEditRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="Span23" runat="server">
                                         Actual end date not edited since the date entered would result in two employment records being marked active simultaneously. Edit employment records accordingly 
@@ -594,11 +602,18 @@
                             <%--Index 7: Expected End Date--%>
                             <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date" DataFormatString="{0:d/MM/yyyy}"/>
 
-                            <%--Index 8: isDeleted--%>
+                            <%--Index 8: isChanged--%>
                             <asp:BoundField HeaderText="isChanged" DataField="isChanged" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden" />
 
                             <%--Index 9: actual_end_date--%>
                             <asp:BoundField HeaderText="Actual End Date" DataField="actual_end_date"/>
+
+                             <%--Index 10: status--%>
+                            <asp:TemplateField HeaderText="Status">
+                                <ItemTemplate>
+                                    <span id="status-label" class="label <%# Eval("status_class") %>"><%# Eval("status") %></span>
+                                </ItemTemplate>
+                            </asp:TemplateField>
 
                         </Columns>
                     </asp:GridView>

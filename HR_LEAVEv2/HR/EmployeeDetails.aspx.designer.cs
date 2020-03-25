@@ -1012,13 +1012,31 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span22;
         
         /// <summary>
-        /// multipleActiveRecordsPanel control.
+        /// multipleActiveRecordsAddRecordPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsPanel;
+        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsAddRecordPanel;
+        
+        /// <summary>
+        /// Span25 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span25;
+        
+        /// <summary>
+        /// multipleActiveRecordsEditRecordPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsEditRecordPanel;
         
         /// <summary>
         /// Span23 control.
