@@ -225,10 +225,7 @@ namespace HR_LEAVEv2.HR
             if (ViewState["frontend_record_being_edited"] != null)
             {
                 int index = Convert.ToInt32(ViewState["frontend_record_being_edited"].ToString());
-                if (GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "record_id")].Text.ToString() != "-1")
-                {
-                    GridView1.Rows[index].CssClass = GridView1.Rows[index].CssClass.Replace("highlighted-record", "");
-                }
+                GridView1.Rows[index].CssClass = GridView1.Rows[index].CssClass.Replace("highlighted-record", "");
                 ViewState["frontend_record_being_edited"] = null;
                 ViewState["record_being_edited"] = null;
             }
@@ -285,7 +282,7 @@ namespace HR_LEAVEv2.HR
                 // case: cannot add another record if there already exists an active record
                 foreach(DataRow dr in dt.Rows)
                 {
-                    if(dr.ItemArray[(int)emp_records_columns.status].ToString() == "Active")
+                    if(dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1" && dr.ItemArray[(int)emp_records_columns.status].ToString() == "Active")
                     {
                         multipleActiveRecordsAddRecordPanel.Style.Add("display", "inline-block");
                         isRecordAllowed = false;
@@ -330,6 +327,7 @@ namespace HR_LEAVEv2.HR
                     {
                         //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class
                         dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success");
+
 
                         ViewState["Gridview1_dataSource"] = dt;
                     }
@@ -1633,10 +1631,24 @@ namespace HR_LEAVEv2.HR
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
 
-                // highlight new records
+                // adds badge to new records
                 i = GetColumnIndexByName(e.Row, "record_id");
-                if (e.Row.Cells[i].Text.ToString() == "-1" && this.isEditMode) // row is a new record if record_id = -1
-                    e.Row.CssClass = "highlighted-record";
+                if (e.Row.Cells[i].Text.ToString() == "-1" && this.isEditMode)
+                {
+                    // row is a new record if record_id = -1
+                    Label newRecordLabel = (Label)e.Row.FindControl("new_record_label");
+                    newRecordLabel.Visible = true;
+                }
+
+
+                // add badge to edited records
+                i = GetColumnIndexByName(e.Row, "isChanged");
+                if (e.Row.Cells[i].Text.ToString() == "2" && this.isEditMode)
+                {
+                    // row is an edited record if isChanged = 2
+                    Label editedRecordLabel = (Label)e.Row.FindControl("edited_record_label");
+                    editedRecordLabel.Visible = true;
+                }
 
                 //hide end employment record button if actual_end_date is already populated
                 i = GetColumnIndexByName(e.Row, "actual_end_date");

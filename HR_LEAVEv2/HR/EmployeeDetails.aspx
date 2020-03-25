@@ -612,6 +612,8 @@
                             <asp:TemplateField HeaderText="Status">
                                 <ItemTemplate>
                                     <span id="status-label" class="label <%# Eval("status_class") %>"><%# Eval("status") %></span>
+                                    <asp:Label ID="new_record_label" runat="server" CssClass="label label-primary" Text="New" Visible ="false"></asp:Label>
+                                    <asp:Label ID="edited_record_label" runat="server" CssClass="label label-warning" Text="Edited" Visible ="false"></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
 
