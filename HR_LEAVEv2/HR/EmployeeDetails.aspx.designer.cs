@@ -850,6 +850,33 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator endDateRequiredValidator;
         
         /// <summary>
+        /// actualEndDateSpan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl actualEndDateSpan;
+        
+        /// <summary>
+        /// txtActualEndDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtActualEndDate;
+        
+        /// <summary>
+        /// CalendarExtender3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::AjaxControlToolkit.CalendarExtender CalendarExtender3;
+        
+        /// <summary>
         /// invalidStartDateValidationMsgPanel control.
         /// </summary>
         /// <remarks>
@@ -958,6 +985,114 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span17;
         
         /// <summary>
+        /// recordEditEndDateInvalidPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel recordEditEndDateInvalidPanel;
+        
+        /// <summary>
+        /// recordEditEndDateOnWeekend control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel recordEditEndDateOnWeekend;
+        
+        /// <summary>
+        /// Span22 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span22;
+        
+        /// <summary>
+        /// multipleActiveRecordsAddRecordPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsAddRecordPanel;
+        
+        /// <summary>
+        /// Span25 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span25;
+        
+        /// <summary>
+        /// multipleActiveRecordsEditRecordPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsEditRecordPanel;
+        
+        /// <summary>
+        /// Span23 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span23;
+        
+        /// <summary>
+        /// recordEditEndDateBeforeStartDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel recordEditEndDateBeforeStartDate;
+        
+        /// <summary>
+        /// noEditsToRecordsMade control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noEditsToRecordsMade;
+        
+        /// <summary>
+        /// editUnsuccessful control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel editUnsuccessful;
+        
+        /// <summary>
+        /// editEmploymentRecordSuccessful control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel editEmploymentRecordSuccessful;
+        
+        /// <summary>
+        /// editEmpRecordSuccTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl editEmpRecordSuccTxt;
+        
+        /// <summary>
         /// cancelNewRecordBtn control.
         /// </summary>
         /// <remarks>
@@ -974,6 +1109,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.LinkButton addNewRecordBtn;
+        
+        /// <summary>
+        /// editRecordBtn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton editRecordBtn;
         
         /// <summary>
         /// GridView1 control.
@@ -1111,6 +1255,24 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel endDateBeforeStartDatePanel;
         
         /// <summary>
+        /// multipleActiveRecordsEndRecordPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsEndRecordPanel;
+        
+        /// <summary>
+        /// Span24 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span24;
+        
+        /// <summary>
         /// submitEndEmpRecordBtn control.
         /// </summary>
         /// <remarks>
@@ -1118,5 +1280,14 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.LinkButton submitEndEmpRecordBtn;
+        
+        /// <summary>
+        /// closeEndEmpRecordModalBtn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button closeEndEmpRecordModalBtn;
     }
 }

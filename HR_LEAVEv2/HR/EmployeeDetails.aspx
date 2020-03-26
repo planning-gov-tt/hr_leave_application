@@ -13,9 +13,10 @@
             margin-bottom:25px;
         }
 
-        .new-record{
+        .highlighted-record{
             background-color: #e0e0eb;
         }
+
     </style>
 
     <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to all employees" OnClick="returnToPreviousBtn_Click">
@@ -377,7 +378,7 @@
             </div>
         </div>
 
-        <%--Add new Employment Record--%>
+        <%--Employment Record form--%>
         <div id="addEmploymentRecordContainer" class="container text-center" style="background-color: #f0f0f5; padding-bottom: 10px;">
             <h3>Employment Record</h3>
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
@@ -399,7 +400,7 @@
                                 <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [pos_id], [pos_name] FROM [position] ORDER BY [pos_name]"></asp:SqlDataSource>
                             </div>
                             <div class="form-group text-center" style="margin-top: 45px;">
-                                <span style="margin-right: 7%;">
+                                <span style="margin-right: 25px">
                                     <label for="txtStartDate">Start date</label>
                                     <asp:TextBox ID="txtStartDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
                                     <i id="startDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
@@ -425,6 +426,14 @@
 
                                     </asp:RequiredFieldValidator>
                                 </span>
+                                <span runat="server" id="actualEndDateSpan" style="display:none; margin-left:25px;">
+                                    <label for="txtActualEndDate">
+                                        Actual end date
+                                    </label>
+                                    <asp:TextBox ID="txtActualEndDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
+                                    <i id="actualEndDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
+                                    <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="txtActualEndDate" PopupButtonID="actualEndDateCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
+                                </span>
                             </div>
 
                             <div id="validationDiv" style="margin-top: 25px;">
@@ -434,11 +443,11 @@
                                 </asp:Panel>
                                 <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                    <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
+                                    <span id="invalidEndDateValidationMsg" runat="server">Expected end date is not valid</span>
                                 </asp:Panel>
                                 <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                    <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
+                                    <span id="dateComparisonValidationMsg" runat="server">Expected end date cannot precede start date</span>
                                 </asp:Panel>
                                 <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -452,6 +461,50 @@
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="Span17" runat="server">Cannot add duplicate record</span>
                                 </asp:Panel>
+                                <asp:Panel ID="recordEditEndDateInvalidPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>Actual end date is not valid</span>
+                                </asp:Panel>
+                                <asp:Panel ID="recordEditEndDateOnWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span22" runat="server">Actual end date is on the weekend</span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="multipleActiveRecordsAddRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span25" runat="server">
+                                        Record not added since this would result in two employment records being marked active simultaneously. Edit employment records accordingly 
+                                        to ensure only one active record
+                                    </span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="multipleActiveRecordsEditRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span23" runat="server">
+                                        Actual end date not edited since the date entered would result in two employment records being marked active simultaneously. Edit employment records accordingly 
+                                        to ensure only one active record
+                                    </span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="recordEditEndDateBeforeStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>Actual end date cannot be before start date</span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="noEditsToRecordsMade" runat="server" CssClass="row alert alert-info" Style="display: none; margin: 0px 5px; margin-top:5px;" role="alert">
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    <span>No Edits made</span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="editUnsuccessful" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>Edits could not be made</span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="editEmploymentRecordSuccessful" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px; margin-top:5px;" role="alert">
+                                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                    <span id="editEmpRecordSuccTxt" runat="server"></span>
+                                </asp:Panel>
                             </div>
                         </div>
                         <div class="text-center" style="margin-top: 35px; margin-bottom: 45px;">
@@ -462,6 +515,10 @@
                             <asp:LinkButton runat="server" ID="addNewRecordBtn" CssClass="btn btn-primary" Text="Add new Record" OnClick="addNewRecordBtn_Click" ValidationGroup="empRecord">
                                  <i class="fa fa-plus" aria-hidden="true"></i>
                                  Add new record
+                            </asp:LinkButton>
+                            <asp:LinkButton runat="server" ID="editRecordBtn" CssClass="btn btn-primary" Text="Edit new Record" OnClick="editRecordBtn_Click" ValidationGroup="empRecord" Visible="false">
+                                 <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                 Save record
                             </asp:LinkButton>
                         </div>
 
@@ -478,6 +535,20 @@
                         <Columns>
                             <asp:TemplateField HeaderText="Action" Visible="true">
                                 <ItemTemplate>
+                                    <%--edit emp record button--%>
+                                    <asp:LinkButton ID="LinkButton1"
+                                        runat="server"
+                                        CssClass="btn btn-warning content-tooltipped"
+                                        data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="Edit employment record"
+                                        CausesValidation="false" 
+                                        CommandName="editEmpRecord"
+                                        CommandArgument =" <%# ((GridViewRow) Container).RowIndex %>"
+                                        >
+                                        <i class="fa fa fa-pencil" aria-hidden="true"></i>
+                                    </asp:LinkButton>
+
                                     <%--delete button--%>
                                     <asp:LinkButton ID="deleteBtn"
                                         runat="server"
@@ -531,11 +602,20 @@
                             <%--Index 7: Expected End Date--%>
                             <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date" DataFormatString="{0:d/MM/yyyy}"/>
 
-                            <%--Index 8: isDeleted--%>
+                            <%--Index 8: isChanged--%>
                             <asp:BoundField HeaderText="isChanged" DataField="isChanged" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden" />
 
                             <%--Index 9: actual_end_date--%>
                             <asp:BoundField HeaderText="Actual End Date" DataField="actual_end_date"/>
+
+                             <%--Index 10: status--%>
+                            <asp:TemplateField HeaderText="Status">
+                                <ItemTemplate>
+                                    <span id="status-label" class="label <%# Eval("status_class") %>"><%# Eval("status") %></span>
+                                    <asp:Label ID="new_record_label" runat="server" CssClass="label label-primary" Text="New" Visible ="false"></asp:Label>
+                                    <asp:Label ID="edited_record_label" runat="server" CssClass="label label-warning" Text="Edited" Visible ="false"></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
 
                         </Columns>
                     </asp:GridView>
@@ -559,8 +639,8 @@
 
         <asp:Panel ID="editFormPanel" runat="server" CssCclass="row text-center" Style="margin-top: 50px;">
             <asp:LinkButton ID="editBtn" CssClass="btn btn-success" runat="server" ValidationGroup="submitFullFormGroup" OnClick="editBtn_Click">
-                <i class="fa fa-pencil" aria-hidden="true"></i>
-                Edit employee
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                Save employee
             </asp:LinkButton>
         </asp:Panel>
     </div>
@@ -608,13 +688,21 @@
                                 <span>End date cannot be before start date</span>
                             </asp:Panel>
 
+                            <asp:Panel ID="multipleActiveRecordsEndRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span id="Span24" runat="server">
+                                    Actual end date not edited since the date entered would result in two employment records being marked active simultaneously. Edit employment records accordingly 
+                                    to ensure only one active record
+                                </span>
+                            </asp:Panel>
+
                         </div>
                         <div class="modal-footer">
                             <asp:LinkButton runat="server" ID="submitEndEmpRecordBtn" class="btn btn-primary" OnClick="submitEndEmpRecordBtn_Click" CausesValidation="false">
                                  <i class="fa fa-send" aria-hidden="true"></i>
                                  Submit
                             </asp:LinkButton>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <asp:Button ID="closeEndEmpRecordModalBtn" runat="server" Text="Close" CssClass="btn btn-secondary" OnClick="closeEndEmpRecordModalBtn_Click"/>
                         </div>
                     </div>
                 </ContentTemplate>

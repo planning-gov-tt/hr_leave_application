@@ -27,6 +27,28 @@ namespace HR_LEAVEv2.Classes
             public string subject { get; set; }
         }
 
+
+        public string sanitizeStringForAsciiCharacters(string str)
+        {
+            // sanitize search strings for any ASCII characters that may cause trouble 
+            // single quote ('), double quote ("), open bracket and close bracket
+
+            // single quote
+            str = str.Replace("&#39;", "'");
+
+            //double quote
+            str = str.Replace("&#34;", "\"");
+
+            //open bracket
+            str = str.Replace("&#40;", "(");
+
+            //close bracket
+            str = str.Replace("&#41;", ")");
+
+            return str;
+
+        }
+
         public string resetNumNotifications(string employee_id)
         {
             /* What this function does:
