@@ -68,12 +68,15 @@
         <%--View mode: Shows the start and end date of leave application--%>
         <%--Apply mode: Allows user to enter start and end date of application--%>
         <div class="row">
+
             <%--Start Date--%>
             <div style="display:inline-block; margin-right:15%;">
                 <label for="txtFrom" style="font-size:1.2em">From:</label>
+
                 <asp:Panel ID="startDateInfoPanel" runat="server" Style="display:inline;">
                     <asp:Label ID="startDateInfoTxt" runat="server" Style="display:inline;font-size:1.05em"></asp:Label> 
                 </asp:Panel>
+
                 <asp:Panel ID="startDateApplyPanel" runat="server">
                     <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox>
                     <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
@@ -84,9 +87,11 @@
             <%--End Date--%>
             <div style="display: inline-block;">
                 <label for="txtTo" style="font-size: 1.2em">To:</label>
+
                 <asp:Panel ID="endDateInfoPanel" runat="server" Style="display:inline;">
                     <asp:Label ID="endDateInfoTxt" runat="server" Style="display: inline;font-size:1.05em"></asp:Label>
                 </asp:Panel>
+
                 <asp:Panel ID="endDateApplyPanel" runat="server">
                     <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" AutoPostBack="true" OnTextChanged="datesEntered"></asp:TextBox>
                     <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
@@ -95,21 +100,26 @@
 
             </div>
         </div>
+
+        <%--Apply mode, View mode: Shows the number of days being applied for--%>
+        <%--Edit mode: allows a HR 1 or HR 2 to edit the number of days applied for--%> 
         <asp:Panel ID="numDaysAppliedForPanel" CssClass="row form-group" runat="server">
-            <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-right: 5px; cursor: pointer"
-                data-toggle="tooltip"
-                data-placement="left"
-                title="This count is a literal count and does not take into consideration all holidays and weekends. Consult with HR to find out the exact amount of days taken"></i>
+
+            <%--apply mode, view mode--%>
             <label for="numDaysAppliedFor" style="font-size: 1.2em">Days applied for:</label>
+
             <asp:Label ID="numDaysAppliedFor" runat="server" Text="0" Style="font-size: 1.05em"></asp:Label>
+
+            <%--edit mode--%>
             <asp:TextBox ID="numDaysAppliedForEditTxt" runat="server" Width ="35px" Visible="false" ></asp:TextBox>
-            <asp:RegularExpressionValidator ValidationGroup="editGroup" 
-                        ID="RegularExpressionValidator11" runat="server" 
-                        ControlToValidate="numDaysAppliedForEditTxt" 
-                        ErrorMessage="Please enter a valid number" ForeColor="Red" 
-                        ValidationExpression="^[0-9]*$" 
-                        Display="Dynamic">  
-                    </asp:RegularExpressionValidator>
+            <asp:RegularExpressionValidator ValidationGroup="editGroup"
+                ID="RegularExpressionValidator11" runat="server"
+                ControlToValidate="numDaysAppliedForEditTxt"
+                ErrorMessage="Please enter a valid number" ForeColor="Red"
+                ValidationExpression="^[0-9]*$"
+                Display="Dynamic">  
+            </asp:RegularExpressionValidator>
+
         </asp:Panel>
 
          <%--View mode: Shows if leave application is qualified--%> 
@@ -138,7 +148,9 @@
         <%--View mode: Shows the supervisor the leave application was submitted to--%>
         <%--Apply mode: Allows user to enter supervisor to send leave application to--%>
         <div class="row form-group">
+
             <label for="supervisor_select" style="font-size:1.2em; display:inline;">Supervisor:</label>
+
             <%--apply mode--%>
             <asp:Panel ID="supervisorSelectUserControlPanel" runat="server" Style="display: inline;">
                 <ajaxToolkit:ComboBox ID="supervisorSelect"
@@ -162,19 +174,27 @@
             <asp:Panel ID="supervisorPanel" runat="server"  Style="display:inline;">
                 <asp:Label ID="supervisorNameTxt" runat="server" Style="text-align:center;font-size:1.05em;"></asp:Label>
             </asp:Panel>
+
         </div>
 
         <%--Apply mode: Allows user to upload docs--%>
         <asp:Panel ID="fileUploadPanel" runat="server" Style="margin:0 auto; text-align:center" CssClass="row form-group">
+
             <label for="FileUpload1" style="font-size:1.2em; display:inline;">Upload Files:</label>
+
             <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin:0 auto; display: inline-block; background-color: lightgrey" AllowMultiple="true"/> 
+            
             <asp:LinkButton ID="uploadFilesBtn" runat="server" OnClick="uploadBtn_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Upload files">
                 <i class="fa fa-upload" aria-hidden="true"></i>
             </asp:LinkButton>
+
             <asp:LinkButton ID="clearAllFilesBtn" runat="server" OnClick="clearUploadedFiles_Click" OnClientClick="return confirm('Clear all files?');" CssClass="btn btn-sm btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Clear all uploaded files">
                 <i class="fa fa-times" aria-hidden="true"></i>
             </asp:LinkButton>
+
             <br />
+
+            <%--Shows the files uploaded to Session--%>
             <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align: left; margin: 0 auto; display: inline-block;">
                 Files Uploaded:
                 <asp:ListView ID="filesUploadedListView" runat="server" GroupItemCount="10">
@@ -215,15 +235,22 @@
 
                 </asp:ListView>
             </asp:Panel>
-            <br />                            
+
+            <br />       
+                                 
         </asp:Panel>
 
+        <%--View mode, Edit mode: shows a downloadable list of all the files associated with a LA--%>
         <asp:Panel ID="filesToDownloadPanel" runat="server">
+
             <label for="filesToDownloadList" style="font-size:1.2em; display:inline;">Previously uploaded files:</label>
+
             <asp:DropDownList ID="filesToDownloadList" runat="server"></asp:DropDownList>
+
             <asp:LinkButton ID="btnDownloadFiles" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Download file" OnClick="btnDownloadFiles_Click" Style="display:inline-block; margin-left:5px;">
                 <i class="fa fa-download" aria-hidden="true"></i>
             </asp:LinkButton>
+
         </asp:Panel>
         
 
@@ -246,21 +273,26 @@
             <textarea runat="server" class="form-control" id="hrCommentsTxt" rows="4" style="width:45%; margin:0 auto;font-size:1.05em;"></textarea>
         </asp:Panel>
 
+        <%--Shows info relevant to the employee but which does not stop them from completing a LA--%>
         <div class="row" id="infoRow" style="margin-bottom:5px;">
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
+
                     <asp:Panel ID="daysTakenDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display:none; margin:0px 5px; width:450px;" role="alert">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
                         <span id="Span10" runat="server">Disclaimer: days applied for may not be completely accurate and is subject to change. Consult HR for further information</span>
                     </asp:Panel>
+
                     <asp:Panel ID="holidayInAppliedTimePeriodPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin:0px 5px;width:450px;" role="alert">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
                         <span id="holidayInAppliedTimeTxt" runat="server"></span>
                     </asp:Panel>
+
                     <asp:Panel ID="submitHardCopyOfMedicalDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin:0px 5px;width:450px;" role="alert">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
                         <span id="Span13" runat="server">A hard copy of your medical leave must also be submitted to HR</span>
                     </asp:Panel>
+
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
@@ -273,6 +305,7 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="startDateIsHolidayTxt" runat="server"></span>
                     </asp:Panel>
+
                     <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="endDateIsHolidayTxt" runat="server"></span>
@@ -292,14 +325,17 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
                     </asp:Panel>
+
                     <asp:Panel ID="startDateBeforeTodayValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="startDateBeforeTodayValidationMsg" runat="server">Start date cannot be before today</span>
                     </asp:Panel>
+
                     <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
                     </asp:Panel>
+
                     <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
@@ -314,6 +350,7 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidVacationStartDateMsg" runat="server">You must request vacation leave at least a month before the start date</span>
                     </asp:Panel>
+
                     <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
@@ -370,6 +407,7 @@
                                  <i class="fa fa-times" aria-hidden="true"></i>
                                  Cancel
                         </asp:LinkButton>
+
                         <asp:LinkButton ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click">
                                  <i class="fa fa-send" aria-hidden="true"></i>
                                  Submit
@@ -378,16 +416,20 @@
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
+
+        <%--Edit mode: contains submit button and validaation messages for edits made--%>
         <asp:Panel ID="submitEditsPanel" runat="server" CssClass="row" Style="margin-top: 15px;">
             <asp:LinkButton ID="submitEditsBtn" runat="server" CssClass="btn btn-success" OnClick="submitEditsBtn_Click" ValidationGroup="editGroup">
                 <i class="fa fa-floppy-o" aria-hidden="true"></i>
                 Save edit(s)
             </asp:LinkButton>
+
             <asp:Panel ID="noEditsMadePanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block;" role="alert" Visible="false">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <span id="Span9" runat="server">No edits made</span>
                 <asp:Button ID="Button2" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left:3px;" OnClick="returnToPreviousBtn_Click"/>
             </asp:Panel>
+
             <asp:Panel ID="successfulSubmitEditsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
                 <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                 <span id="Span2" runat="server">Edits successfully made</span>
@@ -399,7 +441,6 @@
                 <span id="Span14" runat="server">Error editing application</span>
                 <asp:Button ID="Button3" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left:3px;" OnClick="returnToPreviousBtn_Click"/>
             </asp:Panel>
-
 
         </asp:Panel>
 

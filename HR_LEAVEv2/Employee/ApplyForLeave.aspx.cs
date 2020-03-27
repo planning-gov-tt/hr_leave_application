@@ -135,18 +135,24 @@ namespace HR_LEAVEv2.Employee
         // VALIDATION METHODS
         protected Boolean validateDates(string startDate, string endDate)
         {
+            // returns a Boolean representing whether the dates entered for the start date and end date of the leave period specified are valid
+            // also shows error/warning/info messages accordingly
+
             clearDateErrors();
-            DateTime start, end;
-            start = end = DateTime.MinValue;
+
+            DateTime start = DateTime.MinValue, 
+                     end = DateTime.MinValue;
+
             Boolean isValidated = true;
 
-            // validate start date is a date
+            // ensure start date is a valid date
             if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start))
             {
                 invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
                 isValidated = false;
             }
 
+            // ensure end date is a valid date
             if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
             {
                 invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
@@ -155,8 +161,8 @@ namespace HR_LEAVEv2.Employee
 
             if (isValidated)
             {
-                //todo: inform user if there are holidays in between their dates
 
+                // inform user that there are holidays in between the leave period applied for
                 List<string> holidaysInBetween = getHolidaysInLeavePeriod(start, end);
                 if (holidaysInBetween.Count > 0)
                 {
@@ -164,14 +170,14 @@ namespace HR_LEAVEv2.Employee
                     holidayInAppliedTimePeriodPanel.Style.Add("display", "inline-block");
                 }
 
-                //ensure start date is not a holiday
+                // ensure start date is not a holiday
                 holidaysInBetween = getHolidaysInLeavePeriod(start, start);
                 if (holidaysInBetween.Count > 0)
                 {
                     startDateIsHolidayTxt.InnerText = $"Start date cannot be on {holidaysInBetween.ElementAt(0)}";
                     startDateIsHoliday.Style.Add("display", "inline-block");
                 }
-                //ensure end date is not a holiday
+                // ensure end date is not a holiday
                 holidaysInBetween = getHolidaysInLeavePeriod(end, end);
                 if (holidaysInBetween.Count > 0)
                 {
@@ -179,21 +185,21 @@ namespace HR_LEAVEv2.Employee
                     endDateIsHoliday.Style.Add("display", "inline-block");
                 }
 
-                //ensure start date is not a weekend
+                // ensure start date is not on the weekend
                 if (start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
                 {
                     startDateIsWeekend.Style.Add("display", "inline-block");
                     isValidated = false;
                 }
 
-                //ensure end date is not weekend
+                // ensure end date is not on the weekend
                 if (end.DayOfWeek == DayOfWeek.Saturday || end.DayOfWeek == DayOfWeek.Sunday)
                 {
                     endDateIsWeekend.Style.Add("display", "inline-block");
                     isValidated = false;
                 }
 
-                // compare dates to ensure end date is not before start date
+                // ensure end date is not before start date
                 if (DateTime.Compare(start, end) > 0)
                 {
                     dateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
@@ -202,14 +208,14 @@ namespace HR_LEAVEv2.Employee
 
                 if (!String.IsNullOrEmpty(typeOfLeave.SelectedValue))
                 {
-                    // ensure start date is not a day before today once not sick leave
+                    // once not sick leave, ensure start date is not a day before today 
                     if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, DateTime.Today) < 0)
                     {
                         startDateBeforeTodayValidationMsgPanel.Style.Add("display", "inline-block");
                         isValidated = false;
                     }
 
-                    // if leave type is vacation: ensure start date is at least one month from today
+                    // if leave type is vacation, ensure start date is at least one month from today
                     if (typeOfLeave.SelectedValue.Equals("Vacation"))
                     {
                         DateTime firstDateVacationCanBeTaken = DateTime.Today.AddMonths(1);
@@ -221,12 +227,14 @@ namespace HR_LEAVEv2.Employee
                         }
                     }
 
-                    // if type of leave is sick: ensure you can only apply for it retroactively
+                    // if type of leave is sick, ensure you can only apply for it retroactively
                     if (typeOfLeave.SelectedValue.Equals("Sick"))
                     {
 
                         //todo: if sick days span a weekend, warn user
 
+                        // ensure that if employee applies for more than two days consecutive sick leave, they are warned that they must
+                        // upload a file (medical)
                         if ((end - start).Days + 1 > 2)
                         {
                             List<HttpPostedFile> files = null;
@@ -247,6 +255,7 @@ namespace HR_LEAVEv2.Employee
                             }
                         }
 
+                        // ensure sick leave ends before today (sick leave is taken retroactively)
                         if (DateTime.Compare(end, DateTime.Today) > 0)
                         {
                             invalidSickLeaveStartDate.Style.Add("display", "inline-block");
@@ -259,7 +268,7 @@ namespace HR_LEAVEv2.Employee
             return isValidated;
         }
 
-        public IEnumerable<DateTime> EachCalendarDay(DateTime startDate, DateTime endDate)
+        protected IEnumerable<DateTime> EachCalendarDay(DateTime startDate, DateTime endDate)
         {
             for (var date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1))
                 yield
@@ -268,6 +277,8 @@ namespace HR_LEAVEv2.Employee
 
         protected List<string> getHolidaysInLeavePeriod(DateTime start, DateTime end)
         {
+            // returns a List<string> containing the names of holidays which fall in between the leave period specified
+
             Dictionary<string, DateTime> publicHolidays = new Dictionary<string, DateTime>() {
                     { "New Years", new DateTime(DateTime.Now.Year, 1, 1) },
                     { "New Years Day", new DateTime(DateTime.Now.Year + 1, 1, 1) },
@@ -285,7 +296,6 @@ namespace HR_LEAVEv2.Employee
                 };
 
             List<string> holidaysInBetween = new List<string>();
-            //todo: inform user if there are holidays in between their dates
             foreach (DateTime day in EachCalendarDay(start, end))
             {
                 foreach (KeyValuePair<string, DateTime> holiday in publicHolidays)
@@ -300,6 +310,8 @@ namespace HR_LEAVEv2.Employee
 
         protected Boolean validateLeave(string typeOfLeaveSelected)
         {
+            // returns a Boolean representing whether the type of leave selected is valid. The appropriate validation message is also constructed and 
+            // shown to the user
             invalidLeaveTypePanel.Style.Add("display", "none");
             invalidLeaveTypeTxt.InnerText = string.Empty;
 
@@ -315,10 +327,11 @@ namespace HR_LEAVEv2.Employee
                 }
                 else
                 {
-                    // validate choice of leave
                     string empType = string.Empty,
                         leaveBalanceToGet = string.Empty;
+
                     int leaveBalance = 0;
+
                     DateTime startDate = DateTime.MinValue;
 
                     switch (typeOfLeaveSelected)
@@ -346,15 +359,11 @@ namespace HR_LEAVEv2.Employee
                             break;
                     }
 
+                    // get employee's employment type, start date and the leave balance of the type of leave applied for
                     try
                     {
                         string sql = $@"
-                        SELECT ep.employment_type, ep.start_date, e.{leaveBalanceToGet} as 'leave_balance', 
-	                        IIF('{typeOfLeaveSelected}' IN (SELECT [leave_type] FROM [HRLeaveTestDb].[dbo].[emptypeleavetype] elt WHERE elt.employment_type = ep.employment_type), 
-		                        'Yes', 
-		                        'No'
-	                        ) AS 'isLeaveTypeValid'
-
+                        SELECT ep.employment_type, ep.start_date, e.{leaveBalanceToGet} as 'leave_balance'
                         FROM dbo.employee e
                         JOIN dbo.employeeposition ep
                         ON e.employee_id = ep.employee_id
@@ -372,7 +381,7 @@ namespace HR_LEAVEv2.Employee
                                     {
                                         empType = reader["employment_type"].ToString();
                                         startDate = Convert.ToDateTime(reader["start_date"].ToString());
-                                        isValid = reader["isLeaveTypeValid"].ToString();
+                                        isValid = "Yes";
                                         leaveBalance = Convert.ToInt32(reader["leave_balance"].ToString());
 
                                     }
@@ -385,12 +394,10 @@ namespace HR_LEAVEv2.Employee
                         throw ex;
                     }
 
+                    // check if the amt of days taken is more than that MAX_DAYS_PAST_BALANCE
                     int daysTaken = Convert.ToInt32(numDaysAppliedFor.Text);
-                    if (String.IsNullOrEmpty(isValid) || String.IsNullOrWhiteSpace(isValid))
+                    if (daysTaken >= (leaveBalance + MAX_DAYS_PAST_BALANCE) && files == null)
                         isValid = "No";
-                    else if (daysTaken >= (leaveBalance + MAX_DAYS_PAST_BALANCE) && files == null)
-                        isValid = "No- Too much days";
-
 
 
                     empType = String.IsNullOrEmpty(empType) || String.IsNullOrWhiteSpace(empType) ? "unregistered" : empType;
@@ -399,29 +406,32 @@ namespace HR_LEAVEv2.Employee
                     {
                         DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
 
+                        
                         if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
                         {
+                            // ensure employee cannot apply for vacation within first 11 months of Contract
                             if (typeOfLeaveSelected == "Vacation")
+                            {
+                                isValid = "No";
                                 errTxt = "Cannot apply for Vacation leave within first 11 months of contract";
+                            }
+                                
                         }
                         else
                         {
+                            // ensure that employee cannot apply for personal leave after first 11 months of Contract
                             if (typeOfLeaveSelected == "Personal")
+                            {
+                                isValid = "No";
                                 errTxt = "Cannot apply for Personal leave after first 11 months of contract";
+                            }
+                               
                         }
 
                     }
                     else if (isValid == "No")
-                    {
-                        errTxt = $"Cannot apply for {typeOfLeaveSelected} leave as {empType} worker";
-                    }
-                    else if (isValid == "No- Too much days")
-                    {
                         errTxt = "Not eligible for amount of leave applied for";
-                    }
-
                 }
-
             }
             else
             {
@@ -429,7 +439,7 @@ namespace HR_LEAVEv2.Employee
                 errTxt = "Type of Leave not selected";
             }
 
-            if (!String.IsNullOrEmpty(errTxt))
+            if (isValid == "No" || !String.IsNullOrEmpty(errTxt))
             {
                 invalidLeaveTypeTxt.InnerText = errTxt;
                 invalidLeaveTypePanel.Style.Add("display", "inline-block");
@@ -440,6 +450,7 @@ namespace HR_LEAVEv2.Employee
 
         protected Boolean validateSupervisor(string supId)
         {
+            // returns a Boolean representing whether the supervisor is valid (has an id that is not -1)
             invalidSupervisor.Style.Add("display", "none");
             if (supId == "-1")
                 invalidSupervisor.Style.Add("display", "inline-block");
@@ -448,43 +459,62 @@ namespace HR_LEAVEv2.Employee
         }
         // _______________________________________________________________________
 
+
         // CLEAR ERRORS METHODS
         protected void clearDateErrors()
         {
-            // date errors
+            // clears all errors associated with the validation of dates
+
             dateComparisonValidationMsgPanel.Style.Add("display", "none");
+
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+
             startDateBeforeTodayValidationMsgPanel.Style.Add("display", "none");
+
             invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+
             invalidVacationStartDateMsgPanel.Style.Add("display", "none");
+
             invalidSickLeaveStartDate.Style.Add("display", "none");
+
             moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
+
             startDateIsWeekend.Style.Add("display", "none");
+
             endDateIsWeekend.Style.Add("display", "none");
+
             holidayInAppliedTimePeriodPanel.Style.Add("display", "none");
+
             startDateIsHoliday.Style.Add("display", "none");
+
             endDateIsHoliday.Style.Add("display", "none");
         }
 
         protected void clearSubmitLeaveApplicationErrors()
         {
+            // clears all errors associated with submitting a leave application
             errorInsertingFilesToDbPanel.Style.Add("display", "none");
+
             errorSubmittingLeaveApplicationPanel.Style.Add("display", "none");
+
             errorSendingEmailNotifications.Style.Add("display", "none");
+
             errorSendingInHouseNotifications.Style.Add("display", "none");
         }
 
         protected void clearFilesErrors()
         {
+            // clears all errors associated with uploading/clearing/downloading files
             invalidFileTypePanel.Style.Add("display", "none");
             fileUploadedTooLargePanel.Style.Add("display", "none");
         }
         //________________________________________________________________________
 
+        
         // INITIAL PREP OF PAGE BASED ON MODE
         protected void adjustPageForViewMode()
         {
-            //Title
+            // sets Title of page
             viewModeTitle.Visible = true;
             editModeTitle.Visible = false;
             applyModeTitle.Visible = false;
@@ -540,7 +570,7 @@ namespace HR_LEAVEv2.Employee
 
         protected void adjustPageForEditMode(LeaveTransactionDetails ltDetails)
         {
-            //Title
+            // Title
             viewModeTitle.Visible = false;
             editModeTitle.Visible = true;
             applyModeTitle.Visible = false;
@@ -548,12 +578,12 @@ namespace HR_LEAVEv2.Employee
             // upload files
             fileUploadPanel.Visible = true;
 
-            //if supervisor on leave application, then they can leave a comment
+            // if supervisor on leave application, then they can leave a comment
             if (Session["emp_id"].ToString() == ltDetails.supId)
                 supCommentsTxt.Disabled = false;
 
+            // adjust page to allow HR to leave comments or edit the number of days applied for
             List<string> permissions = (List<string>)Session["permissions"];
-
             if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
             {
                 hrCommentsTxt.Disabled = false;
@@ -563,15 +593,17 @@ namespace HR_LEAVEv2.Employee
             else
                 numDaysAppliedFor.Visible = true;
 
-
+            // submit button
             submitEditsPanel.Visible = true;
 
         }
         //________________________________________________________________________
 
+        
         // POPULATION OF DATA FIELDS ON PAGE FOR VIEW AND EDIT MODE
         protected LeaveTransactionDetails populatePage(string leaveId)
         {
+            // populates the page with the relevant details 
             LeaveTransactionDetails ltDetails = null;
 
             // get info for relevant leave application based on passed leaveId and populate form controls
@@ -762,7 +794,7 @@ namespace HR_LEAVEv2.Employee
                             // store previous HR comment in viewstate
                             ViewState["hrComment"] = hrCommentsTxt.Value = ltDetails.hrComment;
 
-                            //populate dropdown list with file names
+                            //populate dropdown list with file names if there are files associated with the LA
                             /* Since the file name is gotten by using a join on both the employee id and the leave transaction id then the file name will always be relevant and not
                              * a different file with the same filename
                              * 
@@ -853,9 +885,11 @@ namespace HR_LEAVEv2.Employee
         }
         //________________________________________________________________________
 
+        
         // FILES METHODS
         protected void uploadBtn_Click(object sender, EventArgs e)
         {
+            // uploads file to Session storage to await upload to DB
             if (FileUpload1.HasFiles)
             {
                 List<string> filesTooLarge = new List<string>();
@@ -874,6 +908,7 @@ namespace HR_LEAVEv2.Employee
 
                 // used to check whether the file(s) uploaded are of a certain format
                 List<string> allowedFileExtensions = new List<string>() { ".pdf", ".doc", ".docx" };
+
                 foreach (HttpPostedFile uploadedFile in FileUpload1.PostedFiles)
                 {
                     if (uploadedFile.ContentLength < maxRequestLength)
@@ -913,7 +948,6 @@ namespace HR_LEAVEv2.Employee
 
                 if (dt.Rows.Count > 0)
                 {
-
 
                     // add files to session so they will persist after postback
                     Session["uploadedFiles"] = files;
@@ -960,6 +994,7 @@ namespace HR_LEAVEv2.Employee
 
         protected void clearUploadedFiles_Click(object sender, EventArgs e)
         {
+            // clears uploaded files from Session storage
 
             filesUploadedPanel.Visible = false;
             FileUpload1.Dispose();
@@ -982,6 +1017,8 @@ namespace HR_LEAVEv2.Employee
 
         protected void btnDownloadFiles_Click(object sender, EventArgs e)
         {
+            // downloads the files uploaded to a LA
+
             string file = filesToDownloadList.SelectedValue.ToString();
             try
             {
@@ -1030,6 +1067,8 @@ namespace HR_LEAVEv2.Employee
 
         protected void clearIndividualFileBtn_Click(object sender, EventArgs e)
         {
+            // remove an individual file from List of uploaded files in Session
+
             LinkButton btn = sender as LinkButton;
             string file_name = btn.Attributes["data-id"].ToString();
 
@@ -1044,10 +1083,7 @@ namespace HR_LEAVEv2.Employee
 
                 HttpPostedFile fileToRemove = files.SingleOrDefault<HttpPostedFile>(file => Path.GetFileName(file.FileName).ToString() == file_name);
                 if (fileToRemove != null)
-                {
                     files.Remove(fileToRemove);
-                }
-
 
                 if (files.Count > 0)
                 {
@@ -1299,6 +1335,7 @@ namespace HR_LEAVEv2.Employee
 
         protected void sendNotifications()
         {
+            // sends both email and in application notifs to the relevant users
 
             Boolean isEmailNotifsSentSuccessfully = false,
                     isInAppNotifsSentSuccessfully = false;
@@ -1393,6 +1430,7 @@ namespace HR_LEAVEv2.Employee
             {
                 isInAppNotifsSentSuccessfully = false;
             }
+
             //send supervisor notif
             try
             {
@@ -1426,17 +1464,16 @@ namespace HR_LEAVEv2.Employee
 
         protected void resetNumNotifications()
         {
-            // set number of notifications
-
+            // resets the number of notifications for the current user
             Label num_notifs = (Label)Master.FindControl("num_notifications");
             num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
 
             System.Web.UI.UpdatePanel up = (System.Web.UI.UpdatePanel)Master.FindControl("notificationsUpdatePanel");
             up.Update();
         }
-
         //________________________________________________________________________
 
+        
         // EDIT MODE: LA EDITED
         protected void submitEditsBtn_Click(object sender, EventArgs e)
         {
@@ -1670,24 +1707,33 @@ namespace HR_LEAVEv2.Employee
         }
         //________________________________________________________________________
 
+        
         // METHODS FIRED WHEN FORM INPUTS CHANGE
         protected void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // validates supervisor whenever the user changes the supervisor value
             validateSupervisor(supervisorSelect.SelectedValue);
         }
 
         protected void datesEntered(object sender, EventArgs e)
         {
-            DateTime start, end;
-            start = end = DateTime.MinValue;
-            Boolean isStartDateFilled, isEndDateFilled;
-            isStartDateFilled = DateTime.TryParseExact(txtFrom.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start);
-            isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
+            // populates the value for the number of days applied for 
 
+
+            DateTime start = DateTime.MinValue, 
+                     end = DateTime.MinValue;
+
+            Boolean isStartDateFilled = DateTime.TryParseExact(txtFrom.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start),
+                    isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
+
+            // if type of leave has been selected (typeOfLeave.SelectedIndex == 0 when no leave type has been selected as yet) and the dates are valid
+            // OR if the start and end date are filled
             if ((typeOfLeave.SelectedIndex != 0 && validateDates(txtFrom.Text, txtTo.Text)) || (isStartDateFilled && isEndDateFilled))
             {
+                // checks to see if the amt of days in between the start and the end is greater than 0, otherwise the value will be 0
                 numDaysAppliedFor.Text = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1).ToString() : "0";
 
+                // reduces the number of days applied for if holidays fall in between the leave period applied for
                 List<string> holidays = getHolidaysInLeavePeriod(start, end);
                 if (holidays.Count > 0)
                     numDaysAppliedFor.Text = $"{ Convert.ToInt32(numDaysAppliedFor.Text) - holidays.Count}";
@@ -1705,13 +1751,16 @@ namespace HR_LEAVEv2.Employee
         }
         //________________________________________________________________________
 
+        
         protected void refreshForm(object sender, EventArgs e)
         {
+            // refreshes form by redirecting back to the page
             Response.Redirect("~/Employee/ApplyForLeave.aspx");
         }
 
         protected void returnToPreviousBtn_Click(object sender, EventArgs e)
         {
+            // returns to wherever is specified in the query string, returnUrl
             Response.Redirect(Request.QueryString["returnUrl"]);
         }
 
