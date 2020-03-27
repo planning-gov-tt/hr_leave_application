@@ -36,6 +36,7 @@ namespace HR_LEAVEv2.HR
 
             if (!IsPostBack)
             {
+                // persists option for which type of employees to view, active or inactive
                 if (Session["viewForAllEmployees"] != null)
                 {
                     employeeStatusDropDown.SelectedValue = Session["viewForAllEmployees"].ToString();
@@ -385,11 +386,13 @@ namespace HR_LEAVEv2.HR
 
         protected void newEmployeeBtn_Click(object sender, EventArgs e)
         {
+            // redirects to create new employee page
             Response.Redirect("~/HR/EmployeeDetails.aspx?mode=create");
         }
 
         protected void employeeStatusDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // change the type of employees to view, Active or Inactive
             Session["viewForAllEmployees"] = employeeStatusDropDown.SelectedValue;
             ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
             DataPager1.SetPageProperties(0, 8, false);
