@@ -1252,8 +1252,8 @@ namespace HR_LEAVEv2.HR
              *  
              * Employment Records
              *  Datatable is formatted in the folowing manner in the ItemArray:
-                Index:         0             1            2         3        4        5          6               7              8           9
-                Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date
+                Index:         0             1            2         3        4        5          6               7              8           9           10          11
+                Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date  status  status_class
 
                 The record_id field is used to distinguish between records that are:
                     1. Newly added records (not yet in the db but must be added): record_id = -1
@@ -1504,8 +1504,8 @@ namespace HR_LEAVEv2.HR
             // EDIT EMPLOYMENT RECORDS--------------------------------------------------------------------------------------------------------------------------
             /**
                 * datatable is formatted in the folowing manner in the ItemArray:
-                * Index:         0             1            2         3        4        5          6               7              8           9
-                * Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date
+                * Index:         0             1            2         3        4        5          6               7              8           9            10       11
+                * Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date  status  status_class
             * */
 
             if (dt.Rows.Count > 0)
@@ -1513,10 +1513,10 @@ namespace HR_LEAVEv2.HR
                 // a list to contain the ids of deleted employment records. This list is used to create audit logs for deletion of records
                 List<string> deletedRecords = new List<string>();
 
-                //delete the records with an 'isChanged' field of '1'
+                // delete the records with an 'isChanged' field of '1'
                 foreach (DataRow dr in dt.Rows)
                 {
-                    // once the row does not represent a newly added row (which is not in DB) and the 'isChanged' field is '1' (representing a deleted row)
+                    // once the row does not represent a newly added row (which is not in DB thus cannot be deleted) and the 'isChanged' field is '1' (representing a deleted row)
                     if (dr.ItemArray[(int)emp_records_columns.record_id].ToString() != "-1" && dr.ItemArray[(int)emp_records_columns.isChanged].ToString() == "1")
                     {
                         try
@@ -1637,7 +1637,7 @@ namespace HR_LEAVEv2.HR
                     util.addAuditLog(Session["emp_id"].ToString(), empId, action);
                 }
 
-                List<string> editedRecords = new List<string>();
+                int numEditedRecords = 0;
                 List<string> editedEmpRecordsLog = new List<string>();
                 //edit records data from gridview
                 foreach (DataRow dr in dt.Rows)
@@ -1684,13 +1684,17 @@ namespace HR_LEAVEv2.HR
 
                                     if (isEmpRecordEditFieldsSuccessful)
                                     {
-                                        editedRecords.Add(dr.ItemArray[(int)emp_records_columns.record_id].ToString());
+                                        // increment counter for number of records edited
+                                        numEditedRecords++;
+
+                                        // create array of info about each Field edited for a given record. This array is used to create the action for an audit log
                                         if (Session["editedRecords"] != null)
                                         {
                                             Dictionary<string, HashSet<string>> editedRecordsDict = (Dictionary < string, HashSet< string >>) Session["editedRecords"];
 
                                             foreach(KeyValuePair<string, HashSet<string>> entry in editedRecordsDict)
                                             {
+                                                // create List<string> with record_id and Fields edited info in it
                                                 string log = $"record_id= {entry.Key}, Fields edited= {String.Join(", ", entry.Value.ToArray())}";
                                                 editedEmpRecordsLog.Add(log);
                                             }
@@ -1711,7 +1715,7 @@ namespace HR_LEAVEv2.HR
                 }
 
                 // add audit log for edited records
-                if (editedRecords.Count > 0)
+                if (numEditedRecords > 0)
                 {
                     /*
                     * Add info about edits made to employee such as:
@@ -1722,11 +1726,12 @@ namespace HR_LEAVEv2.HR
                     util.addAuditLog(Session["emp_id"].ToString(), empId, action);
                 }
 
-                if (deletedRecords.Count > 0 || addedRecords.Count > 0 || editedRecords.Count > 0)
+                if (deletedRecords.Count > 0 || addedRecords.Count > 0 || numEditedRecords > 0)
                     isEmpRecordChanged = true;
             }
             else
             {
+                // if table was empty
                 noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
                 isEmpRecordInsertSuccessful = isEmpRecordDeleteSuccessful = false;
             }
@@ -1818,8 +1823,6 @@ namespace HR_LEAVEv2.HR
         // ADD NEW EMPLOYEE METHOD
         protected void submitBtn_Click(object sender, EventArgs e)
         {
-            //TODO: add more specific error messages. Follow edit function's example
-
             this.clearErrors();
 
             Auth auth = new Auth();
@@ -1882,8 +1885,8 @@ namespace HR_LEAVEv2.HR
             // Employment Records
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
 
-            Boolean isInsertSuccessful, isDuplicateIdentifier;
-            isInsertSuccessful = isDuplicateIdentifier = false;
+            Boolean isInsertSuccessful = false,
+                isDuplicateIdentifier = false;
 
             // name from AD must be populated because that means the user exists in AD
             // dt cannot be null because that means that no employment record is added
@@ -1953,6 +1956,8 @@ namespace HR_LEAVEv2.HR
                 catch (Exception ex)
                 {
                     // exception logic
+
+                    // if duplicate employee is entered, ie. if an employee ID already within the system is inputted again
                     if (ex.Message.ToString().Contains("Violation of PRIMARY KEY constraint") || ex.Message.ToString().Contains("Cannot insert duplicate key in object 'dbo.employee'"))
                         isDuplicateIdentifier = true;
                     isInsertSuccessful = false;
