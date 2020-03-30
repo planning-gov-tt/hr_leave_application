@@ -117,6 +117,8 @@ namespace HR_LEAVEv2.HR
                         }
                     }
 
+                    // the following sql ensures that out of all an employees employment records, only the most recent one is considered for if the employee can be accessed
+                    // by the current HR 
                     sql = $@"
                         SELECT
                         employee_id, ihris_id, Name, email, '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass

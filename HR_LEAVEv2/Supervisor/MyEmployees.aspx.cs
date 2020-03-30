@@ -43,6 +43,7 @@ namespace HR_LEAVEv2.Supervisor
         {
             try
             {
+                // the following sql gets all employees that are supervised by the current supervisor and that are currently active
                 string sql = $@"
                         SELECT
                             DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
