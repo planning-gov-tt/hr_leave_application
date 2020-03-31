@@ -28,19 +28,20 @@ namespace HR_LEAVEv2.UserControls
             {
                 // get employee employment type
                 //if contract
-                //  display sick leave balance
-                //  display personal leave balance if in first 11 months of contract
-                //  display vacation leave balance if in 12th month+ of contract
+                //  -display sick leave balance
+                //  -display personal leave balance if in first 11 months of contract
+                //  -display vacation leave balance if in 12th month+ of contract
 
                 //if public service
-                //  display sick leave balance
-                //  display casual leave balance
+                //  -display sick leave balance
+                //  -display casual leave balance 
+                //  -display vacation leave balance
 
 
                 vacationPanel.Visible = false;
                 personalPanel.Visible = false;
                 casualPanel.Visible = false;
-                sickPanel.Visible = true;
+                sickPanel.Visible = false;
 
                 EmployeeDetails empDetails = null;
                 string CS = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -50,7 +51,7 @@ namespace HR_LEAVEv2.UserControls
                             SELECT e.[sick], e.[vacation], e.[personal], e.[casual], ep.employment_type, FORMAT(ep.start_date, 'MM/dd/yy') as start_date
                             FROM [dbo].[employee] e
                             LEFT JOIN [dbo].employeeposition ep
-                            ON e.employee_id = ep.employee_id AND GETDATE()>=ep.start_date AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                            ON e.employee_id = ep.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
                             WHERE e.[employee_id] = '{Session["emp_id"]}'
                             ;
                         ";
@@ -75,7 +76,8 @@ namespace HR_LEAVEv2.UserControls
                         }     
                     }
 
-                    if(empDetails == null)
+                    // if no employment records available then show 0-ed out leave balance counter
+                    if (empDetails == null || String.IsNullOrEmpty(empDetails.employmentType))
                     {
                         empDetails = new EmployeeDetails()
                         {
@@ -86,84 +88,88 @@ namespace HR_LEAVEv2.UserControls
                             employmentType = string.Empty,
                             start_date = string.Empty
                         };
+                        inactiveEmpPanel.Visible = true;
                     }
-
-                    ViewState["sick"] = empDetails.sick;
-                    ViewState["vacation"] = empDetails.vacation;
-                    ViewState["personal"] = empDetails.personal;
-                    ViewState["casual"] = empDetails.casual;
-
-
-
-                    if (empDetails.employmentType == "Contract")
+                    else
                     {
-                        /* contract employees
-                            * for a new employee: 
-                            *  vacation = 20 
-                            *  personal = 5
-                            * 
-                            * During the first 11 months of contract, employee only has access to the 5 personal days. 
-                            * After the 11 months, they have access to their:
-                            *          vacation days - days used from personal
-                        */
+                        sickPanel.Visible = true;
 
-                        // is employee in first 11 months of contract?
-                        DateTime startDate = Convert.ToDateTime(empDetails.start_date);
-                        DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
+                        ViewState["sick"] = empDetails.sick;
+                        ViewState["vacation"] = empDetails.vacation;
+                        ViewState["personal"] = empDetails.personal;
+                        ViewState["casual"] = empDetails.casual;
 
-                        if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
-                            // display personal 
-                            personalPanel.Visible = true;
-                        else
+
+
+                        if (empDetails.employmentType == "Contract")
                         {
-                            int personal = Convert.ToInt16(empDetails.personal);
+                            /* contract employees
+                                * for a new employee: 
+                                *  vacation = 20 
+                                *  personal = 5
+                                * 
+                                * During the first 11 months of contract, employee only has access to the 5 personal days. 
+                                * After the 11 months, they have access to their:
+                                *          vacation days - days used from personal
+                            */
 
-                            if (personal > 0)
+                            // is employee in first 11 months of contract?
+                            DateTime startDate = Convert.ToDateTime(empDetails.start_date);
+                            DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
+
+                            if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                                // display personal 
+                                personalPanel.Visible = true;
+                            else
                             {
-                                // subtract personal days used from vacation
-                                int updatedVacation = Convert.ToInt16(empDetails.vacation);
-                                updatedVacation = updatedVacation - (5 - personal);
+                                int personal = Convert.ToInt16(empDetails.personal);
 
-                                if (updatedVacation != Convert.ToInt16(empDetails.vacation))
+                                if (personal > 0)
                                 {
-                                    // update vacation and personal in db
-                                    try
+                                    // subtract personal days used from vacation
+                                    int updatedVacation = Convert.ToInt16(empDetails.vacation);
+                                    updatedVacation = updatedVacation - (5 - personal);
+
+                                    if (updatedVacation != Convert.ToInt16(empDetails.vacation))
                                     {
-                                        string updateVacationSql = $@"
+                                        // update vacation and personal in db
+                                        try
+                                        {
+                                            string updateVacationSql = $@"
                                         UPDATE [dbo].employee 
                                         SET vacation = '{updatedVacation}', personal = '0'
                                         WHERE employee_id = '{Session["emp_id"]}';
                                     ";
-                                        using (SqlCommand cmd = new SqlCommand(updateVacationSql, con))
-                                        {
-                                            int rowsAffected = cmd.ExecuteNonQuery();
-                                            if (rowsAffected > 0)
+                                            using (SqlCommand cmd = new SqlCommand(updateVacationSql, con))
                                             {
-                                                ViewState["vacation"] = updatedVacation.ToString();
+                                                int rowsAffected = cmd.ExecuteNonQuery();
+                                                if (rowsAffected > 0)
+                                                {
+                                                    ViewState["vacation"] = updatedVacation.ToString();
+                                                }
                                             }
                                         }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        //exception logic
-                                        throw ex;
+                                        catch (Exception ex)
+                                        {
+                                            //exception logic
+                                            throw ex;
+                                        }
                                     }
                                 }
+
+                                // display vacation 
+                                vacationPanel.Visible = true;
                             }
 
-                            // display vacation 
+                        }
+                        else if (empDetails.employmentType == "Public Service")
+                        {
+                            // public service employees
+                            casualPanel.Visible = true;
                             vacationPanel.Visible = true;
                         }
-
-                    }
-                    else if (empDetails.employmentType == "Public Service")
-                    {
-                        // public service employees
-                        casualPanel.Visible = true;
-                        vacationPanel.Visible = true;
-                    }
+                    }  
                 } 
-
             }
         }
 

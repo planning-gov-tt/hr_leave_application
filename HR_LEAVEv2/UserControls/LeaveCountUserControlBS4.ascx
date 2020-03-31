@@ -42,12 +42,22 @@
 
 
 <div class="container" style =" height:250px">
+
     <div class="row" style="margin-bottom:10px;">
         <div class="col text-center">
             <h4 id="leaveCountHeader">Current Leave Balance</h4>
         </div>
     </div>
+
     <div class="row text-center">
+
+
+        <asp:Panel ID="inactiveEmpPanel" runat="server" Visible ="false" Style="display:inline-block;">
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <span>Leave Balances unavailable since this employee is inactive</span>
+            </div>
+        </asp:Panel>
 
         <%--sick--%>
         <asp:Panel ID="sickPanel" runat="server" CssClass="col count-block" Style="display:inline-block;">

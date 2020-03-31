@@ -13,6 +13,15 @@ namespace HR_LEAVEv2.UserControls {
     public partial class LeaveCountUserControlBS4 {
         
         /// <summary>
+        /// inactiveEmpPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel inactiveEmpPanel;
+        
+        /// <summary>
         /// sickPanel control.
         /// </summary>
         /// <remarks>

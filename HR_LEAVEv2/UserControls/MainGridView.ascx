@@ -11,45 +11,64 @@
 
 <%--filter fields--%>
 <div id="filterContainer" class="container" style="padding-bottom: 30px">
+
     <div class="row" style="text-align: right">
+
+        <%--Submitted From--%>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbSubmittedFrom" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter submitted from date" Style="width: 75%; display: inline;" placeholder="Submitted From"></asp:TextBox>
             <i id="fromCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender3" TargetControlID="tbSubmittedFrom" PopupButtonID="fromCalendarSubmitted" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
+
+        <%--Submitted to--%>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbSubmittedTo" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter submitted to date" Style="width: 75%; display: inline;" placeholder="Submitted To"></asp:TextBox>
             <i id="toCalendarSubmitted" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender4" TargetControlID="tbSubmittedTo" PopupButtonID="toCalendarSubmitted" runat="server" Format="d/MM/yyyy"/>
         </div>
+
+        <%--Start Date--%>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbStartDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter start date" Style="width: 75%; display: inline;" placeholder="Start Date"></asp:TextBox>
             <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="tbStartDate" PopupButtonID="fromCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
         </div>
+
+        <%--End Date--%>
         <div class="col-xs-3 form-group">
             <asp:TextBox ID="tbEndDate" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter end date" Style="width: 75%; display: inline;" placeholder="End Date"></asp:TextBox>
             <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
             <ajaxToolkit:CalendarExtender ID="CalendarExtender2" TargetControlID="tbEndDate" PopupButtonID="toCalendar" runat="server" Format="d/MM/yyyy"/>
         </div>
+
     </div>
+
+    <%--Supervisor Name/ID search string--%>
     <div id="divTbSupervisor" class="row" runat="server">
         <div class="col-sm-12 form-group" style="text-align: center">
             <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="right" title="Enter supervisor name/ID" placeholder="Supervisor Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
+
+    <%--Employee Name/ID search string--%>
     <div id="divTbEmployee" class="row" runat="server">
         <div class="col-sm-12 form-group" style="text-align: center">
             <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="right" title="Enter employee name/ID" placeholder="Employee Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
+
     <div class="row">
+
+        <%--Leave Types--%>
         <div class="col-sm-4">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter type of leave" runat="server" ID="ddlType" DataSourceID="SqlDataSource1" DataTextField="type_id" DataValueField="type_id" AppendDataBoundItems="true">
                 <asp:ListItem Text="Leave Types (All)" Value=""></asp:ListItem>
             </asp:DropDownList>
             <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" SelectCommand="SELECT [type_id] FROM [leavetype] ORDER BY [type_id] DESC"></asp:SqlDataSource>
         </div>
+
+        <%--Status of LA--%>
         <div class="col-sm-4">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter status of leave" runat="server" ID="ddlStatus">
                 <asp:ListItem Text="Status (All)" Value=""></asp:ListItem>
@@ -61,6 +80,8 @@
                 <asp:ListItem Text="Date Change Requested" Value="Date Change Requested"></asp:ListItem>
             </asp:DropDownList>
         </div>
+
+        <%--Qualified--%>
         <div class="col-sm-4">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter value for if user is qualified" runat="server" ID="ddlQualified">
                 <asp:ListItem Text="Qualified (All)" Value=""></asp:ListItem>
@@ -68,23 +89,28 @@
                 <asp:ListItem Text="No" Value="No"></asp:ListItem>
             </asp:DropDownList>
         </div>
+
     </div>
+
 </div>
 
-<%--button--%>
+<%--filter submit or clear buttons--%>
 <div class="container" style="padding-bottom: 12px; text-align: center">
     <asp:LinkButton ID="clearFilterBtn" runat="server" CssClass="btn btn-primary" Style="margin-left: 5px;" OnClick="clearFilterBtn_Click">
          <i class="fa fa-times"></i>
          Clear Filter
     </asp:LinkButton>
+
     <asp:LinkButton ID="filterBtn" runat="server" OnClick="btnFilter_Click" CssClass="btn btn-primary">
          <i class="fa fa-filter" aria-hidden="true"></i>
          Filter
     </asp:LinkButton>
+
     <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px;  cursor:pointer"  
         data-toggle="tooltip" 
         data-placement="right" 
-        title="Filter finds records which fulfill all the entered constraints"></i>
+        title="Filter finds records which fulfill all the entered constraints">
+    </i>
 </div>
 
 
@@ -93,20 +119,27 @@
 
     <%--if grid view is empty then show notification panel--%>
     <div class="row text-center" id="validationRow" style="margin-bottom:25px;">
+
+        <%--Validation Panel--%>
         <asp:UpdatePanel ID="UpdatePanelMsgs" runat="server">
+
             <ContentTemplate>
+
                 <asp:Panel ID="emptyGridViewMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="validationMsg" runat="server">No leave data available</span>
                 </asp:Panel>
+
                 <asp:Panel ID="invalidSubmittedFromDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidSubmittedFromDateMsg" runat="server">Submitted from date is not valid</span>
                 </asp:Panel>
+
                 <asp:Panel ID="invalidSubmittedToDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidSubmittedToDateMsg" runat="server">Submitted to date is not valid</span>
                 </asp:Panel>
+
                 <asp:Panel ID="submittedDateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="submittedDateComparisonValidationMsg" runat="server">Submitted to date cannot precede submitted from</span>
@@ -115,16 +148,21 @@
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
                 </asp:Panel>
+
                 <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
                 </asp:Panel>
+
                 <asp:Panel ID="appliedForDateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
-                </asp:Panel>               
+                </asp:Panel> 
+                              
             </ContentTemplate>
+
         </asp:UpdatePanel>
+
     </div>
     
     
@@ -209,29 +247,40 @@
                     <i class="fa fa-undo" aria-hidden="true"></i>
                     </asp:LinkButton>
                 </ItemTemplate>
+
             </asp:TemplateField>
 
         </Columns>
+
     </asp:GridView>
 
-    <%--Modal--%>
+    <%--Modal to enter comments when Not Recommending or Not Approving a LA--%>
     <div class="modal fade" id="commentsModal" tabindex="-1" role="dialog" aria-labelledby="commentsModalTitle" aria-hidden="true">
+
         <div class="modal-dialog" role="document" style="width: 50%;">
+
             <div class="modal-content">
+
                 <div class="modal-header text-center">
-                    <h2 class="modal-title" id="commentsModalTitle" style="display: inline; width: 150px;">Comments
-                    </h2>
+
+                    <h2 class="modal-title" id="commentsModalTitle" style="display: inline; width: 150px;">Comments</h2>
+
                     <button type="button" class="close" runat="server" onserverclick="closeCommentModal_Click" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+
                 <asp:UpdatePanel ID="commentsUpdatePanel" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
+
                         <div class="modal-body text-center">
+
                             <asp:HiddenField ID="previousCommentsHiddenField" runat="server" />
                             <asp:HiddenField ID="commentModalTransactionIdHiddenField" runat="server" />
                             <asp:HiddenField ID="commentModalEmployeeIdHiddenField" runat="server" />
+
                             <asp:Label ID="Label1" runat="server" Text="Enter comment:" Font-Size="Medium"></asp:Label>
+
                             <textarea id="commentsTxtArea" runat="server" cols="20" rows="4" class="form-control" style="width: 45%; margin: 0 auto; font-size: 1.05em;"></textarea>
 
                             <%--No Comment added--%>
@@ -257,17 +306,28 @@
                                     <span id="Span2" runat="server">Comments successfully edited</span>
                                 </span>
                             </asp:Panel>
+
                         </div>
+
                         <div class="modal-footer">
+
                             <asp:LinkButton runat="server" ID="submitCommentBtn" class="btn btn-primary" CausesValidation="false" OnClick="submitCommentBtn_Click">
                                         <i class="fa fa-send" aria-hidden="true"></i>
                                         Submit
                             </asp:LinkButton>
+
                             <asp:Button ID="closeCommentModal" runat="server" Text="Close" CssClass="btn btn-secondary" OnClick="closeCommentModal_Click" />
+                        
                         </div>
+
                     </ContentTemplate>
+
                 </asp:UpdatePanel>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
