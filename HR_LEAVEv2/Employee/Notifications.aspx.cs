@@ -15,15 +15,13 @@ namespace HR_LEAVEv2.Employee
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)
-            {
                 bindListView();
-            }
            
         }
 
         protected void resetNumNotifications()
         {
-            // set number of notifications
+            // resets number of notifications for current user
             Util util = new Util();
 
             Label num_notifs = (Label)Master.FindControl("num_notifications");
@@ -80,7 +78,7 @@ namespace HR_LEAVEv2.Employee
 
         protected void ListView1_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
         {
-            // set current page startindex,max rows and rebind to false  
+            // set current page startindex, max rows and rebind to false  
             DataPager1.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
             // Rebind the ListView1  
             bindListView();
@@ -88,6 +86,7 @@ namespace HR_LEAVEv2.Employee
 
         protected void readBtn_Click(object sender, EventArgs e)
         {
+            // sets an individual notification to read
             LinkButton btn = sender as LinkButton;
             string id = btn.Attributes["data-id"].ToString();
             try
@@ -117,6 +116,8 @@ namespace HR_LEAVEv2.Employee
 
         protected void unreadBtn_Click(object sender, EventArgs e)
         {
+            // sets an individual notification to unread
+
             LinkButton btn = sender as LinkButton;
             string id = btn.Attributes["data-id"].ToString();
             try
@@ -145,6 +146,8 @@ namespace HR_LEAVEv2.Employee
 
         protected void deleteBtn_Click(object sender, EventArgs e)
         {
+            // deletes an individual notification
+
             LinkButton btn = sender as LinkButton;
             string id = btn.Attributes["data-id"].ToString();
             try

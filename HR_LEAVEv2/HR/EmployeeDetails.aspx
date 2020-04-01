@@ -603,10 +603,10 @@
                             <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date" DataFormatString="{0:d/MM/yyyy}"/>
 
                             <%--Index 8: isChanged--%>
-                            <asp:BoundField HeaderText="isChanged" DataField="isChanged" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden" />
+                            <asp:BoundField HeaderText="isChanged" DataField="isChanged" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden"/>
 
                             <%--Index 9: actual_end_date--%>
-                            <asp:BoundField HeaderText="Actual End Date" DataField="actual_end_date"/>
+                            <asp:BoundField HeaderText="Actual End Date" DataField="actual_end_date" />
 
                              <%--Index 10: status--%>
                             <asp:TemplateField HeaderText="Status">

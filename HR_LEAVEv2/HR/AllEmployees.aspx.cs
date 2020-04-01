@@ -36,6 +36,7 @@ namespace HR_LEAVEv2.HR
 
             if (!IsPostBack)
             {
+                // persists option for which type of employees to view, active or inactive
                 if (Session["viewForAllEmployees"] != null)
                 {
                     employeeStatusDropDown.SelectedValue = Session["viewForAllEmployees"].ToString();
@@ -116,20 +117,29 @@ namespace HR_LEAVEv2.HR
                         }
                     }
 
+                    // the following sql ensures that out of all an employees employment records, only the most recent one is considered for if the employee can be accessed
+                    // by the current HR 
                     sql = $@"
                         SELECT
-                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email , '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
-                            FROM dbo.employee e
-                            JOIN employeeposition ep
-                            ON ep.employee_id = e.employee_id
-                            WHERE ep.employment_type='{emp_type}' AND e.employee_id <> {Session["emp_id"].ToString()} AND e.employee_id {isActive} 
-                            (
-                                select ep.employee_id
-                                from dbo.employeeposition ep
-                                where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
-                                group by ep.employee_id
-                                having count(*) > 0
-                            );
+                        employee_id, ihris_id, Name, email, '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
+                        FROM
+
+                        (
+                            SELECT
+                                ROW_NUMBER() OVER(PARTITION BY ep.employee_id ORDER BY ep.start_date DESC) as RowNum, e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, ep.employment_type
+                                FROM dbo.employee e
+                                JOIN employeeposition ep
+                                ON ep.employee_id = e.employee_id
+                                WHERE e.employee_id <> {Session["emp_id"].ToString()} AND e.employee_id {isActive} 
+                                (
+                                    select ep.employee_id
+                                    from dbo.employeeposition ep
+                                    where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                    group by ep.employee_id
+                                    having count(*) > 0
+                                )
+                        ) Employees
+                        WHERE RowNum = 1 AND employment_type='{emp_type}'
                     ";
                 }
 
@@ -294,14 +304,15 @@ namespace HR_LEAVEv2.HR
             try
             {
                 string sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, p.pos_name
+                        SELECT TOP 1 e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, p.pos_name
                         FROM [dbo].[employee] e
                         RIGHT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
 
                         INNER JOIN [dbo].position p
                         ON ep.position_id = p.pos_id
-                        WHERE e.employee_id = {emp_id};
+                        WHERE e.employee_id = {emp_id}
+                        ORDER BY ep.start_date DESC;
                     ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -385,11 +396,13 @@ namespace HR_LEAVEv2.HR
 
         protected void newEmployeeBtn_Click(object sender, EventArgs e)
         {
+            // redirects to create new employee page
             Response.Redirect("~/HR/EmployeeDetails.aspx?mode=create");
         }
 
         protected void employeeStatusDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // change the type of employees to view, Active or Inactive
             Session["viewForAllEmployees"] = employeeStatusDropDown.SelectedValue;
             ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
             DataPager1.SetPageProperties(0, 8, false);

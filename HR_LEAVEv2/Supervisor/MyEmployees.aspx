@@ -15,35 +15,52 @@
 
     <h1><%: Title %></h1>
     <div class="container-fluid">
+
         <div class="container" style="width: 65%;">
+
             <div class="row text-center" style="margin-top: 25px;">
+
+                <%--Search Bar--%>
                 <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group" Style="width: 510px; margin: 0 auto;">
+
                     <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control" placeholder="Search Employee" aria-label="Search Employee" aria-describedby="basic-addon2" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
+                    
                     <div class="input-group-addon">
+
                         <asp:LinkButton ID="searchBtn" runat="server" OnClick="searchBtn_Click">
                             <span class="input-group-text" id="basic-addon2">
                                 <i class="fa fa-search"></i>
                             </span>
                         </asp:LinkButton>
+
                     </div>
+
                 </asp:Panel>
+
+                <%--Clear Search--%>
                 <button id="clearSearchBtn" class="btn btn-primary" style="display:none; margin-top:15px;">
                     <i class="fa fa-times"></i>
                     Clear Search
                 </button>
+
             </div>
+
         </div>
         <div class="container" style="width: 100%; margin-top: 55px;">
+
             <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;">
+
                 <EmptyDataTemplate>
                     <div class="alert alert-info text-center" role="alert" style="width: 30%; margin: auto">
                         <i class="fa fa-info-circle"></i>
                         No data on employees available
                     </div>
                 </EmptyDataTemplate>
+
                 <EmptyItemTemplate>
                     </td>
                 </EmptyItemTemplate>
+
                 <GroupTemplate>
                     <tr id="itemPlaceholderContainer" runat="server">
                         <td id="itemPlaceholder" runat="server"></td>
@@ -52,63 +69,107 @@
 
                 <ItemTemplate>
                     <td align="center">
+
                         <div class="custom-card" style="position: relative;">
+
+                            <%--employee icon--%>
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
+
+                            <%--employee name--%>
                             <h4 style="margin-top: 10px;">
-                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h4>
+                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label>
+                            </h4>
+
+                            <%--employee details--%>
                             <div class="custom-card-body">
+
+                                <%--employee ID--%>
                                 <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
                                     <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </div>
+
+                                <%--IHRIS ID--%>
                                 <span >
                                     <h5 style="display: inline;" class="custom-card-body-header-text">IHRIS ID:</h5>
                                     <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </span>
+
+                                <%--email--%>
                                 <span >
                                     <h5 class="custom-card-body-header-text">Email:</h5>
                                     <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </span>
+
                             </div>
+
                             <div class="custom-card-footer">
+
+                                <%--button to show employee details--%>
                                 <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
                                     <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
                                         <i class="fa fa-address-card-o" aria-hidden="true"></i>
                                     </button>
                                 </span>
+
                             </div>
+
                         </div>
+
                     </td>
+
                 </ItemTemplate>
 
                 <AlternatingItemTemplate>
+
                     <td align="center">
+
                         <div class="custom-card" style="margin-left: 20px; margin-right: 20px; position: relative;">
+
+                            <%--employee icon--%>
                             <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
+
+                            <%--employee name--%>
                             <h4 style="margin-top: 10px;">
-                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label></h4>
+                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label>
+                            </h4>
+
+                             <%--employee details--%>
                             <div class="custom-card-body">
+
+                                <%--employee ID--%>
                                 <div>
                                     <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
                                     <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </div>
+
+                                <%--IHRIS ID--%>
                                 <span >
                                     <h5 style="display: inline;" class="custom-card-body-header-text">IHRIS ID:</h5>
                                     <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </span>
+
+                                 <%--email--%>
                                 <span >
                                     <h5 class="custom-card-body-header-text">Email:</h5>
                                     <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
                                 </span>
+
                             </div>
+
                             <div class="custom-card-footer">
+
+                                <%--button to show employee details--%>
                                 <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
                                     <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
                                         <i class="fa fa-address-card-o" aria-hidden="true"></i>
                                     </button>
                                 </span>
+
                             </div>
+
                         </div>
+
                     </td>
                 </AlternatingItemTemplate>
 
@@ -132,27 +193,36 @@
                 </LayoutTemplate>
 
             </asp:ListView>
+
             <asp:DataPager ID="DataPager1" PagedControlID="ListView1" PageSize="8" runat="server">
                 <Fields>
                     <asp:NumericPagerField ButtonType="Link" />
                 </Fields>
             </asp:DataPager>
 
-            <%--Modal--%>
-
+            <%--Modal to view employee details--%>
             <div class="modal fade" id="empDetailsModal" tabindex="-1" role="dialog" aria-labelledby="empDetailsTitle" aria-hidden="true">
+
                 <div class="modal-dialog" role="document" style="width: 65%;">
+
                     <div class="modal-content">
+
                         <div class="modal-header text-center">
+
                             <h2 class="modal-title" id="empDetailsTitle" style="display: inline; width: 150px;">
                                 <span id="empNameDetails"></span>
                             </h2>
+
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
+
                         </div>
+
                         <div class="modal-body text-center">
+
                             <h3>Details</h3>
+
                             <div>
                                 <h4 style="display: inline">Employee ID:</h4>
                                 <span id="empIdDetails"></span>
@@ -167,6 +237,7 @@
                                 <h4 style="display: inline">Email:</h4>
                                 <span id="emailDetails"></span>
                             </div>
+
                             <div id="positionDetails">
                                 <div>
                                     <h4 style="display: inline">Employee Type:</h4>
@@ -184,7 +255,9 @@
                             </div>
 
                             <hr style="width: 45%;" />
+
                             <h3>Leave Balances</h3>
+
                             <div>
                                 <h4 style="display: inline">Vacation Leave Balance:</h4>
                                 <span id="vacationDetails"></span>
@@ -204,15 +277,21 @@
                                 <h4 style="display: inline">Sick Leave Balance:</h4>
                                 <span id="sickDetails"></span>
                             </div>
+
                         </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
 
         </div>
+
     </div>
 
     <script>
