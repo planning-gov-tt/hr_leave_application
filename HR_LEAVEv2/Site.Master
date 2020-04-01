@@ -48,8 +48,11 @@
         </asp:ScriptManager>
 
         <div class="wrapper">
+
             <!-- Sidebar -->
             <nav id="sidebar">
+
+                <%--Header--%>
                 <div class="sidebar-header">
                     <a href="<%= ResolveClientUrl("~/Default.aspx") %>">
                         <img id="mopd-logo" src="<%= ResolveClientUrl("~/Assets/mopd_logo.jpg") %>" alt="Ministry of Planning and Development"/>
@@ -57,32 +60,44 @@
                     </a>
                 </div>
 
+                <%--List of Links--%>
                 <ul class="list-unstyled components">
+
+                    <%--Home--%>
                     <li>
                         <a href="<%= ResolveClientUrl("~/Default.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Home">
                             <i class="fa fa-home navbar-link-icon"></i>
                             <span class="navbar-link-text">Home</span>
                         </a>
                     </li>
+
+                    <%--About Us--%>
                     <li>
                         <a href="<%= ResolveClientUrl("~/Employee/About.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="About Us">
                             <i class="fa fa-info-circle navbar-link-icon"></i>
                             <span class="navbar-link-text">About Us</span>
                         </a>
                     </li>
+
+                    <%--Understanding Leave--%>
                     <li>
                         <a href="<%= ResolveClientUrl("~/Employee/UnderstandingLeave.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Understanding Leave">
                             <i class="fa fa-book navbar-link-icon"></i>
                             <span class="navbar-link-text">Understanding Leave</span>
                         </a>
                     </li>
+
+                    <%--Apply for Leave--%>
                     <li>
                         <a href="<%= ResolveClientUrl("~/Employee/ApplyForLeave.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Apply for Leave">
                             <i class="fa fa-file navbar-link-icon"></i>
                             <span class="navbar-link-text">Apply for Leave</span>
                         </a>
                     </li>
+
+                    <%--Panel with Supervisor links--%>
                     <asp:Panel ID="supervisorPanel" runat="server">
+
                         <li>
                             <a id="supervisorDropdownParent" href="#supervisorSubmenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
                                 <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="Supervisor Actions">
@@ -92,6 +107,7 @@
                                     <span class="dropdown-arrow">&#9660;</span>
                                 </span>
                             </a>
+
                             <ul class="collapse list-unstyled submenu" id="supervisorSubmenu">
                                 <li>
                                     <a href="<%= ResolveClientUrl("~/Supervisor/MyEmployees.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="My Employees">
@@ -99,22 +115,30 @@
                                         <span class="navbar-link-text">My Employees</span>
                                     </a>
                                 </li>
+
                                 <li>
                                     <a href="<%= ResolveClientUrl("~/Supervisor/MyEmployeeLeaveApplications.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Applications">
                                         <i class="fa fa-inbox navbar-link-icon"></i>
                                         <span class="navbar-link-text">Leave Applications</span>
                                     </a>
                                 </li>
+
                                 <li>
                                     <a href="<%= ResolveClientUrl("~/Supervisor/Reports.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
                                         <i class="fa fa-pie-chart navbar-link-icon"></i>
                                         <span class="navbar-link-text">Reports</span>
                                     </a>
                                 </li>
+
                             </ul>
+
                         </li>
+
                     </asp:Panel>
+
+                    <%--Panel with links shared by HR 1 and HR 2--%>
                     <asp:Panel ID="hr1_hr2Panel" runat="server">
+
                         <li>
                             <a id="hr1_hr2DropdownParent" href="#hr1_hr2Submenu" data-toggle="collapse" aria-expanded="false" class="navbar-link dropdown-parent">
                                 <span class="tooltipped" data-toggle="tooltip" data-placement="right" title="HR Actions">
@@ -125,36 +149,49 @@
                                 </span>
                                 
                             </a>
+
                             <ul class="collapse list-unstyled submenu" id="hr1_hr2Submenu">
+
                                 <li>
                                     <a href="<%= ResolveClientUrl("~/HR/AllEmployees.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
                                         <i class="fa fa-users navbar-link-icon"></i>
                                         <span class="navbar-link-text">All Employees</span>
                                     </a>
                                 </li>
+
                                 <li>
                                     <a href="<%= ResolveClientUrl("~/HR/AllEmployeeLeaveApplications.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Applications">
                                         <i class="fa fa-inbox navbar-link-icon"></i>
                                         <span class="navbar-link-text">Leave Applications</span>
                                     </a>
                                 </li>
+
                                 <li>
                                     <a href="<%= ResolveClientUrl("~/HR/Reports.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
                                         <i class="fa fa-pie-chart navbar-link-icon"></i>
                                         <span class="navbar-link-text">Reports</span>
                                     </a>
                                 </li>
+
                             </ul>
+
                         </li>
+
                     </asp:Panel>
+
+                    <%--Panel with HR 3 links--%>
                     <asp:Panel ID="hr3Panel" runat="server">
+
                         <li>
                             <a href="<%= ResolveClientUrl("~/HR/AllEmployees.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="All Employees">
                                 <i class="fa fa-users navbar-link-icon"></i>
                                 <span class="navbar-link-text">All Employees</span>
                             </a>
                         </li>
+
                     </asp:Panel>
+
+                    <%--Notifications--%>
                     <li>
                         <a href="<%= ResolveClientUrl("~/Employee/Notifications.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Notifications">
                             <i class="fa fa-bell navbar-link-icon"></i>
@@ -166,29 +203,39 @@
                             </asp:UpdatePanel>                        
                         </a>
                     </li>
+
+                    <%--My Account--%>
                     <li>
                         <a href="<%= ResolveClientUrl("~/Employee/MyAccount.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="My Account">
                             <i class="fa fa-user-circle navbar-link-icon"></i>
                             <span class="navbar-link-text">My Account</span>
                         </a>
                     </li>
+
+                    <%--Help--%>
                     <li>
                         <a href="<%= ResolveClientUrl("~/Employee/Help.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Help">
                             <i class="fa fa-question-circle navbar-link-icon"></i>
                             <span class="navbar-link-text">Help</span>
                         </a>
                     </li>
+
                 </ul>
+
             </nav>
 
             <!-- Page Content -->
             <div id="content">
+
                 <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
                     <div class="container-fluid">
+
                         <button type="button" id="sidebarCollapse" class="btn btn-info">
                             <i class="fa fa-align-left"></i>
                             <span>Toggle Sidebar</span>
                         </button>
+
                         <span style="float:right; font-size:1.2em">
                             <%=Session["emp_username"].ToString() %>
                         </span>
@@ -197,24 +244,28 @@
                 </nav>
                 
                 <div id="userSelectContainer">
-                    <asp:DropDownList ID="ddlSelectUser" runat="server" AutoPostBack="true" OnSelectedIndexChanged="indexChanged">
-
-                    </asp:DropDownList>
+                    <asp:DropDownList ID="ddlSelectUser" runat="server" AutoPostBack="true" OnSelectedIndexChanged="indexChanged"> </asp:DropDownList>
                 </div>
-                <asp:ContentPlaceHolder ID="MainContent" runat="server">
-                </asp:ContentPlaceHolder>
+
+                <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+
             </div>
 
         </div>      
+
         <hr />
+
         <footer style="text-align:center;">
             <p>&copy; <%: DateTime.Now.Year %> - Ministry of Planning & Development</p>
         </footer>
+
     </form>
 
     <script type="text/javascript">
+
         var storage = window.sessionStorage;
 
+        // enable tool tips for all content pages
         Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             $(".content-tooltipped").tooltip('enable');
         });
@@ -223,12 +274,13 @@
 
             // maintain state of sidebar based on session storage
             var isActive = storage.getItem("isActive");
+
             if (isActive != null) {
                 $('#sidebar').css('transition', 'none');
                 if (isActive.toString().localeCompare("true") == 0) {
                     $('#sidebar').addClass("active");
 
-                    //enable tooltips
+                    //enable tooltips for sidenav
                     $(".tooltipped").tooltip('enable');
 
                     // hide logo
@@ -246,6 +298,7 @@
             }
 
             $('#sidebarCollapse').click(function () {
+
                 // sidebar has class of active when collapsed
                 $('#sidebar').toggleClass('active');
                 $('#sidebar').css('transition', 'all 0.2s');

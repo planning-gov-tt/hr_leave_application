@@ -49,6 +49,7 @@ body {
 }
 /*end style sidenav header*/
 
+
 /*style sidenav links*/
 #sidebar ul.components {
     padding-top: 10px;
@@ -72,12 +73,13 @@ body {
     text-align:center
 }
 #sidebar .navbar-link-text{
-    /*style text for link*/
+    /* style text for link*/
     width: 100px;
 }
-/*end style sidenav links*/
+/* end style sidenav links*/
 
-/*style collapsed sidenav*/
+
+/* style collapsed sidenav*/
 #sidebar.active {
     min-width: 85px;
     max-width: 85px;
@@ -103,9 +105,9 @@ body {
 /*end style collapsed sidenav*/
 
 
-/*style dropdown*/
+/* style dropdown _____________________________________________________*/
 
-/*style children of dropdown menu*/
+/* style children of dropdown menu*/
 #sidebar .submenu li{
     background-color:#6778bf;
 }
@@ -126,15 +128,16 @@ body {
 }
 
 
-/*indent children of dropdown menu when sidenav is expanded*/
+/* indent children of dropdown menu when sidenav is expanded*/
 #sidebar .submenu .navbar-link-icon{
     margin-left:15px;
 }
 
-/*remove indent of children of dropdown menu when sidenav is collapsed*/
+/* remove indent of children of dropdown menu when sidenav is collapsed*/
 #sidebar.active .submenu .navbar-link-icon{
     margin-left:0px;
 }
+/* end style dropdown _____________________________________________________*/
 
 /* style main content */
 #content{
@@ -203,11 +206,10 @@ a, a:active, a:focus, button, button:active, button:focus{
     bottom: 10px; 
     width:100%;
 }
-
 /* end styles for employee cards */
 
-/* styles for notification cards */
 
+/* styles for notification cards */
 .custom-notif-card{
     border:1px solid black; 
     height:300px; 
@@ -215,8 +217,8 @@ a, a:active, a:focus, button, button:active, button:focus{
     text-align:center;
     margin-bottom:20px;
 }
-
 /* end styles for notif cards */
+
 
 /* styles for calendar picker icon */
 .calendar-icon{
@@ -225,6 +227,8 @@ a, a:active, a:focus, button, button:active, button:focus{
 }
 /* end styles for calendar picker icon */
 
+/* style to hide elements*/
 .hidden{
     display:none;
 }
+/* end style to hide elements*/

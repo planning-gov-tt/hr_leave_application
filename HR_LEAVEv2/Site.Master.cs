@@ -11,14 +11,16 @@ namespace HR_LEAVEv2
 
         protected void Page_Init(object sender, EventArgs e)
         {
-
+            // sets employee email and employee id in Session. This is used for identification of the current user throughout the application
 
             Auth auth = new Auth();
-            // store employee's email in Session
-            
+
+            // store employee's email in Session variable once it is empty, ie. the first time the Master page is loaded
             if (Session["emp_email"] == null)
                 Session["emp_email"] = auth.getEmailOfSignedInUserFromActiveDirectory();
 
+            // if Session["emp_email"] is not null after getting call to auth.getEmailOfSignedInUserFromActiveDirectory() or 
+            // if the user info has been gotten already then set username of current user
             if (Session["emp_email"] != null)
             {
                 string username = auth.getUserInfoFromActiveDirectory(Session["emp_email"].ToString());
@@ -42,14 +44,21 @@ namespace HR_LEAVEv2
 
             if (permissions != null)
             {
+                // set displays based on what role a user plays 
+
+                // supervisor
                 if (permissions.Contains("sup_permissions"))
                 {
                     supervisorPanel.Style.Add("display", "block");
                 }
+
+                // HR 1 or HR 2
                 if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
                 {
                     hr1_hr2Panel.Style.Add("display", "block");
                 }
+
+                // HR 3
                 if (permissions.Contains("hr3_permissions"))
                 {
                     hr3Panel.Style.Add("display", "block");
@@ -59,6 +68,8 @@ namespace HR_LEAVEv2
             // load drop down list
             if (!IsPostBack)
             {
+
+                // USED FOR DEVELOPMENT PURPOSES - allows users to switch between user profiles
                 using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
                     SqlCommand cmd = new SqlCommand(
@@ -75,6 +86,7 @@ namespace HR_LEAVEv2
                     ddlSelectUser.DataBind();
                 }
                 ddlSelectUser.SelectedValue = Session["emp_email"].ToString();
+                // END DEVELOPMENT PURPOSES CODE --------------------------------------------------------
 
                 // set number of notifications
                 string count = string.Empty;
@@ -111,6 +123,7 @@ namespace HR_LEAVEv2
 
         protected void indexChanged(object sender, EventArgs e)
         {
+            // sets user data when switching between users with dropdown used in development
             Session["emp_email"] = ddlSelectUser.SelectedItem.Text;
             Session["emp_id"] = Session["permissions"] = null;
             Response.Redirect(Request.RawUrl);
