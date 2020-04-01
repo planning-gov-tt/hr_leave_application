@@ -283,11 +283,19 @@
 
                             <textarea id="commentsTxtArea" runat="server" cols="20" rows="4" class="form-control" style="width: 45%; margin: 0 auto; font-size: 1.05em;"></textarea>
 
+                            <%--Error submitting email--%>
+                            <asp:Panel ID="errorSubmittingEmailMsgPanel" runat="server" Style="display: inline-block; margin-top: 30px;" role="alert" Visible="false">
+                                <span class="alert alert-danger">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span0">Error sending email notification</span>
+                                </span>
+                            </asp:Panel>
+
                             <%--No Comment added--%>
                             <asp:Panel ID="noEditsMadePanel" runat="server" Style="display: inline-block; margin-top: 30px;" role="alert" Visible="false">
                                 <span class="alert alert-info">
                                     <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                    <span id="Span1" runat="server">No changes made to comments</span>
+                                    <span id="Span1">No changes made to comments</span>
                                 </span>
                             </asp:Panel>
 
@@ -295,7 +303,7 @@
                             <asp:Panel ID="addCommentSuccessPanel" runat="server" Style="display: inline-block; margin-top: 30px;" Visible="false" role="alert">
                                 <span class="alert alert-success">
                                     <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                                    <span id="Span9" runat="server">Comments successfully added to leave application</span>
+                                    <span id="Span9">Comments successfully added to leave application</span>
                                 </span>
                             </asp:Panel>
 
@@ -303,7 +311,7 @@
                             <asp:Panel ID="editCommentSuccessPanel" runat="server" Style="display: inline-block; margin-top: 30px;" Visible="false" role="alert">
                                 <span class="alert alert-success">
                                     <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                                    <span id="Span2" runat="server">Comments successfully edited</span>
+                                    <span id="Span2">Comments successfully edited</span>
                                 </span>
                             </asp:Panel>
 

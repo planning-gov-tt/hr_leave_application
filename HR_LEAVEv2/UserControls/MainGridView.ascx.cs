@@ -16,12 +16,16 @@ namespace HR_LEAVEv2.UserControls
     {
         Util util = new Util();
 
+        // used to identify which data and action buttons to show to user
         public string gridViewType { get; set; } // "emp", "sup", "hr"
 
+        // used to show employee relevant data/actions
         public bool btnEmpVisible { get; set; }
 
+        // used to show supervisor relevant data/actions
         public bool btnSupVisible { get; set; }
 
+        // used to show HR relevant data/actions
         public bool btnHrVisible { get; set; }
 
         private List<string> permissions;
@@ -29,7 +33,7 @@ namespace HR_LEAVEv2.UserControls
         //SQL date formatting
         //    FORMAT(getdate(), 'dd-MM-yy') as date
 
-        // general select
+        // general select that is used in constructing the relevant query based on who is viewing the gridview
         private string select = @"
             SELECT
                 lt.transaction_id transaction_id,
@@ -68,8 +72,9 @@ namespace HR_LEAVEv2.UserControls
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
 
-        // VARIABLES TO CHANGE VIEWSTATE VARIABLES //
-        // a simple toggle
+        // VARIABLES TO CHANGE VIEWSTATE VARIABLES 
+
+        // sort direction toggles between two values: DESC and ASC
         private string SortDirection
         {
             get { return ViewState["SortDirection"] != null ? ViewState["SortDirection"].ToString() : "ASC"; } // default to ASC if ViewState is null
@@ -83,7 +88,7 @@ namespace HR_LEAVEv2.UserControls
             set { ViewState["SortExpression"] = value; }
         }
 
-        // filter sql where clause variables
+        // filter variables used to create where clause
         private string SubmittedFrom
         {
             get { return ViewState["SubmittedFrom"] != null ? ViewState["SubmittedFrom"].ToString() : null; } 
@@ -186,12 +191,14 @@ namespace HR_LEAVEv2.UserControls
             }
         }
 
+        // GRIDVIEW METHODS
         private void BindGridView()
         {
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
                 SqlCommand sqlCommand = new SqlCommand();
-                
+
+                // used to build the where statement for the gridview
                 string whereBindGridView = "";
 
                 // emp gridview
@@ -215,14 +222,17 @@ namespace HR_LEAVEv2.UserControls
                 // hr gridview (most complex)
                 else if (gridViewType == "hr")
                 {
+                    // adjust the statuses that can be seen by a HR here. Ensures that the HR will only see statuses that are in the
+                    // list specified below
                     whereBindGridView = $@"
                         WHERE
                             status IN ('Not Recommended', 'Recommended', 'Approved', 'Not Approved') AND
                             e.employee_id != '{Session["emp_id"]}'
                     ";
 
-                    // check the type of leave someone can approve 
+                    // ensure that the type of leave shown to the HR can be approved by that HR 
                     string leaveType = "('Personal', 'No Pay', 'Bereavement', 'Maternity', 'Pre-retirement'";
+
                     if (permissions.Contains("approve_sick"))
                     {
                         leaveType += ", 'Sick'";
@@ -263,7 +273,7 @@ namespace HR_LEAVEv2.UserControls
 
 
                 //*************************************** FILTER ***************************************//
-                // add sql parameters in command for user entered values that did not have validation
+                // assume all form fields are validated by the time they reach this point'
                 string whereFilterGridView = "";
                 if (!string.IsNullOrEmpty(SubmittedFrom))
                 {
@@ -311,7 +321,7 @@ namespace HR_LEAVEv2.UserControls
                             (e.email LIKE @EmployeeName_ID)
                         ) 
                     ";
-                    sqlCommand.Parameters.AddWithValue("@EmployeeName_ID","%" + EmployeeName_ID + "%");
+                    sqlCommand.Parameters.AddWithValue("@EmployeeName_ID", "%" + EmployeeName_ID + "%");
                 }
                 if (!string.IsNullOrEmpty(LeaveType))
                 {
@@ -361,15 +371,14 @@ namespace HR_LEAVEv2.UserControls
                 // assume GV is not empty...if gridview is empty then show message update panel
                 emptyGridViewMsgPanel.Style.Add("display", "none");
                 if (GridView.Rows.Count == 0)
-                {
                     emptyGridViewMsgPanel.Style.Add("display", "inline-block");
-                }
             }
         }
-
-        // helper function to get column index by name
+ 
         int GetColumnIndexByName(GridViewRow row, string columnName)
         {
+            // helper function to get column index by name
+
             int columnIndex = 0;
             foreach (DataControlFieldCell cell in row.Cells)
             {
@@ -380,10 +389,11 @@ namespace HR_LEAVEv2.UserControls
             }
             return columnIndex;
         }
-
-        // changing button view/visibility - row by row
+        
         protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
+            // changing button view/visibility - row by row
+
             // get leave status for that row
             string leaveStatus = null;
             if (e.Row.RowType == DataControlRowType.DataRow)
@@ -403,24 +413,16 @@ namespace HR_LEAVEv2.UserControls
                     // employees are only allowed to CANCEL requests if they are still pending
                     // employees cannot edit leave requests
                     if (leaveStatus == "Pending")
-                    {
                         btnCancelLeave.Visible = true;
-                    }
                     else
-                    {
                         btnCancelLeave.Visible = false;
-                    }
                 }
             }
 
             // if supervisor view
             else if (gridViewType == "sup")
             {
-                // setting template firel coumn to visible
-                // e.Row.Cells[buttonColumnIndex].Visible = true;
-
                 // get supervisor buttons
-
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
                     LinkButton btnNotRecommended = (LinkButton)e.Row.FindControl("btnNotRecommended");
@@ -431,20 +433,20 @@ namespace HR_LEAVEv2.UserControls
                     // else do not show buttons
                     if (leaveStatus == "Pending" || leaveStatus == "Recommended" || leaveStatus == "Not Recommended")
                     {
-                        if(leaveStatus == "Recommended")
+                        // visual feedback for user on button to show whether LA is Recommended or Not Recommended
+                        if (leaveStatus == "Recommended")
                             btnRecommended.Style.Add("opacity", "0.55");
-                        else if(leaveStatus == "Not Recommended")
+                        else if (leaveStatus == "Not Recommended")
                             btnNotRecommended.Style.Add("opacity", "0.55");
+
                         btnNotRecommended.Visible = btnRecommended.Visible = true;
                     }
                     else
-                    {
                         btnNotRecommended.Visible = btnRecommended.Visible = btnEditLeaveRequest.Visible = false;
-                    }
                 }
             }
 
-            // if employee view OR hr view
+            // if hr view
             else if (gridViewType == "hr")
             {
                 if (e.Row.RowType == DataControlRowType.DataRow)
@@ -458,18 +460,19 @@ namespace HR_LEAVEv2.UserControls
                     // if recommended or not approved then show all buttons except undo
                     if (leaveStatus == "Recommended" || leaveStatus == "Not Approved")
                     {
-
-                        if(leaveStatus == "Not Approved")
+                        // visual feedback for Not Approved
+                        if (leaveStatus == "Not Approved")
                             btnNotApproved.Style.Add("opacity", "0.55");
 
                         btnUndoApprove.Visible = false;
                         btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = true;
                     }
 
-                    // if approved then ONLY show undo button
+                    // if approved then ONLY show undo button if conditions are right
                     else if (leaveStatus == "Approved")
                     {
 
+                        // ensure that a HR can undo an approve if the leave period has not already started
                         int startDateIndex = GetColumnIndexByName(e.Row, "start_date");
                         string startDate = e.Row.Cells[startDateIndex].Text.ToString();
 
@@ -480,7 +483,8 @@ namespace HR_LEAVEv2.UserControls
                             {
                                 //start = Convert.ToDateTime(startDate);
                                 start = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            } catch(FormatException fe)
+                            }
+                            catch (FormatException fe)
                             {
                                 throw fe;
                             }
@@ -491,7 +495,7 @@ namespace HR_LEAVEv2.UserControls
                             else
                                 btnUndoApprove.Visible = false;
                         }
-                       
+
                         btnNotApproved.Visible = btnApproved.Visible = false;
                     }
                     else if (leaveStatus == "Not Recommended")
@@ -542,9 +546,11 @@ namespace HR_LEAVEv2.UserControls
 
             string setStatement = "";
 
+            // view details of a LA
             if (commandName == "details")
                 Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=view&leaveId=" + transaction_id + "&returnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
 
+            // edit a LA
             if (commandName == "editLeaveRequest")
             {
                 // redirect to apply for leave form and prepopulate...
@@ -564,148 +570,138 @@ namespace HR_LEAVEv2.UserControls
                 }
                 sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
             }
-            else if (gridViewType == "sup" || gridViewType == "hr")
+            else if (gridViewType == "sup")
             {
-
-                if (gridViewType == "sup")
+                if (commandName == "notRecommended")
                 {
-                    if (commandName == "notRecommended")
-                    {
-                        // update status to Not Recommended
-                        status = "Not Recommended";
-                    }
-                    else if (commandName == "recommended")
-                    {
-                        // update status to Recommended
-                        status = "Recommended";                 
-                    }
+                    // update status to Not Recommended
+                    status = "Not Recommended";
+                }
+                else if (commandName == "recommended")
+                {
+                    // update status to Recommended
+                    status = "Recommended";
+                }
 
 
-
-                    // if sup view then update status, sup_edit_date                    
-                    setStatement = $@"
-                    SET
-                        [status]='{status}',
-                        [supervisor_edit_date] = CURRENT_TIMESTAMP 
+                // if sup view then update status, sup_edit_date                    
+                setStatement = $@"
+                SET
+                    [status]='{status}',
+                    [supervisor_edit_date] = CURRENT_TIMESTAMP 
                 ";
 
+                sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
+            }
+            else if (gridViewType == "hr")
+            {
+                if (commandName == "notApproved")
+                {
+                    // update status to NotApproved
+                    status = "Not Approved";
+                    setStatement = $@"
+                        SET
+                            [status]='{status}',
+                            [hr_manager_id] = '{Session["emp_id"]}', 
+                            [hr_manager_edit_date] = CURRENT_TIMESTAMP
+                        ";
                     sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
                 }
-                else if (gridViewType == "hr")
+                else // approve (subtract) or undo (add)
                 {
-
-                    if (commandName == "notApproved")
+                    string leaveType = "";
+                    if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
                     {
-                        // update status to NotApproved
-                        status = "Not Approved";
-                        setStatement = $@"
-                            SET
-                                [status]='{status}',
-                                [hr_manager_id] = '{Session["emp_id"]}', 
-                                [hr_manager_edit_date] = CURRENT_TIMESTAMP
-                            ";
-                        sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
+                        int indexLeavetype = GetColumnIndexByName(row, "leave_type");
+                        leaveType = (row.Cells[indexLeavetype].Text).ToString();
                     }
-                    else // approve (subtract) or undo (add)
+
+                    string sql = string.Empty;
+
+                    if (leaveType == "No Pay")
                     {
-                        string leaveType = "";
-                        if (row.RowType == DataControlRowType.DataRow) // makes sure it is not a header row, only data row
+                        // if command is approve, update status to Approved
+                        // if command is undo, reset status to Recommended
+                        status = commandName == "approved" ? "Approved" : "Recommended";
+
+                        sql = $@"
+                            -- updating the leave status
+                            UPDATE 
+                                [dbo].[leavetransaction]
+                            SET
+                                [status]='{status}', 
+                                [hr_manager_id] = '{Session["emp_id"]}', 
+                                [hr_manager_edit_date] = CURRENT_TIMESTAMP 
+                            WHERE 
+                                [transaction_id] = {transaction_id};
+                        ";
+                    }
+                    else
+                    {
+                        int daysTakenIndex = GetColumnIndexByName(row, "days_taken");
+
+                        // get difference
+                        int difference = Convert.ToInt32(row.Cells[daysTakenIndex].Text);
+
+                        // check leave type from Gridview to match with balance type in DB in order to update the right leave balance
+                        Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
+                        leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
+                        leaveBalanceColumnName.Add("Casual", "[casual]");
+                        leaveBalanceColumnName.Add("Maternity", "[maternity]");
+                        leaveBalanceColumnName.Add("Personal", "[personal]");
+                        leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
+                        leaveBalanceColumnName.Add("Sick", "[sick]");
+                        leaveBalanceColumnName.Add("Vacation", "[vacation]");
+
+                        // approved => subtract leave from balance
+                        string operation = "";
+                        if (commandName == "approved")
                         {
-                            int indexLeavetype = GetColumnIndexByName(row, "leave_type");
-                            leaveType = (row.Cells[indexLeavetype].Text).ToString();
-                        }
-                        string sql = string.Empty;
+                            // update status to Approved
+                            status = "Approved";
 
-                        if (leaveType == "No Pay")
+                            // Subtract Leave from balance
+                            operation = " - ";
+                        }
+
+                        // undo => add leave back
+                        else if (commandName == "undoApprove")
                         {
-                            // if command is approve, update status to Approved
-                            // if command is undo, reset status to Recommended
-                            status = commandName == "approved" ? "Approved" : "Recommended";
+                            // reset status to Recommended
+                            status = "Recommended";
 
-                            sql = $@"
-                                -- updating the leave status
-                                UPDATE 
-                                    [dbo].[leavetransaction]
-                                SET
-                                    [status]='{status}', 
-                                    [hr_manager_id] = '{Session["emp_id"]}', 
-                                    [hr_manager_edit_date] = CURRENT_TIMESTAMP 
-                                WHERE 
-                                    [transaction_id] = {transaction_id};
-                            ";
+                            // Add leave back to balance
+                            operation = " + ";
                         }
-                        else
-                        {
-                            int daysTakenIndex = GetColumnIndexByName(row, "days_taken");
 
-                            // get difference
-                            int difference = Convert.ToInt32(row.Cells[daysTakenIndex].Text);
+                        sql = $@"
+                            BEGIN TRANSACTION;
 
-                            // check leave type to match with balance type
-                            Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
-                            leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
-                            leaveBalanceColumnName.Add("Casual", "[casual]");
-                            leaveBalanceColumnName.Add("Maternity", "[maternity]");
-                            leaveBalanceColumnName.Add("Personal", "[personal]");
-                            leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
-                            leaveBalanceColumnName.Add("Sick", "[sick]");
-                            leaveBalanceColumnName.Add("Vacation", "[vacation]");
+                            -- updating the leave status
+                            UPDATE 
+                                [dbo].[leavetransaction]
+                            SET
+                                [status]='{status}', 
+                                [hr_manager_id] = '{Session["emp_id"]}', 
+                                [hr_manager_edit_date] = CURRENT_TIMESTAMP 
+                            WHERE 
+                                [transaction_id] = {transaction_id};
 
-                            // TODO: check if in good standing AKA Qualified (if employee has enough leave)
+                            -- updating employee leave balance
+                            UPDATE 
+                                [dbo].[employee]
+                            SET
+                                {leaveBalanceColumnName[leaveType]} = {leaveBalanceColumnName[leaveType]} {operation} {difference}
+                            WHERE
+                                [employee_id] = '{employee_id}';
 
-                            // approved => subtract leave from balance
-                            string operation = "";
-                            if (commandName == "approved")
-                            {
-                                // update status to Approved
-                                status = "Approved";
-                                //message.Subject = "Leave Application Approved";
+                            COMMIT;
+                        ";
+                    }
 
-                                // Subtract Leave from balance
-                                operation = " - ";
-                            }
-
-                            // undo => add leave back
-                            else if (commandName == "undoApprove")
-                            {
-                                // reset status to Recommended
-                                status = "Recommended";
-
-                                // Add leave back to balance
-                                operation = " + ";
-                            }
-
-                            sql = $@"
-                                BEGIN TRANSACTION;
-
-                                -- updating the leave status
-                                UPDATE 
-                                    [dbo].[leavetransaction]
-                                SET
-                                    [status]='{status}', 
-                                    [hr_manager_id] = '{Session["emp_id"]}', 
-                                    [hr_manager_edit_date] = CURRENT_TIMESTAMP 
-                                WHERE 
-                                    [transaction_id] = {transaction_id};
-
-                                -- updating employee leave balance
-                                UPDATE 
-                                    [dbo].[employee]
-                                SET
-                                    {leaveBalanceColumnName[leaveType]} = {leaveBalanceColumnName[leaveType]} {operation} {difference}
-                                WHERE
-                                    [employee_id] = '{employee_id}';
-
-                                COMMIT;
-                            ";
-                        }
-                        
-
-                        sqlCommand.CommandText = sql;
-                    }     
+                    sqlCommand.CommandText = sql;
                 }
             }
-            
             Boolean isQuerySuccessful;
             // execute sql
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
@@ -834,6 +830,8 @@ namespace HR_LEAVEv2.UserControls
                         throw ex;
                     }
 
+                    // if previous comment exists then populate textfield with it and store it in a hihdden field to check if the comment was edited
+                    // in any way later
                     commentsTxtArea.InnerText = previousCommentsHiddenField.Value = !String.IsNullOrEmpty(previousComment) ? previousComment : string.Empty;
                     Dictionary<string, string> rowData = new Dictionary<string, string>()
                     {
@@ -850,13 +848,14 @@ namespace HR_LEAVEv2.UserControls
                         { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Not Recommended" ? "Yes" : "No"},
                         { "employeeEmail", employeeEmail }
                     };
-                    
+
                     ViewState["notRecommendedRow"] = rowData;
 
                     // reset user feedback panels
                     noEditsMadePanel.Visible = false;
                     addCommentSuccessPanel.Visible = false;
                     editCommentSuccessPanel.Visible = false;
+                    errorSubmittingEmailMsgPanel.Visible = false;
 
                     // show modal for user to enter comment
                     ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal({'show':true, 'backdrop':'static', 'keyboard':false});", true);
@@ -871,7 +870,7 @@ namespace HR_LEAVEv2.UserControls
                 if (commandName == "approved")
                 {
 
-                    sendApprovedNotifications(row, employee_id, GridView.DataKeys[index].Values["supervisor_id"].ToString(),employeeEmail, supervisorEmail);
+                    sendApprovedNotifications(row, employee_id, GridView.DataKeys[index].Values["supervisor_id"].ToString(), employeeEmail, supervisorEmail);
 
                     actingEmployeeID = Session["emp_id"].ToString();
                     affectedEmployeeId = employee_id;
@@ -914,6 +913,8 @@ namespace HR_LEAVEv2.UserControls
                         throw ex;
                     }
 
+                    // if previous comment exists then populate textfield with it and store it in a hihdden field to check if the comment was edited
+                    // in any way later
                     commentsTxtArea.InnerText = previousCommentsHiddenField.Value = !String.IsNullOrEmpty(previousComment) ? previousComment : string.Empty;
                     Dictionary<string, string> rowData = new Dictionary<string, string>()
                     {
@@ -939,6 +940,7 @@ namespace HR_LEAVEv2.UserControls
                     noEditsMadePanel.Visible = false;
                     addCommentSuccessPanel.Visible = false;
                     editCommentSuccessPanel.Visible = false;
+                    errorSubmittingEmailMsgPanel.Visible = false;
 
                     // show modal for user to enter comment
                     ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal({'show':true, 'backdrop':'static', 'keyboard':false});", true);
@@ -983,13 +985,21 @@ namespace HR_LEAVEv2.UserControls
             this.GridView.PageIndex = e.NewPageIndex;
             this.BindGridView();
         }
+        // _________________________________________________________________
 
-        protected Boolean validateDates(string startDate, string endDate, int type)
+
+        // FILTER METHODS
+        protected Boolean validateDates(string startDate, string endDate, Panel invalidStartDateParam, Panel invalidEndDateParam, Panel invalidComparisonParam)
         {
+            // validates two dates and returns a Boolean representing whether they are valid or not
+
+            // clear errors before validating 
+            invalidStartDateParam.Style.Add("display", "none");
+            invalidEndDateParam.Style.Add("display", "none");
+            invalidComparisonParam.Style.Add("display", "none");
+
             if (String.IsNullOrEmpty(startDate) && String.IsNullOrEmpty(endDate))
                 return true;
-            // type 0: submitted from, submitted to
-            // type 1: start date, end date
 
             DateTime start, end;
             start = end = DateTime.MinValue;
@@ -998,39 +1008,25 @@ namespace HR_LEAVEv2.UserControls
             // validate start date is a date
             if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start) || String.IsNullOrEmpty(startDate))
             {
-                if (type == 0)
-                    invalidSubmittedFromDate.Style.Add("display", "inline-block");
-                else
-                    invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+                invalidStartDateParam.Style.Add("display", "inline-block");
                 isValidated = false;
             }
 
             // validate end date is a date
             if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end) || String.IsNullOrEmpty(endDate))
             {
-                if (type == 0)
-                    invalidSubmittedToDate.Style.Add("display", "inline-block");
-                else
-                    invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
+                invalidEndDateParam.Style.Add("display", "inline-block");
                 isValidated = false;
             }
-      
+
             if (isValidated)
             {
 
                 // compare dates to ensure end date is not before start date
                 if (DateTime.Compare(start, end) > 0)
                 {
-                    if (type == 0)
-                    {
-                        invalidSubmittedToDate.Style.Add("display", "inline-block");
-                        submittedDateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
-                    }
-                    else{
-                        invalidEndDateValidationMsgPanel.Style.Add("display", "inline-block");
-                        appliedForDateComparisonValidationMsgPanel.Style.Add("display", "inline-block");
-                    }
-
+                    invalidEndDateParam.Style.Add("display", "inline-block");
+                    invalidComparisonParam.Style.Add("display", "inline-block");
                     isValidated = false;
                 }
             }
@@ -1039,38 +1035,31 @@ namespace HR_LEAVEv2.UserControls
 
         protected void btnFilter_Click(object sender, EventArgs e)
         {
-            // check all textboxes/drop down lists and set the respective variables 
-            // these variables are then used in the
-
-            // reset all values to null throughout??
-
-            // check if control exists first?? (because some may be hidden)
-            SubmittedFrom = tbSubmittedFrom.Text.ToString();
-            SubmittedTo = tbSubmittedTo.Text.ToString(); 
-
-            StartDate = tbStartDate.Text.ToString();
-            EndDate = tbEndDate.Text.ToString(); 
-
-            // validate all dates
-            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
-            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
-            appliedForDateComparisonValidationMsgPanel.Style.Add("display", "none");
-            invalidSubmittedFromDate.Style.Add("display", "none");
-            invalidSubmittedToDate.Style.Add("display", "none");
-            submittedDateComparisonValidationMsgPanel.Style.Add("display", "none");
-
+            // check all textboxes/drop down lists and set the respective variables. These variables are checked when binding 
+            // the gridview in order to filter LAs
+            
             bool areSubmitDatesValidated = false, areAppliedDatesValidated = false;
-            areSubmitDatesValidated = validateDates(SubmittedFrom, SubmittedTo, 0);
-            areAppliedDatesValidated = validateDates(StartDate, EndDate, 1);
+            areSubmitDatesValidated = validateDates(tbSubmittedFrom.Text.ToString(), tbSubmittedTo.Text.ToString(), invalidSubmittedFromDate, invalidSubmittedToDate, submittedDateComparisonValidationMsgPanel);
+            areAppliedDatesValidated = validateDates(tbStartDate.Text.ToString(), tbEndDate.Text.ToString(), invalidStartDateValidationMsgPanel, invalidEndDateValidationMsgPanel, appliedForDateComparisonValidationMsgPanel);
+
             if (areSubmitDatesValidated && areAppliedDatesValidated)
             {
                 // display appropriate message in the notification panel
 
+                SubmittedFrom = tbSubmittedFrom.Text.ToString();
+                SubmittedTo = tbSubmittedTo.Text.ToString();
+
+                StartDate = tbStartDate.Text.ToString();
+                EndDate = tbEndDate.Text.ToString();
+
                 SupervisorName_ID = tbSupervisor.Text.ToString();
+
                 EmployeeName_ID = tbEmployee.Text.ToString();
 
                 LeaveType = ddlType.SelectedValue.ToString();
+
                 Status = ddlStatus.SelectedValue.ToString();
+
                 Qualified = ddlQualified.SelectedValue.ToString();
 
                 this.BindGridView();
@@ -1079,15 +1068,17 @@ namespace HR_LEAVEv2.UserControls
 
         protected void clearFilterBtn_Click(object sender, EventArgs e)
         {
-            // clear all filters 
+            // clear all filters
+             
             SubmittedFrom = String.Empty;
             tbSubmittedFrom.Text = String.Empty;
+
             SubmittedTo = String.Empty;
             tbSubmittedTo.Text = String.Empty;
 
-
             StartDate = String.Empty;
             tbStartDate.Text = String.Empty;
+
             EndDate = String.Empty;
             tbEndDate.Text = String.Empty;
 
@@ -1100,23 +1091,30 @@ namespace HR_LEAVEv2.UserControls
 
             SupervisorName_ID = String.Empty;
             tbSupervisor.Text = String.Empty;
+
             EmployeeName_ID = String.Empty;
             tbEmployee.Text = String.Empty;
 
             LeaveType = String.Empty;
             ddlType.SelectedIndex = 0;
+
             Status = String.Empty;
             ddlStatus.SelectedIndex = 0;
+
             Qualified = String.Empty;
             ddlQualified.SelectedIndex = 0;
 
-
             this.BindGridView();
         }
+        // _________________________________________________________________
 
+
+        // NOTIFICATIONS METHODS
         protected void sendApprovedNotifications(GridViewRow row, string employee_id, string supervisor_id, string employeeEmail, string supervisorEmail)
         {
+            // sends notifs to appropriate recipients (email and in house notifs)
 
+            // SEND EMAILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // send email to employee notifying them that their leave application was approved
             MailMessage message = util.getEmployeeViewLeaveApplicationApproved(
                     new Util.EmailDetails
@@ -1151,7 +1149,8 @@ namespace HR_LEAVEv2.UserControls
                     );
             util.sendMail(message);
 
-            // send in application notifications
+            // SEND IN APPLICATION NOTIFS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             // send notif to employee
             string notif_header = $"Leave Application Approved",
                    notification = $"Your leave application to {row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave was approved.";
@@ -1205,6 +1204,8 @@ namespace HR_LEAVEv2.UserControls
 
         protected void sendNotApprovedNotifications(string comment)
         {
+            // sends notifs to appropriate recipients (email and in house notifs)
+
             Dictionary<string, string> row = null;
             if (ViewState["notApprovedRow"] != null)
                 row = (Dictionary<string, string>)ViewState["notApprovedRow"];
@@ -1215,7 +1216,7 @@ namespace HR_LEAVEv2.UserControls
             if (row != null && row["isEmailSentAlready"] == "No")
             {
 
-                // send email notifications
+                // SEND EMAILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 string emailCommentString = string.Empty;
                 if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
@@ -1257,15 +1258,15 @@ namespace HR_LEAVEv2.UserControls
                     }
                 );
                 isSupervisorEmailSent = util.sendMail(message);
-               
-                if(isEmployeeEmailSent && isSupervisorEmailSent)
+
+                if (isEmployeeEmailSent && isSupervisorEmailSent)
                 {
                     row["isEmailSentAlready"] = "Yes";
                     ViewState["notApprovedRow"] = row;
-                }
+                } else
+                    errorSubmittingEmailMsgPanel.Visible = true;
 
-
-                // send in application notifications
+                // SEND IN HOUSE NOTIFS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 // send notif to employee
                 string notif_header = $"Leave Application Not Approved",
@@ -1330,7 +1331,10 @@ namespace HR_LEAVEv2.UserControls
 
         protected void sendRecommendedNotifications(GridViewRow row, string employee_id, string employeeEmail)
         {
-            // send email notifications
+            // sends email and in house notifs
+
+
+            // SEND EMAILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             // send email to employee notifying them that their supervisor recommended their leave to HR
             MailMessage message = util.getEmployeeViewLeaveApplicationRecommended(
@@ -1350,9 +1354,8 @@ namespace HR_LEAVEv2.UserControls
             util.sendMail(message);
 
             // send email to relevant HR officers letting them know that supervisor recommended application
-
             // get relevant HR officers info: id, emails
-            Dictionary<string,string> hr_info = new Dictionary<string, string>();
+            Dictionary<string, string> hr_info = new Dictionary<string, string>();
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -1416,7 +1419,7 @@ namespace HR_LEAVEv2.UserControls
                                 ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        using(SqlDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -1451,7 +1454,7 @@ namespace HR_LEAVEv2.UserControls
             );
             util.sendMail(message);
 
-            // send in application notifications
+            // SEND IN HOUSE NOTIFS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             // send notif to employee
             string notif_header = $"Leave Application Recommended",
@@ -1507,16 +1510,16 @@ namespace HR_LEAVEv2.UserControls
         }
 
         protected void sendNotRecommendedNotifications(string comment)
-
         {
+            // sends email and in house notifs
+
             Dictionary<string, string> row = null;
             if (ViewState["notRecommendedRow"] != null)
                 row = (Dictionary<string, string>)ViewState["notRecommendedRow"];
 
-            if(row != null && row["isEmailSentAlready"] == "No")
+            if (row != null && row["isEmailSentAlready"] == "No")
             {
-                // send email
-
+                // SEND EMAILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 string emailCommentString = string.Empty;
 
@@ -1524,7 +1527,6 @@ namespace HR_LEAVEv2.UserControls
                     emailCommentString = $"Your supervisor left the following comment: <blockquote style='font-size:1.1em;'>\"{comment}\"</blockquote>";
 
                 // send email to employee
-
                 MailMessage message = util.getEmployeeViewLeaveApplicationNotRecommended(
                     new Util.EmailDetails
                     {
@@ -1547,10 +1549,14 @@ namespace HR_LEAVEv2.UserControls
                     ViewState["notRecommendedRow"] = row;
                 }
                 else
+                {
                     ViewState["notRecommendedRow"] = null;
+                    errorSubmittingEmailMsgPanel.Visible = true;
+                }
+                    
 
-
-                // send in application notifs
+                // SEND IN HOUSE NOTIFS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                
                 // send notif to employee
                 string notif_header = $"Leave Application Not Recommended",
                        notification = $"Your leave application to {Session["emp_username"].ToString()} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not recommended.";
@@ -1591,12 +1597,15 @@ namespace HR_LEAVEv2.UserControls
             UpdatePanel up = (UpdatePanel)Page.Master.FindControl("notificationsUpdatePanel");
             up.Update();
         }
+        // _________________________________________________________________
 
+        
+        // COMMENT MODAL ACTIVATED WHEN AN EMPLOYEE IS NOT RECOMMENDED BY THEIR SUPERVISOR OR NOT APPROVED BY HR METHODS
         protected void submitCommentBtn_Click(object sender, EventArgs e)
         {
             // submit comment to leave transaction 
 
-            //get id of transaction
+            //get id of transaction, id of employee, previous comment on LA and current comment on LA
             string leaveId = commentModalTransactionIdHiddenField.Value,
                    employeeId = commentModalEmployeeIdHiddenField.Value,
                    previousComments = previousCommentsHiddenField.Value,
@@ -1686,6 +1695,8 @@ namespace HR_LEAVEv2.UserControls
             else if (gridViewType == "hr")
                 sendNotApprovedNotifications(comment);
         }
+        // _________________________________________________________________
+
     }
 }
 

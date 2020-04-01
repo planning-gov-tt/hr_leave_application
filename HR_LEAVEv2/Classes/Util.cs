@@ -9,7 +9,6 @@ namespace HR_LEAVEv2.Classes
 {
     public class Util
     {
-
         public class EmailDetails
         {
             public string employee_id { get; set; }
@@ -806,7 +805,7 @@ namespace HR_LEAVEv2.Classes
 
         /*
          * employee view: submitted LA
-         * Get the email body for the email sent to an employee they submit a LA
+         * Get the email body for the email sent to an employee when they submit a LA
          **/
         public MailMessage getEmployeeViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
