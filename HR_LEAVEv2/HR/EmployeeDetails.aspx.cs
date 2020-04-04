@@ -972,6 +972,9 @@ namespace HR_LEAVEv2.HR
             noEmploymentRecordEnteredErrorPanel.Style.Add("display", "none");
             fullFormSubmitSuccessPanel.Style.Add("display", "none");
 
+            // NO CHANGES MADE
+            noChangesMadePanel.Style.Add("display", "none");
+
             // EMPLOYMENT RECORD
 
             // ADD
@@ -1051,7 +1054,7 @@ namespace HR_LEAVEv2.HR
                             ON p.pos_id = ep.position_id
 
                             WHERE employee_id = {empId}
-                            ORDER BY start_date DESC;
+                            ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC;
                     ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -1073,17 +1076,17 @@ namespace HR_LEAVEv2.HR
             // check the employee's current employment type to ensure that the current HR can view and edit the information presented 
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
-                string empType = string.Empty;
-                int index = 0;
-                foreach(DataRow record in dataTable.Rows)
-                {
-                    if (isRecordActive(record.ItemArray[(int)emp_records_columns.actual_end_date].ToString()) || index == 0)
-                    {
-                        empType = record.ItemArray[(int)emp_records_columns.employment_type].ToString();
-                        break;
-                    }
-                    index++;
-                }
+                string empType = dataTable.Rows[0].ItemArray[(int)emp_records_columns.employment_type].ToString();
+                //int index = 0;
+                //foreach(DataRow record in dataTable.Rows)
+                //{
+                //    if (isRecordActive(record.ItemArray[(int)emp_records_columns.actual_end_date].ToString()) || index == 0)
+                //    {
+                //        empType = record.ItemArray[(int)emp_records_columns.employment_type].ToString();
+                //        break;
+                //    }
+                //    index++;
+                //}
 
                 if (!permissions.Contains("hr1_permissions"))
                 {

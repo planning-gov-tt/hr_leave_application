@@ -117,29 +117,45 @@ namespace HR_LEAVEv2.HR
                         }
                     }
 
-                    // the following sql ensures that out of all an employees employment records, only the most recent one is considered for if the employee can be accessed
-                    // by the current HR 
-                    sql = $@"
-                        SELECT
-                        employee_id, ihris_id, Name, email, '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
-                        FROM
+                    // the following sql ensures that out of all an employees employment records, only the most recent one (the most recently ended) is considered for if the employee can be accessed
+                    // by the current HR.
 
-                        (
+                    sql = $@"
+                        SELECT *
+                        FROM(
                             SELECT
-                                ROW_NUMBER() OVER(PARTITION BY ep.employee_id ORDER BY ep.start_date DESC) as RowNum, e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, ep.employment_type
+                                ROW_NUMBER() OVER(PARTITION BY ep.employee_id ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum,
+                                e.employee_id, 
+                                e.ihris_id, 
+                                e.first_name + ' ' + e.last_name as 'Name', 
+                                e.email, 
+                                ep.employment_type,
+                                '{activeLabel}' as isActive, 
+                                'label {bootstrapClass}' as bootstrapClass,
+	                            (SELECT IIF(actual_end_date IS NULL OR GETDATE() < actual_end_date, 'Yes', 'No')
+		                            FROM (
+			                            SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
+			                            FROM dbo.employeeposition hr_ep
+			                            WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
+		                            ) HR_INFO
+		                          WHERE RowNum = 1) as 'is_hr_active'
+
                                 FROM dbo.employee e
+
                                 JOIN employeeposition ep
                                 ON ep.employee_id = e.employee_id
-                                WHERE e.employee_id <> {Session["emp_id"].ToString()} AND e.employee_id {isActive} 
+
+                                WHERE ep.employee_id <> '{Session["emp_id"].ToString()}' AND ep.employee_id {isActive}
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
                                     where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
                                     group by ep.employee_id
                                     having count(*) > 0
-                                )
+                                ) 
                         ) Employees
-                        WHERE RowNum = 1 AND employment_type='{emp_type}'
+
+                        WHERE RowNum = 1 AND employment_type='{emp_type}' AND Employees.is_hr_active = 'Yes';
                     ";
                 }
 

@@ -623,7 +623,7 @@ namespace HR_LEAVEv2.Employee
                         SELECT 
                             lt.employee_id, 
                             emp.first_name + ' ' + emp.last_name as 'employee_name', 
-                            ep.employment_type , 
+                            ep.employment_type, 
                             FORMAT(lt.start_date, 'd/MM/yyyy') start_date, 
                             FORMAT(lt.end_date, 'd/MM/yyyy') end_date, 
                             lt.qualified,
@@ -664,9 +664,13 @@ namespace HR_LEAVEv2.Employee
 				            ) as 'files_id'
                             
                         FROM [dbo].[leavetransaction] lt
+
                         JOIN [dbo].[employee] sup ON sup.employee_id = lt.supervisor_id
-                        LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id
+
+                        LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+
                         JOIN [dbo].[employee] emp ON emp.employee_id = lt.employee_id
+
                         WHERE lt.transaction_id = {leaveId};
                     ";
 
@@ -745,9 +749,9 @@ namespace HR_LEAVEv2.Employee
                                                     (ltDetails.typeOfLeave == "Casual" && !permissions.Contains("approve_casual"))
                                                 )
                                                )
-                                                Response.Redirect("~/AccessDenied.aspx");
-
-                                        }
+                                               Response.Redirect("~/AccessDenied.aspx");
+                                        } else
+                                            Response.Redirect("~/AccessDenied.aspx");
                                     }
                                     else
                                     {

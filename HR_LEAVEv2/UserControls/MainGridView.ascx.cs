@@ -22,12 +22,6 @@ namespace HR_LEAVEv2.UserControls
         // used to show employee relevant data/actions
         public bool btnEmpVisible { get; set; }
 
-        // used to show supervisor relevant data/actions
-        public bool btnSupVisible { get; set; }
-
-        // used to show HR relevant data/actions
-        public bool btnHrVisible { get; set; }
-
         private List<string> permissions;
 
         //SQL date formatting
@@ -42,6 +36,7 @@ namespace HR_LEAVEv2.UserControls
                 e.employee_id employee_id,
                 e.last_name + ', ' + LEFT(e.first_name, 1) + '.' AS employee_name,
                 ep.employment_type employment_type,
+                IIF(ep.employment_type IS NOT NULL AND lt.created_at >= ep.start_date, 'Yes', 'No') as isLAfromActiveUser,
 
                 lt.leave_type leave_type,
                 lt.start_date,
@@ -67,7 +62,7 @@ namespace HR_LEAVEv2.UserControls
                 INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
                 INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
                 LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
-                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND GETDATE()>= ep.start_date AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
             ";
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -147,7 +142,7 @@ namespace HR_LEAVEv2.UserControls
         protected void Page_Load(object sender, EventArgs e)
         {
 
-            btnEmpVisible = btnSupVisible = btnHrVisible = false;
+            btnEmpVisible = false;
             permissions = (List<string>)Session["permissions"];
 
 
@@ -169,16 +164,7 @@ namespace HR_LEAVEv2.UserControls
 
                 // Hide Supervisor Columnn
                 GridView.Columns[1].Visible = false;
-                btnSupVisible = true;
                 divTbSupervisor.Visible = false;
-            }
-            else // hr
-            {
-                // show all "Recommended", "Approved", "Not Approved", "Date Change Requested"
-                // show "Approved" and "Not Approved" buttons
-                // Filter on "Recommended" by default
-                // Apply appropriate filters
-                btnHrVisible = true;
             }
 
             if (!IsPostBack)
@@ -215,7 +201,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     whereBindGridView = $@"
                         WHERE
-                            supervisor_id = '{Session["emp_id"]}'
+                            supervisor_id = '{Session["emp_id"]}';
                     ";
                 }
 
@@ -269,12 +255,47 @@ namespace HR_LEAVEv2.UserControls
                         AND employment_type IN {employmentTypes}            
                     ";
 
+                    // ensure that only leave applications submitted during the period of their current active record gets shown
+                    whereBindGridView += $@" AND lt.created_at >= ep.start_date AND lt.created_at <= GETDATE()";
+
+                    // ensure that the current HR viewing data is active
+                    whereBindGridView += $@"
+                        AND ((SELECT actual_end_date
+							FROM (
+								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
+								FROM dbo.employeeposition hr_ep
+								WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}'
+							) HR_INFO
+							WHERE RowNum = 1) IS NULL
+
+						OR (
+							(SELECT actual_end_date
+							FROM (
+								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
+								FROM dbo.employeeposition hr_ep
+								WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
+							) HR_INFO
+							WHERE RowNum = 1) IS NOT NULL
+
+							AND 
+
+							GETDATE() < (SELECT actual_end_date
+							FROM (
+								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
+								FROM dbo.employeeposition hr_ep
+								WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
+							) HR_INFO
+							WHERE RowNum = 1)
+						))
+                    ";
+
                 }// end hr if
 
 
                 //*************************************** FILTER ***************************************//
                 // assume all form fields are validated by the time they reach this point'
-                string whereFilterGridView = "";
+
+                string whereFilterGridView = string.Empty;
                 if (!string.IsNullOrEmpty(SubmittedFrom))
                 {
                     whereFilterGridView += $@"
@@ -393,13 +414,21 @@ namespace HR_LEAVEv2.UserControls
         protected void GridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             // changing button view/visibility - row by row
-
+            
             // get leave status for that row
             string leaveStatus = null;
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
                 int statusIndex = GetColumnIndexByName(e.Row, "status");
                 leaveStatus = e.Row.Cells[statusIndex].Text.ToString();
+            }
+
+            // hide isLAfromActiveUser column
+            int isLAfromActiveUserIndex = -1;
+            if (e.Row.RowType == DataControlRowType.Header || e.Row.RowType == DataControlRowType.DataRow)
+            {
+                isLAfromActiveUserIndex = GetColumnIndexByName(e.Row, "isLAfromActiveUser");
+                e.Row.Cells[isLAfromActiveUserIndex].Style.Add("display", "none");
             }
 
             // if employee view
@@ -418,93 +447,110 @@ namespace HR_LEAVEv2.UserControls
                         btnCancelLeave.Visible = false;
                 }
             }
-
-            // if supervisor view
-            else if (gridViewType == "sup")
+            else
             {
-                // get supervisor buttons
+                string isLAfromActiveUser = string.Empty;
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
-                    LinkButton btnNotRecommended = (LinkButton)e.Row.FindControl("btnNotRecommended");
-                    LinkButton btnRecommended = (LinkButton)e.Row.FindControl("btnRecommended");
-                    LinkButton btnEditLeaveRequest = (LinkButton)e.Row.FindControl("btnEditLeaveRequest");
-
-                    // only show buttons if HR has not acted or pending
-                    // else do not show buttons
-                    if (leaveStatus == "Pending" || leaveStatus == "Recommended" || leaveStatus == "Not Recommended")
-                    {
-                        // visual feedback for user on button to show whether LA is Recommended or Not Recommended
-                        if (leaveStatus == "Recommended")
-                            btnRecommended.Style.Add("opacity", "0.55");
-                        else if (leaveStatus == "Not Recommended")
-                            btnNotRecommended.Style.Add("opacity", "0.55");
-
-                        btnNotRecommended.Visible = btnRecommended.Visible = true;
-                    }
+                    // if LA is from inactive user- show visual feedback
+                    isLAfromActiveUser = e.Row.Cells[isLAfromActiveUserIndex].Text.ToString();
+                    if (isLAfromActiveUser == "No")
+                        e.Row.CssClass = "inactive-employee-LA";
                     else
-                        btnNotRecommended.Visible = btnRecommended.Visible = btnEditLeaveRequest.Visible = false;
+                        e.Row.CssClass.Replace("inactive-employee-LA", "");
                 }
-            }
 
-            // if hr view
-            else if (gridViewType == "hr")
-            {
-                if (e.Row.RowType == DataControlRowType.DataRow)
+
+                // if supervisor view
+                if (gridViewType == "sup")
                 {
-                    // get HR buttons
-                    LinkButton btnNotApproved = (LinkButton)e.Row.FindControl("btnNotApproved");
-                    LinkButton btnApproved = (LinkButton)e.Row.FindControl("btnApproved");
-                    LinkButton btnEditLeaveRequest = (LinkButton)e.Row.FindControl("btnEditLeaveRequest");
-                    LinkButton btnUndoApprove = (LinkButton)e.Row.FindControl("btnUndoApprove");
-
-                    // if recommended or not approved then show all buttons except undo
-                    if (leaveStatus == "Recommended" || leaveStatus == "Not Approved")
+                    // get supervisor buttons
+                    if (e.Row.RowType == DataControlRowType.DataRow && isLAfromActiveUser == "Yes")
                     {
-                        // visual feedback for Not Approved
-                        if (leaveStatus == "Not Approved")
-                            btnNotApproved.Style.Add("opacity", "0.55");
+                        LinkButton btnNotRecommended = (LinkButton)e.Row.FindControl("btnNotRecommended");
+                        LinkButton btnRecommended = (LinkButton)e.Row.FindControl("btnRecommended");
+                        LinkButton btnEditLeaveRequest = (LinkButton)e.Row.FindControl("btnEditLeaveRequest");
 
-                        btnUndoApprove.Visible = false;
-                        btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = true;
-                    }
+                        btnEditLeaveRequest.Visible = true;
 
-                    // if approved then ONLY show undo button if conditions are right
-                    else if (leaveStatus == "Approved")
-                    {
-
-                        // ensure that a HR can undo an approve if the leave period has not already started
-                        int startDateIndex = GetColumnIndexByName(e.Row, "start_date");
-                        string startDate = e.Row.Cells[startDateIndex].Text.ToString();
-
-                        if (!string.IsNullOrEmpty(startDate))
+                        // only show buttons if HR has not acted or pending
+                        // else do not show buttons
+                        if (leaveStatus == "Pending" || leaveStatus == "Recommended" || leaveStatus == "Not Recommended")
                         {
-                            DateTime start = DateTime.MinValue;
-                            try
-                            {
-                                //start = Convert.ToDateTime(startDate);
-                                start = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            }
-                            catch (FormatException fe)
-                            {
-                                throw fe;
-                            }
+                            // visual feedback for user on button to show whether LA is Recommended or Not Recommended
+                            if (leaveStatus == "Recommended")
+                                btnRecommended.Style.Add("opacity", "0.55");
+                            else if (leaveStatus == "Not Recommended")
+                                btnNotRecommended.Style.Add("opacity", "0.55");
 
-                            // if today is a day before the start date of the application then show undo button
-                            if (DateTime.Compare(DateTime.Today, start) < 0)
-                                btnUndoApprove.Visible = true;
-                            else
-                                btnUndoApprove.Visible = false;
+                            btnNotRecommended.Visible = btnRecommended.Visible = true;
+                        }
+                        else
+                            btnNotRecommended.Visible = btnRecommended.Visible = false;
+                    }
+                }
+
+                // if hr view
+                else if (gridViewType == "hr")
+                {
+                    if (e.Row.RowType == DataControlRowType.DataRow && isLAfromActiveUser == "Yes")
+                    {
+                        // get HR buttons
+                        LinkButton btnNotApproved = (LinkButton)e.Row.FindControl("btnNotApproved");
+                        LinkButton btnApproved = (LinkButton)e.Row.FindControl("btnApproved");
+                        LinkButton btnEditLeaveRequest = (LinkButton)e.Row.FindControl("btnEditLeaveRequest");
+                        LinkButton btnUndoApprove = (LinkButton)e.Row.FindControl("btnUndoApprove");
+
+                        // if recommended or not approved then show all buttons except undo
+                        if (leaveStatus == "Recommended" || leaveStatus == "Not Approved")
+                        {
+                            // visual feedback for Not Approved
+                            if (leaveStatus == "Not Approved")
+                                btnNotApproved.Style.Add("opacity", "0.55");
+
+                            btnUndoApprove.Visible = false;
+                            btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = true;
                         }
 
-                        btnNotApproved.Visible = btnApproved.Visible = false;
-                    }
-                    else if (leaveStatus == "Not Recommended")
-                    {
-                        btnUndoApprove.Visible = false;
-                        btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = false;
+                        // if approved then ONLY show undo button if conditions are right
+                        else if (leaveStatus == "Approved")
+                        {
+
+                            // ensure that a HR can undo an approve if the leave period has not already started
+                            int startDateIndex = GetColumnIndexByName(e.Row, "start_date");
+                            string startDate = e.Row.Cells[startDateIndex].Text.ToString();
+
+                            if (!string.IsNullOrEmpty(startDate))
+                            {
+                                DateTime start = DateTime.MinValue;
+                                try
+                                {
+                                    //start = Convert.ToDateTime(startDate);
+                                    start = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                }
+                                catch (FormatException fe)
+                                {
+                                    throw fe;
+                                }
+
+                                // if today is a day before the start date of the application then show undo button
+                                if (DateTime.Compare(DateTime.Today, start) < 0)
+                                    btnUndoApprove.Visible = true;
+                                else
+                                    btnUndoApprove.Visible = false;
+                            }
+
+                            btnNotApproved.Visible = btnApproved.Visible = false;
+                        }
+                        else if (leaveStatus == "Not Recommended")
+                        {
+                            btnUndoApprove.Visible = false;
+                            btnNotApproved.Visible = btnApproved.Visible = btnEditLeaveRequest.Visible = false;
+                        }
                     }
                 }
             }
+            
         }
 
         protected void GridView_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -1379,10 +1425,9 @@ namespace HR_LEAVEv2.UserControls
 			                                    FROM dbo.employeerole er
 
 			                                    JOIN dbo.employee e 
-			                                    ON e.employee_id = '1'
+			                                    ON e.employee_id = {employee_id}
 
-			                                    LEFT JOIN dbo.employeeposition ep
-                                          
+			                                    LEFT JOIN dbo.employeeposition ep                                          
 			                                    ON ep.employee_id = e.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 
 			                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')
@@ -1407,7 +1452,6 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
-
 		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.actual_end_date IS NULL OR GETDATE() < hr_ep.actual_end_date)
 
 		                                    WHERE hr_ep.dept_id = 2
