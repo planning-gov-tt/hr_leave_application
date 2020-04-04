@@ -74,7 +74,7 @@ namespace HR_LEAVEv2.Employee
                         FROM dbo.employee e
 
                         LEFT JOIN dbo.employeeposition ep
-                        ON e.employee_id = ep.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                        ON e.employee_id = ep.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 
                         JOIN dbo.emptypeleavetype elt
                         ON elt.employment_type = ep.employment_type
@@ -667,7 +667,7 @@ namespace HR_LEAVEv2.Employee
 
                         JOIN [dbo].[employee] sup ON sup.employee_id = lt.supervisor_id
 
-                        LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                        LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 
                         JOIN [dbo].[employee] emp ON emp.employee_id = lt.employee_id
 

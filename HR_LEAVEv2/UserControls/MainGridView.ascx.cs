@@ -19,9 +19,6 @@ namespace HR_LEAVEv2.UserControls
         // used to identify which data and action buttons to show to user
         public string gridViewType { get; set; } // "emp", "sup", "hr"
 
-        // used to show employee relevant data/actions
-        public bool btnEmpVisible { get; set; }
-
         private List<string> permissions;
 
         //SQL date formatting
@@ -62,7 +59,7 @@ namespace HR_LEAVEv2.UserControls
                 INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
                 INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
                 LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
-                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
             ";
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -138,11 +135,15 @@ namespace HR_LEAVEv2.UserControls
             set { ViewState["Qualified"] = value; }
         }
 
+        private string LAfromActiveInactiveEmp
+        {
+            get { return ViewState["LAfromActiveInactiveEmp"] != null ? ViewState["LAfromActiveInactiveEmp"].ToString() : null; }
+            set { ViewState["LAfromActiveInactiveEmp"] = value; }
+        }
+
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
-            btnEmpVisible = false;
             permissions = (List<string>)Session["permissions"];
 
 
@@ -152,7 +153,6 @@ namespace HR_LEAVEv2.UserControls
                 // show all transactions submitted by employee_id
 
                 // hide employee column
-                btnEmpVisible = true;
                 GridView.Columns[2].Visible = false;
                 divTbEmployee.Visible = false;
             }
@@ -201,7 +201,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     whereBindGridView = $@"
                         WHERE
-                            supervisor_id = '{Session["emp_id"]}';
+                            supervisor_id = '{Session["emp_id"]}'
                     ";
                 }
 
@@ -252,11 +252,11 @@ namespace HR_LEAVEv2.UserControls
                     }
                     employmentTypes += ")";
                     whereBindGridView += $@"
-                        AND employment_type IN {employmentTypes}            
+                        AND (employment_type IN {employmentTypes} OR employment_type IS NULL)          
                     ";
 
                     // ensure that only leave applications submitted during the period of their current active record gets shown
-                    whereBindGridView += $@" AND lt.created_at >= ep.start_date AND lt.created_at <= GETDATE()";
+                    //whereBindGridView += $@" AND lt.created_at >= ep.start_date AND lt.created_at <= GETDATE()";
 
                     // ensure that the current HR viewing data is active
                     whereBindGridView += $@"
@@ -269,6 +269,16 @@ namespace HR_LEAVEv2.UserControls
 							WHERE RowNum = 1) IS NULL
 
 						OR (
+                            (SELECT start_date
+							FROM (
+								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.start_date
+								FROM dbo.employeeposition hr_ep
+								WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
+							) HR_INFO
+							WHERE RowNum = 1) <= GETDATE()
+                            
+                            AND
+
 							(SELECT actual_end_date
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
@@ -364,6 +374,21 @@ namespace HR_LEAVEv2.UserControls
                     ";
                 }
 
+                if (!string.IsNullOrEmpty(LAfromActiveInactiveEmp))
+                {
+                    if(LAfromActiveInactiveEmp == "Active")
+                        whereFilterGridView += $@"
+                            AND ep.employment_type IS NOT NULL AND lt.created_at >= ep.start_date
+                        ";
+                    else if(LAfromActiveInactiveEmp == "Inactive")
+                        whereFilterGridView += $@"
+                            AND NOT (ep.employment_type IS NOT NULL AND lt.created_at >= ep.start_date)
+                        ";
+                    // else if viewing both then add no where clause
+                }
+
+                
+
                 string sql = select + from + whereBindGridView + whereFilterGridView;
                 sqlCommand.CommandText = sql;
                 sqlCommand.Connection = sqlConnection;
@@ -425,16 +450,27 @@ namespace HR_LEAVEv2.UserControls
 
             // hide isLAfromActiveUser column
             int isLAfromActiveUserIndex = -1;
+            string isLAfromActiveUser = string.Empty;
             if (e.Row.RowType == DataControlRowType.Header || e.Row.RowType == DataControlRowType.DataRow)
             {
                 isLAfromActiveUserIndex = GetColumnIndexByName(e.Row, "isLAfromActiveUser");
                 e.Row.Cells[isLAfromActiveUserIndex].Style.Add("display", "none");
+
+                if (e.Row.RowType == DataControlRowType.DataRow)
+                {
+                    // if LA is from inactive user- show visual feedback
+                    isLAfromActiveUser = e.Row.Cells[isLAfromActiveUserIndex].Text.ToString();
+                    if (isLAfromActiveUser == "No")
+                        e.Row.CssClass = "inactive-employee-LA";
+                    else
+                        e.Row.CssClass.Replace("inactive-employee-LA", "");
+                }
             }
 
             // if employee view
             if (gridViewType == "emp")
             {
-                if (e.Row.RowType == DataControlRowType.DataRow)
+                if (e.Row.RowType == DataControlRowType.DataRow && isLAfromActiveUser == "Yes")
                 {
                     // get cancel leave request button 
                     LinkButton btnCancelLeave = (LinkButton)e.Row.FindControl("btnCancelLeave");
@@ -449,17 +485,6 @@ namespace HR_LEAVEv2.UserControls
             }
             else
             {
-                string isLAfromActiveUser = string.Empty;
-                if (e.Row.RowType == DataControlRowType.DataRow)
-                {
-                    // if LA is from inactive user- show visual feedback
-                    isLAfromActiveUser = e.Row.Cells[isLAfromActiveUserIndex].Text.ToString();
-                    if (isLAfromActiveUser == "No")
-                        e.Row.CssClass = "inactive-employee-LA";
-                    else
-                        e.Row.CssClass.Replace("inactive-employee-LA", "");
-                }
-
 
                 // if supervisor view
                 if (gridViewType == "sup")
@@ -1079,11 +1104,23 @@ namespace HR_LEAVEv2.UserControls
             return isValidated;
         }
 
+        protected void clearFilterErrors()
+        {
+            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
+            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
+            appliedForDateComparisonValidationMsgPanel.Style.Add("display", "none");
+            invalidSubmittedFromDate.Style.Add("display", "none");
+            invalidSubmittedToDate.Style.Add("display", "none");
+            submittedDateComparisonValidationMsgPanel.Style.Add("display", "none");
+        }
+
         protected void btnFilter_Click(object sender, EventArgs e)
         {
             // check all textboxes/drop down lists and set the respective variables. These variables are checked when binding 
             // the gridview in order to filter LAs
-            
+
+            clearFilterErrors();
+
             bool areSubmitDatesValidated = false, areAppliedDatesValidated = false;
             areSubmitDatesValidated = validateDates(tbSubmittedFrom.Text.ToString(), tbSubmittedTo.Text.ToString(), invalidSubmittedFromDate, invalidSubmittedToDate, submittedDateComparisonValidationMsgPanel);
             areAppliedDatesValidated = validateDates(tbStartDate.Text.ToString(), tbEndDate.Text.ToString(), invalidStartDateValidationMsgPanel, invalidEndDateValidationMsgPanel, appliedForDateComparisonValidationMsgPanel);
@@ -1108,6 +1145,8 @@ namespace HR_LEAVEv2.UserControls
 
                 Qualified = ddlQualified.SelectedValue.ToString();
 
+                LAfromActiveInactiveEmp = ddlLAfromActiveOrInactive.SelectedValue.ToString();
+
                 this.BindGridView();
             }
         }
@@ -1115,6 +1154,7 @@ namespace HR_LEAVEv2.UserControls
         protected void clearFilterBtn_Click(object sender, EventArgs e)
         {
             // clear all filters
+            clearFilterErrors();
              
             SubmittedFrom = String.Empty;
             tbSubmittedFrom.Text = String.Empty;
@@ -1127,13 +1167,6 @@ namespace HR_LEAVEv2.UserControls
 
             EndDate = String.Empty;
             tbEndDate.Text = String.Empty;
-
-            invalidStartDateValidationMsgPanel.Style.Add("display", "none");
-            invalidEndDateValidationMsgPanel.Style.Add("display", "none");
-            appliedForDateComparisonValidationMsgPanel.Style.Add("display", "none");
-            invalidSubmittedFromDate.Style.Add("display", "none");
-            invalidSubmittedToDate.Style.Add("display", "none");
-            submittedDateComparisonValidationMsgPanel.Style.Add("display", "none");
 
             SupervisorName_ID = String.Empty;
             tbSupervisor.Text = String.Empty;
@@ -1149,6 +1182,9 @@ namespace HR_LEAVEv2.UserControls
 
             Qualified = String.Empty;
             ddlQualified.SelectedIndex = 0;
+
+            LAfromActiveInactiveEmp = String.Empty;
+            ddlLAfromActiveOrInactive.SelectedIndex = 0;
 
             this.BindGridView();
         }
@@ -1428,7 +1464,7 @@ namespace HR_LEAVEv2.UserControls
 			                                    ON e.employee_id = {employee_id}
 
 			                                    LEFT JOIN dbo.employeeposition ep                                          
-			                                    ON ep.employee_id = e.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+			                                    ON ep.employee_id = e.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
 
 			                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')
 		                                    )
@@ -1452,7 +1488,7 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
-		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.actual_end_date IS NULL OR GETDATE() < hr_ep.actual_end_date)
+		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.start_date <= GETDATE() AND hr_ep.actual_end_date IS NULL OR GETDATE() < hr_ep.actual_end_date)
 
 		                                    WHERE hr_ep.dept_id = 2
 	                                    )

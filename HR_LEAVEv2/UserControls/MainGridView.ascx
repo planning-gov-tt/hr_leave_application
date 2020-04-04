@@ -65,7 +65,7 @@
     <div class="row">
 
         <%--Leave Types--%>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter type of leave" runat="server" ID="ddlType" DataSourceID="SqlDataSource1" DataTextField="type_id" DataValueField="type_id" AppendDataBoundItems="true">
                 <asp:ListItem Text="Leave Types (All)" Value=""></asp:ListItem>
             </asp:DropDownList>
@@ -73,7 +73,7 @@
         </div>
 
         <%--Status of LA--%>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter status of leave" runat="server" ID="ddlStatus">
                 <asp:ListItem Text="Status (All)" Value=""></asp:ListItem>
                 <asp:ListItem Text="Pending" Value="Pending"></asp:ListItem>
@@ -86,11 +86,20 @@
         </div>
 
         <%--Qualified--%>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter value for if user is qualified" runat="server" ID="ddlQualified">
                 <asp:ListItem Text="Qualified (All)" Value=""></asp:ListItem>
                 <asp:ListItem Text="Yes" Value="Yes"></asp:ListItem>
                 <asp:ListItem Text="No" Value="No"></asp:ListItem>
+            </asp:DropDownList>
+        </div>
+
+        <%--Show LAs from --%>
+        <div class="col-sm-3">
+            <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter which type of LA to view" runat="server" ID="ddlLAfromActiveOrInactive">
+                <asp:ListItem Text="All Leave Applications" Value="ActiveInactive"></asp:ListItem>
+                <asp:ListItem Text="Active Leave Applications" Value="Active"></asp:ListItem>
+                <asp:ListItem Text="Inactive Leave Applications" Value="Inactive"></asp:ListItem>
             </asp:DropDownList>
         </div>
 
@@ -203,7 +212,7 @@
                     </asp:LinkButton>
 
                     <%--employee buttons--%>
-                    <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete Leave Request" Visible="<%# btnEmpVisible %>" runat="server"
+                    <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete Leave Request" Visible="false" runat="server"
                         OnClientClick="return confirm('Delete leave application?');"
                         CommandName="cancelLeave"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">

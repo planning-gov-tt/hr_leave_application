@@ -85,7 +85,7 @@ namespace HR_LEAVEv2.HR
                             (
                                 select ep.employee_id
                                 from dbo.employeeposition ep
-                                where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                where ep.start_date <= GETDATE() AND  ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
                                 group by ep.employee_id
                                 having count(*) > 0
                             ) 
@@ -149,7 +149,7 @@ namespace HR_LEAVEv2.HR
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
-                                    where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                    where ep.start_date <= GETDATE() AND  ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
                                     group by ep.employee_id
                                     having count(*) > 0
                                 ) 
@@ -228,7 +228,7 @@ namespace HR_LEAVEv2.HR
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
-                                    where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                    where ep.start_date <= GETDATE() AND  ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
                                     group by ep.employee_id
                                     having count(*) > 0
                                 ) 
@@ -272,7 +272,7 @@ namespace HR_LEAVEv2.HR
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
-                                    where ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                    where ep.start_date <= GETDATE() AND  ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
                                     group by ep.employee_id
                                     having count(*) > 0
                                 ) 
