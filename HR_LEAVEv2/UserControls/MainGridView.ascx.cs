@@ -203,6 +203,46 @@ namespace HR_LEAVEv2.UserControls
                         WHERE
                             supervisor_id = '{Session["emp_id"]}'
                     ";
+
+                    // ensure that the current HR viewing data is active
+                    whereBindGridView += $@"
+                        AND ((SELECT actual_end_date
+							FROM (
+								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
+								FROM dbo.employeeposition sup_ep
+								WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}'
+							) HR_INFO
+							WHERE RowNum = 1) IS NULL
+
+						OR (
+                            (SELECT start_date
+							FROM (
+								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.start_date
+								FROM dbo.employeeposition sup_ep
+								WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}'
+							) HR_INFO
+							WHERE RowNum = 1) <= GETDATE()
+                            
+                            AND
+
+							(SELECT actual_end_date
+							FROM (
+								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
+								FROM dbo.employeeposition sup_ep
+								WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}'
+							) HR_INFO
+							WHERE RowNum = 1) IS NOT NULL
+
+							AND 
+
+							GETDATE() < (SELECT actual_end_date
+							FROM (
+								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
+								FROM dbo.employeeposition sup_ep
+								WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}'
+							) HR_INFO
+							WHERE RowNum = 1)
+						))";
                 }
 
                 // hr gridview (most complex)
