@@ -7,6 +7,10 @@
     #gridViewContainer th, td{
         text-align:center;
     }
+
+    .inactive-employee-LA{
+        background-color: #e0e0eb;
+    }
 </style>
 
 <%--filter fields--%>
@@ -61,7 +65,7 @@
     <div class="row">
 
         <%--Leave Types--%>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter type of leave" runat="server" ID="ddlType" DataSourceID="SqlDataSource1" DataTextField="type_id" DataValueField="type_id" AppendDataBoundItems="true">
                 <asp:ListItem Text="Leave Types (All)" Value=""></asp:ListItem>
             </asp:DropDownList>
@@ -69,7 +73,7 @@
         </div>
 
         <%--Status of LA--%>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter status of leave" runat="server" ID="ddlStatus">
                 <asp:ListItem Text="Status (All)" Value=""></asp:ListItem>
                 <asp:ListItem Text="Pending" Value="Pending"></asp:ListItem>
@@ -82,11 +86,20 @@
         </div>
 
         <%--Qualified--%>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter value for if user is qualified" runat="server" ID="ddlQualified">
                 <asp:ListItem Text="Qualified (All)" Value=""></asp:ListItem>
                 <asp:ListItem Text="Yes" Value="Yes"></asp:ListItem>
                 <asp:ListItem Text="No" Value="No"></asp:ListItem>
+            </asp:DropDownList>
+        </div>
+
+        <%--Show LAs from --%>
+        <div class="col-sm-3">
+            <asp:DropDownList CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="top" title="Enter which type of LA to view" runat="server" ID="ddlLAfromActiveOrInactive">
+                <asp:ListItem Text="All Leave Applications" Value="ActiveInactive"></asp:ListItem>
+                <asp:ListItem Text="Active Leave Applications" Value="Active"></asp:ListItem>
+                <asp:ListItem Text="Inactive Leave Applications" Value="Inactive"></asp:ListItem>
             </asp:DropDownList>
         </div>
 
@@ -178,8 +191,7 @@
         DataKeyNames="transaction_id, employee_id, supervisor_id, hr_manager_id"
         runat="server">
 
-        <Columns>
-
+        <Columns>           
             <asp:BoundField HeaderText="Date Submitted" DataField="date_submitted" SortExpression="date_submitted" DataFormatString="{0:d/MM/yyyy h:mm tt}" />
             <asp:BoundField HeaderText="Supervisor" DataField="supervisor_name" SortExpression="supervisor_name" />
             <asp:BoundField HeaderText="Employee" DataField="employee_name" SortExpression="employee_name" />
@@ -189,7 +201,6 @@
             <asp:BoundField HeaderText="Leave Type" DataField="leave_type" SortExpression="leave_type" />
             <asp:BoundField HeaderText="Status" DataField="status" SortExpression="status" />
             <asp:BoundField HeaderText="Qualified" DataField="qualified" SortExpression="qualified" />
-
             <%--action buttons--%>
             <asp:TemplateField HeaderText="Action" Visible="true">
                 <ItemTemplate>
@@ -201,7 +212,7 @@
                     </asp:LinkButton>
 
                     <%--employee buttons--%>
-                    <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete Leave Request" Visible="<%# btnEmpVisible %>" runat="server"
+                    <asp:LinkButton ID="btnCancelLeave" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete Leave Request" Visible="false" runat="server"
                         OnClientClick="return confirm('Delete leave application?');"
                         CommandName="cancelLeave"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
@@ -210,38 +221,38 @@
 
 
                     <%--supervisor buttons--%>
-                    <asp:LinkButton ID="btnNotRecommended" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Not Recommended" Visible="<%# btnSupVisible %>" runat="server"
+                    <asp:LinkButton ID="btnNotRecommended" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Not Recommended" Visible="false" runat="server"
                         CommandName="notRecommended"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                     <i class="fa fa-times" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnRecommended" CssClass="btn btn-success content-tooltipped" data-toggle="tooltip" data-placement="top" title="Recommended" Visible="<%# btnSupVisible %>" runat="server"
+                    <asp:LinkButton ID="btnRecommended" CssClass="btn btn-success content-tooltipped" data-toggle="tooltip" data-placement="top" title="Recommended" Visible="false" runat="server"
                         CommandName="recommended"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                     <i class="fa fa-check" aria-hidden="true"></i>
                     </asp:LinkButton>
 
                     <%--hr buttons--%>
-                    <asp:LinkButton ID="btnNotApproved" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Not Approved" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnNotApproved" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Not Approved"  Visible="false" runat="server"
                         CommandName="notApproved"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                     <i class="fa fa-times" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnApproved" CssClass="btn btn-success content-tooltipped" data-toggle="tooltip" data-placement="top" title="Approved" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnApproved" CssClass="btn btn-success content-tooltipped" data-toggle="tooltip" data-placement="top" title="Approved"  Visible="false" runat="server"
                         CommandName="approved"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                     <i class="fa fa-check" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnEditLeaveRequest"  CssClass="btn btn-warning content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request" Visible="<%# btnSupVisible || btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnEditLeaveRequest"  CssClass="btn btn-warning content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit Leave Request"  Visible="false" runat="server"
                         CommandName="editLeaveRequest"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                     <i class="fa fa-pencil" aria-hidden="true"></i>
                     </asp:LinkButton>
 
-                    <asp:LinkButton ID="btnUndoApprove" CssClass="btn btn-warning content-tooltipped" data-toggle="tooltip" data-placement="top" title="Undo Approve" Visible="<%# btnHrVisible %>" runat="server"
+                    <asp:LinkButton ID="btnUndoApprove" CssClass="btn btn-warning content-tooltipped" data-toggle="tooltip" data-placement="top" title="Undo Approve"  Visible="false" runat="server"
                         CommandName="undoApprove"
                         CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
                     <i class="fa fa-undo" aria-hidden="true"></i>
@@ -249,6 +260,8 @@
                 </ItemTemplate>
 
             </asp:TemplateField>
+
+            <asp:BoundField HeaderText="isLAfromActiveUser" DataField="isLAfromActiveUser" SortExpression="isLAfromActiveUser" /> 
 
         </Columns>
 

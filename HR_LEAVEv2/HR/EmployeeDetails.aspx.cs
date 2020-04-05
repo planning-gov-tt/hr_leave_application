@@ -561,7 +561,7 @@ namespace HR_LEAVEv2.HR
                 // check if there already exists an active record. Two active records cannot exist at the same time
                 foreach (DataRow dr in dt.Rows)
                 {
-                    // check if there is any record that is active, the record cannot be deleted
+                    // check if there is any record that is active, the record being checked cannot have an isChanged value of 1 (cannot be an already deleted record)
                     if (dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1" && dr.ItemArray[(int)emp_records_columns.status].ToString() == "Active")
                     {
                         multipleActiveRecordsAddRecordPanel.Style.Add("display", "inline-block");
@@ -609,8 +609,13 @@ namespace HR_LEAVEv2.HR
 
                     if (!isDuplicate)
                     {
-                        //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class
-                        dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success");
+                        // if start date is before or on Today then the record is active, otherwise it is not
+                        if(DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), DateTime.Now) <= 0)
+                            //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class
+                            dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success");
+                        else
+                            //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class
+                            dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger");
                         ViewState["Gridview1_dataSource"] = dt;
                     }
                     else
@@ -661,7 +666,7 @@ namespace HR_LEAVEv2.HR
                 {
                     // edit datatable and rebind gridview
 
-                    if (isActualEndDateValid(end.ToString("d/MM/yyyy"), indexInDt))
+                    if (isRecordValid(startDate, end.ToString("d/MM/yyyy"), indexInDt))
                     {
                         // set record to be edited
                         dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.isChanged, "2");
@@ -670,7 +675,7 @@ namespace HR_LEAVEv2.HR
                         dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.actual_end_date, end.ToString("d/MM/yyyy"));
 
                         // change status 
-                        if (isRecordActive(end.ToString("d/MM/yyyy")))
+                        if (isRecordActive(startDate, end.ToString("d/MM/yyyy")))
                         {
                             dt.Rows[indexInDt][(int)emp_records_columns.status] = "Active";
                             dt.Rows[indexInDt][(int)emp_records_columns.status_class] = "label-success";
@@ -723,9 +728,13 @@ namespace HR_LEAVEv2.HR
 
         }
 
-        protected Boolean isRecordActive(string proposedEndDate)
+        protected Boolean isRecordActive(string proposedStartDate, string proposedEndDate)
         {
             // returns a Boolean which represents whether the proposed actual end date passed will make a record active or inactive. The date passed is assumed to be validated
+
+            // check if start date of record is a day in the future, meaning the record is currently inactive
+            if (DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), DateTime.Now) > 0)
+                return false;
 
             // if the passed end date is empty then the record is automaticaly Active
             if (String.IsNullOrEmpty(proposedEndDate) || String.IsNullOrWhiteSpace(proposedEndDate) || proposedEndDate == "&nbsp;")
@@ -735,16 +744,50 @@ namespace HR_LEAVEv2.HR
                 return (DateTime.Compare(DateTime.Now, DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
         }
 
-        protected Boolean isActualEndDateValid(string proposedEndDate, int index)
+        //protected Boolean isActualEndDateValid(string proposedEndDate, int index)
+        //{
+        //    // returns a Boolean representing whether the proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
+        //    // any other active records exist in order to validate the passed end date.
+
+        //    if (ViewState["Gridview1_dataSource"] != null)
+        //    {
+        //        int numActiveRows = 0, i = 0;
+
+        //        // state of passed end date and corresponding record
+        //        bool isProposedEndDateActive = isRecordActive(proposedEndDate);
+
+        //        DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+        //        foreach (DataRow dr in dt.Rows)
+        //        {
+        //            // once the record is not deleted and is not the record currently being edited (the record to which the proposed end date will belong to)
+        //            if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && i != index)
+        //            {
+        //                if (dr[(int)emp_records_columns.status].ToString() == "Active")
+        //                    numActiveRows++;
+        //            }
+        //            i++;
+        //        }
+        //        if (isProposedEndDateActive)
+        //            numActiveRows++;
+
+        //        return numActiveRows <= 1;
+        //    }
+
+        //    return false;
+
+        //}
+
+        protected Boolean isRecordValid(string proposedStartDate, string proposedEndDate, int index)
         {
-            // returns a Boolean representing whether the proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
-            // any other active records exist in order to validate the passed end date.
+            // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
+            // any other active records exist in order to validate the record.
+
             if (ViewState["Gridview1_dataSource"] != null)
             {
                 int numActiveRows = 0, i = 0;
 
                 // state of passed end date and corresponding record
-                bool isProposedEndDateActive = isRecordActive(proposedEndDate);
+                bool isProposedRecordActive = isRecordActive(proposedStartDate, proposedEndDate);
 
                 DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
                 foreach (DataRow dr in dt.Rows)
@@ -757,7 +800,7 @@ namespace HR_LEAVEv2.HR
                     }
                     i++;
                 }
-                if (isProposedEndDateActive)
+                if (isProposedRecordActive)
                     numActiveRows++;
 
                 return numActiveRows <= 1;
@@ -806,7 +849,7 @@ namespace HR_LEAVEv2.HR
                             isStartDateChanged = Convert.ToDateTime(dt.Rows[index].ItemArray[(int)emp_records_columns.start_date]).ToString("d/MM/yyyy") != startDate,
                             isExpectedEndDateChanged = Convert.ToDateTime(dt.Rows[index].ItemArray[(int)emp_records_columns.expected_end_date]).ToString("d/MM/yyyy") != expectedEndDate,
                             isActualEndDateChanged = dt.Rows[index][(int)emp_records_columns.actual_end_date].ToString() != actualEndDate,
-                            isEditActualEndDateSuccessful = true;
+                            isEditedRecordValid = true;
 
                         if (isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isActualEndDateChanged)
                         {
@@ -834,8 +877,25 @@ namespace HR_LEAVEv2.HR
 
                                 if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrWhiteSpace(startDate) && isStartDateChanged)
                                 {
-                                    dt.Rows[index][(int)emp_records_columns.start_date] = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                    editsMade.Add("Start Date");
+                                    if (isRecordValid(startDate, actualEndDate, index))
+                                    {
+                                        editsMade.Add("Start Date");
+                                        dt.Rows[index][(int)emp_records_columns.start_date] = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+
+                                        if (isRecordActive(startDate, actualEndDate))
+                                        {
+                                            dt.Rows[index][(int)emp_records_columns.status] = "Active";
+                                            dt.Rows[index][(int)emp_records_columns.status_class] = "label-success";
+                                        }
+                                        else
+                                        {
+                                            dt.Rows[index][(int)emp_records_columns.status] = "Inactive";
+                                            dt.Rows[index][(int)emp_records_columns.status_class] = "label-danger";
+                                        }
+                                    }
+                                    else
+                                        isEditedRecordValid = false; 
+                                    
                                 }
                                 else if (isStartDateChanged && (String.IsNullOrEmpty(startDate) || String.IsNullOrWhiteSpace(startDate) || startDate == "&nbsp;"))
                                     invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
@@ -852,9 +912,11 @@ namespace HR_LEAVEv2.HR
 
                                 if (isActualEndDateChanged)
                                 {
+                                    if (isEditedRecordValid && !isStartDateChanged)
+                                        isEditedRecordValid = isRecordValid(startDate, actualEndDate, index);
+
                                     // does edit make employee have more than one record that is active (end date is not null and today is before end date) or (end date is null)
-                                    if (isActualEndDateValid(actualEndDate, index))
-                                    {
+                                    if (isEditedRecordValid) {
                                         editsMade.Add("Actual End Date");
 
                                         if (!String.IsNullOrEmpty(actualEndDate) && !String.IsNullOrWhiteSpace(actualEndDate) && actualEndDate != "&nbsp;")
@@ -862,7 +924,7 @@ namespace HR_LEAVEv2.HR
                                         else
                                             dt.Rows[index][(int)emp_records_columns.actual_end_date] = string.Empty;
 
-                                        if (isRecordActive(actualEndDate))
+                                        if (isRecordActive(startDate, actualEndDate))
                                         {
                                             dt.Rows[index][(int)emp_records_columns.status] = "Active";
                                             dt.Rows[index][(int)emp_records_columns.status_class] = "label-success";
@@ -874,15 +936,12 @@ namespace HR_LEAVEv2.HR
                                         }
                                     }
                                     else
-                                    {
-                                        isEditActualEndDateSuccessful = false;
                                         multipleActiveRecordsEditRecordPanel.Style.Add("display", "inline-block");
-                                    }
 
                                 }
 
 
-                                if (!(isActualEndDateChanged && !isEditActualEndDateSuccessful && !(isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged)))
+                                if (!((isActualEndDateChanged || isStartDateChanged && !isEditedRecordValid) && !(isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged)))
                                 {
                                     dt.Rows[index].SetField<string>((int)emp_records_columns.isChanged, "2");
 
@@ -972,6 +1031,9 @@ namespace HR_LEAVEv2.HR
             noEmploymentRecordEnteredErrorPanel.Style.Add("display", "none");
             fullFormSubmitSuccessPanel.Style.Add("display", "none");
 
+            // NO CHANGES MADE
+            noChangesMadePanel.Style.Add("display", "none");
+
             // EMPLOYMENT RECORD
 
             // ADD
@@ -1039,8 +1101,8 @@ namespace HR_LEAVEv2.HR
                                 ep.expected_end_date,
                                 '0' as isChanged,
                                 FORMAT(ep.actual_end_date, 'd/MM/yyyy') actual_end_date,
-                                IIF(ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date, 'Active', 'Inactive') as status, 
-                                IIF(ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date, 'label-success', 'label-danger') as status_class
+                                IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'Active', 'Inactive') as status, 
+                                IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'label-success', 'label-danger') as status_class
                                 
                             FROM [dbo].[employeeposition] ep
 
@@ -1051,7 +1113,7 @@ namespace HR_LEAVEv2.HR
                             ON p.pos_id = ep.position_id
 
                             WHERE employee_id = {empId}
-                            ORDER BY start_date DESC;
+                            ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC;
                     ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -1073,17 +1135,17 @@ namespace HR_LEAVEv2.HR
             // check the employee's current employment type to ensure that the current HR can view and edit the information presented 
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
-                string empType = string.Empty;
-                int index = 0;
-                foreach(DataRow record in dataTable.Rows)
-                {
-                    if (isRecordActive(record.ItemArray[(int)emp_records_columns.actual_end_date].ToString()) || index == 0)
-                    {
-                        empType = record.ItemArray[(int)emp_records_columns.employment_type].ToString();
-                        break;
-                    }
-                    index++;
-                }
+                string empType = dataTable.Rows[0].ItemArray[(int)emp_records_columns.employment_type].ToString();
+                //int index = 0;
+                //foreach(DataRow record in dataTable.Rows)
+                //{
+                //    if (isRecordActive(record.ItemArray[(int)emp_records_columns.actual_end_date].ToString()) || index == 0)
+                //    {
+                //        empType = record.ItemArray[(int)emp_records_columns.employment_type].ToString();
+                //        break;
+                //    }
+                //    index++;
+                //}
 
                 if (!permissions.Contains("hr1_permissions"))
                 {

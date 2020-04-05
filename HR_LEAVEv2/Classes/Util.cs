@@ -158,22 +158,22 @@ namespace HR_LEAVEv2.Classes
 
         public Boolean sendMail(MailMessage message)
         {
-            SmtpClient smtp = new SmtpClient();
-            smtp.Port = 25;
-            smtp.Host = "10.240.32.231"; //for PLANNING host 
-            //smtp.EnableSsl = true;
-            //smtp.UseDefaultCredentials = false;
-            //smtp.Credentials = new NetworkCredential("hr.leave@planning.gov.tt", "p@ssword1");
-            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            //SmtpClient smtp = new SmtpClient();
+            //smtp.Port = 25;
+            //smtp.Host = "10.240.32.231"; //for PLANNING host 
+            ////smtp.EnableSsl = true;
+            ////smtp.UseDefaultCredentials = false;
+            ////smtp.Credentials = new NetworkCredential("hr.leave@planning.gov.tt", "p@ssword1");
+            //smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
-            try
-            {
-                smtp.Send(message);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            //try
+            //{
+            //    smtp.Send(message);
+            //}
+            //catch (Exception ex)
+            //{
+            //    return false;
+            //}
 
             return true;
         }

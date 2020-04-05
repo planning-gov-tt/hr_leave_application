@@ -51,7 +51,7 @@ namespace HR_LEAVEv2.UserControls
                             SELECT e.[sick], e.[vacation], e.[personal], e.[casual], ep.employment_type, FORMAT(ep.start_date, 'MM/dd/yy') as start_date
                             FROM [dbo].[employee] e
                             LEFT JOIN [dbo].employeeposition ep
-                            ON e.employee_id = ep.employee_id AND (ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                            ON e.employee_id = ep.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
                             WHERE e.[employee_id] = '{Session["emp_id"]}'
                             ;
                         ";
