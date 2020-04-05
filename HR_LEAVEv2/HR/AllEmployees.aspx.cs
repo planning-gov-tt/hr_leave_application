@@ -85,7 +85,7 @@ namespace HR_LEAVEv2.HR
                             (
                                 select ep.employee_id
                                 from dbo.employeeposition ep
-                                where ep.start_date <= GETDATE() AND  ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
                                 group by ep.employee_id
                                 having count(*) > 0
                             ) 
@@ -132,9 +132,9 @@ namespace HR_LEAVEv2.HR
                                 ep.employment_type,
                                 '{activeLabel}' as isActive, 
                                 'label {bootstrapClass}' as bootstrapClass,
-	                            (SELECT IIF(actual_end_date IS NULL OR GETDATE() < actual_end_date, 'Yes', 'No')
+	                            (SELECT IIF(start_date <= GETDATE() AND (actual_end_date IS NULL OR GETDATE() <= actual_end_date), 'Yes', 'No')
 		                            FROM (
-			                            SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
+			                            SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.start_date, hr_ep.actual_end_date
 			                            FROM dbo.employeeposition hr_ep
 			                            WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
 		                            ) HR_INFO
@@ -149,7 +149,7 @@ namespace HR_LEAVEv2.HR
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
-                                    where ep.start_date <= GETDATE() AND  ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                    where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
                                     group by ep.employee_id
                                     having count(*) > 0
                                 ) 
@@ -228,7 +228,7 @@ namespace HR_LEAVEv2.HR
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
-                                    where ep.start_date <= GETDATE() AND  ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                    where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
                                     group by ep.employee_id
                                     having count(*) > 0
                                 ) 
@@ -272,7 +272,7 @@ namespace HR_LEAVEv2.HR
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
-                                    where ep.start_date <= GETDATE() AND  ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                    where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
                                     group by ep.employee_id
                                     having count(*) > 0
                                 ) 

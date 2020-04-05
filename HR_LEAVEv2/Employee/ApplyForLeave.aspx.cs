@@ -74,7 +74,7 @@ namespace HR_LEAVEv2.Employee
                         FROM dbo.employee e
 
                         LEFT JOIN dbo.employeeposition ep
-                        ON e.employee_id = ep.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                        ON e.employee_id = ep.employee_id AND (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date))
 
                         JOIN dbo.emptypeleavetype elt
                         ON elt.employment_type = ep.employment_type
@@ -667,7 +667,7 @@ namespace HR_LEAVEv2.Employee
 
                         JOIN [dbo].[employee] sup ON sup.employee_id = lt.supervisor_id
 
-                        LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                        LEFT JOIN [dbo].employeeposition ep ON ep.id = lt.employee_position_id
 
                         JOIN [dbo].[employee] emp ON emp.employee_id = lt.employee_id
 
@@ -1179,6 +1179,7 @@ namespace HR_LEAVEv2.Employee
                     string sql = $@"
                         INSERT INTO [dbo].[leavetransaction]
                            ([employee_id]
+                           ,[employee_position_id]
                            ,[leave_type]
                            ,[start_date]
                            ,[end_date]
@@ -1190,6 +1191,7 @@ namespace HR_LEAVEv2.Employee
                         OUTPUT INSERTED.transaction_id
                         VALUES
                            ( '{empId}'
+                            , (SELECT id FROM [dbo].[employeeposition] WHERE start_date <= GETDATE() AND (actual_end_date IS NULL OR GETDATE() <= actual_end_date) AND employee_id = '{empId}')
                             ,'{leaveType}'
                             ,'{DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             ,'{DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'

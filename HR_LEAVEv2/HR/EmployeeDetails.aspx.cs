@@ -1101,8 +1101,8 @@ namespace HR_LEAVEv2.HR
                                 ep.expected_end_date,
                                 '0' as isChanged,
                                 FORMAT(ep.actual_end_date, 'd/MM/yyyy') actual_end_date,
-                                IIF(ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date, 'Active', 'Inactive') as status, 
-                                IIF(ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date, 'label-success', 'label-danger') as status_class
+                                IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'Active', 'Inactive') as status, 
+                                IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'label-success', 'label-danger') as status_class
                                 
                             FROM [dbo].[employeeposition] ep
 

@@ -53,7 +53,7 @@ namespace HR_LEAVEv2.Supervisor
 	                    e.first_name + ' ' + e.last_name as 'Name', 
 	                    e.email,
 	                    (
-		                    SELECT IIF(start_date <= GETDATE() AND actual_end_date IS NULL OR GETDATE() < actual_end_date, 'Yes', 'No')
+		                    SELECT IIF(start_date <= GETDATE() AND (actual_end_date IS NULL OR GETDATE() <= actual_end_date), 'Yes', 'No')
 		                    FROM (
 			                    SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date, sup_ep.start_date
 			                    FROM dbo.employeeposition sup_ep
@@ -72,7 +72,7 @@ namespace HR_LEAVEv2.Supervisor
                     (
                         select ep.employee_id
                         from dbo.employeeposition ep
-                        where ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                        where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
                         group by ep.employee_id
                         having count(*) > 0
                     ) 
@@ -123,7 +123,7 @@ namespace HR_LEAVEv2.Supervisor
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
-                                    where ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date
+                                    where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
                                     group by ep.employee_id
                                     having count(*) > 0
                                 ) 

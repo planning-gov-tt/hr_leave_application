@@ -32,8 +32,7 @@ namespace HR_LEAVEv2.UserControls
                               
                 e.employee_id employee_id,
                 e.last_name + ', ' + LEFT(e.first_name, 1) + '.' AS employee_name,
-                ep.employment_type employment_type,
-                IIF(ep.employment_type IS NOT NULL AND lt.created_at >= ep.start_date, 'Yes', 'No') as isLAfromActiveUser,
+                IIF(relevant_ep.employment_type IS NOT NULL AND (relevant_ep.start_date <= GETDATE() AND (relevant_ep.actual_end_date IS NULL OR GETDATE() <= relevant_ep.actual_end_date)), 'Yes', 'No') isLAfromActiveUser,
 
                 lt.leave_type leave_type,
                 lt.start_date,
@@ -59,7 +58,7 @@ namespace HR_LEAVEv2.UserControls
                 INNER JOIN [dbo].[employee] e ON e.employee_id = lt.employee_id
                 INNER JOIN [dbo].[employee] s ON s.employee_id = lt.supervisor_id
                 LEFT JOIN [dbo].[employee] hr ON hr.employee_id = lt.hr_manager_id 
-                LEFT JOIN [dbo].employeeposition ep ON ep.employee_id = lt.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+                LEFT JOIN [dbo].employeeposition relevant_ep ON relevant_ep.id = lt.employee_position_id
             ";
 
         private string connectionString = ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString;
@@ -235,7 +234,7 @@ namespace HR_LEAVEv2.UserControls
 
 							AND 
 
-							GETDATE() < (SELECT actual_end_date
+							GETDATE() <= (SELECT actual_end_date
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
 								FROM dbo.employeeposition sup_ep
@@ -292,7 +291,7 @@ namespace HR_LEAVEv2.UserControls
                     }
                     employmentTypes += ")";
                     whereBindGridView += $@"
-                        AND (employment_type IN {employmentTypes} OR employment_type IS NULL)          
+                        AND (relevant_ep.employment_type IN {employmentTypes})          
                     ";
 
                     // ensure that only leave applications submitted during the period of their current active record gets shown
@@ -329,7 +328,7 @@ namespace HR_LEAVEv2.UserControls
 
 							AND 
 
-							GETDATE() < (SELECT actual_end_date
+							GETDATE() <= (SELECT actual_end_date
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
 								FROM dbo.employeeposition hr_ep
@@ -418,11 +417,11 @@ namespace HR_LEAVEv2.UserControls
                 {
                     if(LAfromActiveInactiveEmp == "Active")
                         whereFilterGridView += $@"
-                            AND ep.employment_type IS NOT NULL AND lt.created_at >= ep.start_date
+                            AND relevant_ep.employment_type IS NOT NULL AND (relevant_ep.start_date <= GETDATE() AND (relevant_ep.actual_end_date IS NULL OR GETDATE() <= relevant_ep.actual_end_date))
                         ";
                     else if(LAfromActiveInactiveEmp == "Inactive")
                         whereFilterGridView += $@"
-                            AND NOT (ep.employment_type IS NOT NULL AND lt.created_at >= ep.start_date)
+                            AND NOT (relevant_ep.employment_type IS NOT NULL AND (relevant_ep.start_date <= GETDATE() AND (relevant_ep.actual_end_date IS NULL OR GETDATE() <= relevant_ep.actual_end_date)))
                         ";
                     // else if viewing both then add no where clause
                 }
@@ -1504,7 +1503,7 @@ namespace HR_LEAVEv2.UserControls
 			                                    ON e.employee_id = {employee_id}
 
 			                                    LEFT JOIN dbo.employeeposition ep                                          
-			                                    ON ep.employee_id = e.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
+			                                    ON ep.employee_id = e.employee_id AND (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date))
 
 			                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')
 		                                    )
@@ -1528,7 +1527,7 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
-		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.start_date <= GETDATE() AND hr_ep.actual_end_date IS NULL OR GETDATE() < hr_ep.actual_end_date)
+		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.start_date <= GETDATE() AND (hr_ep.actual_end_date IS NULL OR GETDATE() <= hr_ep.actual_end_date))
 
 		                                    WHERE hr_ep.dept_id = 2
 	                                    )
