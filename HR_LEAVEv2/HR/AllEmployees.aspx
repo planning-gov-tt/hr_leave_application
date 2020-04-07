@@ -270,24 +270,11 @@
 
                             <h3>Leave Balances</h3>
 
-                            <div>
-                                <h4 style="display: inline">Vacation Leave Balance:</h4>
-                                <span id="vacationDetails"></span>
-                            </div>
+                            <div id="leaveBalancesDetails"></div>
 
-                            <div>
-                                <h4 style="display: inline">Personal Leave Balance:</h4>
-                                <span id="personalDetails"></span>
-                            </div>
-
-                            <div>
-                                <h4 style="display: inline">Casual Leave Balance:</h4>
-                                <span id="casualDetails"></span>
-                            </div>
-
-                            <div>
-                                <h4 style="display: inline">Sick Leave Balance:</h4>
-                                <span id="sickDetails"></span>
+                            <div id="leaveBalancesErrorPanel" class="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span>Leave balances could not be loaded</span>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -355,19 +342,19 @@
             $('#empIdDetails').text(data.emp_id);
             $('#ihrisIdDetails').text(data.ihris_id);
             $('#emailDetails').text(data.email);
-            $('#vacationDetails').text(data.vacation);
-            $('#personalDetails').text(data.personal);
-            $('#casualDetails').text(data.casual);
-            $('#sickDetails').text(data.sick);
+            $('#leaveBalancesDetails').html(data.leave_balances);
             if (data.isCompleteRecord == '1') {
                 $('#errorPanel').hide();
-                $('#positionDetails').show();
+                $('#leaveBalancesErrorPanel').hide();
 
-                $('#empTypeDetails').text(data.employment_type);
+                $('#positionDetails').show();
                 $('#empPositionDetails').text(data.position);
+
+                $('#empTypeDetails').text(data.employment_type);            
             } else {
                 $('#positionDetails').hide();
                 $('#errorPanel').show();
+                $('#leaveBalancesErrorPanel').show();
             }
 
         }

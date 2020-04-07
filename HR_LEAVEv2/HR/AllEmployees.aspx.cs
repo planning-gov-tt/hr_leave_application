@@ -23,7 +23,8 @@ namespace HR_LEAVEv2.HR
             public string personal { get; set; }
             public string casual { get; set; }
             public string sick { get; set; }
-
+            public string leave_balances { get; set; }
+            public DateTime start_date { get; set; }
             public string employment_type { get; set; }
             public string position { get; set; }
         };
@@ -320,15 +321,17 @@ namespace HR_LEAVEv2.HR
             try
             {
                 string sql = $@"
-                        SELECT TOP 1 e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, p.pos_name
+                        SELECT TOP 1 e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, ep.start_date, p.pos_name
                         FROM [dbo].[employee] e
+
                         RIGHT JOIN [dbo].employeeposition ep
                         ON e.employee_id = ep.employee_id
 
                         INNER JOIN [dbo].position p
                         ON ep.position_id = p.pos_id
+
                         WHERE e.employee_id = {emp_id}
-                        ORDER BY ep.start_date DESC;
+                        ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC;
                     ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -338,23 +341,77 @@ namespace HR_LEAVEv2.HR
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            while (reader.Read())
+                            if (reader.HasRows)
                             {
-                                empDetails = new EmpDetails
+                                while (reader.Read())
                                 {
-                                    emp_id = reader["employee_id"].ToString(),
-                                    ihris_id = reader["ihris_id"].ToString(),
-                                    name = reader["name"].ToString(),
-                                    email = reader["email"].ToString(),
-                                    vacation = reader["vacation"].ToString(),
-                                    personal = reader["personal"].ToString(),
-                                    casual = reader["casual"].ToString(),
-                                    sick = reader["sick"].ToString(),
-                                    employment_type = reader["employment_type"].ToString(),
-                                    position = reader["pos_name"].ToString(),
-                                    isCompleteRecord = '1'   
-                                };
-                            }
+                                    empDetails = new EmpDetails
+                                    {
+                                        emp_id = reader["employee_id"].ToString(),
+                                        ihris_id = reader["ihris_id"].ToString(),
+                                        name = reader["name"].ToString(),
+                                        email = reader["email"].ToString(),
+                                        vacation = reader["vacation"].ToString(),
+                                        personal = reader["personal"].ToString(),
+                                        casual = reader["casual"].ToString(),
+                                        sick = reader["sick"].ToString(),
+                                        employment_type = reader["employment_type"].ToString(),
+                                        start_date = (DateTime)reader["start_date"],
+                                        position = reader["pos_name"].ToString(),
+                                        isCompleteRecord = '1'
+                                    };
+                                }
+
+                                string leaveBalancesDetailsStr = $@"
+                                <div>
+                                     <h4 style = 'display: inline'>Sick Leave Balance:</h4>
+                                     <span> {empDetails.sick} </span>
+                                </div>
+                            ";
+                                // set appropriate leave balance details based on employment type
+                                if (empDetails.employment_type == "Contract")
+                                {
+                                    // is employee in first 11 months of contract?
+                                    DateTime startDate = empDetails.start_date;
+                                    DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
+
+                                    if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                                        // display personal 
+                                        leaveBalancesDetailsStr += $@"
+                                        <div>
+                                            <h4 style='display: inline'>Personal Leave Balance:</h4>
+                                            <span>{empDetails.personal}</span>
+                                        </div>
+                                     ";
+                                    else
+                                    {
+                                        // display vacation 
+                                        leaveBalancesDetailsStr += $@"
+                                        <div>
+                                            <h4 style='display: inline'>Vacation Leave Balance:</h4>
+                                            <span>{empDetails.vacation}</span>
+                                        </div>
+                                     ";
+                                    }
+
+                                }
+                                else if (empDetails.employment_type == "Public Service")
+                                {
+                                    // public service employees- show casual and vacation
+                                    leaveBalancesDetailsStr += $@"
+                                        <div>
+                                            <h4 style='display: inline'>Casual Leave Balance:</h4>
+                                            <span>{empDetails.casual}</span>
+                                        </div>
+                                        <div>
+                                            <h4 style='display: inline'>Vacation Leave Balance:</h4>
+                                            <span>{empDetails.vacation}</span>
+                                        </div>
+                                     ";
+                                }
+
+                                empDetails.leave_balances = leaveBalancesDetailsStr;
+                            }     
                         }
                     }
                 }
@@ -366,11 +423,10 @@ namespace HR_LEAVEv2.HR
 
             if (empDetails == null)
             {
-                empDetails = null;
                 try
                 {
                     string sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
                         FROM [dbo].[employee] e
                         WHERE e.employee_id = {emp_id};
                     ";
@@ -390,10 +446,6 @@ namespace HR_LEAVEv2.HR
                                         ihris_id = reader["ihris_id"].ToString(),
                                         name = reader["name"].ToString(),
                                         email = reader["email"].ToString(),
-                                        vacation = reader["vacation"].ToString(),
-                                        personal = reader["personal"].ToString(),
-                                        casual = reader["casual"].ToString(),
-                                        sick = reader["sick"].ToString(),
                                         isCompleteRecord = '0'
                                     };
                                 }
