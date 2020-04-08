@@ -136,10 +136,10 @@ namespace HR_LEAVEv2.UserControls
                                         try
                                         {
                                             string updateVacationSql = $@"
-                                        UPDATE [dbo].employee 
-                                        SET vacation = '{updatedVacation}', personal = '0'
-                                        WHERE employee_id = '{Session["emp_id"]}';
-                                    ";
+                                                UPDATE [dbo].employee 
+                                                SET vacation = '{updatedVacation}', personal = '0'
+                                                WHERE employee_id = '{Session["emp_id"]}';
+                                            ";
                                             using (SqlCommand cmd = new SqlCommand(updateVacationSql, con))
                                             {
                                                 int rowsAffected = cmd.ExecuteNonQuery();

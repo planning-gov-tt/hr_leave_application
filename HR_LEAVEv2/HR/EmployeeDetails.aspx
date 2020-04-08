@@ -312,72 +312,52 @@
                 </div>
             </asp:Panel>      
         </div>
-
+        
         <%--Leave Balances--%>
-        <div class="container text-center" style="width: 50%; background-color: #e0e0eb;  margin-bottom: 5px; padding-bottom: 15px;">
+        <div class="container text-center" style="width: 50%; background-color: #e0e0eb; margin-bottom: 5px; padding-bottom: 15px;">
             <h3>Leave Balances
-                <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
+                <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer;font-size: 14px;"
                     data-toggle="tooltip"
                     data-placement="right"
                     title="All empty form fields default to a leave balance of 0"></i>
             </h3>
-            <%--Sick Leave--%>
-            <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator7" runat="server" ControlToValidate="sickLeaveInput" ErrorMessage="Please enter valid sick leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
-                </asp:RegularExpressionValidator>
-                <label for="sickLeaveInput">Sick Leave</label>
-                <asp:TextBox CssClass="form-control" ID="sickLeaveInput" placeholder="Enter sick leave balance" runat="server"></asp:TextBox>
-            </div>
+            <asp:ListView ID="ListView1" runat="server" GroupItemCount="10" Style="text-align: left;">
+                <EmptyDataTemplate>
+                    <div class="alert alert-info text-center" role="alert" style="display: inline-block; margin: 0 auto">
+                        <i class="fa fa-info-circle"></i>
+                        No Leave Types available
+                    </div>
+                </EmptyDataTemplate>
 
-            <%--Vacation--%>
-            <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator5" runat="server" ControlToValidate="vacationLeaveInput" ErrorMessage="Please enter valid vacation leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
-                </asp:RegularExpressionValidator>
-                <label for="vacationLeaveInput">Vacation Leave</label>
-                <asp:TextBox CssClass="form-control" ID="vacationLeaveInput" placeholder="Enter vacation leave balance" runat="server"></asp:TextBox>
-            </div>
+                <EmptyItemTemplate>
+                    </td>
+                </EmptyItemTemplate>
 
-            <%--Personal--%>
-            <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator4" runat="server" ControlToValidate="personalLeaveInput" ErrorMessage="Please enter valid personal leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
-                </asp:RegularExpressionValidator>
-                <label for="personalLeaveInput">Personal Leave</label>
-                <asp:TextBox CssClass="form-control" ID="personalLeaveInput" placeholder="Enter personal leave balance" runat="server"></asp:TextBox>
-            </div>
+                <GroupTemplate>
+                    <div id="itemPlaceholderContainer" runat="server">
+                        <div id="itemPlaceholder" runat="server"></div>
+                    </div>
+                </GroupTemplate>
 
-            <%--Casual--%>
-            <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator6" runat="server" ControlToValidate="casualLeaveInput" ErrorMessage="Please enter valid casual leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
-                </asp:RegularExpressionValidator>
-                <label for="casualLeaveInput">Casual Leave</label>
-                <asp:TextBox CssClass="form-control" ID="casualLeaveInput" placeholder="Enter casual leave balance" runat="server"></asp:TextBox>
-            </div>
+                <ItemTemplate>
+                    <div class="form-group text-left">
+                        <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator7" runat="server" ControlToValidate="LeaveInput" ErrorMessage='<%#Eval("validation") %>' ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
+                        </asp:RegularExpressionValidator>
+                        <label for="LeaveInput"><%#Eval("leave_type") %> Leave</label>
+                        <asp:TextBox CssClass="form-control" ID="LeaveInput" placeholder='<%#Eval("placeholder") %>' runat="server"></asp:TextBox>
+                        <asp:HiddenField ID="leaveTypeHiddenField" runat="server" Value='<%#Eval("leave_type") %>' />
+                    </div>
+                </ItemTemplate>
 
-            <%--Bereavement--%>
-            <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator8" runat="server" ControlToValidate="bereavementLeaveInput" ErrorMessage="Please enter valid bereavement leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
-                </asp:RegularExpressionValidator>
-                <label for="bereavementLeaveInput">Bereavement Leave</label>
-                <asp:TextBox CssClass="form-control" ID="bereavementLeaveInput" placeholder="Enter bereavement leave balance" runat="server"></asp:TextBox>
-            </div>
+                <LayoutTemplate>
+                    <div id="groupPlaceholderContainer" runat="server">
+                        <div id="groupPlaceholder" runat="server"></div>
+                    </div>
+                </LayoutTemplate>
 
-            <%--Maternity--%>
-            <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator9" runat="server" ControlToValidate="maternityLeaveInput" ErrorMessage="Please enter valid maternity leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
-                </asp:RegularExpressionValidator>
-                <label for="maternityLeaveInput">Maternity Leave</label>
-                <asp:TextBox CssClass="form-control" ID="maternityLeaveInput" placeholder="Enter maternity leave balance" runat="server"></asp:TextBox>
-            </div>
-
-            <%--Pre-Retirement--%>
-            <div class="form-group text-left">
-                <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" ID="RegularExpressionValidator10" runat="server" ControlToValidate="preRetirementLeaveInput" ErrorMessage="Please enter valid pre-retirement leave number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic" Style="float: right;">  
-                </asp:RegularExpressionValidator>
-                <label for="preRetirementLeaveInput">Pre-retirement Leave</label>
-                <asp:TextBox CssClass="form-control" ID="preRetirementLeaveInput" placeholder="Enter pre-retirement leave balance" runat="server"></asp:TextBox>
-            </div>
+            </asp:ListView>
         </div>
-
+       
         <%--Employment Record form--%>
         <div id="addEmploymentRecordContainer" class="container text-center" style="background-color: #f0f0f5; padding-bottom: 10px;">
             <h3>Employment Record</h3>
