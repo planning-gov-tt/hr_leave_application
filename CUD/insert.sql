@@ -1,5 +1,5 @@
-USE [HRLeaveTestDb]; -- testing db
---USE [HRLeaveDevDb]; -- development db
+--USE [HRLeaveTestDb]; -- testing db
+USE [HRLeaveDevDb]; -- development db
 GO
 
 
@@ -61,44 +61,44 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 ('hr_public_officer', 'public_officer_permissions');
 
 
-INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [pre_retirement]) VALUES 
+INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [paternity], [pre_retirement]) VALUES 
 -- IT
-('1', '1', 'PLANNING\ Tristan Sankar', 'Tristan', 'Sankar', 'Tristan.Sankar@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
-('115245', '115245', 'PLANNING\ Clint Ramoutar', 'Clint', 'Ramoutar', 'Clint.Ramoutar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
-('3', '3', 'PLANNING\ Christopher Sahadeo', 'Christopher', 'Sahadeo', 'Christopher.Sahadeo@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0),
-('184164', '184164', 'PLANNING\ Dale Cudjoe', 'Dale', 'Cudjoe', 'Dale.Cudjoe@planning.gov.tt', 15, 5, 0, 14, 2, 0, 0),
-('157778', '157778', 'PLANNING\ Nandani Ramsaran', 'Nandani', 'Ramsaran', 'Nandani.Ramsaran@planning.gov.tt', 10, 5, 0, 14, 2, 0, 0),
-('161720', '161720', 'PLANNING\ Rishi Boodoo', 'Rishi', 'Boodoo', 'Rishi.Boodoo@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
-('159118', '159118', 'PLANNING\ Carlisle McKay', 'Carlisle', 'McKay', 'Carlisle.McKay@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0),
-('15067', '15067', 'PLANNING\ Rohini Singh', 'Rohini', 'Singh', 'Rohini.Singh@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
-('42352', '42352', 'PLANNING\ Melissa Bynoe', 'Melissa', 'Bynoe', 'Melissa.Bynoe@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
-('123337', '123337', 'PLANNING\ Kene Bryan', 'Kene', 'Bryan', 'Kene.Bryan@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0), -- Director
-('140480', '140480', 'PLANNING\ Kelly DeLandro', 'Kelly', 'DeLandro', 'Kelly.DeLandro@planning.gov.tt', 9, 5, 0, 14, 2, 0, 0), -- Director
+('1', '1', 'PLANNING\ Tristan Sankar', 'Tristan', 'Sankar', 'Tristan.Sankar@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0, 0),
+('115245', '115245', 'PLANNING\ Clint Ramoutar', 'Clint', 'Ramoutar', 'Clint.Ramoutar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0, 0),
+('3', '3', 'PLANNING\ Christopher Sahadeo', 'Christopher', 'Sahadeo', 'Christopher.Sahadeo@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0, 0),
+('184164', '184164', 'PLANNING\ Dale Cudjoe', 'Dale', 'Cudjoe', 'Dale.Cudjoe@planning.gov.tt', 15, 5, 0, 14, 2, 0, 0, 0),
+('157778', '157778', 'PLANNING\ Nandani Ramsaran', 'Nandani', 'Ramsaran', 'Nandani.Ramsaran@planning.gov.tt', 10, 5, 0, 14, 2, 0, 0, 0),
+('161720', '161720', 'PLANNING\ Rishi Boodoo', 'Rishi', 'Boodoo', 'Rishi.Boodoo@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0, 0),
+('159118', '159118', 'PLANNING\ Carlisle McKay', 'Carlisle', 'McKay', 'Carlisle.McKay@planning.gov.tt', 0, 5, 0, 10, 1, 0, 0, 0),
+('15067', '15067', 'PLANNING\ Rohini Singh', 'Rohini', 'Singh', 'Rohini.Singh@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0, 0),
+('42352', '42352', 'PLANNING\ Melissa Bynoe', 'Melissa', 'Bynoe', 'Melissa.Bynoe@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0, 0),
+('123337', '123337', 'PLANNING\ Kene Bryan', 'Kene', 'Bryan', 'Kene.Bryan@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0, 0), -- Director
+('140480', '140480', 'PLANNING\ Kelly DeLandro', 'Kelly', 'DeLandro', 'Kelly.DeLandro@planning.gov.tt', 9, 5, 0, 14, 2, 0, 0, 0), -- Director
 --Pele
-('34521', '34521', 'PLANNING\ Pele StHill', 'Pele', 'St.Hill', 'Pele.StHill@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
+('34521', '34521', 'PLANNING\ Pele StHill', 'Pele', 'St.Hill', 'Pele.StHill@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0, 0),
 --Deneyse
-('12454', '12454', 'PLANNING\ Deneyse Outar', 'Deneyse', 'Outar', 'Deneyse.Outar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
+('12454', '12454', 'PLANNING\ Deneyse Outar', 'Deneyse', 'Outar', 'Deneyse.Outar@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0, 0),
 --Stacy
-('67689', '67689', 'PLANNING\ StacyAnn Drakes', 'StacyAnn', 'Drakes', 'StacyAnn.Drakes@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0),
+('67689', '67689', 'PLANNING\ StacyAnn Drakes', 'StacyAnn', 'Drakes', 'StacyAnn.Drakes@planning.gov.tt', 20, 5, 0, 14, 2, 0, 0, 0),
 -- HR
-('83612', '83612', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'Melanie.Noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- Director
-('11948', '11948', 'PLANNING\ Charmaine Carmichael', 'Charmaine', 'Carmichael', 'Charmaine.Carmichael@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- HRO3
-('01511', '01511', 'PLANNING\ Christine Bowen', 'Christine', 'Bowen', 'Christine.Bowen@planning.gov.tt', 30, 0, 0, 14, 2, 0, 50), -- HRO2
-('13888', '13888', 'PLANNING\ Sharline Bharath-Jaggernauth', 'Sharline', 'Bharath-Jaggernauth', 'Sharline.Bharath-Jaggernauth@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0), -- HRO2
-('87465', '87465', 'PLANNING\ Kathy-Ann Williams', 'Kathy-Ann', 'Williams', 'Kathy-Ann.Williams@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0), -- HRO1
-('09246', '09246', 'PLANNING\ Suzette Maraj', 'Suzette', 'Maraj', 'Suzette.Maraj@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0), -- AO2
-('01548', '01548', 'PLANNING\ Nazmoon Khan', 'Nazmoon', 'Khan', 'Nazmoon.Khan@planning.gov.tt', 30, 0, 5, 14, 2, 0, 30), -- HRO3
+('83612', '83612', 'PLANNING\ Melanie Noel', 'Melanie', 'Noel', 'Melanie.Noel@planning.gov.tt', 30, 0, 0, 14, 2, 0, 0, 50), -- Director
+('11948', '11948', 'PLANNING\ Charmaine Carmichael', 'Charmaine', 'Carmichael', 'Charmaine.Carmichael@planning.gov.tt', 30, 0, 0, 14, 2, 0, 0, 50), -- HRO3
+('01511', '01511', 'PLANNING\ Christine Bowen', 'Christine', 'Bowen', 'Christine.Bowen@planning.gov.tt', 30, 0, 0, 14, 2, 0, 0, 50), -- HRO2
+('13888', '13888', 'PLANNING\ Sharline Bharath-Jaggernauth', 'Sharline', 'Bharath-Jaggernauth', 'Sharline.Bharath-Jaggernauth@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0, 0), -- HRO2
+('87465', '87465', 'PLANNING\ Kathy-Ann Williams', 'Kathy-Ann', 'Williams', 'Kathy-Ann.Williams@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0, 0), -- HRO1
+('09246', '09246', 'PLANNING\ Suzette Maraj', 'Suzette', 'Maraj', 'Suzette.Maraj@planning.gov.tt', 25, 0, 0, 14, 2, 0, 0, 0), -- AO2
+('01548', '01548', 'PLANNING\ Nazmoon Khan', 'Nazmoon', 'Khan', 'Nazmoon.Khan@planning.gov.tt', 30, 0, 5, 14, 2, 0, 0, 30), -- HRO3
 -- testing hard filter
 -- adding pauline under charmichael (hr2) as contract
-('38137', '38137', 'PLANNING\ Pauline Solozano', 'Pauline', 'Solozano', 'Pauline.Solozano@planning.gov.tt', 30, 0, 5, 14, 2, 0, 30), -- HRO3
+('38137', '38137', 'PLANNING\ Pauline Solozano', 'Pauline', 'Solozano', 'Pauline.Solozano@planning.gov.tt', 30, 0, 5, 14, 2, 0, 0, 30), -- HRO3
 -- adding usha under nazmoon (hr2) as public servant
-('05356', '05356', 'PLANNING\ Usha Balkaran', 'Usha', 'Balkaran', 'Usha.Balkaran@planning.gov.tt', 30, 0, 5, 14, 2, 0, 30), -- HRO3
+('05356', '05356', 'PLANNING\ Usha Balkaran', 'Usha', 'Balkaran', 'Usha.Balkaran@planning.gov.tt', 30, 0, 5, 14, 2, 0, 0,30), -- HRO3
 
 -- PS
-('07525', '07525', 'PLANNING\ Joanne Deoraj', 'Joanne', 'Deoraj', 'Joanne.Deoraj@planning.gov.tt', 50, 0, 5, 14, 2, 0, 0), -- PS
+('07525', '07525', 'PLANNING\ Joanne Deoraj', 'Joanne', 'Deoraj', 'Joanne.Deoraj@planning.gov.tt', 50, 0, 5, 14, 2, 0, 0, 0), -- PS
 
 -- Minister
-('4', '4', 'PLANNING\ Cherrie-Ann Crichlow-Cockburn', 'Cherrie-Ann', 'Crichlow-Cockburn', 'Cherrie-Ann.Crichlow-Cockburn@planning.gov.tt', 50, 0, 5, 14, 2, 0, 0); -- Minister
+('4', '4', 'PLANNING\ Cherrie-Ann Crichlow-Cockburn', 'Cherrie-Ann', 'Crichlow-Cockburn', 'Cherrie-Ann.Crichlow-Cockburn@planning.gov.tt', 50, 0, 5, 14, 2, 0, 0, 0); -- Minister
 -- PM
 -- P
 
@@ -254,54 +254,8 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 ('No Pay'),
 ('Bereavement'),
 ('Maternity'),
-('Pre-retirement'),
-('Leave Renewal'),
-('Compensatory');
-
-
-SET IDENTITY_INSERT [dbo].[leavetransaction] ON;
-
-INSERT INTO [dbo].[leavetransaction] ([transaction_id], [created_at], [employee_id], [leave_type], [start_date], [end_date], [qualified],[days_taken], [supervisor_id], [supervisor_edit_date], [hr_manager_id], [hr_manager_edit_date], [status], [emp_comment],[sup_comment],[hr_comment]) VALUES
--- SCENARIOS 
--- VIEWS: (emp, sup, hr)
-
--- emp applies for sick leave to sup, pending
-(1, '20191208 10:00:00 AM', '1', 'Sick', '20191201', '20191207','Yes',7, '115245', NULL, NULL, NULL, 'Pending', NULL, NULL, NULL),
-
--- emp applies for sick leave to sup, recommended
-(2, '20191208 12:00:00 PM', '3', 'Sick', '20201201', '20201207','Yes', 7,'115245', '20191208 12:10:00 PM', NULL, NULL, 'Recommended','I have swine flu', 'Good Standing',NULL),
-
--- emp applies for vacation leave to sup, to hr, approved
-(3, '20191101 9:54:00 AM', '184164', 'Vacation', '20201201','20201210','Yes', 10,'123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved',NULL, 'Good',NULL),
-
--- same employee applies for sick leave to sup, recommended
-(4, '20191110 9:54:00 AM', '184164', 'Sick', '20191109', '20191109','Yes', 1,'123337', '20191111 10:05:12 AM', NULL, NULL, 'Recommended', NULL,NULL, NULL),
-
--- setup for demo
--- hr director applies to PS for vacation leave - after approval should not see your own app in hr gridview
-(5, '20191112 9:54:00 AM', '83612', 'Vacation', '20191212', '20200101','Yes', 21,'07525', NULL, NULL, NULL, 'Pending', NULL, NULL, NULL),
-
--- hr director applies to PS for sick leave
-(6, '20191125 12:54:00 PM', '83612', 'Sick', '20191123', '20191124','Yes', 2,'07525', NULL, NULL, NULL, 'Recommended', NULL,'No problem',NULL),
-
--- HRO3 applies to HR Director for sick leave (sup)
-(7, '20191125 12:54:00 PM', '11948', 'Sick', '20201123', '20201124','Yes', 2,'83612', NULL, NULL, NULL, 'Pending', NULL,NULL,NULL),
-
--- hr2
--- can see and approve sick and casual ONLY
--- can see and approve contract ONLY
-(8, '20191125 12:54:00 PM', '38137', 'Sick', '20191123', '20191124','Yes', 2,'11948', NULL, NULL, NULL, 'Recommended', 'Ebola take me','Feel Better',NULL),
-
--- can see and approve public_services ONLY
-(9, '20191125 12:54:00 PM', '05356', 'Casual', '20191123', '20191124','Yes', 2,'01548', NULL, NULL, NULL, 'Recommended', NULL,NULL,NULL)
-
--- hr1
--- can see and appprove all other types (vacation etc)
-;
-
-
-SET IDENTITY_INSERT [dbo].[leavetransaction] OFF;
-
+('Paternity'),
+('Pre-retirement');
 
 SET IDENTITY_INSERT [dbo].[department] ON;
 
@@ -405,27 +359,65 @@ INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;
 
-SET IDENTITY_INSERT [dbo].[emptypeleavetype] ON;
+SET IDENTITY_INSERT [dbo].[leavetransaction] ON;
 
-INSERT INTO [dbo].[emptypeleavetype] ([id], [employment_type], [leave_type]) VALUES
-(1, 'Contract', 'Bereavement'),
-(2, 'Contract', 'Compensatory'),
-(3, 'Contract', 'Leave Renewal'),
-(4, 'Contract', 'Maternity'),
-(5, 'Contract', 'No Pay'),
-(6, 'Contract', 'Personal'),
-(7, 'Contract', 'Pre-retirement'),
-(8, 'Contract', 'Sick'),
-(9, 'Contract', 'Vacation'),
-(10, 'Public Service', 'Bereavement'),
-(11, 'Public Service', 'Compensatory'),
-(12, 'Public Service', 'Leave Renewal'),
-(13, 'Public Service', 'Maternity'),
-(14, 'Public Service', 'No Pay'),
-(15, 'Public Service', 'Casual'),
-(16, 'Public Service', 'Pre-retirement'),
-(17, 'Public Service', 'Sick'),
-(18, 'Public Service', 'Vacation')
+INSERT INTO [dbo].[leavetransaction] ([transaction_id], [created_at], [employee_id], [employee_position_id], [leave_type], [start_date], [end_date], [qualified],[days_taken], [supervisor_id], [supervisor_edit_date], [hr_manager_id], [hr_manager_edit_date], [status], [emp_comment],[sup_comment],[hr_comment]) VALUES
+-- SCENARIOS 
+-- VIEWS: (emp, sup, hr)
+
+-- emp applies for sick leave to sup, pending
+(1, '20191208 10:00:00 AM', '1', 1 ,'Sick', '20191201', '20191207','Yes',7, '115245', NULL, NULL, NULL, 'Pending', NULL, NULL, NULL),
+
+-- emp applies for sick leave to sup, recommended
+(2, '20191208 12:00:00 PM', '3', 2, 'Sick', '20201201', '20201207','Yes', 7,'115245', '20191208 12:10:00 PM', NULL, NULL, 'Recommended','I have swine flu', 'Good Standing',NULL),
+
+-- emp applies for vacation leave to sup, to hr, approved
+(3, '20191101 9:54:00 AM', '184164', 9, 'Vacation', '20201201','20201210','Yes', 10,'123337', '20191104 8:01:00 AM', '11948', '20191105 1:10:04 PM', 'Approved',NULL, 'Good',NULL),
+
+-- same employee applies for sick leave to sup, recommended
+(4, '20191110 9:54:00 AM', '184164', 9, 'Sick', '20191109', '20191109','Yes', 1,'123337', '20191111 10:05:12 AM', NULL, NULL, 'Recommended', NULL,NULL, NULL),
+
+-- setup for demo
+-- hr director applies to PS for vacation leave - after approval should not see your own app in hr gridview
+(5, '20191112 9:54:00 AM', '83612', 11, 'Vacation', '20191212', '20200101','Yes', 21,'07525', NULL, NULL, NULL, 'Pending', NULL, NULL, NULL),
+
+-- hr director applies to PS for sick leave
+(6, '20191125 12:54:00 PM', '83612', 11, 'Sick', '20191123', '20191124','Yes', 2,'07525', NULL, NULL, NULL, 'Recommended', NULL,'No problem',NULL),
+
+-- HRO3 applies to HR Director for sick leave (sup)
+(7, '20191125 12:54:00 PM', '11948', 10, 'Sick', '20201123', '20201124','Yes', 2,'83612', NULL, NULL, NULL, 'Pending', NULL,NULL,NULL),
+
+-- hr2
+-- can see and approve sick and casual ONLY
+-- can see and approve contract ONLY
+(8, '20191125 12:54:00 PM', '38137', 7, 'Sick', '20191123', '20191124','Yes', 2,'11948', NULL, NULL, NULL, 'Recommended', 'Ebola take me','Feel Better',NULL),
+
+-- can see and approve public_services ONLY
+(9, '20191125 12:54:00 PM', '05356', 8, 'Casual', '20191123', '20191124','Yes', 2,'01548', NULL, NULL, NULL, 'Recommended', NULL,NULL,NULL)
+
+-- hr1
+-- can see and appprove all other types (vacation etc)
 ;
 
-SET IDENTITY_INSERT [dbo].[emptypeleavetype] OFF;
+
+SET IDENTITY_INSERT [dbo].[leavetransaction] OFF;
+
+
+INSERT INTO [dbo].[emptypeleavetype] ([employment_type], [leave_type]) VALUES
+('Contract', 'Bereavement'),
+('Contract', 'Maternity'),
+('Contract', 'Paternity'),
+('Contract', 'No Pay'),
+('Contract', 'Personal'),
+('Contract', 'Pre-retirement'),
+('Contract', 'Sick'),
+('Contract', 'Vacation'),
+('Public Service', 'Bereavement'),
+('Public Service', 'Maternity'),
+('Public Service', 'Paternity'),
+('Public Service', 'No Pay'),
+('Public Service', 'Casual'),
+('Public Service', 'Pre-retirement'),
+('Public Service', 'Sick'),
+('Public Service', 'Vacation')
+;
