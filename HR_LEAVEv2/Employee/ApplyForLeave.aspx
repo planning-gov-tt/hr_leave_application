@@ -108,7 +108,11 @@
             <%--apply mode, view mode--%>
             <label for="numDaysAppliedFor" style="font-size: 1.2em">Days applied for:</label>
 
-            <asp:Label ID="numDaysAppliedFor" runat="server" Text="0" Style="font-size: 1.05em"></asp:Label>
+            <asp:UpdatePanel ID="UpdatePanel3" runat="server" Style="display:inline-block;">
+                <ContentTemplate>
+                     <asp:Label ID="numDaysAppliedFor" runat="server" Text="0" Style="font-size: 1.05em"></asp:Label>
+                </ContentTemplate>
+            </asp:UpdatePanel>    
 
             <%--edit mode--%>
             <asp:TextBox ID="numDaysAppliedForEditTxt" runat="server" Width ="35px" Visible="false" ></asp:TextBox>
@@ -142,7 +146,21 @@
             <%--view mode, edit mode--%>
             <asp:Panel ID="typeOfLeavePanel" runat="server" Style="display:inline;">
                 <asp:Label ID="typeOfLeaveTxt" runat="server" Style="text-align:center;font-size:1.05em;"></asp:Label> 
+                <asp:LinkButton ID="convertToPaidLeave" runat="server" OnClick="convertToPaidLeave_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Convert to Paid Leave" Style="margin-left:15px;" Visible ="false">
+                    <i class="fa fa-money" aria-hidden ="true" style="font-size:1.5em"></i>
+                </asp:LinkButton>
+
+                <asp:UpdatePanel ID="UpdatePanel2" runat="server">
+                    <ContentTemplate>
+                        <asp:Panel ID="filesNeededForConversionToPaidPanel" runat="server" CssClass="row alert alert-warning" Style="display: block; width: 600px; margin: 0 auto; margin-top: 10px;" role="alert" Visible="false">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span16" runat="server">No files currently uploaded. Upload recommendation from PS and try again</span>
+                        </asp:Panel>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
             </asp:Panel>
+
+            
         </div>
 
         <%--View mode: Shows the supervisor the leave application was submitted to--%>
@@ -364,6 +382,11 @@
                     <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidLeaveTypeTxt" runat="server"></span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="duplicateFileNameTxt" runat="server">File name already exists</span>
                     </asp:Panel>
 
                     <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">

@@ -121,9 +121,9 @@ namespace HR_LEAVEv2.Employee
             }
             else
             {
-                if(mode == "apply")
+                clearFilesErrors();
+                if (mode == "apply")
                 {
-                    clearFilesErrors();
                     validateDates(txtFrom.Text, txtTo.Text);
                     validateLeave(typeOfLeave.SelectedValue);
                     validateSupervisor(supervisorSelect.SelectedValue != "" ? supervisorSelect.SelectedValue : "-1");
@@ -531,6 +531,7 @@ namespace HR_LEAVEv2.Employee
             // clears all errors associated with uploading/clearing/downloading files
             invalidFileTypePanel.Style.Add("display", "none");
             fileUploadedTooLargePanel.Style.Add("display", "none");
+            duplicateFileNamesPanel.Style.Add("display", "none");
             fileUploadNeededPanel.Style.Add("display", "none");
         }
         //________________________________________________________________________
@@ -599,6 +600,10 @@ namespace HR_LEAVEv2.Employee
             viewModeTitle.Visible = false;
             editModeTitle.Visible = true;
             applyModeTitle.Visible = false;
+
+            // show convert to paid leave button if leave type is No Pay
+            if (typeOfLeaveTxt.Text == "No Pay")
+                convertToPaidLeave.Visible = true;
 
             // upload files
             fileUploadPanel.Visible = true;
@@ -810,7 +815,8 @@ namespace HR_LEAVEv2.Employee
                             // store previous num days applied for in viewstate
                             ViewState["daysTaken"] = numDaysAppliedForEditTxt.Text = ltDetails.daysTaken;
 
-                            typeOfLeaveTxt.Text = ltDetails.typeOfLeave;
+                            ViewState["typeOfLeave"] = typeOfLeaveTxt.Text = ltDetails.typeOfLeave;
+
                             statusTxt.Text = ltDetails.status;
                             qualifiedTxt.Text = ltDetails.qualified;
                             submittedOnTxt.Text = "Submitted on: " + ltDetails.submittedOn;
@@ -924,6 +930,9 @@ namespace HR_LEAVEv2.Employee
                 List<string> filesTooLarge = new List<string>();
                 List<string> invalidFiles = new List<string>();
 
+                // used in edit mode to ensure files with the same name cannot be uploaded by a single user
+                List<string> duplicateFiles = new List<string>();
+
                 // used to store list of files added
                 List<HttpPostedFile> files = new List<HttpPostedFile>();
 
@@ -944,6 +953,15 @@ namespace HR_LEAVEv2.Employee
                     {
                         if (allowedFileExtensions.Contains(Path.GetExtension(uploadedFile.FileName).ToString()))
                         {
+                            if(mode == "edit")
+                            {
+                                // check for duplicate file name
+                                if(filesToDownloadList.Items.FindByText(Path.GetFileName(uploadedFile.FileName).ToString()) != null)
+                                {
+                                    duplicateFiles.Add(Path.GetFileName(uploadedFile.FileName).ToString());
+                                    continue;
+                                }
+                            }
                             dt.Rows.Add(Path.GetFileName(uploadedFile.FileName).ToString());
                             files.Add(uploadedFile);
                         }
@@ -973,6 +991,13 @@ namespace HR_LEAVEv2.Employee
                     HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("fileUploadTooLargeTxt");
                     txt.InnerText = $"Could not upload {String.Join(", ", filesTooLarge.Select(fileName => "'" + fileName + "'").ToArray())}. File(s) too large";
                     fileUploadedTooLargePanel.Style.Add("display", "inline-block");
+                }
+
+                if(duplicateFiles.Count > 0)
+                {
+                    HtmlGenericControl txt = (HtmlGenericControl)duplicateFileNamesPanel.FindControl("duplicateFileNameTxt");
+                    txt.InnerText = $"Could not upload {String.Join(", ", duplicateFiles.Select(fileName => "'" + fileName + "'").ToArray())}. Uploaded file name(s) already exist for this leave application";
+                    duplicateFileNamesPanel.Style.Add("display", "inline-block");
                 }
 
                 if (dt.Rows.Count > 0)
@@ -1005,6 +1030,7 @@ namespace HR_LEAVEv2.Employee
                     }
                     else if (mode == "edit")
                     {
+                        filesNeededForConversionToPaidPanel.Visible = false;
                         filesToDownloadPanel.Style.Add("margin-top", "15px");
                     }
 
@@ -1504,6 +1530,7 @@ namespace HR_LEAVEv2.Employee
             Boolean isSupCommentsChanged = false,
                 isHrCommentsChanged = false,
                 isDaysTakenChanged = false,
+                isLeaveTypeChanged = false,
                 areFilesUploaded = false,
                 isEditSuccessful = false;
 
@@ -1524,6 +1551,8 @@ namespace HR_LEAVEv2.Employee
                 isHrCommentsChanged = ViewState["hrComment"].ToString() != hrComment;
             }
 
+            isLeaveTypeChanged = ViewState["typeOfLeave"].ToString() != typeOfLeaveTxt.Text;
+
             daysTaken = numDaysAppliedForEditTxt.Text;
             isDaysTakenChanged = ViewState["daysTaken"].ToString() != daysTaken;
 
@@ -1531,8 +1560,15 @@ namespace HR_LEAVEv2.Employee
             areFilesUploaded = files != null;
             List<string> uploadedFilesIds = null;
 
-            if (isDaysTakenChanged || isSupCommentsChanged || isHrCommentsChanged || areFilesUploaded)
+            if (isDaysTakenChanged || isSupCommentsChanged || isHrCommentsChanged || isLeaveTypeChanged || areFilesUploaded)
             {
+
+                if (isLeaveTypeChanged && !areFilesUploaded)
+                {
+                    filesNeededForConversionToPaidPanel.Visible = true;
+                    return;
+                }
+
                 try
                 {
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -1540,10 +1576,12 @@ namespace HR_LEAVEv2.Employee
                         connection.Open();
                         string sql = string.Empty,
                             comments = string.Empty,
+                            daysTakenAndQualifiedSql = string.Empty,
+                            leaveTypeSql = string.Empty,
                             updateLeaveBalance = string.Empty;
 
                         if (!isSupCommentsChanged && isHrCommentsChanged)
-                            comments = $"hr_comment = @HrComments,";
+                            comments = $"hr_comment = @HrComment,";
                         if (isSupCommentsChanged && !isHrCommentsChanged)
                             comments = $"sup_comment = @SupervisorComments,";
                         if (isSupCommentsChanged && isHrCommentsChanged)
@@ -1571,9 +1609,11 @@ namespace HR_LEAVEv2.Employee
                                 SET 
                                     [hr_manager_id] = '{Session["emp_id"]}', 
                                     [hr_manager_edit_date] = CURRENT_TIMESTAMP,
+                                    {comments}
+                                    leave_type = '{typeOfLeaveTxt.Text}',
                                     days_taken = @DaysTaken, 
-                                    {comments} 
-                                    qualified = {util.getSqlForCalculatingQualifiedField(typeOfLeaveTxt.Text, $"(SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId})")}
+                                    qualified = { util.getSqlForCalculatingQualifiedField(typeOfLeaveTxt.Text, $"(SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId})")}
+                                    
                                 WHERE transaction_id = {leaveId};
                                 
                                 {updateLeaveBalance}                                
@@ -1583,15 +1623,21 @@ namespace HR_LEAVEv2.Employee
 
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            if (!String.IsNullOrEmpty(supComment) && !String.IsNullOrWhiteSpace(supComment))
-                                command.Parameters.AddWithValue("@SupervisorComments", supComment);
-                            else
-                                command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
+                            if (isSupCommentsChanged)
+                            {
+                                if (!String.IsNullOrEmpty(supComment) && !String.IsNullOrWhiteSpace(supComment))
+                                    command.Parameters.AddWithValue("@SupervisorComments", supComment);
+                                else
+                                    command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
+                            }
 
-                            if (!String.IsNullOrEmpty(hrComment) && !String.IsNullOrWhiteSpace(hrComment))
-                                command.Parameters.AddWithValue("@HrComments", hrComment);
-                            else
-                                command.Parameters.AddWithValue("@HrComments", DBNull.Value);
+                            if (isHrCommentsChanged)
+                            {
+                                if (!String.IsNullOrEmpty(hrComment) && !String.IsNullOrWhiteSpace(hrComment))
+                                    command.Parameters.AddWithValue("@HrComments", hrComment);
+                                else
+                                    command.Parameters.AddWithValue("@HrComments", DBNull.Value);
+                            }
 
                             command.Parameters.AddWithValue("@DaysTaken", daysTaken);
 
@@ -1696,6 +1742,8 @@ namespace HR_LEAVEv2.Employee
                     actionString.Add($"hr comment= '{hrComment}'");
                 if (isDaysTakenChanged)
                     actionString.Add($"Days taken= {daysTaken}");
+                if (isLeaveTypeChanged)
+                    actionString.Add($"Leave Type changed to= {typeOfLeaveTxt.Text}");
                 if (areFilesUploaded)
                     actionString.Add($"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}");
 
@@ -1746,6 +1794,20 @@ namespace HR_LEAVEv2.Employee
         {
             // returns to wherever is specified in the query string, returnUrl
             Response.Redirect(Request.QueryString["returnUrl"]);
+        }
+
+        protected void convertToPaidLeave_Click(object sender, EventArgs e)
+        {
+            List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null;
+            if(files != null)
+            {
+                // convert
+                typeOfLeaveTxt.Text = "Paid";
+            }
+            else
+            {
+                filesNeededForConversionToPaidPanel.Visible = true;
+            }
         }
 
         //protected void disableForm()
