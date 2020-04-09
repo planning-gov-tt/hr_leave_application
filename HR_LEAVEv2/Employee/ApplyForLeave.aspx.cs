@@ -308,6 +308,20 @@ namespace HR_LEAVEv2.Employee
             return holidaysInBetween;
         }
 
+        protected int getNumWeekendsInLeavePeriod(DateTime start, DateTime end)
+        {
+            // returns an int containing the number of weekend days which fall in between the leave period specified
+
+            int numWeekends = 0;
+            foreach (DateTime day in EachCalendarDay(start, end))
+            {
+                if (day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday)
+                    numWeekends++;
+            }
+
+            return numWeekends;
+        }
+
         protected Boolean validateLeave(string typeOfLeaveSelected)
         {
             // returns a Boolean representing whether the type of leave selected is valid. The appropriate validation message is also constructed and 
@@ -423,6 +437,39 @@ namespace HR_LEAVEv2.Employee
             }
 
             return isValid == "Yes" && String.IsNullOrEmpty(errTxt);
+        }
+
+        protected void populateDaysTaken()
+        {
+            // populates the value for the number of days applied for 
+            DateTime start = DateTime.MinValue,
+                    end = DateTime.MinValue;
+
+            Boolean isStartDateFilled = DateTime.TryParseExact(txtFrom.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start),
+                    isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
+
+            // if type of leave has been selected (typeOfLeave.SelectedIndex == 0 when no leave type has been selected as yet) and the dates are valid
+            // OR if the start and end date are filled
+            if ((typeOfLeave.SelectedIndex != 0 && validateDates(txtFrom.Text, txtTo.Text)) || (isStartDateFilled && isEndDateFilled))
+            {
+                int numDays = 0;
+                // checks to see if the amt of days in between the start and the end is greater than 0, otherwise the value will be 0
+                numDays = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1) : 0;
+                //numDaysAppliedFor.Text = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1).ToString() : "0";
+
+                // reduces the number of days applied for if holidays fall in between the leave period applied for
+                List<string> holidays = getHolidaysInLeavePeriod(start, end);
+                if (holidays.Count > 0)
+                    numDays = numDays - holidays.Count;
+                //numDaysAppliedFor.Text = $"{ Convert.ToInt32(numDaysAppliedFor.Text) - holidays.Count}";
+
+                // if leave type is not no pay or sick then minus weekends from count
+                if (!typeOfLeave.SelectedValue.Equals("No Pay") && !typeOfLeave.SelectedValue.Equals("Sick"))
+                    numDays = numDays - getNumWeekendsInLeavePeriod(start, end);
+
+                numDaysAppliedFor.Text = numDays.ToString();
+                validateLeave(typeOfLeave.SelectedValue);
+            }
         }
 
         protected Boolean validateSupervisor(string supId)
@@ -1677,36 +1724,14 @@ namespace HR_LEAVEv2.Employee
         protected void datesEntered(object sender, EventArgs e)
         {
             // populates the value for the number of days applied for 
-
-
-            DateTime start = DateTime.MinValue, 
-                     end = DateTime.MinValue;
-
-            Boolean isStartDateFilled = DateTime.TryParseExact(txtFrom.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start),
-                    isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
-
-            // if type of leave has been selected (typeOfLeave.SelectedIndex == 0 when no leave type has been selected as yet) and the dates are valid
-            // OR if the start and end date are filled
-            if ((typeOfLeave.SelectedIndex != 0 && validateDates(txtFrom.Text, txtTo.Text)) || (isStartDateFilled && isEndDateFilled))
-            {
-                // checks to see if the amt of days in between the start and the end is greater than 0, otherwise the value will be 0
-                numDaysAppliedFor.Text = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1).ToString() : "0";
-
-                // reduces the number of days applied for if holidays fall in between the leave period applied for
-                List<string> holidays = getHolidaysInLeavePeriod(start, end);
-                if (holidays.Count > 0)
-                    numDaysAppliedFor.Text = $"{ Convert.ToInt32(numDaysAppliedFor.Text) - holidays.Count}";
-
-                validateLeave(typeOfLeave.SelectedValue);
-            }
-
-
+            populateDaysTaken();
         }
 
         protected void typeOfLeave_SelectedIndexChanged(object sender, EventArgs e)
         {
             validateDates(txtFrom.Text, txtTo.Text);
             validateLeave(typeOfLeave.SelectedValue);
+            populateDaysTaken();
         }
         //________________________________________________________________________
 
