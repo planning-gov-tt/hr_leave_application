@@ -371,7 +371,12 @@ namespace HR_LEAVEv2.Employee
                     // check if the amt of days taken is more than that MAX_DAYS_PAST_BALANCE
                     int daysTaken = Convert.ToInt32(numDaysAppliedFor.Text);
                     if (daysTaken >= (leaveBalance + MAX_DAYS_PAST_BALANCE) && files == null)
+                    {
                         isValid = "No";
+                        errTxt = "Not eligible for amount of leave entered";
+                        fileUploadNeededPanel.Style.Add("display", "inline-block");
+                    }
+                        
 
 
                     empType = String.IsNullOrEmpty(empType) || String.IsNullOrWhiteSpace(empType) ? "unregistered" : empType;
@@ -403,8 +408,6 @@ namespace HR_LEAVEv2.Employee
                         }
 
                     }
-                    else if (isValid == "No")
-                        errTxt = "Not eligible for amount of leave applied for";
                 }
             }
             else
@@ -481,6 +484,7 @@ namespace HR_LEAVEv2.Employee
             // clears all errors associated with uploading/clearing/downloading files
             invalidFileTypePanel.Style.Add("display", "none");
             fileUploadedTooLargePanel.Style.Add("display", "none");
+            fileUploadNeededPanel.Style.Add("display", "none");
         }
         //________________________________________________________________________
 
@@ -939,6 +943,8 @@ namespace HR_LEAVEv2.Employee
 
                     if (mode == "apply")
                     {
+                        fileUploadNeededPanel.Style.Add("display", "none");
+
                         if (typeOfLeave.SelectedValue == "Sick")
                         {
                             // hide error if it was shown

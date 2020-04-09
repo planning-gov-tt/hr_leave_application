@@ -715,6 +715,24 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl dateComparisonValidationMsg;
         
         /// <summary>
+        /// fileUploadNeededPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel fileUploadNeededPanel;
+        
+        /// <summary>
+        /// Span15 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span15;
+        
+        /// <summary>
         /// moreThan2DaysConsecutiveSickLeave control.
         /// </summary>
         /// <remarks>

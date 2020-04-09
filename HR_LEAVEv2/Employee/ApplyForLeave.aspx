@@ -341,12 +341,17 @@
                         <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
                     </asp:Panel>
 
+                    <asp:Panel ID="fileUploadNeededPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span id="Span15" runat="server">No files currently uploaded. Upload supporting documentation to submit your application</span>
+                    </asp:Panel>
+
                     <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span6" runat="server">No files currently uploaded. More than 2 days of consecutive sick leave requires a medical leave of absence.</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidVacationStartDateMsg" runat="server">You must request vacation leave at least a month before the start date</span>
                     </asp:Panel>
@@ -361,7 +366,7 @@
                         <span id="invalidLeaveTypeTxt" runat="server"></span>
                     </asp:Panel>
 
-                    <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
                     </asp:Panel>
@@ -371,7 +376,7 @@
                         <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span id="Span3" runat="server">Could not verify supervisor</span>
                     </asp:Panel>
