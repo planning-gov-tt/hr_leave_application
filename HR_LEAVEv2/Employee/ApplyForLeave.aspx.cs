@@ -321,10 +321,9 @@ namespace HR_LEAVEv2.Employee
             List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null;
             if (!String.IsNullOrEmpty(typeOfLeaveSelected) || !String.IsNullOrWhiteSpace(typeOfLeaveSelected))
             {
-                if (typeOfLeaveSelected == "No Pay")
-                {
-                    isValid = "Yes";
-                }
+                Dictionary<string, string> leaveBalanceMappings = util.getLeaveTypeMapping();
+                if (util.isLeaveTypeWithoutBalance(typeOfLeaveSelected))
+                    return true;
                 else
                 {
                     string empType = string.Empty,
@@ -334,36 +333,11 @@ namespace HR_LEAVEv2.Employee
 
                     DateTime startDate = DateTime.MinValue;
 
-                    switch (typeOfLeaveSelected)
-                    {
-                        case "Personal":
-                            leaveBalanceToGet = "personal";
-                            break;
-                        case "Vacation":
-                            leaveBalanceToGet = "vacation";
-                            break;
-                        case "Casual":
-                            leaveBalanceToGet = "casual";
-                            break;
-                        case "Sick":
-                            leaveBalanceToGet = "sick";
-                            break;
-                        case "Bereavement":
-                            leaveBalanceToGet = "bereavement";
-                            break;
-                        case "Maternity":
-                            leaveBalanceToGet = "maternity";
-                            break;
-                        case "Pre-retirement":
-                            leaveBalanceToGet = "pre_retirement";
-                            break;
-                    }
-
                     // get employee's employment type, start date and the leave balance of the type of leave applied for
                     try
                     {
                         string sql = $@"
-                        SELECT ep.employment_type, ep.start_date, e.{leaveBalanceToGet} as 'leave_balance'
+                        SELECT ep.employment_type, ep.start_date, e.{leaveBalanceMappings[typeOfLeaveSelected]} as 'leave_balance'
                         FROM dbo.employee e
                         JOIN dbo.employeeposition ep
                         ON e.employee_id = ep.employee_id
@@ -1195,19 +1169,8 @@ namespace HR_LEAVEv2.Employee
                             ,'{leaveType}'
                             ,'{DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             ,'{DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
-                            , (SELECT IIF((
-				                ( '{leaveType}'= 'Sick' AND {numDaysAppliedFor.Text} <= e.sick) OR
-				                ('{leaveType}' = 'Casual' AND {numDaysAppliedFor.Text} <= e.casual) OR
-				                ('{leaveType}' = 'Vacation' AND {numDaysAppliedFor.Text} <= e.vacation) OR
-				                ('{leaveType}'= 'Personal' AND {numDaysAppliedFor.Text} <= e.personal) OR
-				                ('{leaveType}' = 'Bereavement' AND {numDaysAppliedFor.Text} <= e.bereavement) OR
-				                ('{leaveType}' = 'Maternity' AND {numDaysAppliedFor.Text} <= e.maternity) OR
-				                ('{leaveType}' = 'Pre-retirement' AND {numDaysAppliedFor.Text} <= e.pre_retirement) OR
-                                ('{leaveType}' = 'No Pay')
-				                ), 'Yes', 'No')
-                              FROM [dbo].[employee] e
-                              WHERE e.employee_id = {empId})
-                            , {numDaysAppliedFor.Text}
+                            , {util.getSqlForCalculatingQualifiedField(leaveType, $"'{empId}'")}
+                            , @DaysTaken
                             ,'{supId}'
                             ,'Pending'
                             ,@Comments
@@ -1223,6 +1186,8 @@ namespace HR_LEAVEv2.Employee
                                 command.Parameters.AddWithValue("@Comments", comments);
                             else
                                 command.Parameters.AddWithValue("@Comments", DBNull.Value);
+
+                            command.Parameters.AddWithValue("@DaysTaken", numDaysAppliedFor.Text);
                             transaction_id = command.ExecuteScalar().ToString();
                             isLeaveApplicationInsertSuccessful = !String.IsNullOrEmpty(transaction_id);
                         }
@@ -1311,7 +1276,7 @@ namespace HR_LEAVEv2.Employee
                 }
 
 
-                if (isFileUploadSuccessful)
+                if (isFileUploadSuccessful && isLeaveApplicationInsertSuccessful)
                 {
                     // add audit log
                     string fileActionString = String.Empty;
@@ -1531,16 +1496,9 @@ namespace HR_LEAVEv2.Employee
                         if (isSupCommentsChanged && isHrCommentsChanged)
                             comments = $"sup_comment = @SupervisorComments, hr_comment = @HrComments,";
 
-                        Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
-                        leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
-                        leaveBalanceColumnName.Add("Casual", "[casual]");
-                        leaveBalanceColumnName.Add("Maternity", "[maternity]");
-                        leaveBalanceColumnName.Add("Personal", "[personal]");
-                        leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
-                        leaveBalanceColumnName.Add("Sick", "[sick]");
-                        leaveBalanceColumnName.Add("Vacation", "[vacation]");
+                        Dictionary<string, string> leaveBalanceColumnName = util.getLeaveTypeMapping();
 
-                        if (statusTxt.Text == "Approved" && isDaysTakenChanged && typeOfLeaveTxt.Text != "No Pay")
+                        if (statusTxt.Text == "Approved" && isDaysTakenChanged && !util.isLeaveTypeWithoutBalance(typeOfLeaveTxt.Text))
                         {
                             int difference = Convert.ToInt32(daysTaken) - Convert.ToInt32(ViewState["daysTaken"].ToString());
                             updateLeaveBalance = $@"                          
@@ -1562,18 +1520,7 @@ namespace HR_LEAVEv2.Employee
                                     [hr_manager_edit_date] = CURRENT_TIMESTAMP,
                                     days_taken = @DaysTaken, 
                                     {comments} 
-                                    qualified = (SELECT IIF((
-				                        ( '{typeOfLeaveTxt.Text}'= 'Sick' AND @DaysTaken <= e.sick) OR
-				                        ('{typeOfLeaveTxt.Text}' = 'Casual' AND @DaysTaken <= e.casual) OR
-				                        ('{typeOfLeaveTxt.Text}' = 'Vacation' AND @DaysTaken  <= e.vacation) OR
-				                        ('{typeOfLeaveTxt.Text}'= 'Personal' AND @DaysTaken <= e.personal) OR
-				                        ('{typeOfLeaveTxt.Text}' = 'Bereavement' AND @DaysTaken <= e.bereavement) OR
-				                        ('{typeOfLeaveTxt.Text}' = 'Maternity' AND @DaysTaken <= e.maternity) OR
-				                        ('{typeOfLeaveTxt.Text}' = 'Pre-retirement' AND @DaysTaken <= e.pre_retirement) OR
-                                        ('{typeOfLeaveTxt.Text}' = 'No Pay')
-				                        ), 'Yes', 'No')
-                                        FROM [dbo].[employee] e
-                                        WHERE e.employee_id = (SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId}))
+                                    qualified = {util.getSqlForCalculatingQualifiedField(typeOfLeaveTxt.Text, $"(SELECT employee_id FROM leavetransaction WHERE transaction_id = {leaveId})")}
                                 WHERE transaction_id = {leaveId};
                                 
                                 {updateLeaveBalance}                                

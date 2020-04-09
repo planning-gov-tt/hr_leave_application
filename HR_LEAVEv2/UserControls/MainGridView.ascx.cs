@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using System.Net.Mail;
 using HR_LEAVEv2.Classes;
 using System.Web.UI;
+using System.Linq;
 
 namespace HR_LEAVEv2.UserControls
 {
@@ -256,7 +257,18 @@ namespace HR_LEAVEv2.UserControls
                     ";
 
                     // ensure that the type of leave shown to the HR can be approved by that HR 
-                    string leaveType = "('Personal', 'No Pay', 'Bereavement', 'Maternity', 'Pre-retirement'";
+                    List<string> allLeaveTypes = util.getListOfAllLeaveTypes();
+
+                    // remove these types since whether HR can interact with these types is up to their permissions
+                    allLeaveTypes.Remove("Sick");
+                    allLeaveTypes.Remove("Casual");
+                    allLeaveTypes.Remove("Vacation");
+
+                    // add single quotes around leave types
+                    for(int i = 0; i < allLeaveTypes.Count; i++)
+                        allLeaveTypes[i] = $"'{allLeaveTypes[i]}'";
+
+                    string leaveType = $"({String.Join(", ", allLeaveTypes.ToArray())}";
 
                     if (permissions.Contains("approve_sick"))
                     {
@@ -728,7 +740,7 @@ namespace HR_LEAVEv2.UserControls
 
                     string sql = string.Empty;
 
-                    if (leaveType == "No Pay")
+                    if (util.isLeaveTypeWithoutBalance(leaveType))
                     {
                         // if command is approve, update status to Approved
                         // if command is undo, reset status to Recommended
@@ -754,14 +766,7 @@ namespace HR_LEAVEv2.UserControls
                         int difference = Convert.ToInt32(row.Cells[daysTakenIndex].Text);
 
                         // check leave type from Gridview to match with balance type in DB in order to update the right leave balance
-                        Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
-                        leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
-                        leaveBalanceColumnName.Add("Casual", "[casual]");
-                        leaveBalanceColumnName.Add("Maternity", "[maternity]");
-                        leaveBalanceColumnName.Add("Personal", "[personal]");
-                        leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
-                        leaveBalanceColumnName.Add("Sick", "[sick]");
-                        leaveBalanceColumnName.Add("Vacation", "[vacation]");
+                        Dictionary<string, string> leaveBalanceColumnName = util.getLeaveTypeMapping();
 
                         // approved => subtract leave from balance
                         string operation = "";

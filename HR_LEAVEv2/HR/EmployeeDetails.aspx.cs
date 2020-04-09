@@ -57,15 +57,51 @@ namespace HR_LEAVEv2.HR
                     string mode = Request.QueryString["mode"];
                     string empId = Request.QueryString["empId"];
 
+                    // create leave balance elements
+                    try
+                    {
+                        string sql = $@"
+                                SELECT [type_id] as 'leave_type', 'Please enter valid ' + [type_id] + ' Leave number' as 'validation', 'Enter ' + [type_id] + ' Leave balance' as 'placeholder'
+                                FROM [dbo].[leavetype] 
+                            ";
+
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                SqlDataAdapter ad = new SqlDataAdapter(command);
+
+                                DataTable dt = new DataTable();
+                                ad.Fill(dt);
+
+                                foreach (DataRow dr in dt.Rows)
+                                {
+                                    if (util.isLeaveTypeWithoutBalance(dr.ItemArray[0].ToString()))
+                                        dr.Delete();
+                                }
+                                ListView1.DataSource = dt;
+                                ListView1.DataBind();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+
                     if (mode == "edit")
                     {
                         // populates page and authorizes HR user based on employee's employment type
                         populatePage(empId);
                         this.adjustPageForEditMode();
                     }
-                        
+
                     else
+                    {
                         this.adjustPageForCreateMode();
+                    }
+                        
                 } 
             } else
             {
@@ -744,39 +780,6 @@ namespace HR_LEAVEv2.HR
                 return (DateTime.Compare(DateTime.Now, DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
         }
 
-        //protected Boolean isActualEndDateValid(string proposedEndDate, int index)
-        //{
-        //    // returns a Boolean representing whether the proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
-        //    // any other active records exist in order to validate the passed end date.
-
-        //    if (ViewState["Gridview1_dataSource"] != null)
-        //    {
-        //        int numActiveRows = 0, i = 0;
-
-        //        // state of passed end date and corresponding record
-        //        bool isProposedEndDateActive = isRecordActive(proposedEndDate);
-
-        //        DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
-        //        foreach (DataRow dr in dt.Rows)
-        //        {
-        //            // once the record is not deleted and is not the record currently being edited (the record to which the proposed end date will belong to)
-        //            if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && i != index)
-        //            {
-        //                if (dr[(int)emp_records_columns.status].ToString() == "Active")
-        //                    numActiveRows++;
-        //            }
-        //            i++;
-        //        }
-        //        if (isProposedEndDateActive)
-        //            numActiveRows++;
-
-        //        return numActiveRows <= 1;
-        //    }
-
-        //    return false;
-
-        //}
-
         protected Boolean isRecordValid(string proposedStartDate, string proposedEndDate, int index)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
@@ -1136,16 +1139,6 @@ namespace HR_LEAVEv2.HR
             if (dataTable != null && dataTable.Rows.Count > 0)
             {
                 string empType = dataTable.Rows[0].ItemArray[(int)emp_records_columns.employment_type].ToString();
-                //int index = 0;
-                //foreach(DataRow record in dataTable.Rows)
-                //{
-                //    if (isRecordActive(record.ItemArray[(int)emp_records_columns.actual_end_date].ToString()) || index == 0)
-                //    {
-                //        empType = record.ItemArray[(int)emp_records_columns.employment_type].ToString();
-                //        break;
-                //    }
-                //    index++;
-                //}
 
                 if (!permissions.Contains("hr1_permissions"))
                 {
@@ -1222,6 +1215,8 @@ namespace HR_LEAVEv2.HR
                 throw ex;
             }
 
+            Dictionary<string, string> leaveMapping = util.getLeaveTypeMapping();
+
             // get leave balances and populate textboxes
             try
             {
@@ -1229,13 +1224,7 @@ namespace HR_LEAVEv2.HR
                 {
                     connection.Open();
                     string sql = $@"
-                        SELECT [vacation]
-                                ,[personal]
-                                ,[casual]
-                                ,[sick]
-                                ,[bereavement]
-                                ,[maternity]
-                                ,[pre_retirement],
+                        SELECT {String.Join(", ", leaveMapping.Values.ToArray<string>())},
                                 [first_name] + ' ' + [last_name] as 'employee_name'
                             FROM [dbo].[employee]
                             WHERE employee_id = {empId};
@@ -1244,30 +1233,24 @@ namespace HR_LEAVEv2.HR
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            while (reader.Read())
-                            {
-                                vacationLeaveInput.Text = reader["vacation"].ToString();
-                                personalLeaveInput.Text = reader["personal"].ToString();
-                                casualLeaveInput.Text = reader["casual"].ToString();
-                                sickLeaveInput.Text = reader["sick"].ToString();
-                                bereavementLeaveInput.Text = reader["bereavement"].ToString();
-                                maternityLeaveInput.Text = reader["maternity"].ToString();
-                                preRetirementLeaveInput.Text = reader["pre_retirement"].ToString();
-
-                                empNameHeader.InnerText = reader["employee_name"].ToString();
-                            }
-
                             // store initial leave balances
                             Dictionary<string, string> previousLeaveBalances = new Dictionary<string, string>();
 
-                            previousLeaveBalances = new Dictionary<string, string>();
-                            previousLeaveBalances["vacation"] = vacationLeaveInput.Text;
-                            previousLeaveBalances["personal"] = personalLeaveInput.Text;
-                            previousLeaveBalances["casual"] = casualLeaveInput.Text;
-                            previousLeaveBalances["sick"] = sickLeaveInput.Text;
-                            previousLeaveBalances["bereavement"] = bereavementLeaveInput.Text;
-                            previousLeaveBalances["maternity"] = maternityLeaveInput.Text;
-                            previousLeaveBalances["pre_retirement"] = preRetirementLeaveInput.Text;
+                            while (reader.Read())
+                            {
+                                foreach(KeyValuePair<string, string> kvp in leaveMapping)
+                                {
+                                    string colName = kvp.Value.Replace("[", "").Replace("]", "");
+
+                                    // set value on screen
+                                    setLeaveBalanceText(reader[colName].ToString(), kvp.Key);
+
+                                    // set value in backend- used to check for changes if edits are made
+                                    previousLeaveBalances[colName] = reader[colName].ToString();
+                                }
+
+                                empNameHeader.InnerText = reader["employee_name"].ToString();
+                            }
 
                             ViewState["previousLeaveBalances"] = previousLeaveBalances;
                         }
@@ -1497,14 +1480,15 @@ namespace HR_LEAVEv2.HR
 
             // EDIT LEAVE BALANCES--------------------------------------------------------------------------------------------------------------------------
 
+
             // get data from leave balances
-            currentLeaveBalances["vacation"] = String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text;
-            currentLeaveBalances["personal"] = String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text;
-            currentLeaveBalances["casual"] = String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text;
-            currentLeaveBalances["sick"] = String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text;
-            currentLeaveBalances["bereavement"] = String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text;
-            currentLeaveBalances["maternity"] = String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text;
-            currentLeaveBalances["pre_retirement"] = String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text;
+            Dictionary<string, string> leaveMapping = util.getLeaveTypeMapping();
+            foreach (KeyValuePair<string, string> kvp in leaveMapping)
+            {
+                string balance = getLeaveBalanceText(kvp.Key);
+                string newKey = kvp.Value.Replace("[", "").Replace("]", "");
+                currentLeaveBalances[newKey] = String.IsNullOrEmpty(balance) ? "0" : balance;
+            }
 
             //checks which leave balances were edited and adds them to a new dictionary (editedLeaveBalances)
             // As such, editedLeaveBalances contains the dictionary of leave balances which were edited
@@ -1911,17 +1895,14 @@ namespace HR_LEAVEv2.HR
             }
 
             // Leave Balances 
-            Dictionary<string, string> currentLeaveBalances = new Dictionary<string, string>()
+            Dictionary<string, string> leaveMapping = util.getLeaveTypeMapping(),
+                currentLeaveBalances = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, string> kvp in leaveMapping)
             {
-                { "vacation", String.IsNullOrEmpty(vacationLeaveInput.Text) ? "0" : vacationLeaveInput.Text},
-                { "personal", String.IsNullOrEmpty(personalLeaveInput.Text) ? "0" : personalLeaveInput.Text},
-                { "casual", String.IsNullOrEmpty(casualLeaveInput.Text) ? "0" : casualLeaveInput.Text},
-                { "sick", String.IsNullOrEmpty(sickLeaveInput.Text) ? "0" : sickLeaveInput.Text},
-                { "bereavement", String.IsNullOrEmpty(bereavementLeaveInput.Text) ? "0" : bereavementLeaveInput.Text},
-                { "maternity", String.IsNullOrEmpty(maternityLeaveInput.Text) ? "0" : maternityLeaveInput.Text},
-                { "preRetirement", String.IsNullOrEmpty(preRetirementLeaveInput.Text) ? "0" : preRetirementLeaveInput.Text}
-            };
-
+                string balance = getLeaveBalanceText(kvp.Key);
+                string newKey = kvp.Value.Replace("_", "").Replace("[", "").Replace("]", "");
+                currentLeaveBalances[newKey] = String.IsNullOrEmpty(balance) ? "0" : balance;
+            }
 
             // Roles
             List<string> authorizations = new List<string>() { "emp" };
@@ -1966,13 +1947,7 @@ namespace HR_LEAVEv2.HR
                               ,[first_name]
                               ,[last_name]
                               ,[email]
-                              ,[vacation]
-                              ,[personal]
-                              ,[casual]
-                              ,[sick]
-                              ,[bereavement]
-                              ,[maternity]
-                              ,[pre_retirement])
+                              , {String.Join(", ", leaveMapping.Values.ToArray<string>())})
                         VALUES
                            ( @EmployeeId
                             ,@IhrisId
@@ -1980,13 +1955,7 @@ namespace HR_LEAVEv2.HR
                             ,@FirstName
                             ,@LastName
                             ,@Email
-                            ,@Vacation
-                            ,@Personal
-                            ,@Casual
-                            ,@Sick
-                            ,@Bereavement
-                            ,@Maternity
-                            ,@PreRetirement
+                            ,@{String.Join(", @", currentLeaveBalances.Keys.ToArray<string>())}
                             );
                     ";
 
@@ -2001,13 +1970,11 @@ namespace HR_LEAVEv2.HR
                             command.Parameters.AddWithValue("@FirstName", firstname);
                             command.Parameters.AddWithValue("@LastName", lastname);
                             command.Parameters.AddWithValue("@Email", email);
-                            command.Parameters.AddWithValue("@Vacation", currentLeaveBalances["vacation"]);
-                            command.Parameters.AddWithValue("@Personal", currentLeaveBalances["personal"]);
-                            command.Parameters.AddWithValue("@Casual", currentLeaveBalances["casual"]);
-                            command.Parameters.AddWithValue("@Sick", currentLeaveBalances["sick"]);
-                            command.Parameters.AddWithValue("@Bereavement", currentLeaveBalances["bereavement"]);
-                            command.Parameters.AddWithValue("@Maternity", currentLeaveBalances["maternity"]);
-                            command.Parameters.AddWithValue("@PreRetirement", currentLeaveBalances["preRetirement"]);
+
+                            foreach(KeyValuePair<string, string> kvp in currentLeaveBalances)
+                            {
+                                command.Parameters.AddWithValue($"@{kvp.Key}", kvp.Value);
+                            }
 
                             int rowsAffected = command.ExecuteNonQuery();
                             isInsertSuccessful = rowsAffected > 0;
@@ -2181,6 +2148,34 @@ namespace HR_LEAVEv2.HR
         protected void returnToPreviousBtn_Click(object sender, EventArgs e)
         {
             Response.Redirect("~/HR/AllEmployees.aspx");
-        } 
+        }
+
+        protected ListViewItem getSelectedLeaveBalanceListViewItem(string leaveType)
+        {
+            // get item 
+            foreach (ListViewItem item in ListView1.Items)
+            {
+                HiddenField id = (HiddenField)item.FindControl("leaveTypeHiddenField");
+                if (id.Value == leaveType)
+                    return item;
+            }
+
+            return null;
+        }
+
+        protected string getLeaveBalanceText(string leaveType)
+        {
+            ListViewItem selectedItem = getSelectedLeaveBalanceListViewItem(leaveType);
+            TextBox balance = (TextBox)selectedItem.FindControl("LeaveInput");
+            return balance.Text;
+        }
+
+        protected void setLeaveBalanceText(string balance, string leaveType)
+        {
+            ListViewItem selectedItem = getSelectedLeaveBalanceListViewItem(leaveType);
+            TextBox balanceTxt = (TextBox)selectedItem.FindControl("LeaveInput");
+            balanceTxt.Text = balance;
+        }
+
     }
 }

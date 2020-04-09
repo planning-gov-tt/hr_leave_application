@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 
@@ -26,6 +27,94 @@ namespace HR_LEAVEv2.Classes
             public string subject { get; set; }
         }
 
+        public Dictionary<string, string> getLeaveTypeMapping()
+        {
+            // returns a dictionary with the leave type (type_id) as the Key and the column name representing the leave balance as the value
+            // dictionary only contains leave types that have corresponding balances
+
+            Dictionary<string, string> leaveBalanceColumnName = new Dictionary<string, string>();
+
+
+            leaveBalanceColumnName.Add("Bereavement", "[bereavement]");
+            leaveBalanceColumnName.Add("Casual", "[casual]");
+            leaveBalanceColumnName.Add("Maternity", "[maternity]");
+            leaveBalanceColumnName.Add("Paternity", "[paternity]");
+            leaveBalanceColumnName.Add("Personal", "[personal]");
+            leaveBalanceColumnName.Add("Pre-retirement", "[pre_retirement]");
+            leaveBalanceColumnName.Add("Sick", "[sick]");
+            leaveBalanceColumnName.Add("Vacation", "[vacation]");
+            return leaveBalanceColumnName;
+        }
+
+        public bool isLeaveTypeWithoutBalance(string leaveType)
+        {
+            // returns a boolean representing whether the leave type has a corresponding balance or not
+
+            Dictionary<string, string> leaveMappings= getLeaveTypeMapping();
+            return !leaveMappings.ContainsKey(leaveType);
+        }
+
+        public List<string> getListOfAllLeaveTypes()
+        {
+            // returns a List<string> of all the leave types in the DB
+
+            List<string> leaveTypes = new List<string>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                        SELECT [type_id] FROM [dbo].[leavetype]
+                    ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                leaveTypes.Add(reader["type_id"].ToString());
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                return null;
+            }
+            return leaveTypes;
+        }
+
+        public string getSqlForCalculatingQualifiedField(string leaveTypeToBeCompared ,string empId)
+        {
+            // returns the sql representing the IIF statement that determines whether a LA is qualified or not based on the applied for leave type and the corresponding leave balance
+
+            // get all leave types
+            List<string> leaveTypes = getListOfAllLeaveTypes();
+            Dictionary<string, string> leaveTypeMappings = getLeaveTypeMapping();
+            List<string> conditionalList = new List<string>();
+
+            foreach(string leaveType in leaveTypes)
+            {
+                // if leave type has no balance then it is automatically qualified
+                if (isLeaveTypeWithoutBalance(leaveType))
+                    conditionalList.Add($"('{leaveTypeToBeCompared}' = '{leaveType}')");
+
+                // check if the number of days applied for is less than the number of days available in the corresponding leave balance
+                else
+                    conditionalList.Add($"('{leaveTypeToBeCompared}' = '{leaveType}' AND @DaysTaken <= e.{leaveTypeMappings[leaveType]})");
+            }
+
+            return $@"
+                    (
+                        SELECT IIF(({String.Join(" OR ", conditionalList.ToArray())}), 'Yes', 'No')
+                        FROM [dbo].[employee] e
+                        WHERE e.employee_id = {empId}
+                    )
+                ";
+        }
 
         public string sanitizeStringForAsciiCharacters(string str)
         {
