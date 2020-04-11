@@ -450,6 +450,28 @@
                                     <span id="Span22" runat="server">Actual end date is on the weekend</span>
                                 </asp:Panel>
 
+                                <asp:Panel ID="startDateClashEditRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span26" runat="server">
+                                        Record not edited since the current employment record's start date falls within the time period of another employment record
+                                    </span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="employmentRecordClashPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span28" runat="server">
+                                        Record not edited since the edit would result in a clash between employment records. This means that the edit causes more than one employment
+                                        record to overlap
+                                    </span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="startDateClashAddRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span id="Span27" runat="server">
+                                        Record not added since the current employment record's start date falls within the time period of another employment record
+                                    </span>
+                                </asp:Panel>
+
                                 <asp:Panel ID="multipleActiveRecordsAddRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="Span25" runat="server">

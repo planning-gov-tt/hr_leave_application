@@ -41,6 +41,13 @@ namespace HR_LEAVEv2.Employee
             public string files_id { get; set; }
         };
 
+        // used to store start date of current employee's active start record
+        private string ActiveRecordStartDate
+        {
+            get { return ViewState["activeRecordStartDate"] != null ? ViewState["activeRecordStartDate"].ToString() : null; }
+            set { ViewState["activeRecordStartDate"] = value; }
+        }
+
         // used for determining how much days is too much days to apply for based on a user's leave balance
         const int MAX_DAYS_PAST_BALANCE = 10;
 
@@ -104,8 +111,46 @@ namespace HR_LEAVEv2.Employee
                     }
 
 
+                    // populate active record start date to ensure employee does not submit for leave before the start of their employment
+                    DateTime activeRecordStartDate = DateTime.MinValue;
+
+                    if (ActiveRecordStartDate == null)
+                    {
+                        try
+                        {
+                            string sql = $@"
+                        SELECT ep.start_date
+                        FROM dbo.employeeposition ep
+                        WHERE ep.employee_id = '{Session["emp_id"].ToString()}' AND (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date))
+                    ";
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                            {
+                                connection.Open();
+                                using (SqlCommand command = new SqlCommand(sql, connection))
+                                {
+                                    using (SqlDataReader reader = command.ExecuteReader())
+                                    {
+
+                                        if (reader.Read())
+                                        {
+                                            activeRecordStartDate = (DateTime)reader["start_date"];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+
+                        if (activeRecordStartDate != DateTime.MinValue)
+                            ActiveRecordStartDate = activeRecordStartDate != null ? activeRecordStartDate.ToString("d/MM/yyyy") : string.Empty;
+                    }
+
                     // display normal leave application form
                     this.adjustPageForApplyMode();
+
                 } else 
                 {
                     string leaveId = Request.QueryString["leaveId"];
@@ -129,6 +174,12 @@ namespace HR_LEAVEv2.Employee
                     validateSupervisor(supervisorSelect.SelectedValue != "" ? supervisorSelect.SelectedValue : "-1");
                 }
                     
+            }
+
+            if (mode == "apply")
+            {
+                container.Visible = !String.IsNullOrEmpty(ActiveRecordStartDate);
+                employeeInactivePanel.Visible = String.IsNullOrEmpty(ActiveRecordStartDate);
             }
         }
 
@@ -161,6 +212,18 @@ namespace HR_LEAVEv2.Employee
 
             if (isValidated)
             {
+                // check if start date is a before the start of the employee's current employment record
+                if(!String.IsNullOrEmpty(ActiveRecordStartDate))
+                {
+                    // compare start dates
+                    if (DateTime.Compare(start, DateTime.ParseExact(ActiveRecordStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0)
+                    {
+                        // applied for start date is before start date of active record
+                        startDateIsBeforeStartOfActiveRecordTxt.InnerText = $"Start date is before start of your current employment. Start date must be a day on or after {ActiveRecordStartDate}";
+                        startDateIsBeforeStartOfActiveRecord.Style.Add("display", "inline-block");
+                        isValidated = false;
+                    }
+                } 
 
                 // inform user that there are holidays in between the leave period applied for
                 List<string> holidaysInBetween = getHolidaysInLeavePeriod(start, end);
@@ -176,6 +239,7 @@ namespace HR_LEAVEv2.Employee
                 {
                     startDateIsHolidayTxt.InnerText = $"Start date cannot be on {holidaysInBetween.ElementAt(0)}";
                     startDateIsHoliday.Style.Add("display", "inline-block");
+                    isValidated = false;
                 }
                 // ensure end date is not a holiday
                 holidaysInBetween = getHolidaysInLeavePeriod(end, end);
@@ -183,6 +247,7 @@ namespace HR_LEAVEv2.Employee
                 {
                     endDateIsHolidayTxt.InnerText = $"End date cannot be on {holidaysInBetween.ElementAt(0)}";
                     endDateIsHoliday.Style.Add("display", "inline-block");
+                    isValidated = false;
                 }
 
                 // ensure start date is not on the weekend
@@ -512,6 +577,8 @@ namespace HR_LEAVEv2.Employee
             startDateIsHoliday.Style.Add("display", "none");
 
             endDateIsHoliday.Style.Add("display", "none");
+
+            startDateIsBeforeStartOfActiveRecord.Style.Add("display", "none");
         }
 
         protected void clearSubmitLeaveApplicationErrors()
