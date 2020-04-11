@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web;
 using System.Web.Services;
 using System.Web.UI.WebControls;
 
@@ -272,5 +273,13 @@ namespace HR_LEAVEv2.Supervisor
             return JsonConvert.SerializeObject(empDetails);
         }
 
+        protected void openLeaveLogsBtn_ServerClick(object sender, EventArgs e)
+        {
+            // opens employee's leave logs
+
+            LinkButton lb = sender as LinkButton;
+            string empEmail = lb.Attributes["empEmail"].ToString();
+            Response.Redirect($"~/Supervisor/MyEmployeeLeaveApplications?empEmail={empEmail}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
+        }
     }
 }

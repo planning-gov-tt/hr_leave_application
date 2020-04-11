@@ -111,10 +111,10 @@ namespace HR_LEAVEv2.UserControls
             set { ViewState["SupervisorName_ID"] = value; }
         }
 
-        private string EmployeeName_ID
+        private string EmployeeName_ID_Email
         {
-            get { return ViewState["EmployeeName_ID"] != null ? ViewState["EmployeeName_ID"].ToString() : null; }
-            set { ViewState["EmployeeName_ID"] = value; }
+            get { return ViewState["EmployeeName_ID_Email"] != null ? ViewState["EmployeeName_ID_Email"].ToString() : null; }
+            set { ViewState["EmployeeName_ID_Email"] = value; }
         }
 
         private string LeaveType
@@ -171,7 +171,21 @@ namespace HR_LEAVEv2.UserControls
             {
                 // default sort on date submitted DESC
                 this.SortExpression = "date_submitted";
-                this.SortDirection = "DESC";                
+                this.SortDirection = "DESC";
+
+                // check if filters should be preset
+                if (Request.QueryString.HasKeys())
+                {
+                    string empEmail = string.Empty;
+
+                    if (!String.IsNullOrEmpty(Request.QueryString["empEmail"]))
+                        empEmail = Request.QueryString["empEmail"];
+
+                    // set filter
+                    EmployeeName_ID_Email = empEmail;
+                    tbEmployee.Text = empEmail;
+                }
+                             
 
                 this.BindGridView();
             }
@@ -393,17 +407,17 @@ namespace HR_LEAVEv2.UserControls
                     ";
                     sqlCommand.Parameters.AddWithValue("@SupervisorName_ID", "%" + SupervisorName_ID + "%");
                 }
-                if (!string.IsNullOrEmpty(EmployeeName_ID))
+                if (!string.IsNullOrEmpty(EmployeeName_ID_Email))
                 {
                     whereFilterGridView += $@"
                         AND (
-                            (e.first_name LIKE @EmployeeName_ID) OR
-                            (e.last_name LIKE @EmployeeName_ID) OR
-                            (e.employee_id LIKE @EmployeeName_ID) OR
-                            (e.email LIKE @EmployeeName_ID)
+                            (e.first_name LIKE @EmployeeName_ID_Email) OR
+                            (e.last_name LIKE @EmployeeName_ID_Email) OR
+                            (e.employee_id LIKE @EmployeeName_ID_Email) OR
+                            (e.email LIKE @EmployeeName_ID_Email)
                         ) 
                     ";
-                    sqlCommand.Parameters.AddWithValue("@EmployeeName_ID", "%" + EmployeeName_ID + "%");
+                    sqlCommand.Parameters.AddWithValue("@EmployeeName_ID_Email", "%" + EmployeeName_ID_Email + "%");
                 }
                 if (!string.IsNullOrEmpty(LeaveType))
                 {
@@ -670,13 +684,13 @@ namespace HR_LEAVEv2.UserControls
 
             // view details of a LA
             if (commandName == "details")
-                Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=view&leaveId=" + transaction_id + "&returnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
+                Response.Redirect($"~/Employee/ApplyForLeave.aspx?mode=view&leaveId={transaction_id}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
 
             // edit a LA
             if (commandName == "editLeaveRequest")
             {
                 // redirect to apply for leave form and prepopulate...
-                Response.Redirect("~/Employee/ApplyForLeave.aspx?mode=edit&leaveId=" + transaction_id + "&returnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
+                Response.Redirect($"~/Employee/ApplyForLeave.aspx?mode=edit&leaveId={transaction_id}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
             }
             // if employee view
             if (gridViewType == "emp")
@@ -1181,7 +1195,7 @@ namespace HR_LEAVEv2.UserControls
 
                 SupervisorName_ID = tbSupervisor.Text.ToString();
 
-                EmployeeName_ID = tbEmployee.Text.ToString();
+                EmployeeName_ID_Email = tbEmployee.Text.ToString();
 
                 LeaveType = ddlType.SelectedValue.ToString();
 
@@ -1215,7 +1229,7 @@ namespace HR_LEAVEv2.UserControls
             SupervisorName_ID = String.Empty;
             tbSupervisor.Text = String.Empty;
 
-            EmployeeName_ID = String.Empty;
+            EmployeeName_ID_Email = String.Empty;
             tbEmployee.Text = String.Empty;
 
             LeaveType = String.Empty;

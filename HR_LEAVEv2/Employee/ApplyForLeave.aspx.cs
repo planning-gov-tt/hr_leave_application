@@ -1793,7 +1793,8 @@ namespace HR_LEAVEv2.Employee
         protected void returnToPreviousBtn_Click(object sender, EventArgs e)
         {
             // returns to wherever is specified in the query string, returnUrl
-            Response.Redirect(Request.QueryString["returnUrl"]);
+            string returnUrl = Request.QueryString["returnUrl"].ToString().Replace(",","&returnUrl=");
+            Response.Redirect($"{returnUrl}");
         }
 
         protected void convertToPaidLeave_Click(object sender, EventArgs e)

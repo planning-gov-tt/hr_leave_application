@@ -112,6 +112,13 @@
                                     </button>
                                 </span>
 
+                                <%--button to go to employee's leave logs--%>
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Open Leave Logs">
+                                    <asp:LinkButton ID="openLeaveLogsBtn" empEmail='<%#Eval("email") %>' class="btn btn-primary" runat="server" OnClick="openLeaveLogsBtn_ServerClick">
+                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                    </asp:LinkButton>
+                                </span>
+
                             </div>
 
                         </div>
@@ -164,6 +171,13 @@
                                     <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
                                         <i class="fa fa-address-card-o" aria-hidden="true"></i>
                                     </button>
+                                </span>
+
+                                <%--button to go to employee's leave logs--%>
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Open Leave Logs">
+                                    <asp:LinkButton ID="openLeaveLogsBtn" empEmail='<%#Eval("email") %>' class="btn btn-primary" runat="server" OnClick="openLeaveLogsBtn_ServerClick">
+                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                    </asp:LinkButton>
                                 </span>
 
                             </div>

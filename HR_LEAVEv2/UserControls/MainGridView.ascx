@@ -51,14 +51,14 @@
     <%--Supervisor Name/ID search string--%>
     <div id="divTbSupervisor" class="row" runat="server">
         <div class="col-sm-12 form-group" style="text-align: center">
-            <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="right" title="Enter supervisor name/ID" placeholder="Supervisor Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
+            <asp:TextBox ID="tbSupervisor" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="right" title="Enter supervisor name/ID/Email" placeholder="Supervisor Name/ID/Email" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
 
     <%--Employee Name/ID search string--%>
     <div id="divTbEmployee" class="row" runat="server">
         <div class="col-sm-12 form-group" style="text-align: center">
-            <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="right" title="Enter employee name/ID" placeholder="Employee Name/ID" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
+            <asp:TextBox ID="tbEmployee" runat="server" CssClass="form-control content-tooltipped" data-toggle="tooltip" data-placement="right" title="Enter employee name/ID/Email" placeholder="Employee Name/ID/Email" Style="margin:0 auto; text-align:center" Width="50%"></asp:TextBox>
         </div>
     </div>
 
