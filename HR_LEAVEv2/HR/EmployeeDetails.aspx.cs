@@ -594,17 +594,7 @@ namespace HR_LEAVEv2.HR
                     // get pre-existing data table
                     dt = ViewState["Gridview1_dataSource"] as DataTable;
 
-                // check if there already exists an active record. Two active records cannot exist at the same time
-                foreach (DataRow dr in dt.Rows)
-                {
-                    // check if there is any record that is active, the record being checked cannot have an isChanged value of 1 (cannot be an already deleted record)
-                    if (dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1" && dr.ItemArray[(int)emp_records_columns.status].ToString() == "Active")
-                    {
-                        multipleActiveRecordsAddRecordPanel.Style.Add("display", "inline-block");
-                        isRecordAllowed = false;
-                    }
-
-                }
+                isRecordAllowed = isRecordValid(startDate, string.Empty, -1, multipleActiveRecordsAddRecordPanel, startDateClashAddRecordPanel);
 
                 if (isRecordAllowed)
                 {
@@ -702,7 +692,7 @@ namespace HR_LEAVEv2.HR
                 {
                     // edit datatable and rebind gridview
 
-                    if (isRecordValid(startDate, end.ToString("d/MM/yyyy"), indexInDt))
+                    if (isRecordValid(startDate, end.ToString("d/MM/yyyy"), indexInDt, multipleActiveRecordsEndRecordPanel, employmentRecordClashPanel))
                     {
                         // set record to be edited
                         dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.isChanged, "2");
@@ -756,8 +746,6 @@ namespace HR_LEAVEv2.HR
                         // hide modal
                         ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('hide');", true);
                     }
-                    else
-                        multipleActiveRecordsEndRecordPanel.Style.Add("display", "inline-block");
                 }
             }
             
@@ -780,7 +768,7 @@ namespace HR_LEAVEv2.HR
                 return (DateTime.Compare(DateTime.Now, DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
         }
 
-        protected Boolean isRecordValid(string proposedStartDate, string proposedEndDate, int index)
+        protected Boolean isRecordValid(string proposedStartDate, string proposedEndDate, int index,Panel multipleActiveRecordsPanel, Panel clashingRecords)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
             // any other active records exist in order to validate the record.
@@ -800,13 +788,51 @@ namespace HR_LEAVEv2.HR
                     {
                         if (dr[(int)emp_records_columns.status].ToString() == "Active")
                             numActiveRows++;
+
+                        
+                        DateTime startDate = (DateTime)dr[(int)emp_records_columns.start_date];
+
+                        DateTime endDate = !String.IsNullOrEmpty(dr[(int)emp_records_columns.actual_end_date].ToString())? DateTime.ParseExact(dr[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture): DateTime.MinValue;
+
+                        // ensure that record does not overlap with another record
+                        if(endDate!= DateTime.MinValue)
+                        {
+                            bool test1 = DateTime.Compare(startDate, DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) >= 0;
+                            bool test2 = DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), endDate) <= 0;
+                            // start date cannot be in between any other record's period 
+                            if (DateTime.Compare(startDate, DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) >= 0
+                                || DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), endDate) <= 0)
+                            {
+                                if(clashingRecords != null)
+                                    clashingRecords.Style.Add("display", "inline-block");
+                                return false;
+                            }
+                                
+                        }
+                        else
+                        {
+                            bool test1 = DateTime.Compare(startDate, DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) <= 0;
+                            if (DateTime.Compare(startDate, DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) <= 0 ||
+                                DateTime.Compare(startDate, DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) <= 0
+                                )
+                            {
+                                if (clashingRecords != null)
+                                    clashingRecords.Style.Add("display", "inline-block");
+                                return false;
+                            }
+
+                        }
+
                     }
                     i++;
                 }
                 if (isProposedRecordActive)
                     numActiveRows++;
 
-                return numActiveRows <= 1;
+                if (numActiveRows <= 1)
+                    return true;
+                else if(numActiveRows > 1 && multipleActiveRecordsPanel != null)
+                    multipleActiveRecordsPanel.Style.Add("display", "inline-block");
             }
 
             return false;
@@ -880,7 +906,7 @@ namespace HR_LEAVEv2.HR
 
                                 if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrWhiteSpace(startDate) && isStartDateChanged)
                                 {
-                                    if (isRecordValid(startDate, actualEndDate, index))
+                                    if (isRecordValid(startDate, actualEndDate, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel))
                                     {
                                         editsMade.Add("Start Date");
                                         dt.Rows[index][(int)emp_records_columns.start_date] = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
@@ -916,7 +942,7 @@ namespace HR_LEAVEv2.HR
                                 if (isActualEndDateChanged)
                                 {
                                     if (isEditedRecordValid && !isStartDateChanged)
-                                        isEditedRecordValid = isRecordValid(startDate, actualEndDate, index);
+                                        isEditedRecordValid = isRecordValid(startDate, actualEndDate, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel);
 
                                     // does edit make employee have more than one record that is active (end date is not null and today is before end date) or (end date is null)
                                     if (isEditedRecordValid) {
@@ -938,13 +964,10 @@ namespace HR_LEAVEv2.HR
                                             dt.Rows[index][(int)emp_records_columns.status_class] = "label-danger";
                                         }
                                     }
-                                    else
-                                        multipleActiveRecordsEditRecordPanel.Style.Add("display", "inline-block");
 
                                 }
 
-
-                                if (!((isActualEndDateChanged || isStartDateChanged && !isEditedRecordValid) && !(isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged)))
+                                if(isEditedRecordValid && (isActualEndDateChanged || isStartDateChanged ||isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged))
                                 {
                                     dt.Rows[index].SetField<string>((int)emp_records_columns.isChanged, "2");
 
@@ -979,7 +1002,7 @@ namespace HR_LEAVEv2.HR
                                     editEmpRecordSuccTxt.InnerText = $"{String.Join(", ", editsMade.ToArray())} edits successfully made to employment record. Don't forget to save your changes";
                                     editEmploymentRecordSuccessful.Style.Add("display", "inline-block");
                                 }
-                                else
+                                else if(!(isActualEndDateChanged || isStartDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged))
                                     noEditsToRecordsMade.Style.Add("display", "inline-block");
 
                             }
@@ -1047,6 +1070,7 @@ namespace HR_LEAVEv2.HR
             endDateIsWeekendPanel.Style.Add("display", "none");
             duplicateRecordPanel.Style.Add("display", "none");
             multipleActiveRecordsAddRecordPanel.Style.Add("display", "none");
+            startDateClashAddRecordPanel.Style.Add("display", "none");
 
             // EDIT
             recordEditEndDateInvalidPanel.Style.Add("display", "none");
@@ -1056,6 +1080,8 @@ namespace HR_LEAVEv2.HR
             editUnsuccessful.Style.Add("display", "none");
             noEditsToRecordsMade.Style.Add("display", "none");
             multipleActiveRecordsEditRecordPanel.Style.Add("display", "none");
+            startDateClashEditRecordPanel.Style.Add("display", "none");
+            employmentRecordClashPanel.Style.Add("display", "none");
 
             // END EMPLOYMENT RECORD
             invalidEndDatePanel.Style.Add("display", "none");
