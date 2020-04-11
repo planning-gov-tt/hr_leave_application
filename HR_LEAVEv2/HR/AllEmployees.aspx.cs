@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web;
 using System.Web.Services;
 using System.Web.UI.WebControls;
 
@@ -475,6 +476,15 @@ namespace HR_LEAVEv2.HR
             ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
             DataPager1.SetPageProperties(0, 8, false);
             bindListView();
+        }
+
+        protected void openLeaveLogsBtn_Click(object sender, EventArgs e)
+        {
+            // opens employee's leave logs
+
+            LinkButton lb = sender as LinkButton;
+            string empEmail = lb.Attributes["empEmail"].ToString();
+            Response.Redirect($"~/HR/AllEmployeeLeaveApplications?empEmail={empEmail}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
         }
     }
 }

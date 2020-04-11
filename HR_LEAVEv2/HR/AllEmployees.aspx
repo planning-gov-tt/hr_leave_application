@@ -114,12 +114,21 @@
                                     </button>
                                 </span>
 
+                                <%--button to go to employee's leave logs--%>
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Open Leave Logs">
+                                    <asp:LinkButton ID="openLeaveLogsBtn" empEmail='<%#Eval("email") %>' class="btn btn-primary" runat="server" OnClick="openLeaveLogsBtn_Click" style="margin-left: 5px;">
+                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                    </asp:LinkButton>
+                                </span>
+
                                 <%--button to edit employee--%>
                                 <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>" class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit">
                                     <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color: black;">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                     </button>
                                 </a>
+
+                                
 
                             </div>
 
@@ -176,12 +185,21 @@
                                     </button>
                                 </span>
 
+                                <%--button to go to employee's leave logs--%>
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Open Leave Logs">
+                                    <asp:LinkButton ID="openLeaveLogsBtn" empEmail='<%#Eval("email") %>' class="btn btn-primary" runat="server" OnClick="openLeaveLogsBtn_Click" style="margin-left: 5px;">
+                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                    </asp:LinkButton>
+                                </span>
+
                                 <%--button to edit employee--%>
                                 <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>" class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit">
                                     <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color: black;">
                                         <i class="fa fa-pencil" aria-hidden="true"></i>
                                     </button>
                                 </a>
+
+                                
 
                             </div>
 
