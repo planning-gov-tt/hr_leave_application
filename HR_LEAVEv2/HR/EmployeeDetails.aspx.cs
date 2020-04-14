@@ -844,7 +844,12 @@ namespace HR_LEAVEv2.HR
                             }
                             // proposed actual end date is empty - proposed record is active
                             else
+                            {
+                                if(multipleActiveRecordsPanel != null)
+                                    multipleActiveRecordsPanel.Style.Add("display", "inline-block");
                                 return false; // proposed record is invalid since record already exists that is active and proposed record is active
+                            }
+                               
 
                             if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
                             {
