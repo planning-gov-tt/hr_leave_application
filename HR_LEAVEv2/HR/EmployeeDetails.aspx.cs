@@ -780,6 +780,10 @@ namespace HR_LEAVEv2.HR
                 // state of passed end date and corresponding record
                 bool isProposedRecordActive = isRecordActive(proposedStartDate, proposedEndDate);
 
+                DateTime proposedSD = DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+                        proposedAED = !String.IsNullOrEmpty(proposedEndDate) ? DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
+
+
                 DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
                 foreach (DataRow dr in dt.Rows)
                 {
@@ -795,13 +799,32 @@ namespace HR_LEAVEv2.HR
                         DateTime endDate = !String.IsNullOrEmpty(dr[(int)emp_records_columns.actual_end_date].ToString())? DateTime.ParseExact(dr[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture): DateTime.MinValue;
 
                         // ensure that record does not overlap with another record
-                        if(endDate!= DateTime.MinValue)
+                        bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
+                                 
+
+                        // if record being checked has an end date
+                        if (endDate!= DateTime.MinValue)
                         {
-                            bool test1 = DateTime.Compare(startDate, DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) >= 0;
-                            bool test2 = DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), endDate) <= 0;
-                            // start date cannot be in between any other record's period 
-                            if (DateTime.Compare(startDate, DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) >= 0
-                                || DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), endDate) <= 0)
+                            
+                            bool isRowStartDateInProposedPeriod = false, isRowEndDateinProposedPeriod = false;
+                            // proposed actual end date is not empty
+                            if (proposedAED != DateTime.MinValue)
+                            {
+                                // check if period represented by proposed start date to proposed end date coincides with the given data row's period
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, startDate) >= 0 && DateTime.Compare(proposedSD, endDate) <= 0;
+                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, startDate) >= 0 && DateTime.Compare(proposedAED, endDate) <= 0;
+
+                                isRowStartDateInProposedPeriod = DateTime.Compare(startDate, proposedSD) >= 0 && DateTime.Compare(startDate, proposedAED) <= 0;
+                                isRowEndDateinProposedPeriod = DateTime.Compare(endDate, proposedSD) >= 0 && DateTime.Compare(endDate, proposedAED) <= 0;
+
+                            }
+                            // proposed actual end date is empty- proposed record is active
+                            else
+                            {
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, endDate) <= 0 || DateTime.Compare(proposedSD, startDate) <= 0;
+                            }
+          
+                            if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
                             {
                                 if(clashingRecords != null)
                                     clashingRecords.Style.Add("display", "inline-block");
@@ -809,12 +832,21 @@ namespace HR_LEAVEv2.HR
                             }
                                 
                         }
+                        // if record being checked is active
                         else
                         {
-                            bool test1 = DateTime.Compare(startDate, DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) <= 0;
-                            if (DateTime.Compare(startDate, DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) <= 0 ||
-                                DateTime.Compare(startDate, DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) <= 0
-                                )
+                            // proposed actual end date is not empty
+                            if (proposedAED != DateTime.MinValue)
+                            {
+                                // check if period represented by proposed start date is in active record's period
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, startDate) >= 0;
+                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, startDate) >= 0;
+                            }
+                            // proposed actual end date is empty - proposed record is active
+                            else
+                                return false; // proposed record is invalid since record already exists that is active and proposed record is active
+
+                            if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
                             {
                                 if (clashingRecords != null)
                                     clashingRecords.Style.Add("display", "inline-block");

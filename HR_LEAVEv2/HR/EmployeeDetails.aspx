@@ -468,7 +468,8 @@
                                 <asp:Panel ID="startDateClashAddRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="Span27" runat="server">
-                                        Record not added since the current employment record's start date falls within the time period of another employment record
+                                        Record not added since the current employment record's period would result in an overlap with another employment record. Employment records must be non
+                                        intersecting
                                     </span>
                                 </asp:Panel>
 

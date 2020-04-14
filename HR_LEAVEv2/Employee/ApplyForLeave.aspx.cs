@@ -449,7 +449,7 @@ namespace HR_LEAVEv2.Employee
 
                     // check if the amt of days taken is more than that MAX_DAYS_PAST_BALANCE
                     int daysTaken = Convert.ToInt32(numDaysAppliedFor.Text);
-                    if (daysTaken >= (leaveBalance + MAX_DAYS_PAST_BALANCE) && files == null)
+                    if (daysTaken >= (leaveBalance + MAX_DAYS_PAST_BALANCE) && files == null && typeOfLeave.SelectedValue != "Sick")
                     {
                         isValid = "No";
                         errTxt = "Not eligible for amount of leave entered";
