@@ -14,8 +14,12 @@
 
     <div class="container" style="text-align:center;">
         <div id="currentAccSettingsDiv" class="row">
+
             <asp:UpdatePanel ID="UpdatePanel" runat="server">
+
                 <ContentTemplate>
+
+                    <%--Panel showing gridview containing accumulations data--%>
                     <asp:Panel ID="accExistsPanel" runat="server">
 
                         <asp:LinkButton ID="addNewAccBtn" runat="server" CssClass="btn btn-primary" OnClick="addAccumulationBtn_Click" Style="margin-top: 15px; margin-bottom: 15px;">
@@ -30,7 +34,9 @@
                             AllowSorting="true" AllowPaging="true"
                             PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" AutoGenerateColumns="False"
                             OnRowDeleting="GridView1_RowDeleting">
+
                             <Columns>
+
                                 <asp:TemplateField HeaderText="Action" Visible="true">
                                     <ItemTemplate>
                                         <%--delete button--%>
@@ -53,43 +59,62 @@
                                 <asp:BoundField DataField="accumulation_period_text" HeaderText="Accumulation Period" SortExpression="accumulation_period_text"></asp:BoundField>
                                 <asp:BoundField DataField="accumulation_type" HeaderText="Accumulation Type" SortExpression="accumulation_type"></asp:BoundField>
                                 <asp:BoundField DataField="num_days" HeaderText="Number of Days" SortExpression="num_days"></asp:BoundField>
+                            
                             </Columns>
+
                         </asp:GridView>
+
                     </asp:Panel>
 
+                    <%--Panel showing message if no accumulations data is available--%>
                     <asp:Panel ID="noAccumulationsPanel" runat="server" CssClass="alert alert-info text-center" role="alert" Style="display: inline-block; margin: 0 auto; margin-top:25px" Visible="false">
+                        
                         <i class="fa fa-info-circle"></i>
                         No data on accumulations available
                         <asp:LinkButton ID="addAccumulationBtn" runat="server" CssClass="btn btn-primary" OnClick="addAccumulationBtn_Click" Style="margin-left: 10px;">
                              <i class="fa fa-plus"></i>
                             Add
                         </asp:LinkButton>
+
                     </asp:Panel>
+
                 </ContentTemplate>
+
             </asp:UpdatePanel>
+
         </div>
 
        
 
-        <%-- End Employment Record Modal--%>
+        <%-- Add new Accumulation Modal--%>
         <div class="modal fade" id="addAccumulationModal" tabindex="-1" role="dialog" aria-labelledby="addAccumulationTitle" aria-hidden="true">
 
             <div class="modal-dialog" role="document" style="width: 50%;">
+
                 <div class="modal-content">
+
                     <div class="modal-header text-center">
+
                         <h2 class="modal-title" id="addAccumulationTitle" style="display: inline; width: 150px;">
                             Adjust Settings for Accumulation of Leave on a Yearly Basis
                         </h2>
+
                         <button type="button" class="close" runat="server" onserverclick="closeAddAccumulationBtn_Click" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
+
                     </div>
+
                     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+
                         <Triggers>
                             <asp:PostBackTrigger ControlID="saveAccumulation" />
                         </Triggers>
+
                         <ContentTemplate>
+
                             <div class="modal-body text-center">
+
                                 <div class="row" style="margin-bottom: 20px">
                                     <%--Employment Type--%>
                                     <label for="empTypeList" class="space-label-from-input-element">Employment Type:</label>
@@ -128,28 +153,27 @@
                                     <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ValidationGroup="submitAccumulation" ControlToValidate="numDaysForAccumulation" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
                                 </div>
 
-                                <asp:Panel ID="errorInsertingAccPanel" runat="server" CssClass="row alert alert-danger" Style="display:none; margin-top:15px" role="alert">
-                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                    <span>Error inserting accumulation</span>
-                                </asp:Panel>
-
-                                <asp:Panel ID="succesfulInsertionOfAccPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin-top:15px;" role="alert">
-                                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                                    <span>Successfully inserted accumulation</span>
-                                </asp:Panel>
-
                             </div>
+
                             <div class="modal-footer">
+
                                 <asp:Button ID="closeAddAccumulationBtn" runat="server" Text="Close" CssClass="btn btn-secondary" OnClick="closeAddAccumulationBtn_Click" />
                                 <asp:LinkButton ID="saveAccumulation" runat="server" OnClick="saveAccumulation_Click" ValidationGroup="submitAccumulation" CssClass="btn btn-primary">
                                     <i class="fa fa-floppy-o"></i>
                                     Save
                                 </asp:LinkButton>
+
                             </div>
+
                         </ContentTemplate>
+
                     </asp:UpdatePanel>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 </asp:Content>

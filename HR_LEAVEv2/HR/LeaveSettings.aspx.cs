@@ -32,6 +32,7 @@ namespace HR_LEAVEv2.HR
 
         }
 
+        // Gridview methods
         protected void bindGridview()
         {
             try
@@ -55,7 +56,7 @@ namespace HR_LEAVEv2.HR
                         {
                             GridView1.DataSource = dt;
                             GridView1.DataBind();
-                        }                       
+                        }
                     }
                 }
             }
@@ -65,6 +66,50 @@ namespace HR_LEAVEv2.HR
             }
         }
 
+        protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            GridView1.PageIndex = e.NewPageIndex;
+            bindGridview();
+        }
+
+        protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+
+            DataTable dt = GridView1.DataSource as DataTable;
+            Boolean isDeleteSuccessful = false;
+            string id = dt.Rows[e.RowIndex].ItemArray[0].ToString();
+
+            // delete from db
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                            DELETE FROM [dbo].[accumulations] WHERE id = {id};
+                        ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        int rowsAffected = command.ExecuteNonQuery();
+                        isDeleteSuccessful = rowsAffected > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                isDeleteSuccessful = false;
+            }
+
+            if (isDeleteSuccessful)
+                util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), $"Deleted accumulation; id = {id}");
+
+            this.bindGridview();
+        }
+        //_________________________________________________________________________________________
+
+
+        // bind form control methods
         protected void bindLeaveTypeList()
         {
             List<string> leaveTypesWithBalances = util.getLeaveTypeMapping().Keys.ToList();
@@ -122,13 +167,10 @@ namespace HR_LEAVEv2.HR
             accumulationPeriodList.DataValueField = "value";
             accumulationPeriodList.DataBind();
         }
+        //_________________________________________________________________________________________
 
-        protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        {
-            GridView1.PageIndex = e.NewPageIndex;
-            bindGridview();
-        }
 
+        // add accumulation form methods
         protected void resetAddAccumulationForm()
         {
             empTypeList.DataBind();
@@ -136,10 +178,6 @@ namespace HR_LEAVEv2.HR
             bindAccPeriodList();
             accumulationTypeList.SelectedIndex = 0;
             numDaysForAccumulation.Text = string.Empty;
-
-            //saveAccumulation.Visible = true;
-            //succesfulInsertionOfAccPanel.Style.Add("display", "none");
-            //errorInsertingAccPanel.Style.Add("display", "none");
         }
 
         protected void addAccumulationBtn_Click(object sender, EventArgs e)
@@ -160,6 +198,7 @@ namespace HR_LEAVEv2.HR
                    numDays = numDaysForAccumulation.Text;
 
             Boolean isInsertSuccessful = false;
+            string id = string.Empty; // id of inserted accumulation
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -168,12 +207,13 @@ namespace HR_LEAVEv2.HR
 
                     string sql = $@"
                             INSERT INTO [dbo].[accumulations]([employment_type], [leave_type], [accumulation_period_text], [accumulation_period_value],[accumulation_type], [num_days])
+                            OUTPUT INSERTED.id
                             VALUES ('{empType}', '{leaveType}', '{accText}', '{accValue}', '{accType}', {numDays});
                         ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        int rowsAffected = command.ExecuteNonQuery();
-                        isInsertSuccessful = rowsAffected > 0;
+                        id = command.ExecuteScalar().ToString();
+                        isInsertSuccessful = !String.IsNullOrEmpty(id);
                     }
                 }
             }
@@ -182,52 +222,18 @@ namespace HR_LEAVEv2.HR
                 isInsertSuccessful = false;
             }
 
+            // add audit logs
             if (isInsertSuccessful)
-            {
-                // show success message
-                //succesfulInsertionOfAccPanel.Style.Add("display", "inline-block");
-                //saveAccumulation.Visible = false;
-                bindGridview();
-            }
-            //else
-            //{
-            //    // show error message
-            //    errorInsertingAccPanel.Style.Add("display", "inline-block");
-            //}
+                util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), $"Added new accumulation; id = {id}");
+
+            bindGridview();
         }
 
         protected void closeAddAccumulationBtn_Click(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#addAccumulationModal').modal('hide');", true);
         }
+        //_________________________________________________________________________________________
 
-        protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
-        {
-            
-            DataTable dt = GridView1.DataSource as DataTable;
-
-            // delete from db
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-
-                    string sql = $@"
-                            DELETE FROM [dbo].[accumulations] WHERE id = {dt.Rows[e.RowIndex].ItemArray[0]};
-                        ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        int rowsAffected = command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            this.bindGridview();
-        }
     }
 }

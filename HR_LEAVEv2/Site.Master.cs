@@ -88,6 +88,33 @@ namespace HR_LEAVEv2
                 ddlSelectUser.SelectedValue = Session["emp_email"].ToString();
                 // END DEVELOPMENT PURPOSES CODE --------------------------------------------------------
 
+                // check for accumulations
+                //try
+                //{
+                //    string sql = $@"
+                //        ;
+                //    ";
+
+                //    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                //    {
+                //        connection.Open();
+                //        using (SqlCommand command = new SqlCommand(sql, connection))
+                //        {
+                //            using (SqlDataReader reader = command.ExecuteReader())
+                //            {
+                //                while (reader.Read())
+                //                {
+                //                    count = reader["num_notifs"].ToString();
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
+                //catch (Exception ex)
+                //{
+                //    throw ex;
+                //}
+
                 // set number of notifications
                 string count = string.Empty;
                 try
