@@ -14,10 +14,10 @@
 
     <div class="container" style="text-align:center;">
         <div id="currentAccSettingsDiv" class="row">
-            <h3>Current Settings</h3>
-            <asp:Panel ID="accExistsPanel" runat="server">
-                <asp:UpdatePanel ID="UpdatePanel" runat="server">
-                    <ContentTemplate>
+            <asp:UpdatePanel ID="UpdatePanel" runat="server">
+                <ContentTemplate>
+                    <asp:Panel ID="accExistsPanel" runat="server">
+
                         <asp:LinkButton ID="addNewAccBtn" runat="server" CssClass="btn btn-primary" OnClick="addAccumulationBtn_Click" Style="margin-top: 15px; margin-bottom: 15px;">
                             <i class="fa fa-plus"></i>
                             Add new Accumulation
@@ -28,8 +28,26 @@
                             BorderStyle="None" CssClass="table" Style="margin: 0 auto;"
                             GridLines="Horizontal"
                             AllowSorting="true" AllowPaging="true"
-                            PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" AutoGenerateColumns="False">
+                            PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" AutoGenerateColumns="False"
+                            OnRowDeleting="GridView1_RowDeleting">
                             <Columns>
+                                <asp:TemplateField HeaderText="Action" Visible="true">
+                                    <ItemTemplate>
+                                        <%--delete button--%>
+                                        <asp:LinkButton ID="deleteBtn"
+                                            runat="server"
+                                            CssClass="btn btn-danger content-tooltipped"
+                                            data-toggle="tooltip"
+                                            data-placement="bottom"
+                                            title="Delete accumulation"
+                                            OnClientClick="return confirm('Delete accumulation?');"
+                                            CommandName="delete"
+                                            CausesValidation="false">
+                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                        </asp:LinkButton>
+                                    </ItemTemplate>
+                                </asp:TemplateField>
+                                <asp:BoundField DataField="id" HeaderText="ID" SortExpression="id" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden"></asp:BoundField>
                                 <asp:BoundField DataField="employment_type" HeaderText="Employment Type" SortExpression="employment_type"></asp:BoundField>
                                 <asp:BoundField DataField="leave_type" HeaderText="Leave Type" SortExpression="leave_type"></asp:BoundField>
                                 <asp:BoundField DataField="accumulation_period_text" HeaderText="Accumulation Period" SortExpression="accumulation_period_text"></asp:BoundField>
@@ -37,20 +55,18 @@
                                 <asp:BoundField DataField="num_days" HeaderText="Number of Days" SortExpression="num_days"></asp:BoundField>
                             </Columns>
                         </asp:GridView>
-                    </ContentTemplate>
-                </asp:UpdatePanel>
-            </asp:Panel>
-            
-            
+                    </asp:Panel>
 
-            <asp:Panel ID="noAccumulationsPanel" runat="server" CssClass="alert alert-info text-center" role="alert" style="display:inline-block; margin:0 auto" Visible="false">
-                <i class="fa fa-info-circle"></i>
-                No data on accumulations available
-                <asp:LinkButton ID="addAccumulationBtn" runat="server" CssClass="btn btn-primary" OnClick="addAccumulationBtn_Click" Style="margin-left:10px;">
-                     <i class="fa fa-plus"></i>
-                    Add
-                </asp:LinkButton>
-            </asp:Panel>
+                    <asp:Panel ID="noAccumulationsPanel" runat="server" CssClass="alert alert-info text-center" role="alert" Style="display: inline-block; margin: 0 auto; margin-top:25px" Visible="false">
+                        <i class="fa fa-info-circle"></i>
+                        No data on accumulations available
+                        <asp:LinkButton ID="addAccumulationBtn" runat="server" CssClass="btn btn-primary" OnClick="addAccumulationBtn_Click" Style="margin-left: 10px;">
+                             <i class="fa fa-plus"></i>
+                            Add
+                        </asp:LinkButton>
+                    </asp:Panel>
+                </ContentTemplate>
+            </asp:UpdatePanel>
         </div>
 
        

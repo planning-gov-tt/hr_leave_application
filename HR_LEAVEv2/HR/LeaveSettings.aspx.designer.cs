@@ -13,15 +13,6 @@ namespace HR_LEAVEv2.HR {
     public partial class LeaveSettings {
         
         /// <summary>
-        /// accExistsPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel accExistsPanel;
-        
-        /// <summary>
         /// UpdatePanel control.
         /// </summary>
         /// <remarks>
@@ -29,6 +20,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.UpdatePanel UpdatePanel;
+        
+        /// <summary>
+        /// accExistsPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel accExistsPanel;
         
         /// <summary>
         /// addNewAccBtn control.

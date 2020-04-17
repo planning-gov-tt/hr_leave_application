@@ -41,7 +41,7 @@ namespace HR_LEAVEv2.HR
                     connection.Open();
 
                     string sql = $@"
-                            SELECT [employment_type], [leave_type], [accumulation_period_text], [accumulation_type], [num_days] FROM [accumulations];
+                            SELECT [id], [employment_type], [leave_type], [accumulation_period_text], [accumulation_type], [num_days] FROM [accumulations];
                         ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -199,6 +199,35 @@ namespace HR_LEAVEv2.HR
         protected void closeAddAccumulationBtn_Click(object sender, EventArgs e)
         {
             ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#addAccumulationModal').modal('hide');", true);
+        }
+
+        protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            
+            DataTable dt = GridView1.DataSource as DataTable;
+
+            // delete from db
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                            DELETE FROM [dbo].[accumulations] WHERE id = {dt.Rows[e.RowIndex].ItemArray[0]};
+                        ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        int rowsAffected = command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            this.bindGridview();
         }
     }
 }
