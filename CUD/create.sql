@@ -123,6 +123,7 @@ CREATE TABLE [dbo].[employeeposition] (
   [actual_end_date] DATETIME,
   [employment_type] NVARCHAR (15) NOT NULL,
   [dept_id] INT,
+  [years_worked] INT NOT NULL,
 
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id]),
@@ -229,4 +230,17 @@ CREATE TABLE [dbo].[emptypeleavetype](
   FOREIGN KEY([employment_type]) REFERENCES [dbo].[employmenttype] ([type_id]),
   FOREIGN KEY([leave_type]) REFERENCES [dbo].[leavetype] ([type_id])
 
+);
+
+CREATE TABLE [dbo].[accumulations](
+  [id] INT IDENTITY(1, 1) PRIMARY KEY,
+  [employment_type] NVARCHAR(15) NOT NULL,
+  [leave_type] NVARCHAR(20) NOT NULL,
+  [accumulation_period_text] NVARCHAR(40) NOT NULL,
+  [accumulation_period_value] NVARCHAR(2) NOT NULL,
+  [accumulation_type] NVARCHAR(15) NOT NULL,
+  [num_days] INT NOT NULL,
+
+  FOREIGN KEY([employment_type]) REFERENCES [dbo].[employmenttype] ([type_id]),
+  FOREIGN KEY([leave_type]) REFERENCES [dbo].[leavetype] ([type_id]),
 );

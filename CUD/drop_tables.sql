@@ -6,6 +6,7 @@ DROP TABLE [dbo].[employeefiles];
 DROP TABLE [dbo].[notifications];
 DROP TABLE [dbo].[auditlog];
 DROP TABLE [dbo].[emptypeleavetype];
+DROP TABLE [dbo].[accumulations];
 
 DROP TABLE [dbo].[leavetransaction];
 DROP TABLE [dbo].[leavetype];

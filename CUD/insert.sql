@@ -255,7 +255,8 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 ('Bereavement'),
 ('Maternity'),
 ('Paternity'),
-('Pre-retirement');
+('Pre-retirement'),
+('Paid');
 
 SET IDENTITY_INSERT [dbo].[department] ON;
 
@@ -291,70 +292,70 @@ INSERT INTO [dbo].[employmenttype] ([type_id]) VALUES
 
 SET IDENTITY_INSERT [dbo].[employeeposition] ON;
 
-INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start_date], [expected_end_date], [actual_end_date], [employment_type], [dept_id]) VALUES
+INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start_date], [expected_end_date], [actual_end_date], [employment_type], [dept_id], [years_worked]) VALUES
 -- Tristan Sankar
-(1, '1', 5, '20190927', '20200927', NULL, 'Contract', 1),
+(1, '1', 5, '20190927', '20200927', NULL, 'Contract', 1, 0),
 -- Christopher Sahadeo
-(2, '3', 5, '20190927', '20200927', NULL, 'Public Service', 1),
+(2, '3', 5, '20190927', '20200927', NULL, 'Public Service', 1, 0),
 
 -- multiple periods of employment for one person- Clint
-(3, '115245', 6, '20101005', '20131005', '20131007', 'Contract', 1),
-(4, '115245', 6, '20131015', '20161015', '20161018', 'Contract', 1),
-(5, '115245', 6, '20171120', '20201120', NULL, 'Contract', 1),
+(3, '115245', 6, '20101005', '20131005', '20131007', 'Contract', 1, 3),
+(4, '115245', 6, '20131015', '20161015', '20161018', 'Contract', 1, 3),
+(5, '115245', 6, '20171120', '20201120', NULL, 'Contract', 1, 2),
 
 -- contract and public servant
 --Pauline Solozano
-(7, '38137', 7, '20160927', '20201225', NULL, 'Contract', 2),
+(7, '38137', 7, '20160927', '20201225', NULL, 'Contract', 2, 3),
 --Usha Balkaran
-(8, '05356', 7, '20160927', '20201225', NULL, 'Public Service', 2),
+(8, '05356', 7, '20160927', '20201225', NULL, 'Public Service', 2, 2),
 
 --more seed data
 --Dale Cudjoe
-(9, '184164', 6, '20180927', '20210927', NULL, 'Contract', 1),
+(9, '184164', 6, '20180927', '20210927', NULL, 'Contract', 1, 1),
 --Charmaine Carmichael
-(10, '11948', 7, '20191025', '20221025', NULL, 'Public Service', 2),
+(10, '11948', 7, '20191025', '20221025', NULL, 'Public Service', 2, 0),
 
 --HR Director- Melanie Noel
-(11, '83612', 4, '20180927', '20210927', NULL, 'Public Service', 2),
+(11, '83612', 4, '20180927', '20210927', NULL, 'Public Service', 2, 1),
 
 --PS
-(12, '07525', 8, '20191025', '20221025', NULL, 'Public Service', 4),
+(12, '07525', 8, '20191025', '20221025', NULL, 'Public Service', 4, 0),
 
 --Minister
-(13, '4', 9, '20191025', '20221025', NULL, 'Public Service', 4),
+(13, '4', 9, '20191025', '20221025', NULL, 'Public Service', 4, 0),
 
 -- Nazmoon Khan
-(14, '01548', 7, '20180927', '20210927', NULL, 'Public Service', 2),
+(14, '01548', 7, '20180927', '20210927', NULL, 'Public Service', 2, 1),
 
 --Nandani 
-(15, '157778', 1, '20180927', '20210927', NULL, 'Contract', 1),
+(15, '157778', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --Kene Bryan 
-(16, '123337', 4, '20180927', '20210927', NULL, 'Contract', 1),
+(16, '123337', 4, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --Rishi Boodoo
-(17, '161720', 1, '20180927', '20210927', NULL, 'Contract', 1),
+(17, '161720', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --Carlisle Mckay
-(18, '159118', 6, '20180927', '20210927', NULL, 'Contract', 1),
+(18, '159118', 6, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --Rohini Singh
-(19, '15067', 6, '20180927', '20210927', NULL, 'Contract', 1),
+(19, '15067', 6, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --Kelly DeLandro
-(20, '140480', 1, '20180927', '20210927', NULL, 'Contract', 1),
+(20, '140480', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --Pele St Hill
-(21, '34521', 1, '20180927', '20210927', NULL, 'Contract', 1),
+(21, '34521', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --Deneyse Outar
-(22, '12454', 2, '20180927', '20210927', NULL, 'Contract', 1),
+(22, '12454', 2, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --Melissa Bynoe
-(23, '42352', 1, '20180927', '20210927', NULL, 'Contract', 1),
+(23, '42352', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
 
 --StacyAnn Drakes
-(24, '67689', 1, '20180927', '20210927', NULL, 'Contract', 1)
+(24, '67689', 1, '20180927', '20210927', NULL, 'Contract', 1, 1)
 ;
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;
