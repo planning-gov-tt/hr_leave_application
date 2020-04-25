@@ -27,6 +27,21 @@ namespace HR_LEAVEv2.Classes
             public string subject { get; set; }
         }
 
+        public int getNumYearsBetween(DateTime start, DateTime end)
+        {
+
+            if(DateTime.Compare(start, end) < 0)
+            {
+                int literalYearsInBetween = end.Year - start.Year;
+                if (start.Month > end.Month || (start.Month == end.Month && start.Day > end.Day))
+                    literalYearsInBetween--;
+                return literalYearsInBetween;
+                
+            }
+            return 0;
+            
+        }
+
         public Dictionary<string, string> getLeaveTypeMapping()
         {
             // returns a dictionary with the leave type (type_id) as the Key and the column name representing the leave balance as the value

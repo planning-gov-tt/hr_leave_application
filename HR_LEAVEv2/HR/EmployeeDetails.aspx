@@ -701,11 +701,11 @@
 
                         </div>
                         <div class="modal-footer">
+                            <asp:Button ID="closeEndEmpRecordModalBtn" runat="server" Text="Close" CssClass="btn btn-secondary" OnClick="closeEndEmpRecordModalBtn_Click"/>
                             <asp:LinkButton runat="server" ID="submitEndEmpRecordBtn" class="btn btn-primary" OnClick="submitEndEmpRecordBtn_Click" CausesValidation="false">
                                  <i class="fa fa-send" aria-hidden="true"></i>
                                  Submit
                             </asp:LinkButton>
-                            <asp:Button ID="closeEndEmpRecordModalBtn" runat="server" Text="Close" CssClass="btn btn-secondary" OnClick="closeEndEmpRecordModalBtn_Click"/>
                         </div>
                     </div>
                 </ContentTemplate>

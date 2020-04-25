@@ -3,11 +3,28 @@ using System.Collections.Generic;
 using System.Web.UI;
 using System.Configuration;
 using System.Data.SqlClient;
+using HR_LEAVEv2.Classes;
+using System.Data;
 
 namespace HR_LEAVEv2
 {
     public partial class SiteMaster : MasterPage
     {
+        enum acc_enum
+        {
+            leaveType = 0,
+            accValue = 1,
+            accType = 2,
+            numDays = 3,
+
+        };
+
+        Boolean isStartOfNewContractYear = false,
+                       isStartOfNewYear = false;
+
+        int currentNumYearsWorked = -1;
+        Util util = new Util();
+
 
         protected void Page_Init(object sender, EventArgs e)
         {
@@ -35,6 +52,73 @@ namespace HR_LEAVEv2
             // store employee's permissions in Session
             if (Session["permissions"] == null && Session["emp_id"] != null)
                 Session["permissions"] = auth.getUserPermissions(Session["emp_id"].ToString());
+
+
+            DateTime startDate = DateTime.MinValue;
+            int yearsWorked = -1;
+            string empType = string.Empty;
+
+            currentNumYearsWorked = -1;
+            isStartOfNewYear =  isStartOfNewContractYear = false;
+            // get years worked
+            try
+            {
+                string sql = $@"
+                            SELECT ep.start_date as startDate, ep.years_worked as yearsWorked, ep.employment_type as employmentType
+                            FROM dbo.employeeposition ep
+                            WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {Session["emp_id"].ToString()};
+                        ;
+                    ";
+
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                startDate = Convert.ToDateTime(reader["startDate"]);
+                                yearsWorked = Convert.ToInt32(reader["yearsWorked"]);
+                                empType = reader["employmentType"].ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+
+            if (startDate != DateTime.MinValue && yearsWorked != -1 && !String.IsNullOrEmpty(empType))
+            {
+                Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, DateTime.Today);
+                //Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 28)); // for testing
+
+                if (empType == "Contract")
+                {
+                    // get current number of years worked for their contract and compare with their current value for years worked
+
+                    currentNumYearsWorked = util.getNumYearsBetween(startDate, DateTime.Today);
+                    //currentNumYearsWorked = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 28)); //for testing
+                    isStartOfNewContractYear = currentNumYearsWorked > yearsWorked;
+                }
+
+                else if (empType == "Public Service")
+                {
+                    // get current number of years worked (number of new years passed)
+
+                    currentNumYearsWorked = DateTime.Today.Year - startDate.Year;
+                    //currentNumYearsWorked = 2022 - startDate.Year; //for testing
+                    isStartOfNewYear = currentNumYearsWorked > yearsWorked;
+                }
+
+
+            }
 
         }
 
@@ -87,6 +171,115 @@ namespace HR_LEAVEv2
                 }
                 ddlSelectUser.SelectedValue = Session["emp_email"].ToString();
                 // END DEVELOPMENT PURPOSES CODE --------------------------------------------------------
+
+
+                // sql to be built which will either apply accumulations and then update the years worked or will simply update the years worked if no accumulations are present
+                string updateSql = $@"
+                                    BEGIN TRANSACTION;
+                                ";
+
+                // check for accumulations
+                DataTable dt = new DataTable();
+                dt.Columns.Add("leaveType", typeof(string));
+                dt.Columns.Add("accValue", typeof(string));
+                dt.Columns.Add("accType", typeof(string));
+                dt.Columns.Add("numDays", typeof(string));
+
+                try
+                {
+                    string accSql = $@"
+                            SELECT a.leave_type as leaveType, a.accumulation_period_value as accValue, a.accumulation_type as accType, a.num_days as numDays
+                            FROM [dbo].[accumulations] a
+                            LEFT JOIN dbo.employeeposition ep
+                            ON ep.employment_type = a.employment_type
+                            WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {Session["emp_id"].ToString()};
+                        ;
+                    ";
+
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(accSql, connection))
+                        {
+                            SqlDataAdapter da = new SqlDataAdapter(command);
+                            da.Fill(dt);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+                if(dt.Rows.Count > 0)
+                {
+                    // once employee is active and accumulations exist
+                    Dictionary<string, string> leaveTypeMapping = util.getLeaveTypeMapping();
+
+                    // apply accumulations
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        // iterate through all accumulations and apply accordingly
+
+                        // accValue of 0- Update at the start of new contract year
+                        // accValue of 1- Update at the start of the new year
+                        if(dt.Rows[i].ItemArray[(int)acc_enum.accValue].ToString() == "0" || dt.Rows[i].ItemArray[(int)acc_enum.accValue].ToString() == "1")
+                        {
+                            if (isStartOfNewYear || isStartOfNewContractYear)
+                            {
+
+                                // employee has started new contract year or new year so their leave must be updated
+                                if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Replace")
+                                {
+                                    updateSql += $@"
+                                            UPDATE [dbo].[employee]
+                                            SET {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} =  {dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString()}
+                                            WHERE employee_id = {Session["emp_id"].ToString()};
+                                            
+                                    ";
+                                } else if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Add")
+                                {
+                                    updateSql += $@"
+                                            UPDATE [dbo].[employee]
+                                            SET {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} =  (SELECT {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} + {dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString()} FROM dbo.employee WHERE employee_id = {Session["emp_id"].ToString()})
+                                            WHERE employee_id = {Session["emp_id"].ToString()};
+                                            
+                                    ";
+                                }
+                            }
+                        }
+                    }       
+                }
+
+                if(isStartOfNewContractYear || isStartOfNewYear)
+                {
+                    updateSql += $@"
+
+                        UPDATE [dbo].[employeeposition]
+                        SET years_worked = {currentNumYearsWorked}
+                        WHERE employee_id = {Session["emp_id"].ToString()};
+                                    
+                        COMMIT;
+                        ";
+
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            using (SqlCommand command = new SqlCommand(updateSql, connection))
+                            {
+                                int rowsAffected = command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+                
+
 
                 // set number of notifications
                 string count = string.Empty;

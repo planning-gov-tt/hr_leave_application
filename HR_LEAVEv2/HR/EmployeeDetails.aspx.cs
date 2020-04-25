@@ -872,7 +872,7 @@ namespace HR_LEAVEv2.HR
                     multipleActiveRecordsPanel.Style.Add("display", "inline-block");
             }
 
-            return false;
+            return true;
 
         }
 
@@ -1689,7 +1689,8 @@ namespace HR_LEAVEv2.HR
                                         ,[start_date]
                                         ,[expected_end_date]
                                         ,[employment_type]
-                                        ,[dept_id])
+                                        ,[dept_id]
+                                        ,[years_worked])
                                 OUTPUT INSERTED.id
                                 VALUES
                                     ( @EmployeeId
@@ -1698,6 +1699,7 @@ namespace HR_LEAVEv2.HR
                                     ,@ExpectedEndDate
                                     ,@EmploymentType
                                     ,@DeptId
+                                    ,@YearsWorked
                                     );
                             ";
 
@@ -1712,6 +1714,10 @@ namespace HR_LEAVEv2.HR
                                     command.Parameters.AddWithValue("@PositionId", dr.ItemArray[(int)emp_records_columns.pos_id]);
                                     command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)emp_records_columns.start_date]);
                                     command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
+                                    if(dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
+                                        command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.Today));
+                                    else
+                                        command.Parameters.AddWithValue("@YearsWorked", DateTime.Today.Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
 
                                     string new_record_id = command.ExecuteScalar().ToString();
                                     isEmpRecordInsertSuccessful = !String.IsNullOrWhiteSpace(new_record_id);
@@ -1765,7 +1771,8 @@ namespace HR_LEAVEv2.HR
                                     expected_end_date= @ExpectedEndDate, 
                                     actual_end_date = @ActualEndDate, 
                                     employment_type= '{dr.ItemArray[(int)emp_records_columns.employment_type].ToString()}', 
-                                    dept_id= {dr.ItemArray[(int)emp_records_columns.dept_id].ToString()}
+                                    dept_id= {dr.ItemArray[(int)emp_records_columns.dept_id].ToString()},
+                                    years_worked = @YearsWorked
                                 WHERE id= @RecordId;
                             ";
 
@@ -1782,11 +1789,28 @@ namespace HR_LEAVEv2.HR
                                         command.Parameters.AddWithValue("@ExpectedEndDate", DBNull.Value);
 
                                     if (!String.IsNullOrEmpty(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString()))
+                                    {
                                         command.Parameters.AddWithValue("@ActualEndDate", DateTime.ParseExact(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"));
+
+                                        if(dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
+                                            // calculate years worked with actual end date
+                                            command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.ParseExact(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)));
+                                    }
+
                                     else
+                                    {
                                         command.Parameters.AddWithValue("@ActualEndDate", DBNull.Value);
 
+                                        if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
+                                            // calculate years worked with today's date
+                                            command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.Today));
+                                    }
+
+                                    if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Public Service")
+                                        command.Parameters.AddWithValue("@YearsWorked", DateTime.Today.Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
+
                                     command.Parameters.AddWithValue("@RecordId", dr.ItemArray[(int)emp_records_columns.record_id]);
+
 
                                     int rowsAffected = command.ExecuteNonQuery();
                                     isEmpRecordEditFieldsSuccessful = rowsAffected > 0;
@@ -2120,7 +2144,8 @@ namespace HR_LEAVEv2.HR
                                             ,[start_date]
                                             ,[expected_end_date]
                                             ,[employment_type]
-                                            ,[dept_id])
+                                            ,[dept_id]
+                                            ,[years_worked])
                                     VALUES
                                         ( @EmployeeId
                                         ,@PositionId
@@ -2128,6 +2153,7 @@ namespace HR_LEAVEv2.HR
                                         ,@ExpectedEndDate
                                         ,@EmploymentType
                                         ,@DeptId
+                                        ,@YearsWorked
                                         );
                                 ";
 
@@ -2143,6 +2169,12 @@ namespace HR_LEAVEv2.HR
                                             command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)emp_records_columns.start_date]);
                                             command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
 
+                                            if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
+                                                // get number of years worked by checking start date against current date
+                                                command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.Today));
+                                            else
+                                                // get number of years worked from start of year to  start of year
+                                                command.Parameters.AddWithValue("@YearsWorked", DateTime.Today.Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
                                             int rowsAffected = command.ExecuteNonQuery();
                                             if (rowsAffected > 0)
                                             {

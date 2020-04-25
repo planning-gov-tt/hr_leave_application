@@ -134,6 +134,7 @@
     <Content Include="HR\AllEmployeeLeaveApplications.aspx" />
     <Content Include="HR\AllEmployees.aspx" />
     <Content Include="HR\EmployeeDetails.aspx" />
+    <Content Include="HR\LeaveSettings.aspx" />
     <Content Include="HR\Reports.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -275,6 +276,13 @@
     </Compile>
     <Compile Include="HR\EmployeeDetails.aspx.designer.cs">
       <DependentUpon>EmployeeDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="HR\LeaveSettings.aspx.cs">
+      <DependentUpon>LeaveSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="HR\LeaveSettings.aspx.designer.cs">
+      <DependentUpon>LeaveSettings.aspx</DependentUpon>
     </Compile>
     <Compile Include="HR\Reports.aspx.cs">
       <DependentUpon>Reports.aspx</DependentUpon>

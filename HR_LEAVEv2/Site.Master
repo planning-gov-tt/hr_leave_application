@@ -167,6 +167,13 @@
                                 </li>
 
                                 <li>
+                                    <a href="<%= ResolveClientUrl("~/HR/LeaveSettings.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Leave Settings">
+                                        <i class="fa fa-wrench fa-flip-horizontal navbar-link-icon"></i>
+                                        <span class="navbar-link-text">Leave Settings</span>
+                                    </a>
+                                </li>
+
+                                <li>
                                     <a href="<%= ResolveClientUrl("~/HR/Reports.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Reports">
                                         <i class="fa fa-pie-chart navbar-link-icon"></i>
                                         <span class="navbar-link-text">Reports</span>

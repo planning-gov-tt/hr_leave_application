@@ -1210,15 +1210,6 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span24;
         
         /// <summary>
-        /// submitEndEmpRecordBtn control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton submitEndEmpRecordBtn;
-        
-        /// <summary>
         /// closeEndEmpRecordModalBtn control.
         /// </summary>
         /// <remarks>
@@ -1226,5 +1217,14 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button closeEndEmpRecordModalBtn;
+        
+        /// <summary>
+        /// submitEndEmpRecordBtn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton submitEndEmpRecordBtn;
     }
 }
