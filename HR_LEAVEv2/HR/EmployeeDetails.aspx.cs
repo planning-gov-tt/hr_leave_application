@@ -2170,8 +2170,10 @@ namespace HR_LEAVEv2.HR
                                             command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
 
                                             if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
+                                                // get number of years worked by checking start date against current date
                                                 command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.Today));
                                             else
+                                                // get number of years worked from start of year to  start of year
                                                 command.Parameters.AddWithValue("@YearsWorked", DateTime.Today.Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
                                             int rowsAffected = command.ExecuteNonQuery();
                                             if (rowsAffected > 0)

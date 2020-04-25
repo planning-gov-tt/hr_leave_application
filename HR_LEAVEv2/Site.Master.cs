@@ -4,11 +4,24 @@ using System.Web.UI;
 using System.Configuration;
 using System.Data.SqlClient;
 using HR_LEAVEv2.Classes;
+using System.Data;
 
 namespace HR_LEAVEv2
 {
     public partial class SiteMaster : MasterPage
     {
+        enum acc_enum
+        {
+            leaveType = 0,
+            accValue = 1,
+            accType = 2,
+            numDays = 3,
+            yearsWorked = 4,
+            startDate = 5,
+            employmentType = 6
+
+        };
+
 
         protected void Page_Init(object sender, EventArgs e)
         {
@@ -90,18 +103,19 @@ namespace HR_LEAVEv2
                 // END DEVELOPMENT PURPOSES CODE --------------------------------------------------------
 
                 // check for accumulations
-                List<string> leaveTypes = new List<string>(),
-                       accValues = new List<string>(),
-                       accTypes = new List<string>();
+                DataTable dt = new DataTable();
+                dt.Columns.Add("leaveType", typeof(string));
+                dt.Columns.Add("accValue", typeof(string));
+                dt.Columns.Add("accType", typeof(string));
+                dt.Columns.Add("numDays", typeof(string));
+                dt.Columns.Add("yearsWorked", typeof(string));
+                dt.Columns.Add("startDate", typeof(string));
+                dt.Columns.Add("employmentType", typeof(string));
 
-                DateTime startDate = DateTime.MinValue;
-                int yearsWorked = -1,
-                    numDays = -1;
-                string employmentType = string.Empty;
                 try
                 {
                     string sql = $@"
-                            SELECT a.leave_type, a.accumulation_period_value, a.accumulation_type, a.num_days, ep.start_date, ep.years_worked, ep.employment_type
+                            SELECT a.leave_type as leaveType, a.accumulation_period_value as accValue, a.accumulation_type as accType, a.num_days as numDays, ep.start_date as startDate, ep.years_worked as yearsWorked, ep.employment_type as employmentType
                             FROM [dbo].[accumulations] a
                             LEFT JOIN dbo.employeeposition ep
                             ON ep.employment_type = a.employment_type
@@ -114,19 +128,8 @@ namespace HR_LEAVEv2
                         connection.Open();
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            using (SqlDataReader reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    leaveTypes.Add(reader["leave_type"].ToString());
-                                    accValues.Add(reader["accumulation_period_value"].ToString());
-                                    accTypes.Add(reader["accumulation_type"].ToString());
-                                    startDate = Convert.ToDateTime(reader["start_date"]);
-                                    yearsWorked = Convert.ToInt32(reader["years_worked"]);
-                                    numDays = Convert.ToInt32(reader["num_days"]);
-                                    employmentType = reader["employment_type"].ToString();
-                                }
-                            }
+                            SqlDataAdapter da = new SqlDataAdapter(command);
+                            da.Fill(dt);
                         }
                     }
                 }
@@ -135,50 +138,53 @@ namespace HR_LEAVEv2
                     throw ex;
                 }
 
-                if(startDate != DateTime.MinValue && leaveTypes.Count > 0 && accValues.Count > 0 && accTypes.Count > 0 && yearsWorked != -1 && numDays != -1 && !String.IsNullOrEmpty(employmentType))
+                if(dt.Rows.Count > 0)
                 {
                     // once employee is active and accumulations exist
                     Util util = new Util();
                     Dictionary<string, string> leaveTypeMapping = util.getLeaveTypeMapping();
-
                     int currentNumYearsWorked = -1;
-                    if (employmentType == "Contract")
-                        // get current number of years worked for their contract and compare with their current value for years worked
-                        currentNumYearsWorked = util.getNumYearsBetween(startDate, DateTime.Today);
-                        //currentNumYearsWorked = util.getNumYearsBetween(startDate, new DateTime(2020, 09, 28)); //for testing
-                    else if (employmentType == "Public Service")
-                        // get current number of years worked (number of new years passed)
-                        currentNumYearsWorked = DateTime.Today.Year - startDate.Year;
-                        //currentNumYearsWorked = 2021 - startDate.Year; //for testing
 
                     // apply accumulations
-                    for (int i = 0; i < accValues.Count; i++)
+                    for (int i = 0; i < dt.Rows.Count; i++)
                     {
                         // iterate through all accumulations and apply accordingly
+                        
+                        if (dt.Rows[i].ItemArray[(int)acc_enum.employmentType].ToString() == "Contract")
+                            // get current number of years worked for their contract and compare with their current value for years worked
+                            //currentNumYearsWorked = util.getNumYearsBetween(Convert.ToDateTime(dt.Rows[i].ItemArray[(int)acc_enum.startDate]), DateTime.Today);
+                            currentNumYearsWorked = util.getNumYearsBetween(Convert.ToDateTime(dt.Rows[i].ItemArray[(int)acc_enum.startDate]), new DateTime(2021, 09, 28)); //for testing
+                        else if (dt.Rows[i].ItemArray[(int)acc_enum.employmentType].ToString() == "Public Service")
+                            // get current number of years worked (number of new years passed)
+                            //currentNumYearsWorked = DateTime.Today.Year - Convert.ToDateTime(dt.Rows[i].ItemArray[(int)acc_enum.startDate]).Year;
+                            currentNumYearsWorked = 2022 - Convert.ToDateTime(dt.Rows[i].ItemArray[(int)acc_enum.startDate]).Year; //for testing
+
+                    
 
                         // accValue of 0- Update at the start of new contract year
-                        if(accValues[i] == "0" || accValues[i] == "1")
+                        // accValue of 1- Update at the start of the new year
+                        if(dt.Rows[i].ItemArray[(int)acc_enum.accValue].ToString() == "0" || dt.Rows[i].ItemArray[(int)acc_enum.accValue].ToString() == "1")
                         {
-                            if (currentNumYearsWorked > yearsWorked)
+                            if (currentNumYearsWorked > Convert.ToInt32(dt.Rows[i].ItemArray[(int)acc_enum.yearsWorked]))
                             {
 
                                 // employee has started new contract year or new year so their leave must be updated
                                 string sql = $@"
                                     BEGIN TRANSACTION;
                                 ";
-                                if(accTypes[i] == "Replace")
+                                if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Replace")
                                 {
                                     sql += $@"
                                             UPDATE [dbo].[employee]
-                                            SET {leaveTypeMapping[leaveTypes[i]]} =  {numDays}
+                                            SET {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} =  {dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString()}
                                             WHERE employee_id = {Session["emp_id"].ToString()};
                                             
                                     ";
-                                } else if(accTypes[i] == "Add")
+                                } else if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Add")
                                 {
                                     sql += $@"
                                             UPDATE [dbo].[employee]
-                                            SET {leaveTypeMapping[leaveTypes[i]]} =  (SELECT {leaveTypeMapping[leaveTypes[i]]} + {numDays} FROM dbo.employee WHERE employee_id = {Session["emp_id"].ToString()})
+                                            SET {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} =  (SELECT {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} + {dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString()} FROM dbo.employee WHERE employee_id = {Session["emp_id"].ToString()})
                                             WHERE employee_id = {Session["emp_id"].ToString()};
                                             
                                     ";
