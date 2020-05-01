@@ -274,7 +274,7 @@ namespace HR_LEAVEv2.Employee
                 if (!String.IsNullOrEmpty(typeOfLeave.SelectedValue))
                 {
                     // once not sick leave, ensure start date is not a day before today 
-                    if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, DateTime.Today) < 0)
+                    if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, util.getCurrentDateToday()) < 0)
                     {
                         startDateBeforeTodayValidationMsgPanel.Style.Add("display", "inline-block");
                         isValidated = false;
@@ -283,7 +283,7 @@ namespace HR_LEAVEv2.Employee
                     // if leave type is vacation, ensure start date is at least one month from today
                     if (typeOfLeave.SelectedValue.Equals("Vacation"))
                     {
-                        DateTime firstDateVacationCanBeTaken = DateTime.Today.AddMonths(1);
+                        DateTime firstDateVacationCanBeTaken = util.getCurrentDateToday().AddMonths(1);
 
                         if (DateTime.Compare(start, firstDateVacationCanBeTaken) < 0)
                         {
@@ -321,7 +321,7 @@ namespace HR_LEAVEv2.Employee
                         }
 
                         // ensure sick leave ends before today (sick leave is taken retroactively)
-                        if (DateTime.Compare(end, DateTime.Today) > 0)
+                        if (DateTime.Compare(end, util.getCurrentDateToday()) > 0)
                         {
                             invalidSickLeaveStartDate.Style.Add("display", "inline-block");
                             isValidated = false;
@@ -345,19 +345,19 @@ namespace HR_LEAVEv2.Employee
             // returns a List<string> containing the names of holidays which fall in between the leave period specified
 
             Dictionary<string, DateTime> publicHolidays = new Dictionary<string, DateTime>() {
-                    { "New Years", new DateTime(DateTime.Now.Year, 1, 1) },
-                    { "New Years Day", new DateTime(DateTime.Now.Year + 1, 1, 1) },
-                    { "Shouter Baptist Day", new DateTime(DateTime.Now.Year, 3, 30) },
-                    { "Good Friday", new DateTime(DateTime.Now.Year, 4, 10) },
-                    { "Easter Monday", new DateTime(DateTime.Now.Year, 4, 13) },
-                    { "Indian Arrival Day", new DateTime(DateTime.Now.Year, 5, 30) },
-                    { "Corpus Christi", new DateTime(DateTime.Now.Year, 6, 11) },
-                    { "Labour Day", new DateTime(DateTime.Now.Year, 6, 19) },
-                    { "Emancipation Day", new DateTime(DateTime.Now.Year, 8, 1) },
-                    { "Independence Day", new DateTime(DateTime.Now.Year, 8, 31) },
-                    { "Republic Day", new DateTime(DateTime.Now.Year, 9, 24) },
-                    { "Christmas Day", new DateTime(DateTime.Now.Year, 12, 25) },
-                    { "Boxing Day", new DateTime(DateTime.Now.Year, 12, 26) },
+                    { "New Years", new DateTime(util.getCurrentDate().Year, 1, 1) },
+                    { "New Years Day", new DateTime(util.getCurrentDate().Year + 1, 1, 1) },
+                    { "Shouter Baptist Day", new DateTime(util.getCurrentDate().Year, 3, 30) },
+                    { "Good Friday", new DateTime(util.getCurrentDate().Year, 4, 10) },
+                    { "Easter Monday", new DateTime(util.getCurrentDate().Year, 4, 13) },
+                    { "Indian Arrival Day", new DateTime(util.getCurrentDate().Year, 5, 30) },
+                    { "Corpus Christi", new DateTime(util.getCurrentDate().Year, 6, 11) },
+                    { "Labour Day", new DateTime(util.getCurrentDate().Year, 6, 19) },
+                    { "Emancipation Day", new DateTime(util.getCurrentDate().Year, 8, 1) },
+                    { "Independence Day", new DateTime(util.getCurrentDate().Year, 8, 31) },
+                    { "Republic Day", new DateTime(util.getCurrentDate().Year, 9, 24) },
+                    { "Christmas Day", new DateTime(util.getCurrentDate().Year, 12, 25) },
+                    { "Boxing Day", new DateTime(util.getCurrentDate().Year, 12, 26) },
                 };
 
             List<string> holidaysInBetween = new List<string>();
@@ -465,7 +465,7 @@ namespace HR_LEAVEv2.Employee
                         DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
 
                         
-                        if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                        if (DateTime.Compare(util.getCurrentDateToday(), elevenMonthsFromStartDate) < 0)
                         {
                             // ensure employee cannot apply for vacation within first 11 months of Contract
                             if (typeOfLeaveSelected == "Vacation")
@@ -1385,7 +1385,7 @@ namespace HR_LEAVEv2.Employee
                                             command.Parameters.AddWithValue("@FileData", bytes);
                                             command.Parameters.AddWithValue("@FileName", file_name);
                                             command.Parameters.AddWithValue("@FileExtension", file_extension);
-                                            command.Parameters.AddWithValue("@UploadedOn", DateTime.Now);
+                                            command.Parameters.AddWithValue("@UploadedOn", util.getCurrentDate());
                                             fileid = command.ExecuteScalar().ToString();
 
                                             isFileUploadSuccessful = !String.IsNullOrEmpty(fileid);
@@ -1494,7 +1494,7 @@ namespace HR_LEAVEv2.Employee
                 new Util.EmailDetails
                 {
                     employee_name = Session["emp_username"].ToString(),
-                    date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
+                    date_submitted = util.getCurrentDate().ToString("d/MM/yyyy h:mm tt"),
                     start_date = txtFrom.Text.ToString(),
                     end_date = txtTo.Text.ToString(),
                     days_taken = numDaysAppliedFor.Text,
@@ -1511,7 +1511,7 @@ namespace HR_LEAVEv2.Employee
                 new Util.EmailDetails
                 {
                     supervisor_name = supervisorSelect.SelectedItem.Text,
-                    date_submitted = DateTime.Now.ToString("d/MM/yyyy h:mm tt"),
+                    date_submitted = util.getCurrentDate().ToString("d/MM/yyyy h:mm tt"),
                     start_date = txtFrom.Text.ToString(),
                     end_date = txtTo.Text.ToString(),
                     days_taken = numDaysAppliedFor.Text,
@@ -1533,7 +1533,7 @@ namespace HR_LEAVEv2.Employee
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('Submitted Leave Application',@Notification, 'No', '{Session["emp_id"].ToString()}', '{DateTime.Now}');
+                                VALUES('Submitted Leave Application',@Notification, 'No', '{Session["emp_id"].ToString()}', '{util.getCurrentDate()}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -1557,7 +1557,7 @@ namespace HR_LEAVEv2.Employee
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{Session["emp_username"].ToString()} Submitted Leave Application',@Notification, 'No', '{supervisorSelect.SelectedValue.ToString()}', '{DateTime.Now}');
+                                VALUES('{Session["emp_username"].ToString()} Submitted Leave Application',@Notification, 'No', '{supervisorSelect.SelectedValue.ToString()}', '{util.getCurrentDate()}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -1759,7 +1759,7 @@ namespace HR_LEAVEv2.Employee
                                             command.Parameters.AddWithValue("@FileData", bytes);
                                             command.Parameters.AddWithValue("@FileName", file_name);
                                             command.Parameters.AddWithValue("@FileExtension", file_extension);
-                                            command.Parameters.AddWithValue("@UploadedOn", DateTime.Now);
+                                            command.Parameters.AddWithValue("@UploadedOn", util.getCurrentDate());
                                             fileid = command.ExecuteScalar().ToString();
 
                                             isEditSuccessful = isEditSuccessful && !String.IsNullOrEmpty(fileid);

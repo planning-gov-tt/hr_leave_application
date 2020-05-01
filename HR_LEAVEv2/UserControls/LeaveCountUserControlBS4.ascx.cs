@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 using System.Configuration;
 using System.Data.SqlClient;
+using HR_LEAVEv2.Classes;
 
 namespace HR_LEAVEv2.UserControls
 {
     public partial class LeaveCountUserControlBS4 : System.Web.UI.UserControl
     {
-
+        Util util = new Util();
         private class EmployeeDetails
         {
             public string sick { get; set; }
@@ -117,7 +114,7 @@ namespace HR_LEAVEv2.UserControls
                             DateTime startDate = Convert.ToDateTime(empDetails.start_date);
                             DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
 
-                            if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                            if (DateTime.Compare(util.getCurrentDateToday(), elevenMonthsFromStartDate) < 0)
                                 // display personal 
                                 personalPanel.Visible = true;
                             else

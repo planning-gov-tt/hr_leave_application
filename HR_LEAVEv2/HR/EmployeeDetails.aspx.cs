@@ -501,7 +501,7 @@ namespace HR_LEAVEv2.HR
                 {
                     // end is set to the current date so that the method will not return a DateTime.MinValue value which corresponds to a false validation
                     isValidated = true;
-                    end = DateTime.Now;
+                    end = util.getCurrentDate();
                 }
                    
                 
@@ -636,7 +636,7 @@ namespace HR_LEAVEv2.HR
                     if (!isDuplicate)
                     {
                         // if start date is before or on Today then the record is active, otherwise it is not
-                        if(DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), DateTime.Now) <= 0)
+                        if(DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) <= 0)
                             //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class
                             dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success");
                         else
@@ -757,7 +757,7 @@ namespace HR_LEAVEv2.HR
             // returns a Boolean which represents whether the proposed actual end date passed will make a record active or inactive. The date passed is assumed to be validated
 
             // check if start date of record is a day in the future, meaning the record is currently inactive
-            if (DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), DateTime.Now) > 0)
+            if (DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) > 0)
                 return false;
 
             // if the passed end date is empty then the record is automaticaly Active
@@ -765,7 +765,7 @@ namespace HR_LEAVEv2.HR
                 return true;
             else
                 // if today is before the passed actual end date then the record is active and otherwise, inactive
-                return (DateTime.Compare(DateTime.Now, DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
+                return (DateTime.Compare(util.getCurrentDate(), DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
         }
 
         protected Boolean isRecordValid(string proposedStartDate, string proposedEndDate, int index,Panel multipleActiveRecordsPanel, Panel clashingRecords)
@@ -1715,9 +1715,9 @@ namespace HR_LEAVEv2.HR
                                     command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)emp_records_columns.start_date]);
                                     command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
                                     if(dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
-                                        command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.Today));
+                                        command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), util.getCurrentDateToday()));
                                     else
-                                        command.Parameters.AddWithValue("@YearsWorked", DateTime.Today.Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
+                                        command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
 
                                     string new_record_id = command.ExecuteScalar().ToString();
                                     isEmpRecordInsertSuccessful = !String.IsNullOrWhiteSpace(new_record_id);
@@ -1803,11 +1803,11 @@ namespace HR_LEAVEv2.HR
 
                                         if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
                                             // calculate years worked with today's date
-                                            command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.Today));
+                                            command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), util.getCurrentDateToday()));
                                     }
 
                                     if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Public Service")
-                                        command.Parameters.AddWithValue("@YearsWorked", DateTime.Today.Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
+                                        command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
 
                                     command.Parameters.AddWithValue("@RecordId", dr.ItemArray[(int)emp_records_columns.record_id]);
 
@@ -2171,10 +2171,10 @@ namespace HR_LEAVEv2.HR
 
                                             if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
                                                 // get number of years worked by checking start date against current date
-                                                command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.Today));
+                                                command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), util.getCurrentDateToday()));
                                             else
                                                 // get number of years worked from start of year to  start of year
-                                                command.Parameters.AddWithValue("@YearsWorked", DateTime.Today.Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
+                                                command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
                                             int rowsAffected = command.ExecuteNonQuery();
                                             if (rowsAffected > 0)
                                             {

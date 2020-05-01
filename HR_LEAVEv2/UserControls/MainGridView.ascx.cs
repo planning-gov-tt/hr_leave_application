@@ -624,7 +624,7 @@ namespace HR_LEAVEv2.UserControls
                                 }
 
                                 // if today is a day before the start date of the application then show undo button
-                                if (DateTime.Compare(DateTime.Today, start) < 0)
+                                if (DateTime.Compare(util.getCurrentDateToday(), start) < 0)
                                     btnUndoApprove.Visible = true;
                                 else
                                     btnUndoApprove.Visible = false;
@@ -1302,7 +1302,7 @@ namespace HR_LEAVEv2.UserControls
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{employee_id}', '{DateTime.Now}');
+                                VALUES('{notif_header}', '{notification}', 'No', '{employee_id}', '{util.getCurrentDate()}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -1327,7 +1327,7 @@ namespace HR_LEAVEv2.UserControls
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{supervisor_id}', '{DateTime.Now}');
+                                VALUES('{notif_header}', '{notification}', 'No', '{supervisor_id}', '{util.getCurrentDate()}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -1422,7 +1422,7 @@ namespace HR_LEAVEv2.UserControls
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', @Notification , 'No', '{row["employee_id"]}', '{DateTime.Now}');
+                                VALUES('{notif_header}', @Notification , 'No', '{row["employee_id"]}', '{util.getCurrentDate()}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
@@ -1452,7 +1452,7 @@ namespace HR_LEAVEv2.UserControls
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', @Notification, 'No', '{row["supervisor_id"]}', '{DateTime.Now}');
+                                VALUES('{notif_header}', @Notification, 'No', '{row["supervisor_id"]}', '{util.getCurrentDate()}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
@@ -1605,7 +1605,7 @@ namespace HR_LEAVEv2.UserControls
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{employee_id}', '{DateTime.Now}');
+                                VALUES('{notif_header}', '{notification}', 'No', '{employee_id}', '{util.getCurrentDate()}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -1631,7 +1631,7 @@ namespace HR_LEAVEv2.UserControls
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{id}', '{DateTime.Now}');
+                                VALUES('{notif_header}', '{notification}', 'No', '{id}', '{util.getCurrentDate()}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
@@ -1709,7 +1709,7 @@ namespace HR_LEAVEv2.UserControls
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', @Notification, 'No', '{row["employee_id"]}', '{DateTime.Now}');
+                                VALUES('{notif_header}', @Notification, 'No', '{row["employee_id"]}', '{util.getCurrentDate()}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {

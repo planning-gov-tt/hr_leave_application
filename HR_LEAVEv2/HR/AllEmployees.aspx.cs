@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using HR_LEAVEv2.Classes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -12,6 +13,7 @@ namespace HR_LEAVEv2.HR
 {
     public partial class AllEmployees : System.Web.UI.Page
     {
+        
         List<string> permissions = null;
         class EmpDetails
         {
@@ -318,6 +320,7 @@ namespace HR_LEAVEv2.HR
             /* returns JSON object containing all the employee details. Returns data including Employee Position and Employee Employment type but if the data is not available
              * then by default, only basic employee info is returned 
             */
+            Util util = new Util();
             EmpDetails empDetails = null;
             try
             {
@@ -376,7 +379,7 @@ namespace HR_LEAVEv2.HR
                                     DateTime startDate = empDetails.start_date;
                                     DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
 
-                                    if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                                    if (DateTime.Compare(util.getCurrentDateToday(), elevenMonthsFromStartDate) < 0)
                                         // display personal 
                                         leaveBalancesDetailsStr += $@"
                                         <div>

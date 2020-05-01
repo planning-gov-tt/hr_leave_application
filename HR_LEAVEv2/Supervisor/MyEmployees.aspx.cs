@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using HR_LEAVEv2.Classes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -168,6 +169,7 @@ namespace HR_LEAVEv2.Supervisor
              * then by default, only basic employee info is returned 
             */
             EmpDetails empDetails = null;
+            Util util = new Util();
             try
             {
                 string sql = $@"
@@ -224,7 +226,7 @@ namespace HR_LEAVEv2.Supervisor
                                     DateTime startDate = empDetails.start_date;
                                     DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
 
-                                    if (DateTime.Compare(DateTime.Today, elevenMonthsFromStartDate) < 0)
+                                    if (DateTime.Compare(util.getCurrentDateToday(), elevenMonthsFromStartDate) < 0)
                                         // display personal 
                                         leaveBalancesDetailsStr += $@"
                                         <div>

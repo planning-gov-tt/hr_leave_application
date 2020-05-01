@@ -96,14 +96,14 @@ namespace HR_LEAVEv2
 
             if (startDate != DateTime.MinValue && yearsWorked != -1 && !String.IsNullOrEmpty(empType))
             {
-                Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, DateTime.Today);
+                Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
                 //Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 28)); // for testing
 
                 if (empType == "Contract")
                 {
                     // get current number of years worked for their contract and compare with their current value for years worked
 
-                    currentNumYearsWorked = util.getNumYearsBetween(startDate, DateTime.Today);
+                    currentNumYearsWorked = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
                     //currentNumYearsWorked = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 28)); //for testing
                     isStartOfNewContractYear = currentNumYearsWorked > yearsWorked;
                 }
@@ -112,7 +112,7 @@ namespace HR_LEAVEv2
                 {
                     // get current number of years worked (number of new years passed)
 
-                    currentNumYearsWorked = DateTime.Today.Year - startDate.Year;
+                    currentNumYearsWorked = util.getCurrentDateToday().Year - startDate.Year;
                     //currentNumYearsWorked = 2022 - startDate.Year; //for testing
                     isStartOfNewYear = currentNumYearsWorked > yearsWorked;
                 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -25,6 +26,18 @@ namespace HR_LEAVEv2.Classes
             public string comment { get; set; }
             public string recipient { get; set; }
             public string subject { get; set; }
+        }
+
+        public DateTime getCurrentDate()
+        {
+            //return DateTime.Now;
+            return DateTime.ParseExact("10/05/2020 8:00 am", "dd/MM/yyyy h:mm tt", CultureInfo.InvariantCulture);
+        }
+
+        public DateTime getCurrentDateToday()
+        {
+            //return DateTime.Today;
+            return DateTime.ParseExact("10/05/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         }
 
         public int getNumYearsBetween(DateTime start, DateTime end)
