@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AccessDenied.aspx" />
+    <Content Include="Admin\Settings.aspx" />
     <Content Include="Assets\anonAccountProfilePicPlaceholder.jpg" />
     <Content Include="Employee\About.aspx" />
     <Content Include="Assets\mopd_logo.jpg" />
@@ -199,6 +200,13 @@
     </Compile>
     <Compile Include="AccessDenied.aspx.designer.cs">
       <DependentUpon>AccessDenied.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Settings.aspx.cs">
+      <DependentUpon>Settings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Settings.aspx.designer.cs">
+      <DependentUpon>Settings.aspx</DependentUpon>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Classes\Util.cs" />

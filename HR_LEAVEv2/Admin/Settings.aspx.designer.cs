@@ -7,81 +7,99 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HR_LEAVEv2 {
+namespace HR_LEAVEv2.Admin {
     
     
-    public partial class SiteMaster {
+    public partial class Settings {
         
         /// <summary>
-        /// supervisorPanel control.
+        /// DropDownList1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel supervisorPanel;
+        protected global::System.Web.UI.WebControls.DropDownList DropDownList1;
         
         /// <summary>
-        /// hr1_hr2Panel control.
+        /// addPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel hr1_hr2Panel;
+        protected global::System.Web.UI.WebControls.Panel addPanel;
         
         /// <summary>
-        /// hr3Panel control.
+        /// tblDynamicForm control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel hr3Panel;
+        protected global::System.Web.UI.HtmlControls.HtmlTable tblDynamicForm;
         
         /// <summary>
-        /// notificationsUpdatePanel control.
+        /// formPlaceholder control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel notificationsUpdatePanel;
+        protected global::System.Web.UI.WebControls.PlaceHolder formPlaceholder;
         
         /// <summary>
-        /// num_notifications control.
+        /// GridView1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label num_notifications;
+        protected global::System.Web.UI.WebControls.GridView GridView1;
         
         /// <summary>
-        /// adminPanel control.
+        /// UpdatePanel1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel adminPanel;
+        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
         
         /// <summary>
-        /// ddlSelectUser control.
+        /// noDataPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlSelectUser;
+        protected global::System.Web.UI.WebControls.Panel noDataPanel;
         
         /// <summary>
-        /// MainContent control.
+        /// noTableSelectedPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
+        protected global::System.Web.UI.WebControls.Panel noTableSelectedPanel;
+        
+        /// <summary>
+        /// deleteUnsuccessfulPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel deleteUnsuccessfulPanel;
+        
+        /// <summary>
+        /// deleteSuccessfulPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel deleteSuccessfulPanel;
     }
 }
