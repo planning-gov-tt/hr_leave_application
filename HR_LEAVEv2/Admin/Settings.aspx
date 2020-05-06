@@ -41,52 +41,95 @@
             </asp:DropDownList>
         </div>
 
-        <asp:Panel ID="addPanel" Visible ="false" runat="server" class="row" style="margin-top:15px;">
-            <table id="tblDynamicForm" runat="server" style="margin: 0 auto;">
-                <tr>
-                    <td>
-                        <asp:PlaceHolder ID="formPlaceholder" runat="server"></asp:PlaceHolder>
-                    </td>
-                </tr>
-            </table>
+        <asp:Panel ID="addPanel" Visible ="false" runat="server" class="row" style="margin-top:15px; background-color:#e0e0eb;">
+            <asp:Panel ID="headerForFormPanel" CssClass="row" runat="server" Style="margin-bottom: -20px;" >
+                <h2 id="headerForForm" runat="server"></h2>
+            </asp:Panel>
+            <div class="row">
+                <table id="tblDynamicForm" runat="server" style="margin: 0 auto;">
+                    <tr>
+                        <td>
+                            <asp:PlaceHolder ID="formPlaceholder" runat="server"></asp:PlaceHolder>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <asp:UpdatePanel ID="validationPanel" runat="server" Style="margin-bottom:15px;">
+                <ContentTemplate>
+                    <asp:Panel ID="createSuccessfulPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                        <span>Insert Successful</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="createUnsuccessfulPanel" runat="server" class="alert alert-danger text-center" role="alert" style="display:none; margin:0 5px">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        Insert could not be completed
+                    </asp:Panel>
+
+                    <asp:Panel ID="clashingRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Employment record being inserted clashes with another employment record</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="multipleActiveRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Employment record being inserted would result in multiple active records</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="Panel2" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Start date is not valid</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Start date is not valid</span>
+                    </asp:Panel>
+                    <asp:Panel ID="invalidExpectedEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Expected end date is not valid</span>
+                    </asp:Panel>
+                    <asp:Panel ID="dateComparisonExpectedValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Expected end date cannot precede start date</span>
+                    </asp:Panel>
+                    <asp:Panel ID="dateComparisonActualValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Actual end date cannot precede start date</span>
+                    </asp:Panel>
+                    <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Start date is on the weekend</span>
+                    </asp:Panel>
+                    <asp:Panel ID="expectedEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Expected end date is on the weekend</span>
+                    </asp:Panel>
+                    <asp:Panel ID="invalidActualEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Actual end date is not valid</span>
+                    </asp:Panel>
+                    <asp:Panel ID="actualEndDateOnWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Actual end date is on the weekend</span>
+                    </asp:Panel>
+                </ContentTemplate>
+            </asp:UpdatePanel>
+            
+            <asp:Panel ID="submitBtnPanel" CssClass="row" runat="server" Style="margin-bottom: 25px; margin-top:15px;">
+                <asp:LinkButton ID="createBtn" CssClass="btn btn-primary" runat="server" Visible="false" OnClick="createBtn_Click" ValidationGroup="CU_validation">
+                    <i class="fa fa-save"></i>
+                    Save
+                </asp:LinkButton>
+                <asp:LinkButton ID="EditBtn" CssClass="btn btn-primary" runat="server" Visible="false" ValidationGroup="CU_validation">
+                    <i class="fa fa-save"></i>
+                    Save
+                </asp:LinkButton>
+            </asp:Panel>
         </asp:Panel>
-
-        <div id="gridViewContainer" class="row" style="margin-top: 15px;">
-            <asp:GridView ID="GridView1" runat="server"
-            AutoGenerateColumns="true"
-            AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" Style="margin:0 auto;" OnRowCommand="GridView1_RowCommand"
-            >
-                <Columns>
-                    <%--action buttons--%>
-                    <asp:TemplateField HeaderText="Action">
-                        <ItemTemplate>
-                            <div style="display:flex; justify-content:center;">
-                                <%--details button--%>
-                            <asp:LinkButton ID="editBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit" Style="display:inline-block; margin-right:5px"
-                                CommandName="editRow"
-                                CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                            </asp:LinkButton>
-
-                            <%--employee buttons--%>
-                            <asp:LinkButton ID="deleteBtn" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete" runat="server" Style="display:inline-block;"
-                                OnClientClick="return confirm('Delete row?');"
-                                CommandName="deleteRow"
-                                CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
-                        <i class="fa fa-trash-o" aria-hidden="true"></i>
-                            </asp:LinkButton>
-                            </div>
-                            
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                </Columns>
-               
-
-                <PagerStyle CssClass="gvPager" />
-
-            </asp:GridView>
-
-            <asp:UpdatePanel ID="UpdatePanel1" runat="server" Style="margin-top: 10px;">
+            <div class="row" style="margin-top: 15px;">
+            <asp:UpdatePanel ID="UpdatePanel1" runat="server" Style="margin-bottom: 10px;">
                 <ContentTemplate>
                     <asp:Panel ID="noDataPanel" runat="server" class="alert alert-info text-center" role="alert" style="display:none; margin:0 5px">
                         <i class="fa fa-info-circle"></i>
@@ -101,15 +144,53 @@
                     <asp:Panel ID="deleteUnsuccessfulPanel" runat="server" class="alert alert-danger text-center" role="alert" style="display:none; margin:0 5px">
                         <i class="fa fa-exclamation-triangle"></i>
                         Delete could not be completed
+                        <asp:LinkButton ID="LinkButton2" runat="server" Style="margin-left: 11px; color:#484848;"><i class="fa fa-times-circle"></i></asp:LinkButton>
                     </asp:Panel>
 
                     <asp:Panel ID="deleteSuccessfulPanel" runat="server" class="alert alert-success text-center" role="alert" style="display:none; margin:0 5px">
                         <i class="fa fa-thumbs-up"></i>
                         Delete successful
+                        <asp:LinkButton ID="LinkButton1" runat="server" Style="margin-left: 11px; color:#484848;"><i class="fa fa-times-circle"></i></asp:LinkButton>
                     </asp:Panel>
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
+
+        <div id="gridViewContainer" class="row" style="display: inline-flex; justify-content: center;">
+            <asp:GridView ID="GridView1" runat="server"
+                AutoGenerateColumns="true"
+                AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" Style="margin-right: 30px;" OnRowCommand="GridView1_RowCommand">
+                <Columns>
+                    <%--action buttons--%>
+                    <asp:TemplateField HeaderText="Action">
+                        <ItemTemplate>
+                            <div style="display: flex; justify-content: center;">
+                                <%--details button--%>
+                                <asp:LinkButton ID="editBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit" Style="display: inline-block; margin-right: 5px"
+                                    CommandName="editRow"
+                                    CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                </asp:LinkButton>
+
+                                <%--employee buttons--%>
+                                <asp:LinkButton ID="deleteBtn" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete" runat="server" Style="display: inline-block;"
+                                    OnClientClick="return confirm('Delete row?');"
+                                    CommandName="deleteRow"
+                                    CommandArgument="<%# ((GridViewRow) Container).RowIndex %>">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </asp:LinkButton>
+                            </div>
+
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                </Columns>
+
+
+                <PagerStyle CssClass="gvPager" />
+
+            </asp:GridView>
+        </div>
+        
 
         
 
