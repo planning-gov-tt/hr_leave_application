@@ -18,11 +18,16 @@
         #tblDynamicForm td {
             text-align:left;
         }
+
+        #deleteSuccessfulMsgCancelBtn, #deleteUnsuccessfulMsgCancelBtn{
+            cursor:pointer;
+            outline:none;
+        }
     </style>
     <h1><%: Title %></h1>
-    <div style="margin: 0 auto; margin-top: 30px; width:85%;text-align:center">
+    <div style="margin: 0 auto; margin-top: 30px; width:90%;text-align:center">
         <div class="row">
-            <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="true">
+            <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="true" OnSelectedIndexChanged="DropDownList1_SelectedIndexChanged">
                 <asp:ListItem Value="-">Choose a Table</asp:ListItem>
                 <asp:ListItem Value="assignment">Assignment</asp:ListItem>
                 <asp:ListItem Value="accumulations">Accumulations</asp:ListItem>
@@ -41,9 +46,14 @@
             </asp:DropDownList>
         </div>
 
-        <asp:Panel ID="addPanel" Visible ="false" runat="server" class="row" style="margin-top:15px; background-color:#e0e0eb;">
+        <asp:Panel ID="addPanel" Visible ="false" runat="server" class="row" style="margin-top:15px; margin-bottom:25px; background-color:#e0e0eb;">
             <asp:Panel ID="headerForFormPanel" CssClass="row" runat="server" Style="margin-bottom: -20px;" >
                 <h2 id="headerForForm" runat="server"></h2>
+                <%--<div>
+                    <asp:LinkButton ID="resetForm" runat="server" CssClass="btn btn-primary">
+                        <i class="fa fa-refresh"></i>
+                    </asp:LinkButton>
+                </div>--%>
             </asp:Panel>
             <div class="row">
                 <table id="tblDynamicForm" runat="server" style="margin: 0 auto;">
@@ -128,38 +138,56 @@
                 </asp:LinkButton>
             </asp:Panel>
         </asp:Panel>
-            <div class="row" style="margin-top: 15px;">
-            <asp:UpdatePanel ID="UpdatePanel1" runat="server" Style="margin-bottom: 10px;">
-                <ContentTemplate>
-                    <asp:Panel ID="noDataPanel" runat="server" class="alert alert-info text-center" role="alert" style="display:none; margin:0 5px">
-                        <i class="fa fa-info-circle"></i>
-                        No Data available
-                    </asp:Panel>
 
-                    <asp:Panel ID="noTableSelectedPanel" runat="server" class="alert alert-info text-center" role="alert" style="display:none; margin:0 5px">
-                        <i class="fa fa-info-circle"></i>
-                        No Table selected
-                    </asp:Panel>
+        <div id="gridViewContainer" class="row">
+            <%--Search bar--%>
+            <asp:Panel ID="searchPanel" runat="server" DefaultButton="searchBtn" CssClass="input-group" Width="510px" Style="margin:0 auto; margin-bottom: 10px;" Visible="false">
+                <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" AutoPostBack="true" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
+                <div class="input-group-addon">
+                    <asp:LinkButton ID="searchBtn" runat="server" OnClick="searchBtn_Click">
+                            <span class="input-group-text" id="basic-addon2">
+                                <i class="fa fa-search"></i>
+                            </span>
+                    </asp:LinkButton>
+                </div>
+            </asp:Panel>
 
-                    <asp:Panel ID="deleteUnsuccessfulPanel" runat="server" class="alert alert-danger text-center" role="alert" style="display:none; margin:0 5px">
-                        <i class="fa fa-exclamation-triangle"></i>
-                        Delete could not be completed
-                        <asp:LinkButton ID="LinkButton2" runat="server" Style="margin-left: 11px; color:#484848;"><i class="fa fa-times-circle"></i></asp:LinkButton>
-                    </asp:Panel>
+            <asp:LinkButton ID="clearSearchBtn" runat="server" Visible="false" CssClass="btn btn-primary" OnClick="clearSearchBtn_Click">
+                <i class="fa fa-times"></i>
+                Clear Search
+            </asp:LinkButton>
 
-                    <asp:Panel ID="deleteSuccessfulPanel" runat="server" class="alert alert-success text-center" role="alert" style="display:none; margin:0 5px">
-                        <i class="fa fa-thumbs-up"></i>
-                        Delete successful
-                        <asp:LinkButton ID="LinkButton1" runat="server" Style="margin-left: 11px; color:#484848;"><i class="fa fa-times-circle"></i></asp:LinkButton>
-                    </asp:Panel>
-                </ContentTemplate>
-            </asp:UpdatePanel>
-        </div>
+            <div class="row">
+                <asp:UpdatePanel ID="UpdatePanel1" runat="server" Style="margin-bottom: 10px; margin-top:10px;">
+                    <ContentTemplate>
+                        <asp:Panel ID="noDataPanel" runat="server" class="alert alert-info text-center" role="alert" Style="display: none; margin: 0px 5px">
+                            <i class="fa fa-info-circle"></i>
+                            No Data available
+                        </asp:Panel>
 
-        <div id="gridViewContainer" class="row" style="display: inline-flex; justify-content: center;">
+                        <asp:Panel ID="noTableSelectedPanel" runat="server" class="alert alert-info text-center" role="alert" Style="display: none; margin: 0px 5px">
+                            <i class="fa fa-info-circle"></i>
+                            No Table selected
+                        </asp:Panel>
+
+                        <asp:Panel ID="deleteUnsuccessfulPanel" runat="server" class="alert alert-danger text-center" role="alert" Style="display: none; margin: 0px 5px">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            Delete could not be completed
+                            <i class="fa fa-times-circle" id="deleteUnsuccessfulMsgCancelBtn" style="margin-left: 11px; color: #484848;"></i>
+                        </asp:Panel>
+
+                        <asp:Panel ID="deleteSuccessfulPanel" runat="server" class="alert alert-success text-center" role="alert" Style="display: none; margin: 0px 5px">
+                            <i class="fa fa-thumbs-up"></i>
+                            Delete successful
+                            <i class="fa fa-times-circle" id="deleteSuccessfulMsgCancelBtn" style="margin-left: 11px; color: #484848;"></i>
+                        </asp:Panel>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+            </div>
+
             <asp:GridView ID="GridView1" runat="server"
                 AutoGenerateColumns="true"
-                AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging" Style="margin-right: 30px;" OnRowCommand="GridView1_RowCommand">
+                AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView1_PageIndexChanging"  Style="margin:0 auto;" OnRowCommand="GridView1_RowCommand">
                 <Columns>
                     <%--action buttons--%>
                     <asp:TemplateField HeaderText="Action">
@@ -196,6 +224,17 @@
 
     </div>
     
+    <script>
+        Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
 
+            $('#deleteSuccessfulMsgCancelBtn').click(function () {
+                $('#<%= deleteSuccessfulPanel.ClientID %>').hide();
+            });
+           
+            $('#deleteUnsuccessfulMsgCancelBtn').click(function () {
+                $('#<%= deleteUnsuccessfulPanel.ClientID %>').hide();
+            });
+        });
+    </script>
 
 </asp:Content>

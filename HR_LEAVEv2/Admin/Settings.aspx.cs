@@ -45,6 +45,11 @@ namespace HR_LEAVEv2.Admin
             set { ViewState["dataSource"] = value; }
         }
 
+        private String searchString
+        {
+            get { return ViewState["searchString"] != null ? ViewState["searchString"].ToString() : null; }
+            set { ViewState["searchString"] = value; }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -55,6 +60,8 @@ namespace HR_LEAVEv2.Admin
             selectedTable = DropDownList1.SelectedValue.ToString() != "-" ? DropDownList1.SelectedValue.ToString() : string.Empty;
             addPanel.Visible = !String.IsNullOrEmpty(selectedTable);
             TableMetaData = !String.IsNullOrEmpty(selectedTable) ? TableMetaData : null;
+
+            searchString = searchTxtbox.Text;
 
             clearFeedback();
             bindGridview();
@@ -70,12 +77,12 @@ namespace HR_LEAVEv2.Admin
             int startingIndex = tablesWithNoIntegerId.Contains(selectedTable) ? 0 : 1;
             
             
-            for (int i = startingIndex; i < dt.Columns.Count; i++)
+            for (int i = startingIndex; i < dt.Rows.Count; i++)
             {
                 int tdListIndex = 0;
                 HtmlGenericControl tr = new HtmlGenericControl("tr");
                 List<HtmlGenericControl> tdList = new List<HtmlGenericControl>();
-                string colName = dt.Columns[i].ColumnName;
+                string colName = dt.Rows[i].ItemArray[0].ToString();
 
                 tdList.Add(new HtmlGenericControl("td"));
                 Label lb = new Label();
@@ -163,7 +170,7 @@ namespace HR_LEAVEv2.Admin
 
                 // show create Btn
                 createBtn.Visible = true;
-
+                
             }
         }
 
@@ -175,7 +182,6 @@ namespace HR_LEAVEv2.Admin
         
         protected void bindGridview()
         {
-
             destroyForm();
 
             if (!String.IsNullOrEmpty(selectedTable))
@@ -213,45 +219,55 @@ namespace HR_LEAVEv2.Admin
                     throw ex;
                 }
 
-                try
+                if(TableData == null)
                 {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    try
                     {
-                        connection.Open();
-                        string sql = $@"
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
                             SELECT * FROM dbo.{selectedTable};
                         ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
-                        {
-                            using(SqlDataAdapter adapter = new SqlDataAdapter(command))
+                            using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                DataTable dt = new DataTable();
-                                adapter.Fill(dt);
+                                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                {
+                                    DataTable dt = new DataTable();
+                                    adapter.Fill(dt);
 
-                                TableData = dt;
-                                GridView1.DataSource = dt;
-                                GridView1.DataBind();
-                                if (dt.Rows.Count <= 0)
-                                    noDataPanel.Style.Add("display", "inline-block");
+                                    TableData = dt;
 
-                                // generate form controls 
-                                generateForm(dt);
-                                    
+                                    if (dt.Rows.Count <= 0)
+                                        noDataPanel.Style.Add("display", "inline-block");
+                                    else
+                                        searchPanel.Visible = true;
+
+                                }
                             }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        throw ex;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    //exception logic
-                    throw ex;
-                }
+
+                // generate form controls 
+                generateForm(TableMetaData);
+
+                //bind gridview
+                GridView1.DataSource = TableData;
+                GridView1.DataBind();
+
             }
             else
             {
                 GridView1.DataSource = new DataTable();
                 GridView1.DataBind();
                 noTableSelectedPanel.Style.Add("display", "inline-block");
+                searchPanel.Visible = false;
             }
                 
         }
@@ -285,7 +301,7 @@ namespace HR_LEAVEv2.Admin
             // get row index in which button was clicked
             int index = Convert.ToInt32(e.CommandArgument);
             GridViewRow row = GridView1.Rows[index];
-
+            
             if(row.RowType == DataControlRowType.DataRow)
             {
                 if(e.CommandName == "editRow")
@@ -308,7 +324,7 @@ namespace HR_LEAVEv2.Admin
                             {
                                 // use all columns in where clause for identity
                                 List<string> whereClauseComponents = new List<string>();
-                                for (int i = 1; i < row.Cells.Count; i++)
+                                for (int i = 1; i < GridView1.HeaderRow.Cells.Count; i++)
                                 {
                                     parameters.Add($"@{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
                                     whereClauseComponents.Add($"{GridView1.HeaderRow.Cells[i].Text} = @{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
@@ -346,7 +362,10 @@ namespace HR_LEAVEv2.Admin
                     else
                         deleteUnsuccessfulPanel.Style.Add("display", "inline-block");
 
-                    bindGridview();
+                    if (searchString == null)
+                        bindGridview();
+                    else
+                        searchForData(searchString);
 
                 }
             }
@@ -632,9 +651,84 @@ namespace HR_LEAVEv2.Admin
                 else
                     createUnsuccessfulPanel.Style.Add("display", "inline-block");
 
+                clearSearch();
+                TableData = null;
                 bindGridview();
             }
 
+        }
+
+        protected void searchTxtbox_TextChanged(object sender, EventArgs e)
+        {
+            searchForData(searchString);
+        }
+
+        protected void searchBtn_Click(object sender, EventArgs e)
+        {
+            searchForData(searchString);
+        }
+
+        protected void searchForData(string searchStr)
+        {
+            clearSearchBtn.Visible = true;
+            try
+            {
+                List<string> searchStringComparisonList = new List<string>();
+                for(int i = 0; i< TableMetaData.Rows.Count; i++)
+                {
+                    searchStringComparisonList.Add($"({TableMetaData.Rows[i].ItemArray[0].ToString()} LIKE @SearchString)");
+                }
+
+                string sql = $@"
+                    SELECT * FROM dbo.{selectedTable}
+                    WHERE {String.Join(" OR ", searchStringComparisonList.ToArray())};
+                ";
+               
+
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@SearchString", "%" + searchStr + "%");
+                        SqlDataAdapter ad = new SqlDataAdapter(command);
+
+                        DataTable dt = new DataTable();
+                        ad.Fill(dt);
+
+                        if (dt.Rows.Count <= 0)
+                            noDataPanel.Style.Add("display", "inline-block");
+
+                        TableData = dt;
+                        bindGridview();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        protected void clearSearch()
+        {
+            clearSearchBtn.Visible = false;
+            searchTxtbox.Text = string.Empty;
+            TableData = null;
+            searchString = null;
+        }
+
+        protected void clearSearchBtn_Click(object sender, EventArgs e)
+        {
+            clearSearch();
+            bindGridview();
+        }
+
+        protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            clearSearch();
+            TableData = null;
+            bindGridview();
         }
     }
 }
