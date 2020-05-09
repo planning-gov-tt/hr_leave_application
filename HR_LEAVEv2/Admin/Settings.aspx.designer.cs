@@ -49,6 +49,15 @@ namespace HR_LEAVEv2.Admin {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl headerForForm;
         
         /// <summary>
+        /// resetForm control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton resetForm;
+        
+        /// <summary>
         /// tblDynamicForm control.
         /// </summary>
         /// <remarks>
@@ -94,6 +103,24 @@ namespace HR_LEAVEv2.Admin {
         protected global::System.Web.UI.WebControls.Panel createUnsuccessfulPanel;
         
         /// <summary>
+        /// editSuccessfulPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel editSuccessfulPanel;
+        
+        /// <summary>
+        /// editUnsuccessfulPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel editUnsuccessfulPanel;
+        
+        /// <summary>
         /// clashingRecordsPanel control.
         /// </summary>
         /// <remarks>
@@ -110,15 +137,6 @@ namespace HR_LEAVEv2.Admin {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsPanel;
-        
-        /// <summary>
-        /// Panel2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel Panel2;
         
         /// <summary>
         /// invalidStartDateValidationMsgPanel control.

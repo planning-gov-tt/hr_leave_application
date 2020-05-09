@@ -49,11 +49,11 @@
         <asp:Panel ID="addPanel" Visible ="false" runat="server" class="row" style="margin-top:15px; margin-bottom:25px; background-color:#e0e0eb;">
             <asp:Panel ID="headerForFormPanel" CssClass="row" runat="server" Style="margin-bottom: -20px;" >
                 <h2 id="headerForForm" runat="server"></h2>
-                <%--<div>
-                    <asp:LinkButton ID="resetForm" runat="server" CssClass="btn btn-primary">
+                <div>
+                    <asp:LinkButton ID="resetForm" runat="server" CssClass="btn btn-primary" OnClick="resetForm_Click">
                         <i class="fa fa-refresh"></i>
                     </asp:LinkButton>
-                </div>--%>
+                </div>
             </asp:Panel>
             <div class="row">
                 <table id="tblDynamicForm" runat="server" style="margin: 0 auto;">
@@ -77,25 +77,31 @@
                         Insert could not be completed
                     </asp:Panel>
 
+                    <asp:Panel ID="editSuccessfulPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                        <span>Edit Successful</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="editUnsuccessfulPanel" runat="server" class="alert alert-danger text-center" role="alert" style="display:none; margin:0 5px">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        Edit could not be completed
+                    </asp:Panel>
+
                     <asp:Panel ID="clashingRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Employment record being inserted clashes with another employment record</span>
+                        <span>Employment record being inserted/edited clashes with another employment record</span>
                     </asp:Panel>
 
                     <asp:Panel ID="multipleActiveRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Employment record being inserted would result in multiple active records</span>
-                    </asp:Panel>
-
-                    <asp:Panel ID="Panel2" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Start date is not valid</span>
+                        <span>Employment record being inserted/edited would result in multiple active records</span>
                     </asp:Panel>
 
                     <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Start date is not valid</span>
                     </asp:Panel>
+
                     <asp:Panel ID="invalidExpectedEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Expected end date is not valid</span>
@@ -132,7 +138,7 @@
                     <i class="fa fa-save"></i>
                     Save
                 </asp:LinkButton>
-                <asp:LinkButton ID="EditBtn" CssClass="btn btn-primary" runat="server" Visible="false" ValidationGroup="CU_validation">
+                <asp:LinkButton ID="EditBtn" CssClass="btn btn-primary" runat="server" Visible="false" ValidationGroup="CU_validation" OnClick="EditBtn_Click">
                     <i class="fa fa-save"></i>
                     Save
                 </asp:LinkButton>

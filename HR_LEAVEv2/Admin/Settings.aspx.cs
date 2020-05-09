@@ -51,6 +51,12 @@ namespace HR_LEAVEv2.Admin
             set { ViewState["searchString"] = value; }
         }
 
+        private Dictionary<string, string> dataBeforeEdit
+        {
+            get { return ViewState["dataBeforeEdit"] != null ? ViewState["dataBeforeEdit"] as Dictionary<string, string> : null; }
+            set { ViewState["dataBeforeEdit"] = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             List<string> permissions = (List<string>)Session["permissions"];
@@ -67,16 +73,237 @@ namespace HR_LEAVEv2.Admin
             bindGridview();
         }
 
+        /* GRIDVIEW METHODS */
+
+        protected void bindGridview()
+        {
+
+            if (!String.IsNullOrEmpty(selectedTable))
+            {
+
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
+                            SELECT COL.COLUMN_NAME, 
+                                   COL.DATA_TYPE,
+                                   ISNULL(COL.CHARACTER_MAXIMUM_LENGTH, -1),
+                                   COL.IS_NULLABLE
+                            FROM INFORMATION_SCHEMA.COLUMNS COL
+                            WHERE COL.TABLE_NAME = '{selectedTable}'
+                        ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                            {
+                                DataTable dt = new DataTable();
+                                adapter.Fill(dt);
+
+                                TableMetaData = dt;
+
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    throw ex;
+                }
+
+                if (TableData == null)
+                {
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string sql = $@"
+                            SELECT * FROM dbo.{selectedTable};
+                        ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                {
+                                    DataTable dt = new DataTable();
+                                    adapter.Fill(dt);
+
+                                    TableData = dt;
+
+                                    if (dt.Rows.Count <= 0)
+                                        noDataPanel.Style.Add("display", "inline-block");
+                                    else
+                                        searchPanel.Visible = true;
+
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        throw ex;
+                    }
+                }
+
+                // must destroy and recreate form on every postback
+                destroyForm();
+                generateForm(TableMetaData);
+
+                //bind gridview
+                GridView1.DataSource = TableData;
+                GridView1.DataBind();
+
+            }
+            else
+            {
+                GridView1.DataSource = new DataTable();
+                GridView1.DataBind();
+                noTableSelectedPanel.Style.Add("display", "inline-block");
+                searchPanel.Visible = false;
+            }
+
+        }
+
+        protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+
+            GridView1.PageIndex = e.NewPageIndex;
+            bindGridview();
+        }
+
+        protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            // if unwanted command triggers this function then do nothing
+            if (e.CommandName == "Sort" || e.CommandName == "Page")
+            {
+                return;
+            }
+
+            // get row index in which button was clicked
+            int index = Convert.ToInt32(e.CommandArgument);
+            GridViewRow row = GridView1.Rows[index];
+
+            if (row.RowType == DataControlRowType.DataRow)
+            {
+                if (e.CommandName == "editRow")
+                {
+                    // get relevant data from row
+                    List<string> tablesWithNoIntegerId = new List<string>() { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
+                    int startingIndex = tablesWithNoIntegerId.Contains(selectedTable) ? 1 : 2;
+
+                    Dictionary<string, string> dataPreEdit = new Dictionary<string, string>();
+                    //store all old values
+                    for (int i = 1; i < row.Cells.Count; i++)
+                    {
+                        dataPreEdit[GridView1.HeaderRow.Cells[i].Text] = row.Cells[i].Text;
+                    }
+                    dataBeforeEdit = dataPreEdit;
+
+                    // repopulate form
+                    for (int i = startingIndex; i < row.Cells.Count; i++)
+                    {
+                        TextBox tb = ((TextBox)formPlaceholder.FindControl($"text_{GridView1.HeaderRow.Cells[i].Text}_{selectedTable}"));
+
+                        if (row.Cells[i].Text != "&nbsp;")
+                        {
+                            // check if column type is datetime
+                            if (TableMetaData.Rows[i - 1].ItemArray[1].ToString() == "datetime")
+                                tb.Text = Convert.ToDateTime(row.Cells[i].Text).ToString("d/MM/yyyy");
+                            else
+                                tb.Text = row.Cells[i].Text;
+                        }
+                        else
+                            tb.Text = string.Empty;
+
+                    }
+
+                    headerForForm.InnerText = "Edit";
+                    createBtn.Visible = false;
+                    EditBtn.Visible = true;
+                    clearValidationErrors();
+
+                }
+                else if (e.CommandName == "deleteRow")
+                {
+
+                    Boolean isDeleteSuccessful = false;
+                    try
+                    {
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+
+                            List<string> bridgeTables = new List<string>() { "assignment", "employeerole", "emptypeleavetype", "rolepermission" };
+                            List<string> parameters = new List<string>();
+
+                            string sql = $"DELETE FROM dbo.{selectedTable} WHERE ";
+                            if (bridgeTables.Contains(selectedTable))
+                            {
+                                // use all columns in where clause for identity
+                                List<string> whereClauseComponents = new List<string>();
+                                for (int i = 1; i < GridView1.HeaderRow.Cells.Count; i++)
+                                {
+                                    parameters.Add($"@{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
+                                    whereClauseComponents.Add($"{GridView1.HeaderRow.Cells[i].Text} = @{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
+                                }
+
+                                sql += $"{String.Join(" AND ", whereClauseComponents.ToArray())}";
+                            }
+                            else
+                            {
+                                parameters.Add($"@{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}");
+                                sql += $"{GridView1.HeaderRow.Cells[1].Text} = @{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}"; // use only first column to get identity
+                            }
+
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                int i = 1;
+                                foreach (string parameter in parameters)
+                                {
+                                    command.Parameters.AddWithValue(parameter, row.Cells[i].Text.ToString());
+                                    i++;
+                                }
+                                int rowsAffected = command.ExecuteNonQuery();
+                                isDeleteSuccessful = rowsAffected > 0;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception logic
+                        isDeleteSuccessful = false;
+                    }
+
+                    if (isDeleteSuccessful)
+                        deleteSuccessfulPanel.Style.Add("display", "inline-block"); //show delete success
+                    else
+                        deleteUnsuccessfulPanel.Style.Add("display", "inline-block");
+
+                    if (searchString == null || String.IsNullOrEmpty(searchString))
+                    {
+                        TableData = null;
+                        bindGridview();
+                    }
+                    else
+                        searchForData(searchString);
+
+                }
+            }
+
+        }
+        /* __________________________________________________________________________*/
+
+        /* GENERATE AND DESTROY FORM FOR CREATE AND UPDATING RECORDS */
         protected void generateForm(DataTable dt)
         {
 
-            // set header
-            headerForForm.InnerText = "Create";
-
             List<string> tablesWithNoIntegerId = new List<string>() { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
             int startingIndex = tablesWithNoIntegerId.Contains(selectedTable) ? 0 : 1;
-            
-            
+
+
             for (int i = startingIndex; i < dt.Rows.Count; i++)
             {
                 int tdListIndex = 0;
@@ -128,12 +355,12 @@ namespace HR_LEAVEv2.Admin
                     dateTypeVal.ForeColor = Color.Red;
                     //maxLengthVal.Style.Add("float", "left");
                     tdList[tdListIndex].Controls.Add(dateTypeVal);
-                }                
+                }
 
                 // if column has maximum character length
                 if (TableMetaData.Rows[i].ItemArray[2].ToString() != "-1")
                 {
-                    
+
                     RegularExpressionValidator maxLengthVal = new RegularExpressionValidator();
                     maxLengthVal.ID = $"max_length_{colName}_{selectedTable}";
                     maxLengthVal.ErrorMessage = "Exceeded max data length";
@@ -161,16 +388,29 @@ namespace HR_LEAVEv2.Admin
                     tdList[tdListIndex].Controls.Add(requiredVal);
                 }
 
-                foreach(HtmlGenericControl td in tdList)
+                foreach (HtmlGenericControl td in tdList)
                 {
                     tr.Controls.Add(td);
                 }
- 
+
                 formPlaceholder.Controls.Add(tr);
 
                 // show create Btn
-                createBtn.Visible = true;
+                if(dataBeforeEdit == null)
+                {
+                    // set header
+                    headerForForm.InnerText = "Create";
+                    createBtn.Visible = true;
+                    EditBtn.Visible = false;
+                } else
+                {
+                    // set header
+                    headerForForm.InnerText = "Edit";
+                    createBtn.Visible = false;
+                    EditBtn.Visible = true;
+                }
                 
+
             }
         }
 
@@ -178,107 +418,10 @@ namespace HR_LEAVEv2.Admin
         {
             formPlaceholder.Controls.Clear();
         }
+        /* __________________________________________________________________________*/
 
-        
-        protected void bindGridview()
-        {
-            destroyForm();
 
-            if (!String.IsNullOrEmpty(selectedTable))
-            {
-
-                try
-                {
-                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                    {
-                        connection.Open();
-                        string sql = $@"
-                            SELECT COL.COLUMN_NAME, 
-                                   COL.DATA_TYPE,
-                                   ISNULL(COL.CHARACTER_MAXIMUM_LENGTH, -1),
-                                   COL.IS_NULLABLE
-                            FROM INFORMATION_SCHEMA.COLUMNS COL
-                            WHERE COL.TABLE_NAME = '{selectedTable}'
-                        ";
-                        using (SqlCommand command = new SqlCommand(sql, connection))
-                        {
-                            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                            {
-                                DataTable dt = new DataTable();
-                                adapter.Fill(dt);
-
-                                TableMetaData = dt;
-
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //exception logic
-                    throw ex;
-                }
-
-                if(TableData == null)
-                {
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-                            string sql = $@"
-                            SELECT * FROM dbo.{selectedTable};
-                        ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                                {
-                                    DataTable dt = new DataTable();
-                                    adapter.Fill(dt);
-
-                                    TableData = dt;
-
-                                    if (dt.Rows.Count <= 0)
-                                        noDataPanel.Style.Add("display", "inline-block");
-                                    else
-                                        searchPanel.Visible = true;
-
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        throw ex;
-                    }
-                }
-
-                // generate form controls 
-                generateForm(TableMetaData);
-
-                //bind gridview
-                GridView1.DataSource = TableData;
-                GridView1.DataBind();
-
-            }
-            else
-            {
-                GridView1.DataSource = new DataTable();
-                GridView1.DataBind();
-                noTableSelectedPanel.Style.Add("display", "inline-block");
-                searchPanel.Visible = false;
-            }
-                
-        }
-
-        protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        {
-
-            GridView1.PageIndex = e.NewPageIndex;
-            bindGridview();
-        }
-
+        /* CLEAR MESSAGES FROM SCREEN*/
         protected void clearFeedback()
         {
             noDataPanel.Style.Add("display", "none");
@@ -288,88 +431,9 @@ namespace HR_LEAVEv2.Admin
 
             createSuccessfulPanel.Style.Add("display", "none");
             createUnsuccessfulPanel.Style.Add("display", "none");
-        }
 
-        protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
-        {
-            // if unwanted command triggers this function then do nothing
-            if (e.CommandName == "Sort" || e.CommandName == "Page")
-            {
-                return;
-            }
-
-            // get row index in which button was clicked
-            int index = Convert.ToInt32(e.CommandArgument);
-            GridViewRow row = GridView1.Rows[index];
-            
-            if(row.RowType == DataControlRowType.DataRow)
-            {
-                if(e.CommandName == "editRow")
-                {
-                } else if(e.CommandName == "deleteRow")
-                {
-
-                    Boolean isDeleteSuccessful = false;
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-
-                            List<string> bridgeTables = new List<string>() { "assignment", "employeerole", "emptypeleavetype", "rolepermission" };
-                            List<string> parameters = new List<string>();
-
-                            string sql = $"DELETE FROM dbo.{selectedTable} WHERE ";
-                            if (bridgeTables.Contains(selectedTable))
-                            {
-                                // use all columns in where clause for identity
-                                List<string> whereClauseComponents = new List<string>();
-                                for (int i = 1; i < GridView1.HeaderRow.Cells.Count; i++)
-                                {
-                                    parameters.Add($"@{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
-                                    whereClauseComponents.Add($"{GridView1.HeaderRow.Cells[i].Text} = @{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
-                                }
-                                    
-                                sql += $"{String.Join(" AND ", whereClauseComponents.ToArray())}";
-                            }
-                            else
-                            {
-                                parameters.Add($"@{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}");
-                                sql += $"{GridView1.HeaderRow.Cells[1].Text} = @{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}"; // use only first column to get identity
-                            }
-
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                int i = 1;
-                                foreach(string parameter in parameters)
-                                {
-                                    command.Parameters.AddWithValue(parameter, row.Cells[i].Text.ToString());
-                                    i++;
-                                }
-                                int rowsAffected = command.ExecuteNonQuery();
-                                isDeleteSuccessful = rowsAffected > 0;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        isDeleteSuccessful = false;
-                    }
-
-                    if (isDeleteSuccessful)
-                        deleteSuccessfulPanel.Style.Add("display", "inline-block"); //show delete success
-                    else
-                        deleteUnsuccessfulPanel.Style.Add("display", "inline-block");
-
-                    if (searchString == null)
-                        bindGridview();
-                    else
-                        searchForData(searchString);
-
-                }
-            }
-
+            editSuccessfulPanel.Style.Add("display", "none");
+            editUnsuccessfulPanel.Style.Add("display", "none");
         }
 
         protected void clearValidationErrors()
@@ -383,10 +447,12 @@ namespace HR_LEAVEv2.Admin
             invalidActualEndDatePanel.Style.Add("display", "none");
             actualEndDateOnWeekend.Style.Add("display", "none");
 
-            multipleActiveRecordsPanel.Style.Add("display", "none"); 
+            multipleActiveRecordsPanel.Style.Add("display", "none");
             clashingRecordsPanel.Style.Add("display", "none");
         }
+        /* __________________________________________________________________________*/
 
+        /* VALIDATION METHODS*/
         protected Boolean validateDates(string startDate, string endDate, Panel endDateInvalidPanel, Panel endDateWeekendPanel, Panel dateComparisonPanel)
         {
             DateTime start, end;
@@ -454,7 +520,7 @@ namespace HR_LEAVEv2.Admin
                 return (DateTime.Compare(util.getCurrentDate(), DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
         }
 
-        protected Boolean isRecordValid(string employeeId, string proposedStartDate, string proposedEndDate)
+        protected Boolean isRecordValid(string employeeId, string id, string proposedStartDate, string proposedEndDate)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
             // any other active records exist in order to validate the record. 
@@ -471,7 +537,7 @@ namespace HR_LEAVEv2.Admin
 
                 foreach (DataRow dr in TableData.Rows)
                 {
-                    if(dr.ItemArray[(int)empPositionColumns.employee_id].ToString() == employeeId)
+                    if (dr.ItemArray[(int)empPositionColumns.employee_id].ToString() == employeeId && dr.ItemArray[(int)empPositionColumns.record_id].ToString() != id)
                     {
                         // record being checked is active
                         // must convert start date to correct format before passing to isRecordActive
@@ -543,7 +609,7 @@ namespace HR_LEAVEv2.Admin
 
                         }
                     }
-                   
+
                 }
                 if (isProposedRecordActive)
                     numActiveRows++;
@@ -556,6 +622,83 @@ namespace HR_LEAVEv2.Admin
 
             return true;
 
+        }
+        /* __________________________________________________________________________*/
+
+        /* SEARCH METHODS*/
+        protected void searchTxtbox_TextChanged(object sender, EventArgs e)
+        {
+            searchForData(searchString);
+        }
+
+        protected void searchBtn_Click(object sender, EventArgs e)
+        {
+            searchForData(searchString);
+        }
+
+        protected void searchForData(string searchStr)
+        {
+            clearSearchBtn.Visible = true;
+            try
+            {
+                List<string> searchStringComparisonList = new List<string>();
+                for (int i = 0; i < TableMetaData.Rows.Count; i++)
+                {
+                    searchStringComparisonList.Add($"({TableMetaData.Rows[i].ItemArray[0].ToString()} LIKE @SearchString)");
+                }
+
+                string sql = $@"
+                    SELECT * FROM dbo.{selectedTable}
+                    WHERE {String.Join(" OR ", searchStringComparisonList.ToArray())};
+                ";
+
+
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@SearchString", "%" + searchStr + "%");
+                        SqlDataAdapter ad = new SqlDataAdapter(command);
+
+                        DataTable dt = new DataTable();
+                        ad.Fill(dt);
+
+                        if (dt.Rows.Count <= 0)
+                            noDataPanel.Style.Add("display", "inline-block");
+
+                        TableData = dt;
+                        bindGridview();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        protected void clearSearch()
+        {
+            clearSearchBtn.Visible = false;
+            searchTxtbox.Text = string.Empty;
+            TableData = null;
+            searchString = null;
+        }
+
+        protected void clearSearchBtn_Click(object sender, EventArgs e)
+        {
+            clearSearch();
+            dataBeforeEdit = null;
+            bindGridview();
+        }
+        /* __________________________________________________________________________*/
+
+        protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            clearSearch();
+            TableData = null;
+            bindGridview();
         }
 
         protected void createBtn_Click(object sender, EventArgs e)
@@ -589,8 +732,9 @@ namespace HR_LEAVEv2.Admin
             // validate record if employment record to ensure more than one active record is not added
             if(selectedTable == "employeeposition")
             {
+
                 // both start date and actual end date will be validated in the proper form of d/MM/yyyy
-                isNewRecordValid = isRecordValid(data["employee_id"], data["start_date"], data["actual_end_date"]);
+                isNewRecordValid = isRecordValid(data["employee_id"],"-1", data["start_date"], data["actual_end_date"]);
             }
             
 
@@ -658,77 +802,170 @@ namespace HR_LEAVEv2.Admin
 
         }
 
-        protected void searchTxtbox_TextChanged(object sender, EventArgs e)
+        protected void EditBtn_Click(object sender, EventArgs e)
         {
-            searchForData(searchString);
-        }
+            // edit record
+            clearValidationErrors();
 
-        protected void searchBtn_Click(object sender, EventArgs e)
-        {
-            searchForData(searchString);
-        }
+            // get data
+            ControlCollection t = formPlaceholder.Controls;
+            List<string> tablesWithNoIntegerId = new List<string>() { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
+            int startingIndex = tablesWithNoIntegerId.Contains(selectedTable) ? 0 : 1;
 
-        protected void searchForData(string searchStr)
-        {
-            clearSearchBtn.Visible = true;
-            try
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            for (int i = startingIndex; i < TableMetaData.Rows.Count; i++)
             {
-                List<string> searchStringComparisonList = new List<string>();
-                for(int i = 0; i< TableMetaData.Rows.Count; i++)
+                data[TableMetaData.Rows[i].ItemArray[0].ToString()] = ((TextBox)formPlaceholder.FindControl($"text_{TableMetaData.Rows[i].ItemArray[0].ToString()}_{selectedTable}")).Text;
+            }
+
+            // validate dates uf they exist in form
+            bool areDatesValid = true;
+
+            // validate start date and expected end date
+            if (data.ContainsKey("start_date") && data.ContainsKey("expected_end_date"))
+                areDatesValid = validateDates(data["start_date"], data["expected_end_date"], invalidExpectedEndDatePanel, expectedEndDateIsWeekendPanel, dateComparisonExpectedValidationMsgPanel);
+
+            // validate start date and actual end date
+            if (data.ContainsKey("start_date") && data.ContainsKey("actual_end_date"))
+                areDatesValid = areDatesValid && validateDates(data["start_date"], data["actual_end_date"], invalidActualEndDatePanel, actualEndDateOnWeekend, dateComparisonActualValidationMsgPanel);
+
+            bool isEditedRecordValid = true;
+            // validate record if employment record to ensure more than one active record is not added
+            if (selectedTable == "employeeposition")
+            {
+                // both start date and actual end date will be validated in the proper form of d/MM/yyyy
+                isEditedRecordValid = isRecordValid(data["employee_id"], dataBeforeEdit["id"], data["start_date"], data["actual_end_date"]);
+            }
+
+            if (areDatesValid && isEditedRecordValid && dataBeforeEdit != null)
+            {
+                Boolean isEditSuccessful = false;
+                List<string> setClauseList = new List<string>(),
+                             whereClauseList = new List<string>();
+
+                Dictionary<string, string> parameterList = new Dictionary<string, string>();
+                Dictionary<string, string> whereClauseParameterList = new Dictionary<string, string>();
+
+                // populate set clause list
+                foreach (string key in data.Keys)
                 {
-                    searchStringComparisonList.Add($"({TableMetaData.Rows[i].ItemArray[0].ToString()} LIKE @SearchString)");
+                    parameterList[key] = $"@{key.Replace("_", string.Empty)}";
+                    setClauseList.Add($"{key} = {parameterList[key]}");
                 }
 
-                string sql = $@"
-                    SELECT * FROM dbo.{selectedTable}
-                    WHERE {String.Join(" OR ", searchStringComparisonList.ToArray())};
-                ";
-               
-
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                // populate where clause list with all relevant fields. Bridge entities must contain all fields in the where clause
+                // other tables can just use the first column (id column)
+                if((new[] {"rolepermission", "employeerole", "assignment" }).Contains<string>(selectedTable))
                 {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    foreach (string key in dataBeforeEdit.Keys)
                     {
-                        command.Parameters.AddWithValue("@SearchString", "%" + searchStr + "%");
-                        SqlDataAdapter ad = new SqlDataAdapter(command);
+                        whereClauseParameterList[key] = $"@previousData_{key.Replace("_", string.Empty)}";
+                        whereClauseList.Add($"{key} = {whereClauseParameterList[key]}");
+                    }
+                } else
+                {
+                    
+                    whereClauseParameterList[dataBeforeEdit.Keys.First()] = $"@previousData_{dataBeforeEdit.Keys.First().Replace("_", string.Empty)}";
+                    whereClauseList.Add($"{dataBeforeEdit.Keys.First()} = {whereClauseParameterList[dataBeforeEdit.Keys.First()]}");
+                }    
 
-                        DataTable dt = new DataTable();
-                        ad.Fill(dt);
+                // edit in db
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
+                            UPDATE dbo.{selectedTable}
+                            SET {String.Join(", ", setClauseList.ToArray())}
+                            WHERE {String.Join(" AND ", whereClauseList.ToArray())}
+                        ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            int i = startingIndex;
+                            foreach (string key in data.Keys)
+                            {
+                                if (!String.IsNullOrEmpty(data[key]))
+                                {
+                                    // convert to proper type
+                                    if (TableMetaData.Rows[i].ItemArray[0].ToString() == key)
+                                    {
+                                        if (TableMetaData.Rows[i].ItemArray[1].ToString() == "datetime")
+                                            command.Parameters.AddWithValue(parameterList[key], DateTime.ParseExact(data[key], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture));
+                                        else
+                                            command.Parameters.AddWithValue(parameterList[key], data[key]);
+                                    }
+                                }
+                                else
+                                    command.Parameters.AddWithValue(parameterList[key], DBNull.Value);
 
-                        if (dt.Rows.Count <= 0)
-                            noDataPanel.Style.Add("display", "inline-block");
+                                i++;
+                            }
 
-                        TableData = dt;
-                        bindGridview();
+                            // set data for parameters
+                            i = 0;
+                            foreach(string key in whereClauseParameterList.Keys)
+                            {
+                                if (!String.IsNullOrEmpty(dataBeforeEdit[key]) && dataBeforeEdit[key] != "&nbsp;")
+                                {
+                                    // convert to proper type
+                                    if (TableMetaData.Rows[i].ItemArray[0].ToString() == key)
+                                    {
+                                        if (TableMetaData.Rows[i].ItemArray[1].ToString() == "datetime")
+                                            command.Parameters.AddWithValue(whereClauseParameterList[key], Convert.ToDateTime(dataBeforeEdit[key]));
+                                        else
+                                            command.Parameters.AddWithValue(whereClauseParameterList[key], dataBeforeEdit[key]);
+                                    }
+                                }
+                                else
+                                    command.Parameters.AddWithValue(whereClauseParameterList[key], DBNull.Value);
+
+                                i++;
+                            }
+                            int rowsAffected = command.ExecuteNonQuery();
+                            isEditSuccessful = rowsAffected > 0;
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    isEditSuccessful = false;
+                }
+
+                if (isEditSuccessful)
+                    editSuccessfulPanel.Style.Add("display", "inline-block");
+                else
+                    editUnsuccessfulPanel.Style.Add("display", "inline-block");
+
+                dataBeforeEdit = null;
+                if (searchString == null || String.IsNullOrEmpty(searchString))
+                {
+                    TableData = null;
+                    bindGridview();
+                }
+                else
+                    searchForData(searchString);
             }
-            catch (Exception ex)
+        }
+
+        protected void resetForm_Click(object sender, EventArgs e)
+        {
+            clearValidationErrors();
+            clearFeedback();
+
+            dataBeforeEdit = null;
+            destroyForm();
+            if (TableMetaData != null)
+                generateForm(TableMetaData);
+            else
             {
-                throw ex;
+                if (searchString != null)
+                    searchForData(searchString);
+                else
+                    bindGridview();
             }
-        }
-
-        protected void clearSearch()
-        {
-            clearSearchBtn.Visible = false;
-            searchTxtbox.Text = string.Empty;
-            TableData = null;
-            searchString = null;
-        }
-
-        protected void clearSearchBtn_Click(object sender, EventArgs e)
-        {
-            clearSearch();
-            bindGridview();
-        }
-
-        protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            clearSearch();
-            TableData = null;
-            bindGridview();
+                
         }
     }
 }
