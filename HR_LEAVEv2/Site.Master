@@ -227,6 +227,18 @@
                         </a>
                     </li>
 
+                    <%--Panel with Admin links--%>
+                    <asp:Panel ID="adminPanel" runat="server">
+
+                        <li>
+                            <a href="<%= ResolveClientUrl("~/Admin/Settings.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Admin">
+                                <i class="fa fa-cogs navbar-link-icon"></i>
+                                <span class="navbar-link-text">Admin Settings</span>
+                            </a>
+                        </li>
+
+                    </asp:Panel>
+
                 </ul>
 
             </nav>

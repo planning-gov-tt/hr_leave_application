@@ -134,19 +134,30 @@ namespace HR_LEAVEv2
                 if (permissions.Contains("sup_permissions"))
                 {
                     supervisorPanel.Style.Add("display", "block");
-                }
+                } else
+                    supervisorPanel.Style.Add("display", "none");
 
                 // HR 1 or HR 2
                 if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
                 {
                     hr1_hr2Panel.Style.Add("display", "block");
-                }
+                } else
+                    hr1_hr2Panel.Style.Add("display", "none");
 
                 // HR 3
                 if (permissions.Contains("hr3_permissions"))
                 {
                     hr3Panel.Style.Add("display", "block");
-                }
+                } else
+                    hr3Panel.Style.Add("display", "none");
+
+                // Admin
+                if (permissions.Contains("admin_permissions"))
+                {
+                    adminPanel.Style.Add("display", "block");
+                } else
+                    adminPanel.Style.Add("display", "none");
+
             }
 
             // load drop down list

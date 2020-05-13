@@ -163,6 +163,11 @@ body {
 #hr3Panel{
     display:none;
 }
+
+#adminPanel{
+    display: none;
+}
+
 /*end style role panels*/
 
 /* remove outline from all active links*/

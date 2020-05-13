@@ -63,13 +63,14 @@ namespace HR_LEAVEv2
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
 
             // find the user
-            UserPrincipal user = UserPrincipal.FindByIdentity(ctx, HttpContext.Current.Request.LogonUserIdentity.Name);
-
+            UserPrincipal user = UserPrincipal.FindByIdentity(ctx, HttpContext.Current.Request.LogonUserIdentity.Name.ToString());
             if (user != null)
             {
                 return user.EmailAddress;
             }
             return null;
+
+            //return "Tristan.Sankar@planning.gov.tt";
         }
 
         public string getUserEmployeeId(string email)
