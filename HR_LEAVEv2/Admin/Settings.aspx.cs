@@ -78,9 +78,12 @@ namespace HR_LEAVEv2.Admin
         protected void bindGridview()
         {
 
+            // once a table is selected then bind data to gridview
             if (!String.IsNullOrEmpty(selectedTable))
             {
 
+                // get data about the table's columns like data type, maximum length(if applicable) and whether it is nullable
+                // this data is then used in generating the form used to create and update data
                 try
                 {
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -113,6 +116,7 @@ namespace HR_LEAVEv2.Admin
                     throw ex;
                 }
 
+                // get data from db for the selected table and bid
                 if (TableData == null)
                 {
                     try
@@ -190,17 +194,19 @@ namespace HR_LEAVEv2.Admin
             {
                 if (e.CommandName == "editRow")
                 {
-                    // get relevant data from row
-                    List<string> tablesWithNoIntegerId = new List<string>() { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
-                    int startingIndex = tablesWithNoIntegerId.Contains(selectedTable) ? 1 : 2;
-
-                    Dictionary<string, string> dataPreEdit = new Dictionary<string, string>();
+                    Dictionary<string, string> previousData = new Dictionary<string, string>();
                     //store all old values
                     for (int i = 1; i < row.Cells.Count; i++)
                     {
-                        dataPreEdit[GridView1.HeaderRow.Cells[i].Text] = row.Cells[i].Text;
+                        previousData[GridView1.HeaderRow.Cells[i].Text] = row.Cells[i].Text;
                     }
-                    dataBeforeEdit = dataPreEdit;
+                    dataBeforeEdit = previousData;
+
+                    /* get relevant data from row by determining whether the selected table has an integer id or not. this is relevant since 
+                    *  if the table does not have an integer id then the data will start at the index 2 since index 1 will be the integer id. The id
+                    *  is not needed since id is not edited. Tables without an integer id can start from index 1
+                    */
+                    int startingIndex = (new string[] { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" }.Contains(selectedTable)) ? 1 : 2;
 
                     // repopulate form
                     for (int i = startingIndex; i < row.Cells.Count; i++)
@@ -209,7 +215,7 @@ namespace HR_LEAVEv2.Admin
 
                         if (row.Cells[i].Text != "&nbsp;")
                         {
-                            // check if column type is datetime
+                            // check if column type is datetime and convert data to proper format
                             if (TableMetaData.Rows[i - 1].ItemArray[1].ToString() == "datetime")
                                 tb.Text = Convert.ToDateTime(row.Cells[i].Text).ToString("d/MM/yyyy");
                             else
@@ -220,6 +226,7 @@ namespace HR_LEAVEv2.Admin
 
                     }
 
+                    // setup form for edit mode
                     headerForForm.InnerText = "Edit";
                     createBtn.Visible = false;
                     EditBtn.Visible = true;
@@ -236,10 +243,16 @@ namespace HR_LEAVEv2.Admin
                         {
                             connection.Open();
 
-                            List<string> bridgeTables = new List<string>() { "assignment", "employeerole", "emptypeleavetype", "rolepermission" };
+                            string[] bridgeTables = new string[] { "assignment", "employeerole", "emptypeleavetype", "rolepermission" };
+
+                            /* used to construct the where clause based on whether the table being deleted is a bridge entity or not. Bridge entities
+                               require all their elements to be included in the where to determine identity for the delete. Other tables, however,
+                               only require the first element which is their primary key since only the bridge entities have a composite primary key
+                            */
                             List<string> parameters = new List<string>();
 
                             string sql = $"DELETE FROM dbo.{selectedTable} WHERE ";
+
                             if (bridgeTables.Contains(selectedTable))
                             {
                                 // use all columns in where clause for identity
@@ -254,17 +267,22 @@ namespace HR_LEAVEv2.Admin
                             }
                             else
                             {
+                                // use only the first column in where clause. This column is the primary key of the table.
                                 parameters.Add($"@{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}");
                                 sql += $"{GridView1.HeaderRow.Cells[1].Text} = @{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}"; // use only first column to get identity
                             }
 
                             using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                int i = 1;
+                                /*
+                                    starts with 1 because all parameters added start at the first column but depending on whether the selected table
+                                    is a bridge entity or not, may or may not include data past just the first column.
+                                */
+                                int cellIndex = 1;
                                 foreach (string parameter in parameters)
                                 {
-                                    command.Parameters.AddWithValue(parameter, row.Cells[i].Text.ToString());
-                                    i++;
+                                    command.Parameters.AddWithValue(parameter, row.Cells[cellIndex].Text.ToString());
+                                    cellIndex++;
                                 }
                                 int rowsAffected = command.ExecuteNonQuery();
                                 isDeleteSuccessful = rowsAffected > 0;
@@ -277,18 +295,20 @@ namespace HR_LEAVEv2.Admin
                         isDeleteSuccessful = false;
                     }
 
+
                     if (isDeleteSuccessful)
                         deleteSuccessfulPanel.Style.Add("display", "inline-block"); //show delete success
                     else
-                        deleteUnsuccessfulPanel.Style.Add("display", "inline-block");
+                        deleteUnsuccessfulPanel.Style.Add("display", "inline-block"); // show delete failure
 
+                    // rebind gridview based on whether search string is present and valid
                     if (searchString == null || String.IsNullOrEmpty(searchString))
                     {
-                        TableData = null;
+                        TableData = null; // null TableData reloads gridview from db
                         bindGridview();
                     }
                     else
-                        searchForData(searchString);
+                        searchForData(searchString); // reloads data from db based on search string
 
                 }
             }
@@ -300,16 +320,23 @@ namespace HR_LEAVEv2.Admin
         protected void generateForm(DataTable dt)
         {
 
-            List<string> tablesWithNoIntegerId = new List<string>() { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
+            string[] tablesWithNoIntegerId = new string[] { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
             int startingIndex = tablesWithNoIntegerId.Contains(selectedTable) ? 0 : 1;
 
 
-            for (int i = startingIndex; i < dt.Rows.Count; i++)
+            for (int rowIndex = startingIndex; rowIndex < dt.Rows.Count; rowIndex++)
             {
+                // used to get index of latest td in list
                 int tdListIndex = 0;
+
+                // row where all td's are added
                 HtmlGenericControl tr = new HtmlGenericControl("tr");
+                
+                // list of td's to add to row
                 List<HtmlGenericControl> tdList = new List<HtmlGenericControl>();
-                string colName = dt.Rows[i].ItemArray[0].ToString();
+
+                // used for generating id names and showing name of column 
+                string colName = dt.Rows[rowIndex].ItemArray[0].ToString();
 
                 tdList.Add(new HtmlGenericControl("td"));
                 Label lb = new Label();
@@ -329,8 +356,8 @@ namespace HR_LEAVEv2.Admin
 
                 tdList.Add(new HtmlGenericControl("td"));
 
-                // ensure data being input is correct type
-                if (TableMetaData.Rows[i].ItemArray[1].ToString() == "int")
+                // ensure data being input is correct type by adding the appropriate regex validator
+                if (TableMetaData.Rows[rowIndex].ItemArray[1].ToString() == "int")
                 {
                     RegularExpressionValidator intTypeVal = new RegularExpressionValidator();
                     intTypeVal.ID = $"int_val_{colName}_{selectedTable}";
@@ -340,10 +367,9 @@ namespace HR_LEAVEv2.Admin
                     intTypeVal.ControlToValidate = $"text_{colName}_{selectedTable}";
                     intTypeVal.Display = ValidatorDisplay.Dynamic;
                     intTypeVal.ForeColor = Color.Red;
-                    //maxLengthVal.Style.Add("float", "left");
                     tdList[tdListIndex].Controls.Add(intTypeVal);
                 }
-                if (TableMetaData.Rows[i].ItemArray[1].ToString() == "datetime" || colName.Contains("date"))
+                if (TableMetaData.Rows[rowIndex].ItemArray[1].ToString() == "datetime" || colName.Contains("date"))
                 {
                     RegularExpressionValidator dateTypeVal = new RegularExpressionValidator();
                     dateTypeVal.ID = $"date_val_{colName}_{selectedTable}";
@@ -353,33 +379,30 @@ namespace HR_LEAVEv2.Admin
                     dateTypeVal.ControlToValidate = $"text_{colName}_{selectedTable}";
                     dateTypeVal.Display = ValidatorDisplay.Dynamic;
                     dateTypeVal.ForeColor = Color.Red;
-                    //maxLengthVal.Style.Add("float", "left");
                     tdList[tdListIndex].Controls.Add(dateTypeVal);
                 }
 
-                // if column has maximum character length
-                if (TableMetaData.Rows[i].ItemArray[2].ToString() != "-1")
+                // if column has a maximum character length then add regex validator
+                if (TableMetaData.Rows[rowIndex].ItemArray[2].ToString() != "-1")
                 {
 
                     RegularExpressionValidator maxLengthVal = new RegularExpressionValidator();
                     maxLengthVal.ID = $"max_length_{colName}_{selectedTable}";
                     maxLengthVal.ErrorMessage = "Exceeded max data length";
-                    maxLengthVal.ValidationExpression = $"^[\\s\\S]{{0,{TableMetaData.Rows[i].ItemArray[2].ToString()}}}$";
+                    maxLengthVal.ValidationExpression = $"^[\\s\\S]{{0,{TableMetaData.Rows[rowIndex].ItemArray[2].ToString()}}}$";
                     maxLengthVal.ValidationGroup = "CU_validation";
                     maxLengthVal.ControlToValidate = $"text_{colName}_{selectedTable}";
                     maxLengthVal.Display = ValidatorDisplay.Dynamic;
                     maxLengthVal.ForeColor = Color.Red;
-                    //maxLengthVal.Style.Add("float", "left");
                     tdList[tdListIndex].Controls.Add(maxLengthVal);
                 }
 
-                // if column is nullable
-                if (TableMetaData.Rows[i].ItemArray[3].ToString() == "NO")
+                // if column is not nullable then add required field validator
+                if (TableMetaData.Rows[rowIndex].ItemArray[3].ToString() == "NO")
                 {
                     tdList.Add(new HtmlGenericControl("td"));
                     RequiredFieldValidator requiredVal = new RequiredFieldValidator();
                     requiredVal.ID = $"required_{colName}_{selectedTable}";
-                    //requiredVal.Style.Add("float", "left");
                     requiredVal.ErrorMessage = "Required";
                     requiredVal.ValidationGroup = "CU_validation";
                     requiredVal.ControlToValidate = $"text_{colName}_{selectedTable}";
@@ -388,11 +411,13 @@ namespace HR_LEAVEv2.Admin
                     tdList[tdListIndex].Controls.Add(requiredVal);
                 }
 
+                // add td's to tr
                 foreach (HtmlGenericControl td in tdList)
                 {
                     tr.Controls.Add(td);
                 }
 
+                // add tr to form placeholder
                 formPlaceholder.Controls.Add(tr);
 
                 // show create Btn
@@ -522,19 +547,20 @@ namespace HR_LEAVEv2.Admin
 
         protected Boolean isRecordValid(string employeeId, string id, string proposedStartDate, string proposedEndDate)
         {
-            // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
-            // any other active records exist in order to validate the record. 
+            // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing employment position records. 
+            // This method checks the other records to see if any other active records exist in order to validate the record. 
 
             if (TableData != null)
             {
                 int numActiveRows = 0;
 
-                // state of passed end date and corresponding record
+                // state of proposed record
                 bool isProposedRecordActive = isRecordActive(proposedStartDate, proposedEndDate);
 
                 DateTime proposedSD = DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
                         proposedAED = !String.IsNullOrEmpty(proposedEndDate) ? DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
 
+                // check all rows in employeeposition except the row with the id passed as a parameter to this method
                 foreach (DataRow dr in TableData.Rows)
                 {
                     if (dr.ItemArray[(int)empPositionColumns.employee_id].ToString() == employeeId && dr.ItemArray[(int)empPositionColumns.record_id].ToString() != id)
@@ -545,16 +571,16 @@ namespace HR_LEAVEv2.Admin
                             numActiveRows++;
 
 
-                        DateTime startDate = (DateTime)dr[(int)empPositionColumns.start_date];
+                        DateTime tableDataRowStartDate = (DateTime)dr[(int)empPositionColumns.start_date];
 
-                        DateTime endDate = !String.IsNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? DateTime.ParseExact(dr[(int)empPositionColumns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
+                        DateTime tableDataRowEndDate = !String.IsNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? DateTime.ParseExact(dr[(int)empPositionColumns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
 
                         // ensure that record does not overlap with another record
                         bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
 
 
-                        // if record being checked has an end date
-                        if (endDate != DateTime.MinValue)
+                        // if record from employeeposition being checked has an end date
+                        if (tableDataRowEndDate != DateTime.MinValue)
                         {
 
                             bool isRowStartDateInProposedPeriod = false, isRowEndDateinProposedPeriod = false;
@@ -562,18 +588,16 @@ namespace HR_LEAVEv2.Admin
                             if (proposedAED != DateTime.MinValue)
                             {
                                 // check if period represented by proposed start date to proposed end date coincides with the given data row's period
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, startDate) >= 0 && DateTime.Compare(proposedSD, endDate) <= 0;
-                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, startDate) >= 0 && DateTime.Compare(proposedAED, endDate) <= 0;
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowStartDate) >= 0 && DateTime.Compare(proposedSD, tableDataRowEndDate) <= 0;
+                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, tableDataRowStartDate) >= 0 && DateTime.Compare(proposedAED, tableDataRowEndDate) <= 0;
 
-                                isRowStartDateInProposedPeriod = DateTime.Compare(startDate, proposedSD) >= 0 && DateTime.Compare(startDate, proposedAED) <= 0;
-                                isRowEndDateinProposedPeriod = DateTime.Compare(endDate, proposedSD) >= 0 && DateTime.Compare(endDate, proposedAED) <= 0;
+                                isRowStartDateInProposedPeriod = DateTime.Compare(tableDataRowStartDate, proposedSD) >= 0 && DateTime.Compare(tableDataRowStartDate, proposedAED) <= 0;
+                                isRowEndDateinProposedPeriod = DateTime.Compare(tableDataRowEndDate, proposedSD) >= 0 && DateTime.Compare(tableDataRowEndDate, proposedAED) <= 0;
 
                             }
                             // proposed actual end date is empty- proposed record is active
                             else
-                            {
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, endDate) <= 0 || DateTime.Compare(proposedSD, startDate) <= 0;
-                            }
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowEndDate) <= 0 || DateTime.Compare(proposedSD, tableDataRowStartDate) <= 0;
 
                             if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
                             {
@@ -589,8 +613,8 @@ namespace HR_LEAVEv2.Admin
                             if (proposedAED != DateTime.MinValue)
                             {
                                 // check if period represented by proposed start date is in active record's period
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, startDate) >= 0;
-                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, startDate) >= 0;
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowStartDate) >= 0;
+                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, tableDataRowStartDate) >= 0;
                             }
                             // proposed actual end date is empty - proposed record is active
                             else
@@ -668,6 +692,7 @@ namespace HR_LEAVEv2.Admin
                             noDataPanel.Style.Add("display", "inline-block");
 
                         TableData = dt;
+                        dataBeforeEdit = null;
                         bindGridview();
                     }
                 }
@@ -697,8 +722,28 @@ namespace HR_LEAVEv2.Admin
         protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
         {
             clearSearch();
+            dataBeforeEdit = null;
             TableData = null;
             bindGridview();
+        }
+
+        protected void resetForm_Click(object sender, EventArgs e)
+        {
+            clearValidationErrors();
+            clearFeedback();
+
+            dataBeforeEdit = null;
+            destroyForm();
+            if (TableMetaData != null)
+                generateForm(TableMetaData);
+            else
+            {
+                if (searchString != null || String.IsNullOrEmpty(searchString))
+                    searchForData(searchString);
+                else
+                    bindGridview();
+            }
+
         }
 
         protected void createBtn_Click(object sender, EventArgs e)
@@ -709,15 +754,16 @@ namespace HR_LEAVEv2.Admin
 
             // get data
             ControlCollection t=  formPlaceholder.Controls;
-            List<string> tablesWithNoIntegerId = new List<string>() { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
+            string[] tablesWithNoIntegerId = new string[] { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
             int startingIndex = tablesWithNoIntegerId.Contains(selectedTable) ? 0 : 1;
 
+            // data will be in form: {<column name>: <data to be edited>}
             Dictionary<string, string> data = new Dictionary<string, string>();
             for (int i = startingIndex; i < TableMetaData.Rows.Count; i++){
                 data[TableMetaData.Rows[i].ItemArray[0].ToString()] = ((TextBox)formPlaceholder.FindControl($"text_{TableMetaData.Rows[i].ItemArray[0].ToString()}_{selectedTable}")).Text;
             }
 
-            // validate dates uf they exist in form
+            // validate dates if they exist in form
             bool areDatesValid = true;
 
             // validate start date and expected end date
@@ -729,20 +775,19 @@ namespace HR_LEAVEv2.Admin
                 areDatesValid = areDatesValid && validateDates(data["start_date"], data["actual_end_date"], invalidActualEndDatePanel, actualEndDateOnWeekend, dateComparisonActualValidationMsgPanel);
 
             bool isNewRecordValid = true;
-            // validate record if employment record to ensure more than one active record is not added
-            if(selectedTable == "employeeposition")
-            {
 
-                // both start date and actual end date will be validated in the proper form of d/MM/yyyy
+            // validate record if employment record to ensure more than one active record is not added
+            // both start date and actual end date will already be validated in the proper form of d/MM/yyyy
+            if (selectedTable == "employeeposition")
                 isNewRecordValid = isRecordValid(data["employee_id"],"-1", data["start_date"], data["actual_end_date"]);
-            }
             
 
             if (areDatesValid && isNewRecordValid)
             {
                 Boolean isInsertSuccessful = false;
-                Dictionary<string, string> parameterNames = new Dictionary<string, string>();
 
+                // parameterize data
+                Dictionary<string, string> parameterNames = new Dictionary<string, string>();
                 foreach(string key in data.Keys)
                 {
                     parameterNames[key] = $"@{key.Replace("_", string.Empty)}";
@@ -760,15 +805,15 @@ namespace HR_LEAVEv2.Admin
                         ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            int i = startingIndex;
+                            int rowIndex = startingIndex;
                             foreach(string key in data.Keys)
                             {
                                 if (!String.IsNullOrEmpty(data[key]))
                                 {
                                     // convert to proper type
-                                    if(TableMetaData.Rows[i].ItemArray[0].ToString() == key)
+                                    if(TableMetaData.Rows[rowIndex].ItemArray[0].ToString() == key)
                                     {
-                                        if(TableMetaData.Rows[i].ItemArray[1].ToString() == "datetime")
+                                        if(TableMetaData.Rows[rowIndex].ItemArray[1].ToString() == "datetime")
                                             command.Parameters.AddWithValue(parameterNames[key], DateTime.ParseExact(data[key], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture));
                                         else
                                             command.Parameters.AddWithValue(parameterNames[key], data[key]);
@@ -777,7 +822,7 @@ namespace HR_LEAVEv2.Admin
                                 else
                                     command.Parameters.AddWithValue(parameterNames[key], DBNull.Value);
 
-                                i++;
+                                rowIndex++;
                             }
                             int rowsAffected = command.ExecuteNonQuery();
                             isInsertSuccessful = rowsAffected > 0;
@@ -809,14 +854,13 @@ namespace HR_LEAVEv2.Admin
 
             // get data
             ControlCollection t = formPlaceholder.Controls;
-            List<string> tablesWithNoIntegerId = new List<string>() { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
+
+            string[] tablesWithNoIntegerId = new string[] { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" };
             int startingIndex = tablesWithNoIntegerId.Contains(selectedTable) ? 0 : 1;
 
             Dictionary<string, string> data = new Dictionary<string, string>();
             for (int i = startingIndex; i < TableMetaData.Rows.Count; i++)
-            {
                 data[TableMetaData.Rows[i].ItemArray[0].ToString()] = ((TextBox)formPlaceholder.FindControl($"text_{TableMetaData.Rows[i].ItemArray[0].ToString()}_{selectedTable}")).Text;
-            }
 
             // validate dates uf they exist in form
             bool areDatesValid = true;
@@ -831,11 +875,9 @@ namespace HR_LEAVEv2.Admin
 
             bool isEditedRecordValid = true;
             // validate record if employment record to ensure more than one active record is not added
+            // both start date and actual end date will be validated in the proper form of d/MM/yyyy
             if (selectedTable == "employeeposition")
-            {
-                // both start date and actual end date will be validated in the proper form of d/MM/yyyy
                 isEditedRecordValid = isRecordValid(data["employee_id"], dataBeforeEdit["id"], data["start_date"], data["actual_end_date"]);
-            }
 
             if (areDatesValid && isEditedRecordValid && dataBeforeEdit != null)
             {
@@ -855,7 +897,7 @@ namespace HR_LEAVEv2.Admin
 
                 // populate where clause list with all relevant fields. Bridge entities must contain all fields in the where clause
                 // other tables can just use the first column (id column)
-                if((new[] {"rolepermission", "employeerole", "assignment" }).Contains<string>(selectedTable))
+                if((new string[] {"rolepermission", "employeerole", "assignment" }).Contains<string>(selectedTable))
                 {
                     foreach (string key in dataBeforeEdit.Keys)
                     {
@@ -864,7 +906,6 @@ namespace HR_LEAVEv2.Admin
                     }
                 } else
                 {
-                    
                     whereClauseParameterList[dataBeforeEdit.Keys.First()] = $"@previousData_{dataBeforeEdit.Keys.First().Replace("_", string.Empty)}";
                     whereClauseList.Add($"{dataBeforeEdit.Keys.First()} = {whereClauseParameterList[dataBeforeEdit.Keys.First()]}");
                 }    
@@ -882,15 +923,16 @@ namespace HR_LEAVEv2.Admin
                         ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            int i = startingIndex;
+                            // set data from starting column only, which changes depending on whether selectedTable has an integer PK or not
+                            int rowIndex = startingIndex;
                             foreach (string key in data.Keys)
                             {
                                 if (!String.IsNullOrEmpty(data[key]))
                                 {
                                     // convert to proper type
-                                    if (TableMetaData.Rows[i].ItemArray[0].ToString() == key)
+                                    if (TableMetaData.Rows[rowIndex].ItemArray[0].ToString() == key)
                                     {
-                                        if (TableMetaData.Rows[i].ItemArray[1].ToString() == "datetime")
+                                        if (TableMetaData.Rows[rowIndex].ItemArray[1].ToString() == "datetime")
                                             command.Parameters.AddWithValue(parameterList[key], DateTime.ParseExact(data[key], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture));
                                         else
                                             command.Parameters.AddWithValue(parameterList[key], data[key]);
@@ -899,19 +941,19 @@ namespace HR_LEAVEv2.Admin
                                 else
                                     command.Parameters.AddWithValue(parameterList[key], DBNull.Value);
 
-                                i++;
+                                rowIndex++;
                             }
 
                             // set data for parameters
-                            i = 0;
+                            rowIndex = 0; // set to 0 since this will include the id column
                             foreach(string key in whereClauseParameterList.Keys)
                             {
                                 if (!String.IsNullOrEmpty(dataBeforeEdit[key]) && dataBeforeEdit[key] != "&nbsp;")
                                 {
                                     // convert to proper type
-                                    if (TableMetaData.Rows[i].ItemArray[0].ToString() == key)
+                                    if (TableMetaData.Rows[rowIndex].ItemArray[0].ToString() == key)
                                     {
-                                        if (TableMetaData.Rows[i].ItemArray[1].ToString() == "datetime")
+                                        if (TableMetaData.Rows[rowIndex].ItemArray[1].ToString() == "datetime")
                                             command.Parameters.AddWithValue(whereClauseParameterList[key], Convert.ToDateTime(dataBeforeEdit[key]));
                                         else
                                             command.Parameters.AddWithValue(whereClauseParameterList[key], dataBeforeEdit[key]);
@@ -920,7 +962,7 @@ namespace HR_LEAVEv2.Admin
                                 else
                                     command.Parameters.AddWithValue(whereClauseParameterList[key], DBNull.Value);
 
-                                i++;
+                                rowIndex++;
                             }
                             int rowsAffected = command.ExecuteNonQuery();
                             isEditSuccessful = rowsAffected > 0;
@@ -949,23 +991,6 @@ namespace HR_LEAVEv2.Admin
             }
         }
 
-        protected void resetForm_Click(object sender, EventArgs e)
-        {
-            clearValidationErrors();
-            clearFeedback();
-
-            dataBeforeEdit = null;
-            destroyForm();
-            if (TableMetaData != null)
-                generateForm(TableMetaData);
-            else
-            {
-                if (searchString != null)
-                    searchForData(searchString);
-                else
-                    bindGridview();
-            }
-                
-        }
+        
     }
 }
