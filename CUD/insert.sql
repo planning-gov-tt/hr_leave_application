@@ -15,6 +15,7 @@ INSERT INTO [dbo].[permission] ([permission_id]) VALUES
 ('approve_vacation'),
 ('contract_permissions'),
 ('public_officer_permissions'),
+('admin_permissions'),
 ('assign_role');
 
 
@@ -25,7 +26,8 @@ INSERT INTO [dbo].[role] ([role_id]) VALUES
 ('hr2'),
 ('hr1'),
 ('hr_contract'),
-('hr_public_officer');
+('hr_public_officer'),
+('admin');
 
 
 INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
@@ -58,7 +60,9 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 
 ('hr_contract', 'contract_permissions'),
 
-('hr_public_officer', 'public_officer_permissions');
+('hr_public_officer', 'public_officer_permissions'),
+('admin', 'admin_permissions')
+;
 
 
 INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [paternity], [pre_retirement]) VALUES 
@@ -107,6 +111,7 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 -- IT
 -- Tristan Sankar
 ('1', 'emp'),
+('1', 'admin'),
 --Clint Ramoutar
 ('115245', 'emp'),
 ('115245', 'sup'),
