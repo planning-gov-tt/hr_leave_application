@@ -5,14 +5,17 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Services;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.Supervisor
 {
     public partial class MyEmployees : System.Web.UI.Page
     {
+        Util util = new Util();
         class EmpDetails
         {
             public string emp_id { get; set; }
@@ -283,5 +286,149 @@ namespace HR_LEAVEv2.Supervisor
             string empEmail = lb.Attributes["empEmail"].ToString();
             Response.Redirect($"~/Supervisor/MyEmployeeLeaveApplications?empEmail={empEmail}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
         }
+
+        protected void clearSubmitAlertValidationErrors()
+        {
+            invalidStartDatePanel.Style.Add("display", "none");
+            startDateIsWeekendPanel.Style.Add("display", "none");
+            invalidEndDatePanel.Style.Add("display", "none");
+            endDateIsWeekendPanel.Style.Add("display", "none");
+            dateComparisonPanel.Style.Add("display", "none");
+            successfulAlert.Style.Add("display", "none");
+            unsuccessfulAlert.Style.Add("display", "none");
+        }
+
+        protected Boolean validateDates(string startDate, string endDate)
+        {
+            DateTime start, end;
+            start = end = DateTime.MinValue;
+            Boolean isValidated = true;
+
+            // validate start date is a date
+            if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start))
+            {
+                invalidStartDatePanel.Style.Add("display", "inline-block");
+                isValidated = false;
+            }
+            else
+            {
+                // ensure start date is not a weekend
+                if (start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    startDateIsWeekendPanel.Style.Add("display", "inline-block");
+                    isValidated = false;
+                }
+            }
+
+            // validate end date is a date
+            if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
+            {
+                invalidEndDatePanel.Style.Add("display", "inline-block");
+                isValidated = false;
+            }
+            else
+            {
+                // ensure end date is not weekend
+                if (end.DayOfWeek == DayOfWeek.Saturday || end.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    endDateIsWeekendPanel.Style.Add("display", "inline-block");
+                    isValidated = false;
+                }
+
+            }
+
+            if (start != DateTime.MinValue && end != DateTime.MinValue)
+            {
+                // compare dates to ensure end date is not before start date
+                if (DateTime.Compare(start, end) > 0)
+                {
+                    dateComparisonPanel.Style.Add("display", "inline-block");
+                    isValidated = false;
+                }
+            }
+            
+            return isValidated;
+        }
+
+        protected void datesEntered(object sender, EventArgs e)
+        {
+            clearSubmitAlertValidationErrors();
+            validateDates(txtFrom.Text, txtTo.Text);
+        }
+
+        protected void submitLeaveAlertBtn_Click(object sender, EventArgs e)
+        {
+            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#submitLeaveAlertModal').modal({'show':true, 'backdrop':'static', 'keyboard':false});", true);
+            LinkButton lb = sender as LinkButton;
+            ViewState["empEmailToAlert"] = lb.Attributes["empEmail"].ToString();
+            ViewState["empIdToAlert"] = lb.Attributes["empId"].ToString();
+
+            clearSubmitAlertValidationErrors();
+            txtFrom.Text = txtTo.Text = string.Empty;
+        }
+
+        protected void closeSubmitLeaveAlertModal(object sender, EventArgs e)
+        {
+            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#submitLeaveAlertModal').modal('hide');", true);
+        }
+
+        protected void submitAlertToSubmitLeaveBtn_Click(object sender, EventArgs e)
+        {
+            string startDate = txtFrom.Text,
+                   endDate = txtTo.Text;
+
+            if (ViewState["empEmailToAlert"] != null && ViewState["empIdToAlert"] != null && validateDates(startDate, endDate))
+            {
+                string emailOfEmpBeingAlerted = ViewState["empEmailToAlert"].ToString(),
+                       idOfEmpBeingAlerted = ViewState["empIdToAlert"].ToString();
+                Boolean isAlertSentSuccessful = false;
+
+                // send inhouse alert via notif
+                string notif_header = $"Leave Application Requested",
+                       notification = $"This is a reminder from {Session["emp_username"].ToString()} to submit a leave application for the period of {startDate} to {endDate}";
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+
+                        string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{idOfEmpBeingAlerted}', '{util.getCurrentDate()}');
+                            ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            int rowsAffected = command.ExecuteNonQuery();
+                            isAlertSentSuccessful = rowsAffected > 0;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+                // send mail message
+                MailMessage message = util.getAlertEmpToSubmitLeave(
+                    new Util.EmailDetails
+                    {
+                        supervisor_name = Session["emp_username"].ToString(),
+                        start_date = startDate,
+                        end_date = endDate,
+                        subject = $"Reminder to Submit Leave Application",
+                        recipient = emailOfEmpBeingAlerted
+                    }
+                );
+                isAlertSentSuccessful = isAlertSentSuccessful && util.sendMail(message);
+
+                if (isAlertSentSuccessful)
+                    successfulAlert.Style.Add("display", "inline-block");
+                else
+                    unsuccessfulAlert.Style.Add("display", "inline-block");
+            }
+            else
+                unsuccessfulAlert.Style.Add("display", "inline-block");
+        }
+
     }
 }

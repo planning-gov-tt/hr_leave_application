@@ -275,24 +275,45 @@ namespace HR_LEAVEv2.Classes
 
         public Boolean sendMail(MailMessage message)
         {
-            //SmtpClient smtp = new SmtpClient();
-            //smtp.Port = 25;
-            //smtp.Host = "10.240.32.231"; //for PLANNING host 
-            ////smtp.EnableSsl = true;
-            ////smtp.UseDefaultCredentials = false;
-            ////smtp.Credentials = new NetworkCredential("hr.leave@planning.gov.tt", "p@ssword1");
-            //smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            SmtpClient smtp = new SmtpClient();
+            smtp.Port = 25;
+            smtp.Host = "10.240.32.231"; //for PLANNING host 
+            //smtp.EnableSsl = true;
+            //smtp.UseDefaultCredentials = false;
+            //smtp.Credentials = new NetworkCredential("hr.leave@planning.gov.tt", "p@ssword1");
+            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
-            //try
-            //{
-            //    smtp.Send(message);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return false;
-            //}
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
 
             return true;
+        }
+
+        public MailMessage getAlertEmpToSubmitLeave(EmailDetails details)
+        {
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
+            msg.Body = $@"
+                <div style='margin-bottom:15px;'>
+                    DO NOT REPLY<br/>
+                    <br/>
+
+                    This is a reminder to submit a leave application for the period of {details.start_date} to {details.end_date}. Apply for leave applications 
+                    by clicking <a href='http://webtest/deploy/Employee/ApplyForLeave.aspx'>here</a>.
+                <div>
+                <div>
+                    <br/>
+                    Regards,<br/>
+                        {details.supervisor_name}
+                </div>
+            ";
+
+            return msg;
         }
 
         /*
@@ -443,7 +464,7 @@ namespace HR_LEAVEv2.Classes
                                 Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
                                 <br/>
                                 Regards,<br/>
-                                    HR
+                                    {details.supervisor_name}
                             </div>
 
 

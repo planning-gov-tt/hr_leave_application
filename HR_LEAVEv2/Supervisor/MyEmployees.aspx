@@ -119,64 +119,10 @@
                                     </asp:LinkButton>
                                 </span>
 
-                            </div>
-
-                        </div>
-
-                    </td>
-
-                </ItemTemplate>
-
-                <AlternatingItemTemplate>
-
-                    <td align="center">
-
-                        <div class="custom-card" style="margin-left: 20px; margin-right: 20px; position: relative;">
-
-                            <%--employee icon--%>
-                            <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
-
-                            <%--employee name--%>
-                            <h4 style="margin-top: 10px;">
-                                <asp:Label runat="server" ID="Label4" Text='<%#Eval("Name") %>'></asp:Label>
-                            </h4>
-
-                             <%--employee details--%>
-                            <div class="custom-card-body">
-
-                                <%--employee ID--%>
-                                <div>
-                                    <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
-                                    <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </div>
-
-                                <%--IHRIS ID--%>
-                                <span >
-                                    <h5 style="display: inline;" class="custom-card-body-header-text">IHRIS ID:</h5>
-                                    <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </span>
-
-                                 <%--email--%>
-                                <span >
-                                    <h5 class="custom-card-body-header-text">Email:</h5>
-                                    <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </span>
-
-                            </div>
-
-                            <div class="custom-card-footer">
-
-                                <%--button to show employee details--%>
-                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
-                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
-                                        <i class="fa fa-address-card-o" aria-hidden="true"></i>
-                                    </button>
-                                </span>
-
-                                <%--button to go to employee's leave logs--%>
-                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Open Leave Logs">
-                                    <asp:LinkButton ID="openLeaveLogsBtn" empEmail='<%#Eval("email") %>' class="btn btn-primary" runat="server" OnClick="openLeaveLogsBtn_ServerClick" style="margin-left: 5px;">
-                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                <%--button to alert employee to submit a leave application--%>
+                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Remind employee to submit leave">
+                                    <asp:LinkButton ID="submitLeaveAlertBtn" empEmail='<%#Eval("email") %>' empId='<%#Eval("employee_id")%>' class="btn btn-warning" runat="server" OnClick="submitLeaveAlertBtn_Click" style="margin-left: 5px;">
+                                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
                                     </asp:LinkButton>
                                 </span>
 
@@ -185,8 +131,8 @@
                         </div>
 
                     </td>
-                </AlternatingItemTemplate>
 
+                </ItemTemplate>
 
                 <LayoutTemplate>
                     <table style="width: 100%;">
@@ -280,6 +226,97 @@
 
             </div>
 
+            <%--Modal to view employee details--%>
+            <div class="modal fade" id="submitLeaveAlertModal" tabindex="-1" role="dialog" aria-labelledby="submitLeaveAlertTitle" aria-hidden="true">
+
+                <div class="modal-dialog" role="document" style="width: 45%;">
+
+                    <div class="modal-content">
+
+                        <div class="modal-header text-center">
+
+                            <h2 class="modal-title" id="submitLeaveAlertTitle" style="display: inline; width: 150px;">
+                                <span>Reminder to Submit Leave</span>
+                            </h2>
+
+                            <button id="closeBtnTop" type="button" class="close" runat="server" onserverclick="closeSubmitLeaveAlertModal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+
+                        </div>
+
+                        <asp:UpdatePanel ID="periodForAlertUpdatePanel" runat="server">
+                            <ContentTemplate>
+                                <div class="modal-body text-center">
+
+                                    <asp:Panel ID="startDateApplyPanel" runat="server" Style="display: inline-block; margin-right: 25px;">
+                                        <asp:Label runat="server" ID="txtFromLabel">Start:</asp:Label>
+                                        <asp:TextBox ID="txtFrom" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" ValidationGroup="submitLeaveAlertGrp" AutoPostBack="true" OnTextChanged="datesEntered" ></asp:TextBox>
+                                        <i id="fromCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
+                                        <ajaxToolkit:CalendarExtender ID="fromCalendarExtender" TargetControlID="txtFrom" PopupButtonID="fromCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
+                                        <asp:RequiredFieldValidator ID="startDateRequired" runat="server" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtFrom" ValidationGroup="submitLeaveAlertGrp"></asp:RequiredFieldValidator>
+                                    </asp:Panel>
+
+                                    <asp:Panel ID="endDateApplyPanel" runat="server" Style="display: inline-block;">
+                                        <asp:Label runat="server" ID="txtToLabel">End:</asp:Label>
+                                        <asp:TextBox ID="txtTo" runat="server" CssClass="form-control" Style="width: 150px; height: auto; display: inline;" ValidationGroup="submitLeaveAlertGrp" AutoPostBack="true" OnTextChanged="datesEntered" ></asp:TextBox>
+                                        <i id="toCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
+                                        <ajaxToolkit:CalendarExtender ID="CalendarExtender1" TargetControlID="txtTo" PopupButtonID="toCalendar" runat="server" Format="d/MM/yyyy"></ajaxToolkit:CalendarExtender>
+                                        <asp:RequiredFieldValidator ID="endDateRequired" runat="server" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtTo" ValidationGroup="submitLeaveAlertGrp"></asp:RequiredFieldValidator>
+                                    </asp:Panel>
+
+                                    <div style="margin-top: 15px">
+                                        <asp:Panel ID="invalidStartDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span>Start date is not valid</span>
+                                        </asp:Panel>
+                                        <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span>Start date is on the weekend</span>
+                                        </asp:Panel>
+
+                                        <asp:Panel ID="invalidEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span>End date is not valid</span>
+                                        </asp:Panel>
+
+                                        <asp:Panel ID="endDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span>End date is on the weekend</span>
+                                        </asp:Panel>
+                                        <asp:Panel ID="dateComparisonPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span>End date cannot be before start date</span>
+                                        </asp:Panel>
+
+                                        <asp:Panel ID="successfulAlert" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                            <span>Successfully submitted alert</span>
+                                        </asp:Panel>
+
+                                        <asp:Panel ID="unsuccessfulAlert" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span>Alert could not be submitted</span>
+                                        </asp:Panel>
+
+
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="closeBtnBottom" type="button" class="btn btn-secondary" runat="server" onserverclick="closeSubmitLeaveAlertModal">Close</button>
+                                    <asp:LinkButton ID="submitAlertToSubmitLeaveBtn" runat="server" CssClass="btn btn-success" OnClick="submitAlertToSubmitLeaveBtn_Click" ValidationGroup="submitLeaveAlertGrp">
+                                        <i class="fa fa-send"></i>
+                                        Submit
+                                    </asp:LinkButton>
+                                </div>
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+
+                    </div>
+
+                </div>
+
+            </div>
         </div>
 
     </div>
