@@ -47,7 +47,11 @@ CREATE TABLE [dbo].[employee] (
   [sick] INT NOT NULL,
   [bereavement] INT NOT NULL,
   [maternity] INT NOT NULL,
-  [pre_retirement] INT NOT NULL
+  [paternity] INT NOT NULL,
+  [pre_retirement] INT NOT NULL,
+  
+  -- created on timestamp
+  [created_on] DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -91,45 +95,6 @@ CREATE TABLE [dbo].[leavetype] (
   [type_id] NVARCHAR (20) PRIMARY KEY
 );
 
-
-CREATE TABLE [dbo].[leavetransaction] (
-  [transaction_id] INT IDENTITY (1, 1) PRIMARY KEY,
-  [created_at] DATETIME DEFAULT CURRENT_TIMESTAMP,
-  -- [last_modified] TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- will put in log table
-  [employee_id] NVARCHAR (10) NOT NULL,
-  [leave_type] NVARCHAR (20) NOT NULL,
-  [start_date] DATE NOT NULL,
-  [end_date] DATE NOT NULL,
-  [qualified] NVARCHAR(10) NOT NULL,
-  [days_taken] INT NOT NULL,
-
-  [supervisor_id] NVARCHAR (10) NOT NULL,
-  [supervisor_edit_date] DATETIME,
-
-  [hr_manager_id] NVARCHAR (10), -- can be null if the HR 1 has not yet approved
-  [hr_manager_edit_date] DATETIME,
-
-  [status] NVARCHAR (30) NOT NULL,
-  [emp_comment] NVARCHAR (120),
-  [sup_comment] NVARCHAR (120),
-  [hr_comment] NVARCHAR (120)
-
-  FOREIGN KEY ([employee_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
-  FOREIGN KEY ([leave_type])
-    REFERENCES [dbo].[leavetype] ([type_id])
-    ON UPDATE CASCADE,
-  FOREIGN KEY ([supervisor_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
-  FOREIGN KEY ([hr_manager_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
-  FOREIGN KEY ([status])
-    REFERENCES [dbo].[transactionstate] ([status_id])
-    ON UPDATE CASCADE
-);
--- create update trigger for modified: https://stackoverflow.com/questions/22594567/sql-server-on-update-set-current-timestamp/22594779
-
-
 CREATE TABLE [dbo].[department] (
   [dept_id] INT IDENTITY (1, 1) PRIMARY KEY,
   [dept_abbr] CHAR (5),
@@ -149,7 +114,6 @@ CREATE TABLE [dbo].[employmenttype] (
   [type_id] NVARCHAR (15) PRIMARY KEY
 );
 
-
 CREATE TABLE [dbo].[employeeposition] (
   [id] INT IDENTITY (1, 1) PRIMARY KEY,
   [employee_id] NVARCHAR (10) NOT NULL,
@@ -159,6 +123,7 @@ CREATE TABLE [dbo].[employeeposition] (
   [actual_end_date] DATETIME,
   [employment_type] NVARCHAR (15) NOT NULL,
   [dept_id] INT,
+  [years_worked] INT NOT NULL,
 
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id]),
@@ -170,6 +135,48 @@ CREATE TABLE [dbo].[employeeposition] (
     REFERENCES [dbo].[department] (dept_id)
 );
 
+CREATE TABLE [dbo].[leavetransaction] (
+  [transaction_id] INT IDENTITY (1, 1) PRIMARY KEY,
+  [created_at] DATETIME DEFAULT CURRENT_TIMESTAMP,
+  -- [last_modified] TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- will put in log table
+  [employee_id] NVARCHAR (10) NOT NULL,
+  [employee_position_id] INT NOT NULL,
+  [leave_type] NVARCHAR (20) NOT NULL,
+  [start_date] DATE NOT NULL,
+  [end_date] DATE NOT NULL,
+  [qualified] NVARCHAR(10) NOT NULL,
+  [days_taken] INT NOT NULL,
+
+  [supervisor_id] NVARCHAR (10) NOT NULL,
+  [supervisor_edit_date] DATETIME,
+
+  [hr_manager_id] NVARCHAR (10), -- can be null if the HR 1 has not yet approved
+  [hr_manager_edit_date] DATETIME,
+
+  [status] NVARCHAR (30) NOT NULL,
+  [emp_comment] NVARCHAR (120),
+  [sup_comment] NVARCHAR (120),
+  [hr_comment] NVARCHAR (120)
+
+  FOREIGN KEY ([employee_id])
+    REFERENCES [dbo].[employee] ([employee_id]),
+  FOREIGN KEY ([employee_position_id])
+    REFERENCES [dbo].[employeeposition] ([id])
+	ON DELETE CASCADE,
+  FOREIGN KEY ([leave_type])
+    REFERENCES [dbo].[leavetype] ([type_id])
+    ON UPDATE CASCADE,
+  FOREIGN KEY ([supervisor_id])
+    REFERENCES [dbo].[employee] ([employee_id]),
+  FOREIGN KEY ([hr_manager_id])
+    REFERENCES [dbo].[employee] ([employee_id]),
+  FOREIGN KEY ([status])
+    REFERENCES [dbo].[transactionstate] ([status_id])
+    ON UPDATE CASCADE
+);
+-- create update trigger for modified: https://stackoverflow.com/questions/22594567/sql-server-on-update-set-current-timestamp/22594779
+
+
 CREATE TABLE [dbo].[auditlog] (
   [log_id] INT IDENTITY (1, 1) PRIMARY KEY,
   [machine_name] NVARCHAR (100) NOT NULL,
@@ -178,7 +185,7 @@ CREATE TABLE [dbo].[auditlog] (
   [acting_employee_name] NVARCHAR (60)NOT NULL,
   [affected_employee_id] NVARCHAR (10) NOT NULL,
   [affected_employee_name] NVARCHAR (60) NOT NULL,
-  [action] NVARCHAR (300) NOT NULL,
+  [action] NVARCHAR (350) NOT NULL,
   [created_at] DATETIME NOT NULL,
 
   FOREIGN KEY ([acting_employee_id])
@@ -223,4 +230,17 @@ CREATE TABLE [dbo].[emptypeleavetype](
   FOREIGN KEY([employment_type]) REFERENCES [dbo].[employmenttype] ([type_id]),
   FOREIGN KEY([leave_type]) REFERENCES [dbo].[leavetype] ([type_id])
 
+);
+
+CREATE TABLE [dbo].[accumulations](
+  [id] INT IDENTITY(1, 1) PRIMARY KEY,
+  [employment_type] NVARCHAR(15) NOT NULL,
+  [leave_type] NVARCHAR(20) NOT NULL,
+  [accumulation_period_text] NVARCHAR(40) NOT NULL,
+  [accumulation_period_value] NVARCHAR(2) NOT NULL,
+  [accumulation_type] NVARCHAR(15) NOT NULL,
+  [num_days] INT NOT NULL,
+
+  FOREIGN KEY([employment_type]) REFERENCES [dbo].[employmenttype] ([type_id]),
+  FOREIGN KEY([leave_type]) REFERENCES [dbo].[leavetype] ([type_id]),
 );
