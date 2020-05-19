@@ -1,5 +1,5 @@
-USE [HRLeaveTestDb]; -- testing db
---USE [HRLeaveDevDb]; -- development db
+--USE [HRLeaveTestDb]; -- testing db
+USE [HRLeaveDevDb]; -- development db
 GO
 
 
@@ -172,8 +172,8 @@ CREATE TABLE [dbo].[employeeposition] (
 
 CREATE TABLE [dbo].[auditlog] (
   [log_id] INT IDENTITY (1, 1) PRIMARY KEY,
-  --[machine_name] NVARCHAR (100) NOT NULL,
-  --[ipv6_address] NVARCHAR(50) NOT NULL,
+  [machine_name] NVARCHAR (100) NOT NULL,
+  [ipv6_address] NVARCHAR(50) NOT NULL,
   [acting_employee_id] NVARCHAR (10) NOT NULL,
   [acting_employee_name] NVARCHAR (60)NOT NULL,
   [affected_employee_id] NVARCHAR (10) NOT NULL,

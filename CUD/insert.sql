@@ -1,5 +1,5 @@
-USE [HRLeaveTestDb]; -- testing db
---USE [HRLeaveDevDb]; -- development db
+--USE [HRLeaveTestDb]; -- testing db
+USE [HRLeaveDevDb]; -- development db
 GO
 
 
@@ -251,12 +251,12 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 ('Personal'),
 ('Casual'),
 ('Vacation'),
-('No Pay'),
 ('Bereavement'),
 ('Maternity'),
 ('Pre-retirement'),
 ('Leave Renewal'),
-('Compensatory');
+('Compensatory'),
+('No Pay');
 
 
 SET IDENTITY_INSERT [dbo].[leavetransaction] ON;
@@ -405,27 +405,23 @@ INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;
 
-SET IDENTITY_INSERT [dbo].[emptypeleavetype] ON;
-
-INSERT INTO [dbo].[emptypeleavetype] ([id], [employment_type], [leave_type]) VALUES
-(1, 'Contract', 'Bereavement'),
-(2, 'Contract', 'Compensatory'),
-(3, 'Contract', 'Leave Renewal'),
-(4, 'Contract', 'Maternity'),
-(5, 'Contract', 'No Pay'),
-(6, 'Contract', 'Personal'),
-(7, 'Contract', 'Pre-retirement'),
-(8, 'Contract', 'Sick'),
-(9, 'Contract', 'Vacation'),
-(10, 'Public Service', 'Bereavement'),
-(11, 'Public Service', 'Compensatory'),
-(12, 'Public Service', 'Leave Renewal'),
-(13, 'Public Service', 'Maternity'),
-(14, 'Public Service', 'No Pay'),
-(15, 'Public Service', 'Casual'),
-(16, 'Public Service', 'Pre-retirement'),
-(17, 'Public Service', 'Sick'),
-(18, 'Public Service', 'Vacation')
+INSERT INTO [dbo].[emptypeleavetype] ([employment_type], [leave_type]) VALUES
+('Contract', 'Bereavement'),
+--('Contract', 'Compensatory'),
+--(Contract', 'Leave Renewal'),
+('Contract', 'Maternity'),
+('Contract', 'Personal'),
+('Contract', 'Pre-retirement'),
+('Contract', 'Sick'),
+('Contract', 'Vacation'),
+('Contract', 'No Pay'),
+('Public Service', 'Bereavement'),
+--('Public Service', 'Compensatory'),
+--('Public Service', 'Leave Renewal'),
+('Public Service', 'Maternity'),
+('Public Service', 'Casual'),
+('Public Service', 'Pre-retirement'),
+('Public Service', 'Sick'),
+('Public Service', 'Vacation'),
+('Public Service', 'No Pay')
 ;
-
-SET IDENTITY_INSERT [dbo].[emptypeleavetype] OFF;
