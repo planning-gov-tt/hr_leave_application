@@ -59,7 +59,6 @@ namespace HR_LEAVEv2
             string empType = string.Empty;
 
             currentNumYearsWorked = -1;
-            isStartOfNewYear =  isStartOfNewContractYear = false;
             // get years worked
             try
             {
@@ -96,6 +95,7 @@ namespace HR_LEAVEv2
 
             if (startDate != DateTime.MinValue && yearsWorked != -1 && !String.IsNullOrEmpty(empType))
             {
+                // used to display number of years worked in current job
                 Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
                 //Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 28)); // for testing
 
