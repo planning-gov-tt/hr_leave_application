@@ -180,6 +180,13 @@
                                     </a>
                                 </li>
 
+                                <li>
+                                    <a href="<%= ResolveClientUrl("~/HR/UploadData.aspx") %>" class="tooltipped navbar-link" data-toggle="tooltip" data-placement="right" title="Upload Data">
+                                        <i class="fa fa-upload navbar-link-icon"></i>
+                                        <span class="navbar-link-text">Upload Data</span>
+                                    </a>
+                                </li>
+
                             </ul>
 
                         </li>
