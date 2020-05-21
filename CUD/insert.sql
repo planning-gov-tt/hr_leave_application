@@ -115,6 +115,7 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 --Clint Ramoutar
 ('115245', 'emp'),
 ('115245', 'sup'),
+('115245', 'admin'),
 --Christopher Sahadeo
 ('3', 'emp'),
 -- Dale Cudjoe
