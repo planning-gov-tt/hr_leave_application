@@ -178,7 +178,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     string empEmail = string.Empty;
 
-                    if (!String.IsNullOrEmpty(Request.QueryString["empEmail"]))
+                    if (!util.isNullOrEmpty(Request.QueryString["empEmail"]))
                         empEmail = Request.QueryString["empEmail"];
 
                     // set filter
@@ -371,31 +371,31 @@ namespace HR_LEAVEv2.UserControls
                 // assume all form fields are validated by the time they reach this point'
 
                 string whereFilterGridView = string.Empty;
-                if (!string.IsNullOrEmpty(SubmittedFrom))
+                if (!util.isNullOrEmpty(SubmittedFrom))
                 {
                     whereFilterGridView += $@"
                         AND lt.created_at >= '{DateTime.ParseExact(SubmittedFrom, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
-                if (!string.IsNullOrEmpty(SubmittedTo))
+                if (!util.isNullOrEmpty(SubmittedTo))
                 {
                     whereFilterGridView += $@"
                         AND lt.created_at < dateadd(day,1,'{DateTime.ParseExact(SubmittedTo, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}')
                     ";
                 }
-                if (!string.IsNullOrEmpty(StartDate))
+                if (!util.isNullOrEmpty(StartDate))
                 {
                     whereFilterGridView += $@"
                         AND lt.start_date >= '{DateTime.ParseExact(StartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                     ";
                 }
-                if (!string.IsNullOrEmpty(EndDate))
+                if (!util.isNullOrEmpty(EndDate))
                 {
                     whereFilterGridView += $@"
                         AND lt.end_date < dateadd(day,1,'{DateTime.ParseExact(EndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}') 
                     ";
                 }
-                if (!string.IsNullOrEmpty(SupervisorName_ID))
+                if (!util.isNullOrEmpty(SupervisorName_ID))
                 {
                     whereFilterGridView += $@"
                         AND (
@@ -407,7 +407,7 @@ namespace HR_LEAVEv2.UserControls
                     ";
                     sqlCommand.Parameters.AddWithValue("@SupervisorName_ID", "%" + SupervisorName_ID + "%");
                 }
-                if (!string.IsNullOrEmpty(EmployeeName_ID_Email))
+                if (!util.isNullOrEmpty(EmployeeName_ID_Email))
                 {
                     whereFilterGridView += $@"
                         AND (
@@ -419,27 +419,27 @@ namespace HR_LEAVEv2.UserControls
                     ";
                     sqlCommand.Parameters.AddWithValue("@EmployeeName_ID_Email", "%" + EmployeeName_ID_Email + "%");
                 }
-                if (!string.IsNullOrEmpty(LeaveType))
+                if (!util.isNullOrEmpty(LeaveType))
                 {
                     whereFilterGridView += $@"
                         AND leave_type = '{LeaveType}'
                     ";
                 }
-                if (!string.IsNullOrEmpty(Status))
+                if (!util.isNullOrEmpty(Status))
                 {
                     whereFilterGridView += $@"
                         AND status = '{Status}'
                     ";
                 }
 
-                if (!string.IsNullOrEmpty(Qualified))
+                if (!util.isNullOrEmpty(Qualified))
                 {
                     whereFilterGridView += $@"
                         AND qualified = '{Qualified}'
                     ";
                 }
 
-                if (!string.IsNullOrEmpty(LAfromActiveInactiveEmp))
+                if (!util.isNullOrEmpty(LAfromActiveInactiveEmp))
                 {
                     if(LAfromActiveInactiveEmp == "Active")
                         whereFilterGridView += $@"
@@ -610,7 +610,7 @@ namespace HR_LEAVEv2.UserControls
                             int startDateIndex = GetColumnIndexByName(e.Row, "start_date");
                             string startDate = e.Row.Cells[startDateIndex].Text.ToString();
 
-                            if (!string.IsNullOrEmpty(startDate))
+                            if (!util.isNullOrEmpty(startDate))
                             {
                                 DateTime start = DateTime.MinValue;
                                 try
@@ -961,7 +961,7 @@ namespace HR_LEAVEv2.UserControls
 
                     // if previous comment exists then populate textfield with it and store it in a hihdden field to check if the comment was edited
                     // in any way later
-                    commentsTxtArea.InnerText = previousCommentsHiddenField.Value = !String.IsNullOrEmpty(previousComment) ? previousComment : string.Empty;
+                    commentsTxtArea.InnerText = previousCommentsHiddenField.Value = !util.isNullOrEmpty(previousComment) ? previousComment : string.Empty;
                     Dictionary<string, string> rowData = new Dictionary<string, string>()
                     {
                         { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
@@ -1044,7 +1044,7 @@ namespace HR_LEAVEv2.UserControls
 
                     // if previous comment exists then populate textfield with it and store it in a hihdden field to check if the comment was edited
                     // in any way later
-                    commentsTxtArea.InnerText = previousCommentsHiddenField.Value = !String.IsNullOrEmpty(previousComment) ? previousComment : string.Empty;
+                    commentsTxtArea.InnerText = previousCommentsHiddenField.Value = !util.isNullOrEmpty(previousComment) ? previousComment : string.Empty;
                     Dictionary<string, string> rowData = new Dictionary<string, string>()
                     {
                         { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
@@ -1127,7 +1127,7 @@ namespace HR_LEAVEv2.UserControls
             invalidEndDateParam.Style.Add("display", "none");
             invalidComparisonParam.Style.Add("display", "none");
 
-            if (String.IsNullOrEmpty(startDate) && String.IsNullOrEmpty(endDate))
+            if (util.isNullOrEmpty(startDate) && util.isNullOrEmpty(endDate))
                 return true;
 
             DateTime start, end;
@@ -1135,14 +1135,14 @@ namespace HR_LEAVEv2.UserControls
             Boolean isValidated = true;
 
             // validate start date is a date
-            if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start) || String.IsNullOrEmpty(startDate))
+            if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start) || util.isNullOrEmpty(startDate))
             {
                 invalidStartDateParam.Style.Add("display", "inline-block");
                 isValidated = false;
             }
 
             // validate end date is a date
-            if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end) || String.IsNullOrEmpty(endDate))
+            if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end) || util.isNullOrEmpty(endDate))
             {
                 invalidEndDateParam.Style.Add("display", "inline-block");
                 isValidated = false;
@@ -1359,7 +1359,7 @@ namespace HR_LEAVEv2.UserControls
                 // SEND EMAILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 string emailCommentString = string.Empty;
-                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                if (!util.isNullOrEmpty(comment))
                     emailCommentString = $"HR has left the following comment: <blockquote style='font-size: 1.1em;'>\"{comment}\"</blockquote>";
 
                 // send email to employee
@@ -1412,7 +1412,7 @@ namespace HR_LEAVEv2.UserControls
                 string notif_header = $"Leave Application Not Approved",
                        notification = $"Your leave application to {row["supervisor_name"]} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not approved.";
 
-                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                if (!util.isNullOrEmpty(comment))
                     notification += $"HR said \" {comment} \"";
                 try
                 {
@@ -1441,7 +1441,7 @@ namespace HR_LEAVEv2.UserControls
                 notif_header = $"Leave Application Not Approved for {row["employee_name"]}";
                 notification = $"The leave application of {row["employee_name"]} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not approved.";
 
-                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                if (!util.isNullOrEmpty(comment))
                     notification += $"HR said \" {comment} \".";
 
                 try
@@ -1661,7 +1661,7 @@ namespace HR_LEAVEv2.UserControls
 
                 string emailCommentString = string.Empty;
 
-                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                if (!util.isNullOrEmpty(comment))
                     emailCommentString = $"Your supervisor left the following comment: <blockquote style='font-size:1.1em;'>\"{comment}\"</blockquote>";
 
                 // send email to employee
@@ -1699,7 +1699,7 @@ namespace HR_LEAVEv2.UserControls
                 string notif_header = $"Leave Application Not Recommended",
                        notification = $"Your leave application to {Session["emp_username"].ToString()} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not recommended.";
 
-                if (!String.IsNullOrEmpty(comment) && !String.IsNullOrWhiteSpace(comment))
+                if (!util.isNullOrEmpty(comment))
                     notification += $"Your supervisor said \" {comment} \"";
                 try
                 {
@@ -1784,7 +1784,7 @@ namespace HR_LEAVEv2.UserControls
                                 noEditsMadePanel.Visible = false;
 
                                 // show success message
-                                if (String.IsNullOrEmpty(previousComments) || String.IsNullOrWhiteSpace(previousComments))
+                                if (util.isNullOrEmpty(previousComments))
                                     addCommentSuccessPanel.Visible = true;
                                 else
                                     editCommentSuccessPanel.Visible = true;
@@ -1827,7 +1827,7 @@ namespace HR_LEAVEv2.UserControls
             // hide modal
             ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal('hide');", true);
 
-            string comment = String.IsNullOrEmpty(commentsTxtArea.InnerText) || String.IsNullOrWhiteSpace(commentsTxtArea.InnerText) ? string.Empty : commentsTxtArea.InnerText;
+            string comment = util.isNullOrEmpty(commentsTxtArea.InnerText) ? string.Empty : commentsTxtArea.InnerText;
             if (gridViewType == "sup")
                 sendNotRecommendedNotifications(comment);
             else if (gridViewType == "hr")

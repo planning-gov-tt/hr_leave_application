@@ -41,7 +41,7 @@ namespace HR_LEAVEv2
             if (Session["emp_email"] != null)
             {
                 string username = auth.getUserInfoFromActiveDirectory(Session["emp_email"].ToString());
-                username = string.IsNullOrEmpty(username) ? "User not in Active Directory" : username;
+                username = util.isNullOrEmpty(username) ? "User not in Active Directory" : username;
                 Session["emp_username"] = username;
             }
                 
@@ -93,7 +93,7 @@ namespace HR_LEAVEv2
 
 
 
-            if (startDate != DateTime.MinValue && yearsWorked != -1 && !String.IsNullOrEmpty(empType))
+            if (startDate != DateTime.MinValue && yearsWorked != -1 && !util.isNullOrEmpty(empType))
             {
                 // used to display number of years worked in current job
                 Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, util.getCurrentDateToday());

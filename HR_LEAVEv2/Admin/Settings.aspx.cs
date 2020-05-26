@@ -15,6 +15,8 @@ namespace HR_LEAVEv2.Admin
 {
     public partial class Settings : System.Web.UI.Page
     {
+        Util util = new Util();
+
         string selectedTable = string.Empty;
 
         enum empPositionColumns
@@ -64,8 +66,8 @@ namespace HR_LEAVEv2.Admin
                 Response.Redirect("~/AccessDenied.aspx");
 
             selectedTable = DropDownList1.SelectedValue.ToString() != "-" ? DropDownList1.SelectedValue.ToString() : string.Empty;
-            addPanel.Visible = !String.IsNullOrEmpty(selectedTable);
-            TableMetaData = !String.IsNullOrEmpty(selectedTable) ? TableMetaData : null;
+            addPanel.Visible = !util.isNullOrEmpty(selectedTable);
+            TableMetaData = !util.isNullOrEmpty(selectedTable) ? TableMetaData : null;
 
             searchString = searchTxtbox.Text;
 
@@ -79,7 +81,7 @@ namespace HR_LEAVEv2.Admin
         {
 
             // once a table is selected then bind data to gridview
-            if (!String.IsNullOrEmpty(selectedTable))
+            if (!util.isNullOrEmpty(selectedTable))
             {
 
                 // get data about the table's columns like data type, maximum length(if applicable) and whether it is nullable
@@ -213,7 +215,7 @@ namespace HR_LEAVEv2.Admin
                     {
                         TextBox tb = ((TextBox)formPlaceholder.FindControl($"text_{GridView1.HeaderRow.Cells[i].Text}_{selectedTable}"));
 
-                        if (row.Cells[i].Text != "&nbsp;")
+                        if (!util.isNullOrEmpty(row.Cells[i].Text))
                         {
                             // check if column type is datetime and convert data to proper format
                             if (TableMetaData.Rows[i - 1].ItemArray[1].ToString() == "datetime")
@@ -235,15 +237,13 @@ namespace HR_LEAVEv2.Admin
                 }
                 else if (e.CommandName == "deleteRow")
                 {
-
+                    string[] bridgeTables = new string[] { "assignment", "employeerole", "emptypeleavetype", "rolepermission" };
                     Boolean isDeleteSuccessful = false;
                     try
                     {
                         using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                         {
                             connection.Open();
-
-                            string[] bridgeTables = new string[] { "assignment", "employeerole", "emptypeleavetype", "rolepermission" };
 
                             /* used to construct the where clause based on whether the table being deleted is a bridge entity or not. Bridge entities
                                require all their elements to be included in the where to determine identity for the delete. Other tables, however,
@@ -297,12 +297,27 @@ namespace HR_LEAVEv2.Admin
 
 
                     if (isDeleteSuccessful)
+                    {
                         deleteSuccessfulPanel.Style.Add("display", "inline-block"); //show delete success
+
+                        List<string> primaryKeys = new List<string>();
+                        if (bridgeTables.Contains(selectedTable))
+                        {
+                            for (int i = 1; i < row.Cells.Count; i++)
+                                primaryKeys.Add($"{row.Cells[i].Text.ToString()}");
+                        }
+                        else
+                            primaryKeys.Add($"{row.Cells[1].Text.ToString()}");
+
+                        // add audit log
+                        util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), $"Admin deleted record with id = {String.Join(", ", primaryKeys.ToArray())} from {selectedTable}");
+                    }
+                        
                     else
                         deleteUnsuccessfulPanel.Style.Add("display", "inline-block"); // show delete failure
 
                     // rebind gridview based on whether search string is present and valid
-                    if (searchString == null || String.IsNullOrEmpty(searchString))
+                    if (searchString == null || util.isNullOrEmpty(searchString))
                     {
                         TableData = null; // null TableData reloads gridview from db
                         bindGridview();
@@ -498,7 +513,7 @@ namespace HR_LEAVEv2.Admin
                 isValidated = false;
             }
 
-            if (!String.IsNullOrEmpty(endDate))
+            if (!util.isNullOrEmpty(endDate))
             {
                 // validate end date is a date
                 if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
@@ -531,14 +546,12 @@ namespace HR_LEAVEv2.Admin
         {
             // returns a Boolean which represents whether the proposed actual end date passed will make a record active or inactive. The date passed is assumed to be validated
 
-            Util util = new Util();
-
             // check if start date of record is a day in the future, meaning the record is currently inactive
             if (DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) > 0)
                 return false;
 
             // if the passed end date is empty then the record is automaticaly Active
-            if (String.IsNullOrEmpty(proposedEndDate) || String.IsNullOrWhiteSpace(proposedEndDate) || proposedEndDate == "&nbsp;")
+            if (util.isNullOrEmpty(proposedEndDate))
                 return true;
             else
                 // if today is before the passed actual end date then the record is active and otherwise, inactive
@@ -558,7 +571,7 @@ namespace HR_LEAVEv2.Admin
                 bool isProposedRecordActive = isRecordActive(proposedStartDate, proposedEndDate);
 
                 DateTime proposedSD = DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
-                        proposedAED = !String.IsNullOrEmpty(proposedEndDate) ? DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
+                        proposedAED = !util.isNullOrEmpty(proposedEndDate) ? DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
 
                 // check all rows in employeeposition except the row with the id passed as a parameter to this method
                 foreach (DataRow dr in TableData.Rows)
@@ -573,7 +586,7 @@ namespace HR_LEAVEv2.Admin
 
                         DateTime tableDataRowStartDate = (DateTime)dr[(int)empPositionColumns.start_date];
 
-                        DateTime tableDataRowEndDate = !String.IsNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? DateTime.ParseExact(dr[(int)empPositionColumns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
+                        DateTime tableDataRowEndDate = !util.isNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? DateTime.ParseExact(dr[(int)empPositionColumns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
 
                         // ensure that record does not overlap with another record
                         bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
@@ -738,7 +751,7 @@ namespace HR_LEAVEv2.Admin
                 generateForm(TableMetaData);
             else
             {
-                if (searchString != null || String.IsNullOrEmpty(searchString))
+                if (searchString != null || util.isNullOrEmpty(searchString))
                     searchForData(searchString);
                 else
                     bindGridview();
@@ -762,6 +775,9 @@ namespace HR_LEAVEv2.Admin
             for (int i = startingIndex; i < TableMetaData.Rows.Count; i++){
                 data[TableMetaData.Rows[i].ItemArray[0].ToString()] = ((TextBox)formPlaceholder.FindControl($"text_{TableMetaData.Rows[i].ItemArray[0].ToString()}_{selectedTable}")).Text;
             }
+
+            // get primary keys
+            string primaryKeys = (new string[] { "rolepermission", "employeerole", "assignment" }).Contains<string>(selectedTable) ? "*" : $"{TableMetaData.Rows[0].ItemArray[0].ToString()}";
 
             // validate dates if they exist in form
             bool areDatesValid = true;
@@ -793,6 +809,7 @@ namespace HR_LEAVEv2.Admin
                     parameterNames[key] = $"@{key.Replace("_", string.Empty)}";
                 }
 
+                DataTable insertedData = new DataTable();
                 // add to db
                 try
                 {
@@ -801,6 +818,7 @@ namespace HR_LEAVEv2.Admin
                         connection.Open();
                         string sql = $@"
                             INSERT INTO dbo.{selectedTable} ({String.Join(", ", data.Keys.ToArray())}) 
+                            OUTPUT INSERTED.{primaryKeys}
                             VALUES ({String.Join(", ", parameterNames.Values.ToArray())});
                         ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
@@ -808,7 +826,7 @@ namespace HR_LEAVEv2.Admin
                             int rowIndex = startingIndex;
                             foreach(string key in data.Keys)
                             {
-                                if (!String.IsNullOrEmpty(data[key]))
+                                if (!util.isNullOrEmpty(data[key]))
                                 {
                                     // convert to proper type
                                     if(TableMetaData.Rows[rowIndex].ItemArray[0].ToString() == key)
@@ -824,8 +842,11 @@ namespace HR_LEAVEv2.Admin
 
                                 rowIndex++;
                             }
-                            int rowsAffected = command.ExecuteNonQuery();
-                            isInsertSuccessful = rowsAffected > 0;
+                            using(SqlDataAdapter adapter = new SqlDataAdapter(command))
+                            {
+                                adapter.Fill(insertedData);
+                                isInsertSuccessful = insertedData.Rows.Count > 0;
+                            }
                         }
                     }
                 }
@@ -836,7 +857,14 @@ namespace HR_LEAVEv2.Admin
                 }
 
                 if (isInsertSuccessful)
+                {
                     createSuccessfulPanel.Style.Add("display", "inline-block");
+                    List<string> idPairings = new List<string>();
+                    for (int i = 0; i < insertedData.Columns.Count; i++)
+                        idPairings.Add($"{insertedData.Columns[i].ColumnName} = {insertedData.Rows[0].ItemArray[i].ToString()}");
+                    string action = $"Admin created record with {String.Join(", ", idPairings.ToArray())} in {selectedTable}";
+                    util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), action);
+                }            
                 else
                     createUnsuccessfulPanel.Style.Add("display", "inline-block");
 
@@ -851,6 +879,7 @@ namespace HR_LEAVEv2.Admin
         {
             // edit record
             clearValidationErrors();
+                
 
             // get data
             ControlCollection t = formPlaceholder.Controls;
@@ -927,7 +956,7 @@ namespace HR_LEAVEv2.Admin
                             int rowIndex = startingIndex;
                             foreach (string key in data.Keys)
                             {
-                                if (!String.IsNullOrEmpty(data[key]))
+                                if (!util.isNullOrEmpty(data[key]))
                                 {
                                     // convert to proper type
                                     if (TableMetaData.Rows[rowIndex].ItemArray[0].ToString() == key)
@@ -948,7 +977,7 @@ namespace HR_LEAVEv2.Admin
                             rowIndex = 0; // set to 0 since this will include the id column
                             foreach(string key in whereClauseParameterList.Keys)
                             {
-                                if (!String.IsNullOrEmpty(dataBeforeEdit[key]) && dataBeforeEdit[key] != "&nbsp;")
+                                if (!util.isNullOrEmpty(dataBeforeEdit[key]))
                                 {
                                     // convert to proper type
                                     if (TableMetaData.Rows[rowIndex].ItemArray[0].ToString() == key)
@@ -976,12 +1005,28 @@ namespace HR_LEAVEv2.Admin
                 }
 
                 if (isEditSuccessful)
+                {
                     editSuccessfulPanel.Style.Add("display", "inline-block");
+                    // primary keys 
+                    List<string> primaryKeys = new List<string>();
+                    if ((new string[] { "rolepermission", "employeerole", "assignment" }).Contains<string>(selectedTable))
+                    {
+                        foreach (string key in dataBeforeEdit.Keys)
+                            primaryKeys.Add(key);
+                    }
+                    else
+                        primaryKeys.Add(dataBeforeEdit.Keys.First());
+                    List<string> idPairings = new List<string>();
+                    foreach(string key in primaryKeys)
+                        idPairings.Add($"{key} = {dataBeforeEdit[key]}");
+                    string action = $"Admin edited record with {String.Join(", ", idPairings.ToArray())} in {selectedTable}";
+                    util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), action);
+                }
                 else
                     editUnsuccessfulPanel.Style.Add("display", "inline-block");
 
                 dataBeforeEdit = null;
-                if (searchString == null || String.IsNullOrEmpty(searchString))
+                if (searchString == null || util.isNullOrEmpty(searchString))
                 {
                     TableData = null;
                     bindGridview();

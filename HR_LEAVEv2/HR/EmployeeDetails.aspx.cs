@@ -254,7 +254,7 @@ namespace HR_LEAVEv2.HR
                 // hide end employment record button if actual_end_date is already populated
                 i = GetColumnIndexByName(e.Row, "actual_end_date");
                 LinkButton endEmpRecordBtn = (LinkButton)e.Row.FindControl("endEmpRecordBtn");
-                if (!String.IsNullOrEmpty(e.Row.Cells[i].Text.ToString()) && e.Row.Cells[i].Text.ToString() != "&nbsp;")
+                if (!util.isNullOrEmpty(e.Row.Cells[i].Text.ToString()))
                     endEmpRecordBtn.Visible = false;
                 else
                     endEmpRecordBtn.Visible = true;
@@ -368,7 +368,7 @@ namespace HR_LEAVEv2.HR
                 string actualEndDate = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "actual_end_date")].Text.ToString();
 
                 // show actual end date textbox if actual end date is populated
-                if (!String.IsNullOrEmpty(actualEndDate) && !String.IsNullOrWhiteSpace(actualEndDate) && actualEndDate != "&nbsp;")
+                if (!util.isNullOrEmpty(actualEndDate))
                 {
                     actualEndDateSpan.Style.Add("display", "inline");
                     txtActualEndDate.Text = actualEndDate;
@@ -419,7 +419,7 @@ namespace HR_LEAVEv2.HR
                 isValidated = false;
             }
 
-            if (!String.IsNullOrEmpty(endDate))
+            if (!util.isNullOrEmpty(endDate))
             {
                 // validate end date is a date
                 if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
@@ -456,7 +456,7 @@ namespace HR_LEAVEv2.HR
 
             Boolean isValidated = true;
             DateTime end = DateTime.MinValue;
-            if (!String.IsNullOrEmpty(actualEndDate))
+            if (!util.isNullOrEmpty(actualEndDate))
             {
 
                 // validate end date is a date
@@ -477,7 +477,7 @@ namespace HR_LEAVEv2.HR
                     }
 
                     // compare dates to ensure end date is not before start date
-                    if (!String.IsNullOrEmpty(startDate))
+                    if (!util.isNullOrEmpty(startDate))
                     {
                         if (DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end) > 0)
                         {
@@ -601,7 +601,7 @@ namespace HR_LEAVEv2.HR
                     // case: where no end date is entered. If the employment record is for Contract then 3 years are added to the start date and 
                     // this date is entered for the expected end date value
                     DateTime expected_end_date = DateTime.MinValue;
-                    if (String.IsNullOrEmpty(endDate))
+                    if (util.isNullOrEmpty(endDate))
                     {
                         if (emp_type == "Contract")
                         {
@@ -761,7 +761,7 @@ namespace HR_LEAVEv2.HR
                 return false;
 
             // if the passed end date is empty then the record is automaticaly Active
-            if (String.IsNullOrEmpty(proposedEndDate) || String.IsNullOrWhiteSpace(proposedEndDate) || proposedEndDate == "&nbsp;")
+            if (util.isNullOrEmpty(proposedEndDate))
                 return true;
             else
                 // if today is before the passed actual end date then the record is active and otherwise, inactive
@@ -775,35 +775,35 @@ namespace HR_LEAVEv2.HR
 
             if (ViewState["Gridview1_dataSource"] != null)
             {
-                int numActiveRows = 0, i = 0;
+                int numActiveRows = 0, currIndex = 0;
 
                 // state of passed end date and corresponding record
                 bool isProposedRecordActive = isRecordActive(proposedStartDate, proposedEndDate);
 
                 DateTime proposedSD = DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
-                        proposedAED = !String.IsNullOrEmpty(proposedEndDate) ? DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
+                        proposedAED = !util.isNullOrEmpty(proposedEndDate) ? DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
 
 
                 DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
                 foreach (DataRow dr in dt.Rows)
                 {
                     // once the record is not deleted and is not the record currently being edited (the record to which the proposed end date will belong to)
-                    if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && i != index)
+                    if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && currIndex != index)
                     {
                         if (dr[(int)emp_records_columns.status].ToString() == "Active")
                             numActiveRows++;
 
                         
-                        DateTime startDate = (DateTime)dr[(int)emp_records_columns.start_date];
+                        DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
 
-                        DateTime endDate = !String.IsNullOrEmpty(dr[(int)emp_records_columns.actual_end_date].ToString())? DateTime.ParseExact(dr[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture): DateTime.MinValue;
+                        DateTime dtRowEndDate = !util.isNullOrEmpty(dr[(int)emp_records_columns.actual_end_date].ToString())? DateTime.ParseExact(dr[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture): DateTime.MinValue;
 
                         // ensure that record does not overlap with another record
                         bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
                                  
 
                         // if record being checked has an end date
-                        if (endDate!= DateTime.MinValue)
+                        if (dtRowEndDate != DateTime.MinValue)
                         {
                             
                             bool isRowStartDateInProposedPeriod = false, isRowEndDateinProposedPeriod = false;
@@ -811,17 +811,17 @@ namespace HR_LEAVEv2.HR
                             if (proposedAED != DateTime.MinValue)
                             {
                                 // check if period represented by proposed start date to proposed end date coincides with the given data row's period
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, startDate) >= 0 && DateTime.Compare(proposedSD, endDate) <= 0;
-                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, startDate) >= 0 && DateTime.Compare(proposedAED, endDate) <= 0;
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowStartDate) >= 0 && DateTime.Compare(proposedSD, dtRowEndDate) <= 0;
+                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, dtRowStartDate) >= 0 && DateTime.Compare(proposedAED, dtRowEndDate) <= 0;
 
-                                isRowStartDateInProposedPeriod = DateTime.Compare(startDate, proposedSD) >= 0 && DateTime.Compare(startDate, proposedAED) <= 0;
-                                isRowEndDateinProposedPeriod = DateTime.Compare(endDate, proposedSD) >= 0 && DateTime.Compare(endDate, proposedAED) <= 0;
+                                isRowStartDateInProposedPeriod = DateTime.Compare(dtRowStartDate, proposedSD) >= 0 && DateTime.Compare(dtRowStartDate, proposedAED) <= 0;
+                                isRowEndDateinProposedPeriod = DateTime.Compare(dtRowEndDate, proposedSD) >= 0 && DateTime.Compare(dtRowEndDate, proposedAED) <= 0;
 
                             }
                             // proposed actual end date is empty- proposed record is active
                             else
                             {
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, endDate) <= 0 || DateTime.Compare(proposedSD, startDate) <= 0;
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowEndDate) <= 0 || DateTime.Compare(proposedSD, dtRowStartDate) <= 0;
                             }
           
                             if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
@@ -839,8 +839,8 @@ namespace HR_LEAVEv2.HR
                             if (proposedAED != DateTime.MinValue)
                             {
                                 // check if period represented by proposed start date is in active record's period
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, startDate) >= 0;
-                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, startDate) >= 0;
+                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowStartDate) >= 0;
+                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, dtRowStartDate) >= 0;
                             }
                             // proposed actual end date is empty - proposed record is active
                             else
@@ -861,7 +861,7 @@ namespace HR_LEAVEv2.HR
                         }
 
                     }
-                    i++;
+                    currIndex++;
                 }
                 if (isProposedRecordActive)
                     numActiveRows++;
@@ -941,7 +941,7 @@ namespace HR_LEAVEv2.HR
                                 }
 
 
-                                if (!String.IsNullOrEmpty(startDate) && !String.IsNullOrWhiteSpace(startDate) && isStartDateChanged)
+                                if (!util.isNullOrEmpty(startDate) && isStartDateChanged)
                                 {
                                     if (isRecordValid(startDate, actualEndDate, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel))
                                     {
@@ -963,14 +963,14 @@ namespace HR_LEAVEv2.HR
                                         isEditedRecordValid = false; 
                                     
                                 }
-                                else if (isStartDateChanged && (String.IsNullOrEmpty(startDate) || String.IsNullOrWhiteSpace(startDate) || startDate == "&nbsp;"))
+                                else if (isStartDateChanged && util.isNullOrEmpty(startDate))
                                     invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
 
                                 if (isExpectedEndDateChanged)
                                 {
                                     editsMade.Add("Expected End Date");
 
-                                    if (!String.IsNullOrEmpty(expectedEndDate) && !String.IsNullOrWhiteSpace(expectedEndDate) && expectedEndDate != "&nbsp;")
+                                    if (!util.isNullOrEmpty(expectedEndDate))
                                         dt.Rows[index][(int)emp_records_columns.expected_end_date] = DateTime.ParseExact(expectedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                                     else
                                         dt.Rows[index][(int)emp_records_columns.expected_end_date] = DateTime.MinValue;
@@ -985,7 +985,7 @@ namespace HR_LEAVEv2.HR
                                     if (isEditedRecordValid) {
                                         editsMade.Add("Actual End Date");
 
-                                        if (!String.IsNullOrEmpty(actualEndDate) && !String.IsNullOrWhiteSpace(actualEndDate) && actualEndDate != "&nbsp;")
+                                        if (!util.isNullOrEmpty(actualEndDate))
                                             dt.Rows[index][(int)emp_records_columns.actual_end_date] = actualEndDate;
                                         else
                                             dt.Rows[index][(int)emp_records_columns.actual_end_date] = string.Empty;
@@ -1207,7 +1207,7 @@ namespace HR_LEAVEv2.HR
                 {
                     // the HR 2, HR 3 must have permissions to view data for the same employment type as for the employee who submitted the application
                     //check if hr can view applications from the relevant employment type 
-                    if (String.IsNullOrEmpty(empType) || (empType == "Contract" && !permissions.Contains("contract_permissions")) || (empType == "Public Service" && !permissions.Contains("public_officer_permissions")))
+                    if (util.isNullOrEmpty(empType) || (empType == "Contract" && !permissions.Contains("contract_permissions")) || (empType == "Public Service" && !permissions.Contains("public_officer_permissions")))
                         Response.Redirect("~/AccessDenied.aspx");
                 }
             }
@@ -1550,7 +1550,7 @@ namespace HR_LEAVEv2.HR
             {
                 string balance = getLeaveBalanceText(kvp.Key);
                 string newKey = kvp.Value.Replace("[", "").Replace("]", "");
-                currentLeaveBalances[newKey] = String.IsNullOrEmpty(balance) ? "0" : balance;
+                currentLeaveBalances[newKey] = util.isNullOrEmpty(balance) ? "0" : balance;
             }
 
             //checks which leave balances were edited and adds them to a new dictionary (editedLeaveBalances)
@@ -1720,7 +1720,7 @@ namespace HR_LEAVEv2.HR
                                         command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
 
                                     string new_record_id = command.ExecuteScalar().ToString();
-                                    isEmpRecordInsertSuccessful = !String.IsNullOrWhiteSpace(new_record_id);
+                                    isEmpRecordInsertSuccessful = !util.isNullOrEmpty(new_record_id);
 
 
                                     if (isEmpRecordInsertSuccessful)
@@ -1788,7 +1788,7 @@ namespace HR_LEAVEv2.HR
                                     else
                                         command.Parameters.AddWithValue("@ExpectedEndDate", DBNull.Value);
 
-                                    if (!String.IsNullOrEmpty(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString()))
+                                    if (!util.isNullOrEmpty(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString()))
                                     {
                                         command.Parameters.AddWithValue("@ActualEndDate", DateTime.ParseExact(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"));
 
@@ -1970,7 +1970,7 @@ namespace HR_LEAVEv2.HR
                 nameFromAd = auth.getUserInfoFromActiveDirectory(email); // get first name, last name from active directory
 
 
-            if (!String.IsNullOrEmpty(nameFromAd))
+            if (!util.isNullOrEmpty(nameFromAd))
             {
                 // set first and last name
                 string[] name = nameFromAd.Split(' ');
@@ -1988,7 +1988,7 @@ namespace HR_LEAVEv2.HR
             {
                 string balance = getLeaveBalanceText(kvp.Key);
                 string newKey = kvp.Value.Replace("_", "").Replace("[", "").Replace("]", "");
-                currentLeaveBalances[newKey] = String.IsNullOrEmpty(balance) ? "0" : balance;
+                currentLeaveBalances[newKey] = util.isNullOrEmpty(balance) ? "0" : balance;
             }
 
             // Roles
@@ -2020,7 +2020,7 @@ namespace HR_LEAVEv2.HR
 
             // name from AD must be populated because that means the user exists in AD
             // dt cannot be null because that means that no employment record is added
-            if (!String.IsNullOrEmpty(nameFromAd) && dt != null)
+            if (!util.isNullOrEmpty(nameFromAd) && dt != null)
             {
 
                 // Employee IDs, email, name, username and leave balances
@@ -2214,7 +2214,7 @@ namespace HR_LEAVEv2.HR
             else
             {
                 fullFormErrorPanel.Style.Add("display", "inline-block");
-                if (String.IsNullOrEmpty(nameFromAd))
+                if (util.isNullOrEmpty(nameFromAd))
                     emailNotFoundErrorPanel.Style.Add("display", "inline-block");
                 if (dt == null)
                     noEmploymentRecordEnteredErrorPanel.Style.Add("display", "inline-block");
@@ -2233,7 +2233,7 @@ namespace HR_LEAVEv2.HR
         protected void refreshForm(object sender, EventArgs e)
         {
             string pathname = string.Empty;
-            if (String.IsNullOrEmpty(Request.QueryString["empId"]))
+            if (util.isNullOrEmpty(Request.QueryString["empId"]))
                 pathname = $"~/HR/EmployeeDetails?mode={ Request.QueryString["mode"]}";
             else
                 pathname = $"~/HR/EmployeeDetails?mode={Request.QueryString["mode"]}&empId={Request.QueryString["empId"]}";

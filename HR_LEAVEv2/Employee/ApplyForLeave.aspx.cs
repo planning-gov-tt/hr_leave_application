@@ -178,8 +178,8 @@ namespace HR_LEAVEv2.Employee
 
             if (mode == "apply")
             {
-                container.Visible = !String.IsNullOrEmpty(ActiveRecordStartDate);
-                employeeInactivePanel.Visible = String.IsNullOrEmpty(ActiveRecordStartDate);
+                container.Visible = !util.isNullOrEmpty(ActiveRecordStartDate);
+                employeeInactivePanel.Visible = util.isNullOrEmpty(ActiveRecordStartDate);
             }
         }
 
@@ -213,7 +213,7 @@ namespace HR_LEAVEv2.Employee
             if (isValidated)
             {
                 // check if start date is a before the start of the employee's current employment record
-                if(!String.IsNullOrEmpty(ActiveRecordStartDate))
+                if(!util.isNullOrEmpty(ActiveRecordStartDate))
                 {
                     // compare start dates
                     if (DateTime.Compare(start, DateTime.ParseExact(ActiveRecordStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0)
@@ -271,7 +271,7 @@ namespace HR_LEAVEv2.Employee
                     isValidated = false;
                 }
 
-                if (!String.IsNullOrEmpty(typeOfLeave.SelectedValue))
+                if (!util.isNullOrEmpty(typeOfLeave.SelectedValue))
                 {
                     // once not sick leave, ensure start date is not a day before today 
                     if (!typeOfLeave.SelectedValue.Equals("Sick") && DateTime.Compare(start, util.getCurrentDateToday()) < 0)
@@ -398,7 +398,7 @@ namespace HR_LEAVEv2.Employee
                    errTxt = string.Empty;
 
             List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null;
-            if (!String.IsNullOrEmpty(typeOfLeaveSelected) || !String.IsNullOrWhiteSpace(typeOfLeaveSelected))
+            if (!util.isNullOrEmpty(typeOfLeaveSelected))
             {
                 Dictionary<string, string> leaveBalanceMappings = util.getLeaveTypeMapping();
                 if (util.isLeaveTypeWithoutBalance(typeOfLeaveSelected))
@@ -458,7 +458,7 @@ namespace HR_LEAVEv2.Employee
                         
 
 
-                    empType = String.IsNullOrEmpty(empType) || String.IsNullOrWhiteSpace(empType) ? "unregistered" : empType;
+                    empType = util.isNullOrEmpty(empType) ? "unregistered" : empType;
 
                     if (isValid == "Yes" && empType == "Contract")
                     {
@@ -495,13 +495,13 @@ namespace HR_LEAVEv2.Employee
                 errTxt = "Type of Leave not selected";
             }
 
-            if (isValid == "No" || !String.IsNullOrEmpty(errTxt))
+            if (isValid == "No" || !util.isNullOrEmpty(errTxt))
             {
                 invalidLeaveTypeTxt.InnerText = errTxt;
                 invalidLeaveTypePanel.Style.Add("display", "inline-block");
             }
 
-            return isValid == "Yes" && String.IsNullOrEmpty(errTxt);
+            return isValid == "Yes" && util.isNullOrEmpty(errTxt);
         }
 
         protected void populateDaysTaken()
@@ -824,7 +824,7 @@ namespace HR_LEAVEv2.Employee
                                     // HR 2
                                     if (permissions.Contains("hr2_permissions"))
                                     {
-                                        if (!String.IsNullOrEmpty(ltDetails.empType))
+                                        if (!util.isNullOrEmpty(ltDetails.empType))
                                         {
                                             // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
                                             if (
@@ -901,7 +901,7 @@ namespace HR_LEAVEv2.Employee
                              * a different file with the same filename
                              * 
                              * */
-                            if (!String.IsNullOrWhiteSpace(ltDetails.files) && !String.IsNullOrEmpty(ltDetails.files))
+                            if (!util.isNullOrEmpty(ltDetails.files))
                             {
                                 string[] fileNamesArr = ltDetails.files.Split(',');
                                 string[] fileIdsArr = ltDetails.files_id.Split(',');
@@ -1335,7 +1335,7 @@ namespace HR_LEAVEv2.Employee
 
                             command.Parameters.AddWithValue("@DaysTaken", numDaysAppliedFor.Text);
                             transaction_id = command.ExecuteScalar().ToString();
-                            isLeaveApplicationInsertSuccessful = !String.IsNullOrEmpty(transaction_id);
+                            isLeaveApplicationInsertSuccessful = !util.isNullOrEmpty(transaction_id);
                         }
                     }
                 }
@@ -1388,7 +1388,7 @@ namespace HR_LEAVEv2.Employee
                                             command.Parameters.AddWithValue("@UploadedOn", util.getCurrentDate());
                                             fileid = command.ExecuteScalar().ToString();
 
-                                            isFileUploadSuccessful = !String.IsNullOrEmpty(fileid);
+                                            isFileUploadSuccessful = !util.isNullOrEmpty(fileid);
                                         }
 
                                         if (isFileUploadSuccessful)
@@ -1692,7 +1692,7 @@ namespace HR_LEAVEv2.Employee
                         {
                             if (isSupCommentsChanged)
                             {
-                                if (!String.IsNullOrEmpty(supComment) && !String.IsNullOrWhiteSpace(supComment))
+                                if (!util.isNullOrEmpty(supComment))
                                     command.Parameters.AddWithValue("@SupervisorComments", supComment);
                                 else
                                     command.Parameters.AddWithValue("@SupervisorComments", DBNull.Value);
@@ -1700,7 +1700,7 @@ namespace HR_LEAVEv2.Employee
 
                             if (isHrCommentsChanged)
                             {
-                                if (!String.IsNullOrEmpty(hrComment) && !String.IsNullOrWhiteSpace(hrComment))
+                                if (!util.isNullOrEmpty(hrComment))
                                     command.Parameters.AddWithValue("@HrComments", hrComment);
                                 else
                                     command.Parameters.AddWithValue("@HrComments", DBNull.Value);
@@ -1762,10 +1762,10 @@ namespace HR_LEAVEv2.Employee
                                             command.Parameters.AddWithValue("@UploadedOn", util.getCurrentDate());
                                             fileid = command.ExecuteScalar().ToString();
 
-                                            isEditSuccessful = isEditSuccessful && !String.IsNullOrEmpty(fileid);
+                                            isEditSuccessful = isEditSuccessful && !util.isNullOrEmpty(fileid);
                                         }
 
-                                        if (!String.IsNullOrEmpty(fileid))
+                                        if (!util.isNullOrEmpty(fileid))
                                         {
                                             // insert record into bridge entity which associates file(s) with a given employee
                                             sql = $@"

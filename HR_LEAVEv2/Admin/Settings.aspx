@@ -47,6 +47,7 @@
         </div>
 
         <asp:Panel ID="addPanel" Visible ="false" runat="server" class="row" style="margin-top:15px; margin-bottom:25px; background-color:#e0e0eb;">
+            
             <asp:Panel ID="headerForFormPanel" CssClass="row" runat="server" Style="margin-bottom: -20px;" >
                 <h2 id="headerForForm" runat="server"></h2>
                 <div>
@@ -55,6 +56,7 @@
                     </asp:LinkButton>
                 </div>
             </asp:Panel>
+
             <div class="row">
                 <table id="tblDynamicForm" runat="server" style="margin: 0 auto;">
                     <tr>
@@ -66,7 +68,9 @@
             </div>
             
             <asp:UpdatePanel ID="validationPanel" runat="server" Style="margin-bottom:15px;">
+
                 <ContentTemplate>
+
                     <asp:Panel ID="createSuccessfulPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span>Insert Successful</span>
@@ -106,56 +110,73 @@
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Expected end date is not valid</span>
                     </asp:Panel>
+
                     <asp:Panel ID="dateComparisonExpectedValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Expected end date cannot precede start date</span>
                     </asp:Panel>
+
                     <asp:Panel ID="dateComparisonActualValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Actual end date cannot precede start date</span>
                     </asp:Panel>
+
                     <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Start date is on the weekend</span>
                     </asp:Panel>
+
                     <asp:Panel ID="expectedEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Expected end date is on the weekend</span>
                     </asp:Panel>
+
                     <asp:Panel ID="invalidActualEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Actual end date is not valid</span>
                     </asp:Panel>
+
                     <asp:Panel ID="actualEndDateOnWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Actual end date is on the weekend</span>
                     </asp:Panel>
+
                 </ContentTemplate>
+
             </asp:UpdatePanel>
             
             <asp:Panel ID="submitBtnPanel" CssClass="row" runat="server" Style="margin-bottom: 25px; margin-top:15px;">
+                
                 <asp:LinkButton ID="createBtn" CssClass="btn btn-primary" runat="server" Visible="false" OnClick="createBtn_Click" ValidationGroup="CU_validation">
                     <i class="fa fa-save"></i>
                     Save
                 </asp:LinkButton>
+
                 <asp:LinkButton ID="EditBtn" CssClass="btn btn-primary" runat="server" Visible="false" ValidationGroup="CU_validation" OnClick="EditBtn_Click">
                     <i class="fa fa-save"></i>
                     Save
                 </asp:LinkButton>
+
             </asp:Panel>
+
         </asp:Panel>
 
         <div id="gridViewContainer" class="row">
             <%--Search bar--%>
             <asp:Panel ID="searchPanel" runat="server" DefaultButton="searchBtn" CssClass="input-group" Width="510px" Style="margin:0 auto; margin-bottom: 10px;" Visible="false">
+                
                 <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" AutoPostBack="true" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
+                
                 <div class="input-group-addon">
+
                     <asp:LinkButton ID="searchBtn" runat="server" OnClick="searchBtn_Click">
                             <span class="input-group-text" id="basic-addon2">
                                 <i class="fa fa-search"></i>
                             </span>
                     </asp:LinkButton>
+
                 </div>
+
             </asp:Panel>
 
             <asp:LinkButton ID="clearSearchBtn" runat="server" Visible="false" CssClass="btn btn-primary" OnClick="clearSearchBtn_Click">
