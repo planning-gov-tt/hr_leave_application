@@ -193,6 +193,114 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl nullableErrorTxt;
         
         /// <summary>
+        /// clashingRecordsPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel clashingRecordsPanel;
+        
+        /// <summary>
+        /// clashingRecordsTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl clashingRecordsTxt;
+        
+        /// <summary>
+        /// multipleActiveRecordsPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsPanel;
+        
+        /// <summary>
+        /// multipleActiveRecordsTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl multipleActiveRecordsTxt;
+        
+        /// <summary>
+        /// invalidStartDateValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidStartDateValidationMsgPanel;
+        
+        /// <summary>
+        /// invalidExpectedEndDatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidExpectedEndDatePanel;
+        
+        /// <summary>
+        /// dateComparisonExpectedValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel dateComparisonExpectedValidationMsgPanel;
+        
+        /// <summary>
+        /// dateComparisonActualValidationMsgPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel dateComparisonActualValidationMsgPanel;
+        
+        /// <summary>
+        /// startDateIsWeekendPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel startDateIsWeekendPanel;
+        
+        /// <summary>
+        /// expectedEndDateIsWeekendPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel expectedEndDateIsWeekendPanel;
+        
+        /// <summary>
+        /// invalidActualEndDatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidActualEndDatePanel;
+        
+        /// <summary>
+        /// actualEndDateOnWeekend control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel actualEndDateOnWeekend;
+        
+        /// <summary>
         /// unsuccessfulInsertPanel control.
         /// </summary>
         /// <remarks>
