@@ -24,10 +24,10 @@ namespace HR_LEAVEv2.Employee
             // resets number of notifications for current user
             Util util = new Util();
 
-            Label num_notifs = (Label)Master.FindControl("num_notifications");
+            Label numNotifs = (Label)Master.FindControl("num_notifications");
             int numUnread = Convert.ToInt32(util.resetNumNotifications(Session["emp_id"].ToString()));
             markAllAsRead.Visible = numUnread > 0;
-            num_notifs.Text = numUnread.ToString();
+            numNotifs.Text = numUnread.ToString();
             System.Web.UI.UpdatePanel up = (System.Web.UI.UpdatePanel)Master.FindControl("notificationsUpdatePanel");
             up.Update();
         }

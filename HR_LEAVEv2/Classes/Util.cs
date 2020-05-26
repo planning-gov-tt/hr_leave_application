@@ -28,6 +28,11 @@ namespace HR_LEAVEv2.Classes
             public string subject { get; set; }
         }
 
+        public Boolean isNullOrEmpty(string s)
+        {
+            return String.IsNullOrEmpty(s) || String.IsNullOrWhiteSpace(s) || s == "&nbsp;";
+        }
+
         public DateTime getCurrentDate()
         {
             return DateTime.Now;

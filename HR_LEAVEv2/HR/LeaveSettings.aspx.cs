@@ -213,7 +213,7 @@ namespace HR_LEAVEv2.HR
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
                         id = command.ExecuteScalar().ToString();
-                        isInsertSuccessful = !String.IsNullOrEmpty(id);
+                        isInsertSuccessful = !util.isNullOrEmpty(id);
                     }
                 }
             }

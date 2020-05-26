@@ -74,7 +74,7 @@ namespace HR_LEAVEv2.UserControls
                     }
 
                     // if no employment records available then show 0-ed out leave balance counter
-                    if (empDetails == null || String.IsNullOrEmpty(empDetails.employmentType))
+                    if (empDetails == null || util.isNullOrEmpty(empDetails.employmentType))
                     {
                         empDetails = new EmployeeDetails()
                         {
