@@ -46,7 +46,7 @@ namespace HR_LEAVEv2.HR
 
             // validator for end date when adding employment records
             // an end date is required for Public service employment types but is autofilled if empty for Contract employment types
-            endDateRequiredValidator.Enabled = empTypeList.SelectedValue == "Public Service";
+            //endDateRequiredValidator.Enabled = empTypeList.SelectedValue == "Public Service";
 
             if (!this.IsPostBack)
             {

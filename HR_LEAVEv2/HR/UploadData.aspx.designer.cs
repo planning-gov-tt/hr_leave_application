@@ -139,6 +139,60 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel successfulDataInsertPanel;
         
         /// <summary>
+        /// typeErrorPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel typeErrorPanel;
+        
+        /// <summary>
+        /// typeErrorTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl typeErrorTxt;
+        
+        /// <summary>
+        /// maxLengthErrorPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel maxLengthErrorPanel;
+        
+        /// <summary>
+        /// maxLengthErrorTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl maxLengthErrorTxt;
+        
+        /// <summary>
+        /// nullableErrorPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel nullableErrorPanel;
+        
+        /// <summary>
+        /// nullableErrorTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl nullableErrorTxt;
+        
+        /// <summary>
         /// unsuccessfulInsertPanel control.
         /// </summary>
         /// <remarks>

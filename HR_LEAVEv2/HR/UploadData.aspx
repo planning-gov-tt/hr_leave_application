@@ -1,5 +1,11 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="UploadData.aspx.cs" Inherits="HR_LEAVEv2.HR.UploadData" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <style>
+        #deleteSuccessfulMsgCancelBtn{
+            cursor:pointer;
+            outline:none;
+        }
+    </style>
     <h1><%: Title %></h1>
     <div class="container-fluid" style="margin-top:35px;">
         <asp:Panel ID="fileUploadPanel" runat="server" Style="margin: 0 auto; text-align: center" CssClass="row">
@@ -53,14 +59,40 @@
                 <asp:Panel ID="successfulDataInsertPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                     <span >Data was successfully uploaded to database</span>
+                    <i class="fa fa-times-circle" id="deleteSuccessfulMsgCancelBtn" style="margin-left: 11px; color: #484848;"></i>
+                </asp:Panel>
+
+                <asp:Panel ID="typeErrorPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="typeErrorTxt" runat="server"></span>
+                </asp:Panel>
+
+                <asp:Panel ID="maxLengthErrorPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="maxLengthErrorTxt" runat="server"></span>
+                </asp:Panel>
+
+                <asp:Panel ID="nullableErrorPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="nullableErrorTxt" runat="server"></span>
                 </asp:Panel>
 
                 <asp:Panel ID="unsuccessfulInsertPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span>Data was not uploaded to database</span>
+                    <span>Data was not uploaded to database.</span>
                 </asp:Panel>
 
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>
+
+    <script>
+        Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
+
+            $('#deleteSuccessfulMsgCancelBtn').click(function () {
+                $('#<%= successfulDataInsertPanel.ClientID %>').hide();
+            });
+        });
+    </script>
+
 </asp:Content>
