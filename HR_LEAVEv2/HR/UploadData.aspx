@@ -77,16 +77,6 @@
                     <span id="nullableErrorTxt" runat="server"></span>
                 </asp:Panel>
 
-                <%--<asp:Panel ID="clashingRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="clashingRecordsTxt" runat="server">Employment record being inserted clashes with another employment record</span>
-                </asp:Panel>
-
-                <asp:Panel ID="multipleActiveRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="multipleActiveRecordsTxt" runat="server">Employment record being inserted would result in multiple active records</span>
-                </asp:Panel>--%>
-
                 <asp:Panel ID="clashingRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="clashingRecordsTxt" runat="server">Employment record being inserted clashes with another employment record</span>
@@ -97,60 +87,50 @@
                     <span id="multipleActiveRecordsTxt" runat="server">Employment record being inserted would result in multiple active records</span>
                 </asp:Panel>
 
-                <%--<asp:Panel ID="invalidDateValidationPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="invalidDateTxt" runat="server"></span>
-                </asp:Panel>
-
-                <asp:Panel ID="invalidComparisonValidationPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="invalidComparisonTxt" runat="server"></span>
-                </asp:Panel>
-
-                <asp:Panel ID="dateOnWeekendValidationPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="dateOnWeekendtxt" runat="server"></span>
-                </asp:Panel>--%>
-
                 <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Start date is not valid</span>
-                    </asp:Panel>
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidStartDateTxt" runat="server">Start date is not valid</span>
+                </asp:Panel>
 
-                    <asp:Panel ID="invalidExpectedEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Expected end date is not valid</span>
-                    </asp:Panel>
+                <asp:Panel ID="invalidExpectedEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidExpectedEndDateTxt" runat="server">Expected end date is not valid</span>
+                </asp:Panel>
 
                 <asp:Panel ID="dateComparisonExpectedValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Expected end date cannot precede start date</span>
-                    </asp:Panel>
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="dateComparisonExpectedTxt" runat="server">Expected end date cannot precede start date</span>
+                </asp:Panel>
 
-                    <asp:Panel ID="dateComparisonActualValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Actual end date cannot precede start date</span>
-                    </asp:Panel>
+                <asp:Panel ID="dateComparisonActualValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="dateComparisionActualTxt" runat="server">Actual end date cannot precede start date</span>
+                </asp:Panel>
 
                 <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Start date is on the weekend</span>
-                    </asp:Panel>
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="startDateIsWeekendTxt" runat="server">Start date is on the weekend</span>
+                </asp:Panel>
 
-                    <asp:Panel ID="expectedEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Expected end date is on the weekend</span>
-                    </asp:Panel>
+                <asp:Panel ID="expectedEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="expectedEndDateIsWeekendTxt" runat="server">Expected end date is on the weekend</span>
+                </asp:Panel>
 
-                    <asp:Panel ID="invalidActualEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Actual end date is not valid</span>
-                    </asp:Panel>
+                <asp:Panel ID="invalidActualEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidActualEndDateTxt" runat="server">Actual end date is not valid</span>
+                </asp:Panel>
 
-                    <asp:Panel ID="actualEndDateOnWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Actual end date is on the weekend</span>
-                    </asp:Panel>
+                <asp:Panel ID="actualEndDateOnWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="actualEndDateIsWeekendTxt" runat="server">Actual end date is on the weekend</span>
+                </asp:Panel>
+
+                <asp:Panel ID="wrongTablePanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span>Table structure in Excel file does not match table structure for selected table</span>
+                </asp:Panel>
 
                 <asp:Panel ID="unsuccessfulInsertPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>

@@ -238,6 +238,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel invalidStartDateValidationMsgPanel;
         
         /// <summary>
+        /// invalidStartDateTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidStartDateTxt;
+        
+        /// <summary>
         /// invalidExpectedEndDatePanel control.
         /// </summary>
         /// <remarks>
@@ -245,6 +254,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel invalidExpectedEndDatePanel;
+        
+        /// <summary>
+        /// invalidExpectedEndDateTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidExpectedEndDateTxt;
         
         /// <summary>
         /// dateComparisonExpectedValidationMsgPanel control.
@@ -256,6 +274,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel dateComparisonExpectedValidationMsgPanel;
         
         /// <summary>
+        /// dateComparisonExpectedTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl dateComparisonExpectedTxt;
+        
+        /// <summary>
         /// dateComparisonActualValidationMsgPanel control.
         /// </summary>
         /// <remarks>
@@ -263,6 +290,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel dateComparisonActualValidationMsgPanel;
+        
+        /// <summary>
+        /// dateComparisionActualTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl dateComparisionActualTxt;
         
         /// <summary>
         /// startDateIsWeekendPanel control.
@@ -274,6 +310,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel startDateIsWeekendPanel;
         
         /// <summary>
+        /// startDateIsWeekendTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl startDateIsWeekendTxt;
+        
+        /// <summary>
         /// expectedEndDateIsWeekendPanel control.
         /// </summary>
         /// <remarks>
@@ -281,6 +326,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel expectedEndDateIsWeekendPanel;
+        
+        /// <summary>
+        /// expectedEndDateIsWeekendTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl expectedEndDateIsWeekendTxt;
         
         /// <summary>
         /// invalidActualEndDatePanel control.
@@ -292,13 +346,40 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel invalidActualEndDatePanel;
         
         /// <summary>
-        /// actualEndDateOnWeekend control.
+        /// invalidActualEndDateTxt control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel actualEndDateOnWeekend;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidActualEndDateTxt;
+        
+        /// <summary>
+        /// actualEndDateOnWeekendPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel actualEndDateOnWeekendPanel;
+        
+        /// <summary>
+        /// actualEndDateIsWeekendTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl actualEndDateIsWeekendTxt;
+        
+        /// <summary>
+        /// wrongTablePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel wrongTablePanel;
         
         /// <summary>
         /// unsuccessfulInsertPanel control.

@@ -27,6 +27,13 @@ namespace HR_LEAVEv2.HR
             years_worked = 8
         };
         Util util = new Util();
+
+        private Dictionary<string, List<string>> empPositionValidationMsgs
+        {
+            get { return ViewState["empPositionValidationMsgs"] != null ? ViewState["empPositionValidationMsgs"] as Dictionary<string, List<string>> : null; }
+            set { ViewState["empPositionValidationMsgs"] = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             List<string> permissions = (List<string>)Session["permissions"];
@@ -43,7 +50,7 @@ namespace HR_LEAVEv2.HR
             }
         }
 
-        protected void resetUploadDataPage()
+        protected void clearValidationMessages()
         {
             invalidFileTypePanel.Style.Add("display", "none");
             fileUploadedTooLargePanel.Style.Add("display", "none");
@@ -61,11 +68,18 @@ namespace HR_LEAVEv2.HR
             startDateIsWeekendPanel.Style.Add("display", "none");
             expectedEndDateIsWeekendPanel.Style.Add("display", "none");
             invalidActualEndDatePanel.Style.Add("display", "none");
-            actualEndDateOnWeekend.Style.Add("display", "none");
+            actualEndDateOnWeekendPanel.Style.Add("display", "none");
 
             multipleActiveRecordsPanel.Style.Add("display", "none");
             clashingRecordsPanel.Style.Add("display", "none");
 
+            wrongTablePanel.Style.Add("display", "none");
+        }
+
+        protected void resetUploadDataPage()
+        {
+
+            clearValidationMessages();
             uploadedFile.Visible = false;
             uploadDataBtnPanel.Visible = false;
             chooseTablePanel.Visible = false;
@@ -132,81 +146,46 @@ namespace HR_LEAVEv2.HR
             deleteUploadedFile();
         }
 
-        //protected DataTable getDataTableRepresentingTable(string tableName)
-        //{
-        //    try
-        //    {
-        //        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-        //        {
-        //            connection.Open();
-        //            string sql = $@"
-        //                    SELECT *
-        //                    FROM dbo.{tableName}
-        //                    WHERE 1=2
-        //                ";
-        //            using (SqlCommand command = new SqlCommand(sql, connection))
-        //            {
-        //                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-        //                {
-        //                    DataTable dt = new DataTable();
-        //                    adapter.Fill(dt);
-
-        //                    return dt;
-
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        //exception logic
-        //        return null;
-        //    }
-
-        //}
-        protected Boolean validateDates(string startDate, string endDate, Panel endDateInvalidPanel, Panel endDateWeekendPanel, Panel dateComparisonPanel)
+        protected Boolean validateDates(DateTime start, DateTime end, Boolean isEndDateExpected, string row)
         {
-            DateTime start, end;
-            start = end = DateTime.MinValue;
             Boolean isValidated = true;
-
-            // validate start date is a date
-            if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start))
-            {
-                invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
-                isValidated = false;
-            }
 
             // ensure start date is not a weekend
             if (start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
             {
-                startDateIsWeekendPanel.Style.Add("display", "inline-block");
+                empPositionValidationMsgs["startDateIsWeekend"].Add(row);
                 isValidated = false;
             }
 
-            if (!util.isNullOrEmpty(endDate))
+            if(end != DateTime.MinValue)
             {
-                // validate end date is a date
-                if (!DateTime.TryParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end))
+                // compare dates to ensure end date is not before start date
+                if (DateTime.Compare(start, end) > 0)
                 {
-                    endDateInvalidPanel.Style.Add("display", "inline-block");
-                    isValidated = false;
-                }
-                else
-                {
-                    // compare dates to ensure end date is not before start date
-                    if (DateTime.Compare(start, end) > 0)
+                    if (isEndDateExpected)
                     {
-                        dateComparisonPanel.Style.Add("display", "inline-block");
-                        isValidated = false;
+                        empPositionValidationMsgs["dateComparisonExpected"].Add(row);
+                    }
+                    else
+                    {
+                        empPositionValidationMsgs["dateComparisonActual"].Add(row);
                     }
 
-                    // ensure end date is not weekend
-                    if (end.DayOfWeek == DayOfWeek.Saturday || end.DayOfWeek == DayOfWeek.Sunday)
+                    isValidated = false;
+                }
+
+                // ensure end date is not weekend
+                if (end.DayOfWeek == DayOfWeek.Saturday || end.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    if (isEndDateExpected)
                     {
-                        endDateWeekendPanel.Style.Add("display", "inline-block");
-                        isValidated = false;
+                        empPositionValidationMsgs["expectedEndDateIsWeekend"].Add(row);
                     }
+                    else
+                    {
+                        empPositionValidationMsgs["actualEndDateIsWeekend"].Add(row);
+                    }
+                    isValidated = false;
                 }
             }
 
@@ -229,7 +208,7 @@ namespace HR_LEAVEv2.HR
                 return (DateTime.Compare(util.getCurrentDate(), DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
         }
 
-        protected Boolean isRecordValid(DataTable TableData, string employeeId, string id, string proposedStartDate, string proposedEndDate)
+        protected Boolean isRecordValid(DataTable TableData, string employeeId, string id, string proposedStartDate, string proposedEndDate, string row)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing employment position records. 
             // This method checks the other records to see if any other active records exist in order to validate the record. 
@@ -285,7 +264,7 @@ namespace HR_LEAVEv2.HR
 
                             if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
                             {
-                                clashingRecordsPanel.Style.Add("display", "inline-block");
+                                empPositionValidationMsgs["clashingRecords"].Add(row);
                                 return false;
                             }
 
@@ -304,14 +283,14 @@ namespace HR_LEAVEv2.HR
                             else
                             {
                                 if (multipleActiveRecordsPanel != null)
-                                    multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                                    empPositionValidationMsgs["multipleActiveRecords"].Add(row);
                                 return false; // proposed record is invalid since record already exists that is active and proposed record is active
                             }
 
 
                             if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
                             {
-                                clashingRecordsPanel.Style.Add("display", "inline-block");
+                                empPositionValidationMsgs["clashingRecords"].Add(row);
                                 return false;
                             }
 
@@ -325,7 +304,7 @@ namespace HR_LEAVEv2.HR
                 if (numActiveRows <= 1)
                     return true;
                 else if (numActiveRows > 1)
-                    multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                    empPositionValidationMsgs["multipleActiveRecords"].Add(row);
             }
 
             return true;
@@ -334,6 +313,7 @@ namespace HR_LEAVEv2.HR
 
         protected void uploadDataBtn_Click(object sender, EventArgs e)
         {
+            clearValidationMessages();
             Boolean isUploadSuccessful = false;
             if (Session["uploadedFile"] != null)
             {
@@ -404,11 +384,8 @@ namespace HR_LEAVEv2.HR
 
                                         foreach (IXLCell cell in row.Cells(1, dt.Columns.Count))
                                         {
-                                            //if (!String.IsNullOrEmpty(cell.Value.ToString()) && !String.IsNullOrWhiteSpace(cell.Value.ToString()))
-                                            //{
-                                                dt.Rows[dt.Rows.Count - 1][i] = cell.Value.ToString();
-                                                i++;
-                                            //}
+                                            dt.Rows[dt.Rows.Count - 1][i] = cell.Value.ToString();
+                                            i++;
                                         }
                                     }
                                 }
@@ -424,6 +401,8 @@ namespace HR_LEAVEv2.HR
                     Boolean isDataValid = true;
                     
                     // check whether data is valid based on table metadata and converts datetimes to their proper type
+                    // only checks and validates data for columnns that are present in the excel file. If a column which is necessary but is not included in the file then the error will be thrown and caught when 
+                    // trying to upload the data to the db (the last try catch)
                     for(int rowIndex = 0; rowIndex < dt.Rows.Count; rowIndex++)
                     {
                         List<string> colNamesWithIntTypeError = new List<string>(),
@@ -459,11 +438,11 @@ namespace HR_LEAVEv2.HR
                                     {
                                         //expect data to be date
                                         DateTime formattedDate = DateTime.MinValue;
-                                        isDataValid = DateTime.TryParseExact(dr.ItemArray[colIndex].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out formattedDate);
+                                        Boolean isDateValid = DateTime.TryParseExact(dr.ItemArray[colIndex].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out formattedDate);
 
-                                        if (isDataValid && formattedDate != DateTime.MinValue)
+                                        if (isDateValid && formattedDate != DateTime.MinValue)
                                         {
-                                            dr.ItemArray[colIndex] = formattedDate.ToString();
+                                            dr.SetField(colIndex, formattedDate.ToString());
                                         }
                                         else
                                         {
@@ -472,7 +451,7 @@ namespace HR_LEAVEv2.HR
                                             typeErrorPanel.Style.Add("display", "inline-block");
                                         }
 
-
+                                        isDataValid = isDataValid && isDateValid;
                                     }
 
                                     // check if data exceeds max length
@@ -481,7 +460,8 @@ namespace HR_LEAVEv2.HR
                                         // length of data exceeds max length
                                         if (dr.ItemArray[colIndex].ToString().Length > Convert.ToInt32(metaDataDr.ItemArray[2]))
                                         {
-                                            dr.ItemArray[colIndex] = dr.ItemArray[colIndex].ToString().Substring(0, Convert.ToInt32(metaDataDr.ItemArray[2]));
+                                            dr.SetField(colIndex, dr.ItemArray[colIndex].ToString().Substring(0, Convert.ToInt32(metaDataDr.ItemArray[2])));
+                                            //dr.ItemArray[colIndex] = dr.ItemArray[colIndex].ToString().Substring(0, Convert.ToInt32(metaDataDr.ItemArray[2]));
                                             colNamesWithMaxLengthError.Add(metaDataDr.ItemArray[0].ToString());
                                             maxLengthErrorTxt.InnerText = $"Data on row {rowIndex + 1} in {String.Join(", ", colNamesWithMaxLengthError.ToArray())} exceeds maximum length of {metaDataDr.ItemArray[2].ToString()} characters";
                                             maxLengthErrorPanel.Style.Add("display", "inline-block");
@@ -507,7 +487,8 @@ namespace HR_LEAVEv2.HR
                                     {
                                         // replace blanks with null value
                                         if (util.isNullOrEmpty(dr.ItemArray[colIndex].ToString()))
-                                            dr.ItemArray[colIndex] = DBNull.Value;
+                                            dr.SetField(colIndex, DBNull.Value);
+                                            //dr.ItemArray[colIndex] = DBNull.Value;
                                     }
 
                                 }
@@ -516,8 +497,22 @@ namespace HR_LEAVEv2.HR
                         
                     }
 
-                    if(tableSelectDdl.SelectedValue == "employeeposition")
+                    if (isDataValid && tableSelectDdl.SelectedValue == "employeeposition")
                     {
+                        // reset empPositionValidationMsgs
+                        empPositionValidationMsgs = new Dictionary<string, List<string>>()
+                        {
+                            {"startDateInvalid", new List<string>() },
+                            {"expectedEndDateInvalid", new List<string>() },
+                            {"actualEndDateInvalid", new List<string>() },
+                            {"dateComparisonExpected", new List<string>() },
+                            {"dateComparisonActual", new List<string>() },
+                            {"startDateIsWeekend", new List<string>() },
+                            {"expectedEndDateIsWeekend", new List<string>() },
+                            {"actualEndDateIsWeekend", new List<string>() },
+                            {"clashingRecords", new List<string>() },
+                            {"multipleActiveRecords", new List<string>() },
+                        };
                         // check employment records for consistency for employeeposition table
                         DataTable employmentRecordsDt = new DataTable();
                         try
@@ -538,31 +533,91 @@ namespace HR_LEAVEv2.HR
                                 }
                             }
 
-                            Boolean areDatesValid = false,
-                                isNewRecordValid = true;
 
+                            // empPositionValidationMsgs is initialized with column names already
+                            Boolean areDatesValid;
                             for (int rowIndex = 0; rowIndex < dt.Rows.Count; rowIndex++)
                             {
+                                areDatesValid = false;
+
                                 DataRow dr = dt.Rows[rowIndex];
+                                DateTime start = DateTime.MinValue,
+                                         expectedEnd = DateTime.MinValue,
+                                         actualEnd = DateTime.MinValue;
                                 // check validity of dates 
                                 if (dt.Columns.Contains("start_date") && dt.Columns.Contains("expected_end_date"))
-                                    areDatesValid = validateDates(dr.Field<string>("start_date"), dr.Field<string>("expected_end_date"), invalidExpectedEndDatePanel, expectedEndDateIsWeekendPanel, dateComparisonExpectedValidationMsgPanel);
+                                {
+                                    start = Convert.ToDateTime(dr.Field<string>("start_date"));
+                                    expectedEnd = Convert.ToDateTime(dr.Field<string>("expected_end_date"));
+                                    areDatesValid = validateDates(start, expectedEnd, true, (rowIndex + 1).ToString());
+                                }
+                                    
 
                                 // validate start date and actual end date
                                 if (dt.Columns.Contains("start_date") && dt.Columns.Contains("actual_end_date"))
-                                    areDatesValid = areDatesValid && validateDates(dr.Field<string>("start_date"), dr.Field<string>("actual_end_date"), invalidActualEndDatePanel, actualEndDateOnWeekend, dateComparisonActualValidationMsgPanel);
-
+                                {
+                                    start = Convert.ToDateTime(dr.Field<string>("start_date"));
+                                    if (!util.isNullOrEmpty(dr.Field<string>("actual_end_date")))
+                                        actualEnd = Convert.ToDateTime(dr.Field<string>("actual_end_date"));
+                                    areDatesValid = areDatesValid && validateDates(start, actualEnd, false, (rowIndex + 1).ToString());
+                                }
+                                   
                                 // validate record if employment record to ensure more than one active record is not added
                                 // both start date and actual end date will already be validated in the proper form of d/MM/yyyy
                                 if (areDatesValid)
-                                    isNewRecordValid = isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", dr.Field<string>("start_date"), dr.Field<string>("actual_end_date"));
+                                    isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", start.ToString("d/MM/yyyy"), actualEnd.ToString("d/MM/yyyy"), (rowIndex + 1).ToString()); 
+                            }
 
-                                if (!areDatesValid || !isNewRecordValid)
+                            // check errors and show appropriate messages
+                            foreach(KeyValuePair<string, List<string>> kvp in empPositionValidationMsgs)
+                            {
+                                if(kvp.Value.Count > 0)
                                 {
-                                    isUploadSuccessful = isDataValid = false;
-                                    break;
-                                }
-                                    
+                                    isDataValid = isUploadSuccessful = false;
+                                    switch (kvp.Key)
+                                    {
+                                        case "startDateInvalid":
+                                            invalidStartDateTxt.InnerText = $"Start date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
+                                            invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "expectedEndDateInvalid":
+                                            invalidExpectedEndDateTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
+                                            invalidExpectedEndDatePanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "actualEndDateInvalid":
+                                            invalidActualEndDateTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
+                                            invalidActualEndDatePanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "dateComparisonExpected":
+                                            dateComparisonExpectedTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} cannot precede their corresponding start date";
+                                            dateComparisonExpectedValidationMsgPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "dateComparisionActual":
+                                            dateComparisionActualTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} cannot precede their corresponding start date";
+                                            dateComparisonActualValidationMsgPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "startDateIsWeekend":
+                                            startDateIsWeekendTxt.InnerText = $"Start date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
+                                            startDateIsWeekendPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "expectedEndDateIsWeekend":
+                                            expectedEndDateIsWeekendTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
+                                            expectedEndDateIsWeekendPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "actualEndDateIsWeekend":
+                                            actualEndDateIsWeekendTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
+                                            actualEndDateOnWeekendPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "clashingRecords":
+                                            clashingRecordsTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} clash/clashes with another employment record for their corresponding employee";
+                                            clashingRecordsPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "multipleActiveRecords":
+                                            multipleActiveRecordsTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in multiple active records for their corresponding employee";
+                                            multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                                            break;
+                                    }
+                                }  
                             }
 
                         }
@@ -594,6 +649,8 @@ namespace HR_LEAVEv2.HR
                         }
                         catch (Exception ex)
                         {
+                            if (ex.Message.Contains("The given ColumnMapping does not match up with any column in the source or destination."))
+                                wrongTablePanel.Style.Add("display", "inline-block");
                             //exception logic
                             isUploadSuccessful = false;
                         }
@@ -614,6 +671,7 @@ namespace HR_LEAVEv2.HR
 
         protected void tableSelectDdl_SelectedIndexChanged(object sender, EventArgs e)
         {
+            clearValidationMessages();
             uploadDataBtnPanel.Visible = tableSelectDdl.SelectedValue != "-";
         }
     }
