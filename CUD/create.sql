@@ -124,6 +124,8 @@ CREATE TABLE [dbo].[employeeposition] (
   [employment_type] NVARCHAR (15) NOT NULL,
   [dept_id] INT,
   [years_worked] INT NOT NULL,
+  [annual_vacation_amt] INT NOT NULL,
+  [max_vacation_accumulation] INT NOT NULL
 
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id]),
