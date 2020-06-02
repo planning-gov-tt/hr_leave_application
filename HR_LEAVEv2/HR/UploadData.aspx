@@ -39,7 +39,7 @@
                 Upload data
             </asp:LinkButton>
         </asp:Panel>
-        <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server" Style="margin-top:15px;; text-align:center;">
+        <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server" Style="margin-top:15px;text-align:center;">
             <ContentTemplate>
                 <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>

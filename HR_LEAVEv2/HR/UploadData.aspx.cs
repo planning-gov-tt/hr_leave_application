@@ -40,6 +40,9 @@ namespace HR_LEAVEv2.HR
             if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
 
+            if (!IsPostBack)
+                deleteUploadedFile();
+
             // hide clear file button if no file is uploaded
             clearFileBtn.Visible = Session["uploadedFile"] != null;
 
@@ -195,17 +198,22 @@ namespace HR_LEAVEv2.HR
         protected Boolean isRecordActive(string proposedStartDate, string proposedEndDate)
         {
             // returns a Boolean which represents whether the proposed actual end date passed will make a record active or inactive. The date passed is assumed to be validated
+            try
+            {
+                // check if start date of record is a day in the future, meaning the record is currently inactive
+                if (DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) > 0)
+                    return false;
 
-            // check if start date of record is a day in the future, meaning the record is currently inactive
-            if (DateTime.Compare(DateTime.ParseExact(proposedStartDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) > 0)
+                // if the passed end date is empty then the record is automaticaly Active
+                if (util.isNullOrEmpty(proposedEndDate))
+                    return true;
+                else
+                    // if today is before the passed actual end date then the record is active and otherwise, inactive
+                    return (DateTime.Compare(util.getCurrentDate(), DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
+            } catch(Exception ex)
+            {
                 return false;
-
-            // if the passed end date is empty then the record is automaticaly Active
-            if (util.isNullOrEmpty(proposedEndDate))
-                return true;
-            else
-                // if today is before the passed actual end date then the record is active and otherwise, inactive
-                return (DateTime.Compare(util.getCurrentDate(), DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
+            }           
         }
 
         protected Boolean isRecordValid(DataTable TableData, string employeeId, string id, string proposedStartDate, string proposedEndDate, string row)
@@ -229,14 +237,23 @@ namespace HR_LEAVEv2.HR
                     if (dr.ItemArray[(int)empPositionColumns.employee_id].ToString() == employeeId && dr.ItemArray[(int)empPositionColumns.record_id].ToString() != id)
                     {
                         // record being checked is active
-                        // must convert start date to correct format before passing to isRecordActive
-                        if (isRecordActive(Convert.ToDateTime(dr.ItemArray[(int)empPositionColumns.start_date]).ToString("d/MM/yyyy"), dr.ItemArray[(int)empPositionColumns.actual_end_date].ToString()))
-                            numActiveRows++;
+                        // must convert start date and actual end date (once not empty) to correct format before passing to isRecordActive
+                        if (util.isNullOrEmpty(dr.ItemArray[(int)empPositionColumns.actual_end_date].ToString()))
+                        {
+                            if (isRecordActive(Convert.ToDateTime(dr.ItemArray[(int)empPositionColumns.start_date]).ToString("d/MM/yyyy"), string.Empty))
+                                numActiveRows++;
+                        }
+                        else
+                        {
+                            if (isRecordActive(Convert.ToDateTime(dr.ItemArray[(int)empPositionColumns.start_date]).ToString("d/MM/yyyy"), Convert.ToDateTime(dr.ItemArray[(int)empPositionColumns.actual_end_date]).ToString("d/MM/yyyy")))
+                                numActiveRows++;
+                        }
+                        
 
 
-                        DateTime tableDataRowStartDate = (DateTime)dr[(int)empPositionColumns.start_date];
+                        DateTime tableDataRowStartDate = Convert.ToDateTime(dr[(int)empPositionColumns.start_date]);
 
-                        DateTime tableDataRowEndDate = !util.isNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? DateTime.ParseExact(dr[(int)empPositionColumns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
+                        DateTime tableDataRowEndDate = !util.isNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? Convert.ToDateTime(dr[(int)empPositionColumns.actual_end_date]) : DateTime.MinValue;
 
                         // ensure that record does not overlap with another record
                         bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
@@ -517,30 +534,30 @@ namespace HR_LEAVEv2.HR
                         DataTable employmentRecordsDt = new DataTable();
                         try
                         {
-                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                            {
-                                connection.Open();
-                                string sql = $@"
-                                SELECT * FROM dbo.employeeposition;
-                            ";
-                                using (SqlCommand command = new SqlCommand(sql, connection))
-                                {
-                                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                                    {
-                                        adapter.Fill(employmentRecordsDt);
-
-                                    }
-                                }
-                            }
-
-
                             // empPositionValidationMsgs is initialized with column names already
                             Boolean areDatesValid;
                             for (int rowIndex = 0; rowIndex < dt.Rows.Count; rowIndex++)
                             {
-                                areDatesValid = false;
-
                                 DataRow dr = dt.Rows[rowIndex];
+                                employmentRecordsDt = new DataTable();
+
+                                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                                {
+                                    connection.Open();
+                                    string sql = $@"
+                                    SELECT * FROM dbo.employeeposition 
+                                    WHERE employee_id = {dr.Field<string>("employee_id")};
+                                ";
+                                    using (SqlCommand command = new SqlCommand(sql, connection))
+                                    {
+                                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                        {
+                                            adapter.Fill(employmentRecordsDt);
+
+                                        }
+                                    }
+                                }
+                                areDatesValid = false;
                                 DateTime start = DateTime.MinValue,
                                          expectedEnd = DateTime.MinValue,
                                          actualEnd = DateTime.MinValue;
@@ -565,7 +582,13 @@ namespace HR_LEAVEv2.HR
                                 // validate record if employment record to ensure more than one active record is not added
                                 // both start date and actual end date will already be validated in the proper form of d/MM/yyyy
                                 if (areDatesValid)
-                                    isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", start.ToString("d/MM/yyyy"), actualEnd.ToString("d/MM/yyyy"), (rowIndex + 1).ToString()); 
+                                {
+                                    if(actualEnd != DateTime.MinValue)
+                                        isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", start.ToString("d/MM/yyyy"), actualEnd.ToString("d/MM/yyyy"), (rowIndex + 1).ToString());
+                                    else
+                                        isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", start.ToString("d/MM/yyyy"), string.Empty, (rowIndex + 1).ToString());
+                                }
+                                    
                             }
 
                             // check errors and show appropriate messages

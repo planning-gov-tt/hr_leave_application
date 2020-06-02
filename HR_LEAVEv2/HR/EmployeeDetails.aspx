@@ -17,6 +17,10 @@
             background-color: #e0e0eb;
         }
 
+        #vacationAmtsTable td{
+            padding-bottom:25px;
+        }
+
     </style>
 
     <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to all employees" OnClick="returnToPreviousBtn_Click">
@@ -359,18 +363,18 @@
         </div>
        
         <%--Employment Record form--%>
-        <div id="addEmploymentRecordContainer" class="container text-center" style="background-color: #f0f0f5; padding-bottom: 10px;">
+        <div id="addEmploymentRecordContainer" class="text-center" style="background-color: #f0f0f5; padding-bottom: 10px; padding-top:5px; width:90%; margin: 0 auto;">
             <h3>Employment Record</h3>
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
-                    <asp:Panel runat="server" ID="addEmpRecordForm" Style="display: inline-block; width: 100%">
-                        <div class="container" style="width: 80%; height: 95%">
+                    <asp:Panel runat="server" ID="addEmpRecordForm">
+                        <div>
                             <div class="form-group" style="margin-top: 25px;">
                                 <label for="empTypeList">Employment Type</label>
                                 <asp:DropDownList ID="empTypeList" runat="server" CssClass="form-control" Width="225px" AutoPostBack="true" DataSourceID="SqlDataSource3" DataTextField="type_id" Style="display: inline-block;"></asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [type_id] FROM [employmenttype] ORDER BY [type_id]"></asp:SqlDataSource>
                             </div>
-                            <div class="form-group" style="margin-top: 45px;">
+                            <div class="form-group" style="margin-top: 35px;">
                                 <label for="deptList">Department</label>
                                 <asp:DropDownList ID="deptList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource2" DataValueField="dept_id" DataTextField="dept_name" Style="display: inline-block; margin-right: 7%;"></asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSource2" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [dept_id], [dept_name] FROM [department] ORDER BY [dept_name]"></asp:SqlDataSource>
@@ -379,7 +383,7 @@
                                 <asp:DropDownList ID="positionList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource1" DataValueField="pos_id" DataTextField="pos_name" Style="display: inline-block"></asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [pos_id], [pos_name] FROM [position] ORDER BY [pos_name]"></asp:SqlDataSource>
                             </div>
-                            <div class="form-group text-center" style="margin-top: 45px; display:flex; justify-content:space-around; flex-wrap:wrap;">
+                            <div class="form-group text-center" style="margin-top: 35px; display:flex; justify-content:space-around; flex-wrap:wrap;">
                                 <span>
                                     <label for="txtStartDate">Start date</label>
                                     <asp:TextBox ID="txtStartDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
@@ -417,7 +421,58 @@
                                 </span>
                             </div>
 
-                            <div id="validationDiv" style="margin-top: 25px;">
+                            <div class="form-group" style="margin-top: 35px; display:flex; justify-content:center;">
+                                <table id="vacationAmtsTable">
+                                    <tr>
+                                        <td style="text-align:right;">
+                                            <label for="annualAmtOfLeaveTxt">Annual amount of vacation leave</label>
+                                        </td>
+                                        <td>
+                                            <asp:TextBox ID="annualAmtOfLeaveTxt" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
+                                        </td>
+                                        <td>
+                                            <asp:RequiredFieldValidator
+                                                ValidationGroup="empRecord"
+                                                ID="annualAmtOfLeaveReqValidator"
+                                                runat="server"
+                                                ControlToValidate="annualAmtOfLeaveTxt"
+                                                Display="Dynamic"
+                                                ErrorMessage="Required"
+                                                ForeColor="Red">
+                                            </asp:RequiredFieldValidator>
+                                        </td>
+                                        <td>
+                                            <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ValidationGroup="empRecord" ControlToValidate="annualAmtOfLeaveTxt" ErrorMessage="Input must be numerical" ValidationExpression="^\d+$" ForeColor="Red">
+                                            </asp:RegularExpressionValidator>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:right;">
+                                            <label for="maxAmtOfLeaveTxt">Maximum accumulated vacation leave</label>
+                                        </td>
+                                        <td>
+                                            <asp:TextBox ID="maxAmtOfLeaveTxt" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
+                                        </td>
+                                        <td>
+                                            <asp:RequiredFieldValidator
+                                                ValidationGroup="empRecord"
+                                                ID="maxAmtOfLeaveReqValidator"
+                                                runat="server"
+                                                ControlToValidate="maxAmtOfLeaveTxt"
+                                                Display="Dynamic"
+                                                ErrorMessage="Required"
+                                                ForeColor="Red">
+                                            </asp:RequiredFieldValidator>
+                                        </td>
+                                        <td>
+                                             <asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server" ValidationGroup="empRecord" ControlToValidate="maxAmtOfLeaveTxt" ErrorMessage="Input must be numerical" ValidationExpression="^\d+$" ForeColor="Red">
+                                            </asp:RegularExpressionValidator>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div id="validationDiv" style="margin-top: 10px;">
                                 <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
@@ -511,7 +566,7 @@
                                 </asp:Panel>
                             </div>
                         </div>
-                        <div class="text-center" style="margin-top: 35px; margin-bottom: 45px;">
+                        <div class="text-center" style="margin-top: 25px; margin-bottom: 45px;">
                             <asp:LinkButton runat="server" ID="cancelNewRecordBtn" CssClass="btn btn-danger" Text="Cancel" CausesValidation="false" Style="margin-right: 35px;" OnClick="cancelNewRecordBtn_Click">
                                  <i class="fa fa-times" aria-hidden="true"></i>
                                  Cancel
@@ -529,7 +584,7 @@
                     </asp:Panel>
                     <asp:GridView ID="GridView1" 
                         runat="server" 
-                        BorderStyle="None" CssClass="table" Style="margin: 0 auto;" 
+                        BorderStyle="None" CssClass="table" 
                         GridLines="Horizontal" 
                         OnRowDataBound="GridView1_RowDataBound" OnDataBound="GridView1_DataBound" OnRowDeleting="GridView1_RowDeleting" OnRowCommand="GridView1_RowCommand"
                         AutoGenerateColumns="false" 
@@ -582,37 +637,44 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
 
-                            <%--Index 0: Employment record ID--%>
+                            <%--Employment record ID--%>
                             <asp:BoundField HeaderText="Employment Record ID" DataField="record_id" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden" />
 
-                            <%--Index 1: Employment Type--%>
+                            <%--Employment Type--%>
                             <asp:BoundField HeaderText="Employment Type" DataField="employment_type" />
 
-                            <%--Index 2: Department ID--%>
+                            <%--Department ID--%>
                             <asp:BoundField HeaderText="Department ID" DataField="dept_id" Visible="false" />
 
-                            <%--Index 3: Department--%>
+                            <%--Department--%>
                             <asp:BoundField HeaderText="Department" DataField="dept_name" />
 
-                            <%--Index 4: Position ID--%>
+                            <%--Position ID--%>
                             <asp:BoundField HeaderText="Position ID" DataField="pos_id" Visible="false" />
 
-                            <%--Index 5: Position--%>
+                            <%--Position--%>
                             <asp:BoundField HeaderText="Position" DataField="pos_name" />
 
-                            <%--Index 6: Start--%>
+                            <%--Start--%>
                             <asp:BoundField HeaderText="Start Date" DataField="start_date" DataFormatString="{0:d/MM/yyyy}" />
 
-                            <%--Index 7: Expected End Date--%>
+                            <%--Expected End Date--%>
                             <asp:BoundField HeaderText="Expected End Date" DataField="expected_end_date" DataFormatString="{0:d/MM/yyyy}"/>
 
-                            <%--Index 8: isChanged--%>
+                            <%--isChanged--%>
                             <asp:BoundField HeaderText="isChanged" DataField="isChanged" HeaderStyle-CssClass="hidden" ItemStyle-CssClass="hidden"/>
 
-                            <%--Index 9: actual_end_date--%>
-                            <asp:BoundField HeaderText="Actual End Date" DataField="actual_end_date" />
+                            <%--Actual End Date--%>
+                            <asp:BoundField HeaderText="Actual End Date" DataField="actual_end_date" />   
+                            
+                             
+                            <%--Annual Vacation Amt--%>
+                            <asp:BoundField HeaderText="Annual Vacation" DataField="annual_vacation_amt" />
 
-                             <%--Index 10: status--%>
+                            <%--Max Vacation Accumulation--%>
+                            <asp:BoundField HeaderText="Max Vacation" DataField="max_vacation_accumulation" />
+
+                            <%--Status--%>
                             <asp:TemplateField HeaderText="Status">
                                 <ItemTemplate>
                                     <span id="status-label" class="label <%# Eval("status_class") %>"><%# Eval("status") %></span>

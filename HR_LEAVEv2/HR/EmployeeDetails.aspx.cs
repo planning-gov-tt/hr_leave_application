@@ -29,7 +29,9 @@ namespace HR_LEAVEv2.HR
             isChanged = 8,
             actual_end_date = 9,
             status = 10,
-            status_class = 11
+            status_class = 11,
+            annual_vacation_amt = 12,
+            max_vacation_accumulation = 13
         };
 
         public bool isEditMode { get; set; }
@@ -374,6 +376,12 @@ namespace HR_LEAVEv2.HR
                     txtActualEndDate.Text = actualEndDate;
                 }
 
+                // annual vacation amt
+                annualAmtOfLeaveTxt.Text = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "annual_vacation_amt")].Text.ToString();
+
+                // max vacation accumulation possible
+                maxAmtOfLeaveTxt.Text = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "max_vacation_accumulation")].Text.ToString();
+
                 // highlight row being edited
                 GridView1.Rows[index].CssClass = "highlighted-record";
 
@@ -524,7 +532,7 @@ namespace HR_LEAVEv2.HR
         protected void hideEmploymentRecordForm()
         {
             // hides and resets employment records form
-            this.resetAddEmploymentRecordFormFields();
+            resetAddEmploymentRecordFormFields();
             addEmpRecordForm.Visible = false;
             showFormBtn.Visible = true;
             addNewRecordBtn.Visible = true;
@@ -564,7 +572,9 @@ namespace HR_LEAVEv2.HR
                 endDate = txtEndDate.Text.ToString(), 
                 emp_type = empTypeList.SelectedValue, 
                 dept_id = deptList.SelectedValue,
-                dept_name = deptList.SelectedItem.Text;
+                dept_name = deptList.SelectedItem.Text,
+                annual_vacation_amt = annualAmtOfLeaveTxt.Text,
+                max_amt_of_vacation_accumulation = maxAmtOfLeaveTxt.Text;
 
             Boolean isValidated = validateDates(startDate, endDate),
                 isRecordAllowed = true;
@@ -589,6 +599,8 @@ namespace HR_LEAVEv2.HR
                     dt.Columns.Add("actual_end_date", typeof(string));
                     dt.Columns.Add("status", typeof(string));
                     dt.Columns.Add("status_class", typeof(string));
+                    dt.Columns.Add("annual_vacation_amt", typeof(int));
+                    dt.Columns.Add("max_vacation_accumulation", typeof(int));
                 }
                 else
                     // get pre-existing data table
@@ -637,11 +649,11 @@ namespace HR_LEAVEv2.HR
                     {
                         // if start date is before or on Today then the record is active, otherwise it is not
                         if(DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) <= 0)
-                            //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class
-                            dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success");
+                            //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
+                            dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success", Convert.ToInt32(annual_vacation_amt), Convert.ToInt32(max_amt_of_vacation_accumulation));
                         else
-                            //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class
-                            dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger");
+                            //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
+                            dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger",Convert.ToInt32(annual_vacation_amt), Convert.ToInt32(max_amt_of_vacation_accumulation));
                         ViewState["Gridview1_dataSource"] = dt;
                     }
                     else
@@ -666,6 +678,9 @@ namespace HR_LEAVEv2.HR
             empTypeList.DataBind();
             deptList.DataBind();
             positionList.DataBind();
+
+            annualAmtOfLeaveTxt.Text = string.Empty;
+            maxAmtOfLeaveTxt.Text = string.Empty;
         }
 
         protected void cancelNewRecordBtn_Click(object sender, EventArgs e)
@@ -892,7 +907,9 @@ namespace HR_LEAVEv2.HR
                     actualEndDate = txtActualEndDate.Text.ToString(),
                     emp_type = empTypeList.SelectedValue,
                     dept_id = deptList.SelectedValue,
-                    dept_name = deptList.SelectedItem.Text;
+                    dept_name = deptList.SelectedItem.Text,
+                    annual_vacation_amt = annualAmtOfLeaveTxt.Text,
+                    max_amt_of_vacation_accumulation = maxAmtOfLeaveTxt.Text;
 
                 // validate start and expected end date
                 Boolean isStartAndExpectedEndDateValidated = validateDates(startDate, expectedEndDate);
@@ -915,9 +932,11 @@ namespace HR_LEAVEv2.HR
                             isStartDateChanged = Convert.ToDateTime(dt.Rows[index].ItemArray[(int)emp_records_columns.start_date]).ToString("d/MM/yyyy") != startDate,
                             isExpectedEndDateChanged = Convert.ToDateTime(dt.Rows[index].ItemArray[(int)emp_records_columns.expected_end_date]).ToString("d/MM/yyyy") != expectedEndDate,
                             isActualEndDateChanged = dt.Rows[index][(int)emp_records_columns.actual_end_date].ToString() != actualEndDate,
+                            isAnnualVacationAmtChanged = Convert.ToInt32(dt.Rows[index][(int)emp_records_columns.annual_vacation_amt]) != Convert.ToInt32(annual_vacation_amt),
+                            isMaxAmtOfVacationAccChanged = Convert.ToInt32(dt.Rows[index][(int)emp_records_columns.max_vacation_accumulation]) != Convert.ToInt32(max_amt_of_vacation_accumulation),
                             isEditedRecordValid = true;
 
-                        if (isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isActualEndDateChanged)
+                        if (isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isActualEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged)
                         {
                             List<string> editsMade = new List<string>();
                             try
@@ -1004,14 +1023,26 @@ namespace HR_LEAVEv2.HR
 
                                 }
 
-                                if(isEditedRecordValid && (isActualEndDateChanged || isStartDateChanged ||isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged))
+                                if (isAnnualVacationAmtChanged)
+                                {
+                                    dt.Rows[index][(int)emp_records_columns.annual_vacation_amt] = Convert.ToInt32(annual_vacation_amt);
+                                    editsMade.Add("Annual amount of Vacation leave");
+                                }
+
+                                if (isMaxAmtOfVacationAccChanged)
+                                {
+                                    dt.Rows[index][(int)emp_records_columns.max_vacation_accumulation] = Convert.ToInt32(max_amt_of_vacation_accumulation);
+                                    editsMade.Add("Maximum accumulated Vacation leave");
+                                }
+
+                                if(isEditedRecordValid && (isActualEndDateChanged ||isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged))
                                 {
                                     dt.Rows[index].SetField<string>((int)emp_records_columns.isChanged, "2");
 
                                     ViewState["Gridview1_dataSource"] = dt;
                                     bindGridview();
 
-                                    // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE)
+                                    // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for adding audit log. 
                                     Dictionary<string, HashSet<string>> recordEdits = new Dictionary < string, HashSet< string >> ();
                                     if (Session["editedRecords"] != null)
                                     {
@@ -1039,7 +1070,7 @@ namespace HR_LEAVEv2.HR
                                     editEmpRecordSuccTxt.InnerText = $"{String.Join(", ", editsMade.ToArray())} edits successfully made to employment record. Don't forget to save your changes";
                                     editEmploymentRecordSuccessful.Style.Add("display", "inline-block");
                                 }
-                                else if(!(isActualEndDateChanged || isStartDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged))
+                                else if(!(isActualEndDateChanged || isStartDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isExpectedEndDateChanged))
                                     noEditsToRecordsMade.Style.Add("display", "inline-block");
 
                             }
@@ -1168,7 +1199,9 @@ namespace HR_LEAVEv2.HR
                                 '0' as isChanged,
                                 FORMAT(ep.actual_end_date, 'd/MM/yyyy') actual_end_date,
                                 IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'Active', 'Inactive') as status, 
-                                IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'label-success', 'label-danger') as status_class
+                                IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'label-success', 'label-danger') as status_class,
+                                annual_vacation_amt,
+                                max_vacation_accumulation
                                 
                             FROM [dbo].[employeeposition] ep
 
@@ -1690,7 +1723,9 @@ namespace HR_LEAVEv2.HR
                                         ,[expected_end_date]
                                         ,[employment_type]
                                         ,[dept_id]
-                                        ,[years_worked])
+                                        ,[years_worked]
+                                        ,[annual_vacation_amt]
+                                        ,[max_vacation_accumulation])
                                 OUTPUT INSERTED.id
                                 VALUES
                                     ( @EmployeeId
@@ -1700,6 +1735,8 @@ namespace HR_LEAVEv2.HR
                                     ,@EmploymentType
                                     ,@DeptId
                                     ,@YearsWorked
+                                    ,@AnnualVacationAmt
+                                    ,@MaxVacationAccumulation
                                     );
                             ";
 
@@ -1719,6 +1756,8 @@ namespace HR_LEAVEv2.HR
                                     else
                                         command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
 
+                                    command.Parameters.AddWithValue("@AnnualVacationAmt", dr.ItemArray[(int)emp_records_columns.annual_vacation_amt]);
+                                    command.Parameters.AddWithValue("@MaxVacationAccumulation", dr.ItemArray[(int)emp_records_columns.max_vacation_accumulation]);
                                     string new_record_id = command.ExecuteScalar().ToString();
                                     isEmpRecordInsertSuccessful = !util.isNullOrEmpty(new_record_id);
 
@@ -1772,7 +1811,9 @@ namespace HR_LEAVEv2.HR
                                     actual_end_date = @ActualEndDate, 
                                     employment_type= '{dr.ItemArray[(int)emp_records_columns.employment_type].ToString()}', 
                                     dept_id= {dr.ItemArray[(int)emp_records_columns.dept_id].ToString()},
-                                    years_worked = @YearsWorked
+                                    years_worked = @YearsWorked,
+                                    annual_vacation_amt = @AnnualVacationAmt,
+                                    max_vacation_accumulation = @MaxVacationAccumulation
                                 WHERE id= @RecordId;
                             ";
 
@@ -1808,6 +1849,9 @@ namespace HR_LEAVEv2.HR
 
                                     if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Public Service")
                                         command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
+
+                                    command.Parameters.AddWithValue("@AnnualVacationAmt", dr.ItemArray[(int)emp_records_columns.annual_vacation_amt]);
+                                    command.Parameters.AddWithValue("@MaxVacationAccumulation", dr.ItemArray[(int)emp_records_columns.max_vacation_accumulation]);
 
                                     command.Parameters.AddWithValue("@RecordId", dr.ItemArray[(int)emp_records_columns.record_id]);
 
@@ -2145,7 +2189,9 @@ namespace HR_LEAVEv2.HR
                                             ,[expected_end_date]
                                             ,[employment_type]
                                             ,[dept_id]
-                                            ,[years_worked])
+                                            ,[years_worked]
+                                            ,[annual_vacation_amt]
+                                            ,[max_vacation_accumulation])
                                     VALUES
                                         ( @EmployeeId
                                         ,@PositionId
@@ -2154,6 +2200,8 @@ namespace HR_LEAVEv2.HR
                                         ,@EmploymentType
                                         ,@DeptId
                                         ,@YearsWorked
+                                        ,@AnnualVacationAmt
+                                        ,@MaxVacationAccumulation
                                         );
                                 ";
 
@@ -2175,6 +2223,11 @@ namespace HR_LEAVEv2.HR
                                             else
                                                 // get number of years worked from start of year to  start of year
                                                 command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
+
+                                            command.Parameters.AddWithValue("@AnnualVacationAmt", dr.ItemArray[(int)emp_records_columns.annual_vacation_amt]);
+                                            command.Parameters.AddWithValue("@MaxVacationAccumulation", dr.ItemArray[(int)emp_records_columns.max_vacation_accumulation]);
+
+
                                             int rowsAffected = command.ExecuteNonQuery();
                                             if (rowsAffected > 0)
                                             {
