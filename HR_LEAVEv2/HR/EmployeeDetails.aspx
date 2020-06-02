@@ -379,8 +379,8 @@
                                 <asp:DropDownList ID="positionList" runat="server" CssClass="form-control" Width="225px" DataSourceID="SqlDataSource1" DataValueField="pos_id" DataTextField="pos_name" Style="display: inline-block"></asp:DropDownList>
                                 <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:dbConnectionString %>" ProviderName="System.Data.SqlClient" SelectCommand="SELECT [pos_id], [pos_name] FROM [position] ORDER BY [pos_name]"></asp:SqlDataSource>
                             </div>
-                            <div class="form-group text-center" style="margin-top: 45px;">
-                                <span style="margin-right: 25px">
+                            <div class="form-group text-center" style="margin-top: 45px; display:flex; justify-content:space-around; flex-wrap:wrap;">
+                                <span>
                                     <label for="txtStartDate">Start date</label>
                                     <asp:TextBox ID="txtStartDate" runat="server" CssClass="form-control" Style="width: 150px; display: inline;"></asp:TextBox>
                                     <i id="startDateCalendar" class="fa fa-calendar fa-lg calendar-icon"></i>
@@ -402,11 +402,12 @@
                                         ControlToValidate="txtEndDate" 
                                         Display="Dynamic" 
                                         ErrorMessage="Required"
+                                        Style="margin-right:2px;"
                                         ForeColor="Red">
 
                                     </asp:RequiredFieldValidator>
                                 </span>
-                                <span runat="server" id="actualEndDateSpan" style="display:none; margin-left:25px;">
+                                <span runat="server" id="actualEndDateSpan" style="display:none;">
                                     <label for="txtActualEndDate">
                                         Actual end date
                                     </label>
