@@ -382,6 +382,24 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel wrongTablePanel;
         
         /// <summary>
+        /// invalidAnnualOrMaximumVacationLeaveAmtPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel invalidAnnualOrMaximumVacationLeaveAmtPanel;
+        
+        /// <summary>
+        /// invalidAnnualOrMaximumVacationLeaveAmtTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidAnnualOrMaximumVacationLeaveAmtTxt;
+        
+        /// <summary>
         /// unsuccessfulInsertPanel control.
         /// </summary>
         /// <remarks>

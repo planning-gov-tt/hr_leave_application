@@ -141,6 +141,11 @@
                         <span>Actual end date is on the weekend</span>
                     </asp:Panel>
 
+                    <asp:Panel ID="invalidAnnualOrMaximumVacationLeaveAmtPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Annual amount of vacation leave cannot be more than maximum accumulated vacation leave</span>
+                    </asp:Panel>
+
                 </ContentTemplate>
 
             </asp:UpdatePanel>

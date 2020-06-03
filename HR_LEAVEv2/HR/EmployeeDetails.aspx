@@ -473,6 +473,10 @@
                             </div>
 
                             <div id="validationDiv" style="margin-top: 10px;">
+                                <asp:Panel ID="invalidAnnualOrMaximumVacationLeaveAmtPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>Annual amount of vacation leave cannot be more than maximum accumulated vacation leave</span>
+                                </asp:Panel>
                                 <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>

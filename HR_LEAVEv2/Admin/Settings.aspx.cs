@@ -489,6 +489,9 @@ namespace HR_LEAVEv2.Admin
 
             multipleActiveRecordsPanel.Style.Add("display", "none");
             clashingRecordsPanel.Style.Add("display", "none");
+
+            invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "none");
+
         }
         /* __________________________________________________________________________*/
 
@@ -790,15 +793,22 @@ namespace HR_LEAVEv2.Admin
             if (data.ContainsKey("start_date") && data.ContainsKey("actual_end_date"))
                 areDatesValid = areDatesValid && validateDates(data["start_date"], data["actual_end_date"], invalidActualEndDatePanel, actualEndDateOnWeekend, dateComparisonActualValidationMsgPanel);
 
-            bool isNewRecordValid = true;
+            bool isNewRecordValid = true,
+                 isAnnualAndMaxVacationAmtValid = false;
 
             // validate record if employment record to ensure more than one active record is not added
             // both start date and actual end date will already be validated in the proper form of d/MM/yyyy
             if (selectedTable == "employeeposition")
-                isNewRecordValid = isRecordValid(data["employee_id"],"-1", data["start_date"], data["actual_end_date"]);
+            {
+                isNewRecordValid = isRecordValid(data["employee_id"], "-1", data["start_date"], data["actual_end_date"]);
+                isAnnualAndMaxVacationAmtValid = Convert.ToInt32(data["annual_vacation_amt"]) < Convert.ToInt32(data["max_vacation_accumulation"]);
+                if (!isAnnualAndMaxVacationAmtValid)
+                    invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
+            }
+                
             
 
-            if (areDatesValid && isNewRecordValid)
+            if (areDatesValid && isNewRecordValid && isAnnualAndMaxVacationAmtValid)
             {
                 Boolean isInsertSuccessful = false;
 
@@ -902,13 +912,20 @@ namespace HR_LEAVEv2.Admin
             if (data.ContainsKey("start_date") && data.ContainsKey("actual_end_date"))
                 areDatesValid = areDatesValid && validateDates(data["start_date"], data["actual_end_date"], invalidActualEndDatePanel, actualEndDateOnWeekend, dateComparisonActualValidationMsgPanel);
 
-            bool isEditedRecordValid = true;
+            bool isEditedRecordValid = true,
+                 isAnnualAndMaxVacationAmtValid = false; ;
             // validate record if employment record to ensure more than one active record is not added
             // both start date and actual end date will be validated in the proper form of d/MM/yyyy
             if (selectedTable == "employeeposition")
+            {
                 isEditedRecordValid = isRecordValid(data["employee_id"], dataBeforeEdit["id"], data["start_date"], data["actual_end_date"]);
+                isAnnualAndMaxVacationAmtValid = Convert.ToInt32(data["annual_vacation_amt"]) < Convert.ToInt32(data["max_vacation_accumulation"]);
+                if (!isAnnualAndMaxVacationAmtValid)
+                    invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
+            }
+                
 
-            if (areDatesValid && isEditedRecordValid && dataBeforeEdit != null)
+            if (areDatesValid && isEditedRecordValid && dataBeforeEdit != null && isAnnualAndMaxVacationAmtValid)
             {
                 Boolean isEditSuccessful = false;
                 List<string> setClauseList = new List<string>(),

@@ -132,6 +132,11 @@
                     <span>Table structure in Excel file does not match table structure for selected table</span>
                 </asp:Panel>
 
+                <asp:Panel ID="invalidAnnualOrMaximumVacationLeaveAmtPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidAnnualOrMaximumVacationLeaveAmtTxt" runat="server"></span>
+                </asp:Panel>
+
                 <asp:Panel ID="unsuccessfulInsertPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span>Data was not uploaded to database</span>

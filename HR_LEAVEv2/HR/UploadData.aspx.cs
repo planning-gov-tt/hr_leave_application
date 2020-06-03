@@ -8,7 +8,6 @@ using System.Web;
 using System.Web.Configuration;
 using System.Data.SqlClient;
 using HR_LEAVEv2.Classes;
-using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.HR
 {
@@ -77,6 +76,7 @@ namespace HR_LEAVEv2.HR
             clashingRecordsPanel.Style.Add("display", "none");
 
             wrongTablePanel.Style.Add("display", "none");
+            invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "none");
         }
 
         protected void resetUploadDataPage()
@@ -522,6 +522,7 @@ namespace HR_LEAVEv2.HR
                             {"actualEndDateIsWeekend", new List<string>() },
                             {"clashingRecords", new List<string>() },
                             {"multipleActiveRecords", new List<string>() },
+                            {"invalidAnnualAndMaxVacationAmt", new List<string>() }
                         };
                         // check employment records for consistency for employeeposition table
                         DataTable employmentRecordsDt = new DataTable();
@@ -577,7 +578,8 @@ namespace HR_LEAVEv2.HR
                                 if (areDatesValid)
                                     isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", start, actualEnd, (rowIndex + 1).ToString());
 
-                                    
+                                if(Convert.ToInt32(dr.Field<string>("annual_vacation_amt")) > Convert.ToInt32(dr.Field<string>("max_vacation_accumulation")))
+                                    empPositionValidationMsgs["invalidAnnualAndMaxVacationAmt"].Add((rowIndex + 1).ToString());
                             }
 
                             // check errors and show appropriate messages
@@ -627,6 +629,10 @@ namespace HR_LEAVEv2.HR
                                         case "multipleActiveRecords":
                                             multipleActiveRecordsTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in multiple active records for their corresponding employee";
                                             multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "invalidAnnualAndMaxVacationAmt":
+                                            invalidAnnualOrMaximumVacationLeaveAmtTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in annual amount of vacation leave being more than maximum accumulated vacation leave";
+                                            invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
                                             break;
                                     }
                                 }  

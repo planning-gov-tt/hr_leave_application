@@ -647,14 +647,25 @@ namespace HR_LEAVEv2.HR
 
                     if (!isDuplicate)
                     {
-                        // if start date is before or on Today then the record is active, otherwise it is not
-                        if(DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) <= 0)
-                            //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
-                            dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success", Convert.ToInt32(annual_vacation_amt), Convert.ToInt32(max_amt_of_vacation_accumulation));
+
+                        int annualVacationLeaveAmt = Convert.ToInt32(annual_vacation_amt),
+                            maxVacationLeaveAmt = Convert.ToInt32(max_amt_of_vacation_accumulation);
+
+                        if (maxVacationLeaveAmt > annualVacationLeaveAmt)
+                        {
+                            // if start date is before or on Today then the record is active, otherwise it is not
+                            if (DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) <= 0)
+                                //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
+                                dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success", annualVacationLeaveAmt, maxVacationLeaveAmt);
+                            else
+                                //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
+                                dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger", annualVacationLeaveAmt, maxVacationLeaveAmt);
+                            ViewState["Gridview1_dataSource"] = dt;
+                        }
                         else
-                            //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
-                            dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger",Convert.ToInt32(annual_vacation_amt), Convert.ToInt32(max_amt_of_vacation_accumulation));
-                        ViewState["Gridview1_dataSource"] = dt;
+                            invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
+
+                       
                     }
                     else
                         duplicateRecordPanel.Style.Add("display", "inline-block");
@@ -917,13 +928,15 @@ namespace HR_LEAVEv2.HR
                 // validate actual end date
                 Boolean isActualEndDateValidated = validateActualEndDate(startDate, actualEndDate, recordEditEndDateInvalidPanel, recordEditEndDateOnWeekend, recordEditEndDateBeforeStartDate, null) != DateTime.MinValue;
 
+                Boolean isAnnualAndMaxVacationAmtValidated = Convert.ToInt32(max_amt_of_vacation_accumulation) > Convert.ToInt32(annual_vacation_amt);
+
                 // index of record being edited
                 int index = Convert.ToInt32(ViewState["record_being_edited"].ToString());
 
                 if (ViewState["Gridview1_dataSource"] != null)
                 {
                     DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
-                    if (isStartAndExpectedEndDateValidated && isActualEndDateValidated)
+                    if (isStartAndExpectedEndDateValidated && isActualEndDateValidated && isAnnualAndMaxVacationAmtValidated)
                     {
                         // check if any values are changed and edit relevant values in datatable
                         Boolean isPositionChanged = dt.Rows[index].ItemArray[(int)emp_records_columns.pos_id].ToString() != position_id,
@@ -1082,6 +1095,10 @@ namespace HR_LEAVEv2.HR
                         else
                             noEditsToRecordsMade.Style.Add("display", "inline-block");
                     }
+                    else if(!isAnnualAndMaxVacationAmtValidated)
+                    {
+                        invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
+                    }
                 }
             }
         }
@@ -1129,6 +1146,8 @@ namespace HR_LEAVEv2.HR
             noChangesMadePanel.Style.Add("display", "none");
 
             // EMPLOYMENT RECORD
+
+            invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "none");
 
             // ADD
             invalidStartDateValidationMsgPanel.Style.Add("display", "none");
