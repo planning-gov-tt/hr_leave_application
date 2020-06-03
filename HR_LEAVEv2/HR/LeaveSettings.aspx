@@ -125,7 +125,7 @@
                                 <div class="row" style="margin-bottom: 20px">
                                     <%-- Leave Type--%>
                                     <label for="leaveTypeList" class="space-label-from-input-element">Leave Type:</label>
-                                    <asp:DropDownList ID="leaveTypeList" runat="server" ValidationGroup="submitAccumulation"></asp:DropDownList>
+                                    <asp:DropDownList ID="leaveTypeList" runat="server" ValidationGroup="submitAccumulation" AutoPostBack="true" OnSelectedIndexChanged="leaveTypeList_SelectedIndexChanged"></asp:DropDownList>
                                 </div>
 
                                 <div class="row" style="margin-bottom: 20px">
@@ -137,13 +137,13 @@
                                 <div class="row" style="margin-bottom: 20px">
                                     <%--Type of Accumulation Period--%>
                                     <label for="accumulationTypeList" class="space-label-from-input-element">What to do with leave balance:</label>
-                                    <asp:DropDownList ID="accumulationTypeList" runat="server" ValidationGroup="submitAccumulation">
+                                    <asp:DropDownList ID="accumulationTypeList" runat="server" ValidationGroup="submitAccumulation" AutoPostBack="true" OnSelectedIndexChanged="leaveTypeList_SelectedIndexChanged">
                                         <asp:ListItem>Add</asp:ListItem>
                                         <asp:ListItem>Replace</asp:ListItem>
                                     </asp:DropDownList>
                                 </div>
 
-                                <div class="row">
+                                <asp:Panel ID="numDaysPanel" runat="server" CssClass="row">
                                     <%--Num Days--%>
                                     <label for="numDaysForAccumulation" class="space-label-from-input-element">Number of days:</label>
                                     <asp:TextBox ID="numDaysForAccumulation" runat="server" Width="100px"></asp:TextBox>
@@ -151,7 +151,12 @@
                                         ControlToValidate="numDaysForAccumulation" ErrorMessage="Enter valid number" ForeColor="Red" ValidationExpression="^[0-9]*$" Display="Dynamic">  
                                     </asp:RegularExpressionValidator>
                                     <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ValidationGroup="submitAccumulation" ControlToValidate="numDaysForAccumulation" ErrorMessage="Required" ForeColor="Red"></asp:RequiredFieldValidator>
-                                </div>
+                                </asp:Panel>
+
+                                <asp:Panel ID="vacationDisclaimerPanel" runat="server" Visible="false" CssClass="row alert alert-info text-center" role="alert" Width="500px" Style="margin:0 auto;">
+                                    <i class="fa fa-info-circle"></i>
+                                    <span id="vacationDisclaimerTxt" runat="server"></span>
+                                </asp:Panel>
 
                             </div>
 

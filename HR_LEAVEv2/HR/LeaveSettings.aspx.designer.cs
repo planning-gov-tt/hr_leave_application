@@ -121,6 +121,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.DropDownList accumulationTypeList;
         
         /// <summary>
+        /// numDaysPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel numDaysPanel;
+        
+        /// <summary>
         /// numDaysForAccumulation control.
         /// </summary>
         /// <remarks>
@@ -146,6 +155,24 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
+        
+        /// <summary>
+        /// vacationDisclaimerPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel vacationDisclaimerPanel;
+        
+        /// <summary>
+        /// vacationDisclaimerTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl vacationDisclaimerTxt;
         
         /// <summary>
         /// closeAddAccumulationBtn control.

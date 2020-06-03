@@ -25,6 +25,8 @@ namespace HR_LEAVEv2.HR
                 bindLeaveTypeList();
             }
 
+
+
             // set accumulation period dropdown list
             bindAccPeriodList();
 
@@ -195,7 +197,7 @@ namespace HR_LEAVEv2.HR
                    accText = accumulationPeriodList.SelectedItem == null ? accumulationPeriodList.Items[0].Text : accumulationPeriodList.SelectedItem.Text,
                    accValue = accumulationPeriodList.SelectedItem == null ? accumulationPeriodList.Items[0].Value : accumulationPeriodList.SelectedItem.Value,
                    accType = accumulationTypeList.SelectedItem == null ? accumulationTypeList.Items[0].Value : accumulationTypeList.SelectedItem.Value,
-                   numDays = numDaysForAccumulation.Text;
+                   numDays = util.isNullOrEmpty(numDaysForAccumulation.Text) ? "0" : numDaysForAccumulation.Text;
 
             Boolean isInsertSuccessful = false;
             string id = string.Empty; // id of inserted accumulation
@@ -235,5 +237,24 @@ namespace HR_LEAVEv2.HR
         }
         //_________________________________________________________________________________________
 
+        protected void leaveTypeList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(leaveTypeList.SelectedValue == "Vacation")
+            {
+                numDaysPanel.Visible = false;
+                vacationDisclaimerPanel.Visible = true;
+                string action = accumulationTypeList.SelectedValue == "Add" ? "added" : "replaced";
+                vacationDisclaimerTxt.InnerText = $"The number of days of vacation leave being {action} will be determined by the employee's current annual vacation amount specified by their active employment record";
+            }
+            else
+            {
+                numDaysPanel.Visible = true;
+                vacationDisclaimerPanel.Visible = false;
+                vacationDisclaimerTxt.InnerText = string.Empty;
+            }
+            
+
+            
+        }
     }
 }

@@ -16,7 +16,8 @@ namespace HR_LEAVEv2
             accValue = 1,
             accType = 2,
             numDays = 3,
-
+            annualVacationAmt = 4,
+            maxVacationAccumulation = 5
         };
 
         Boolean isStartOfNewContractYear = false,
@@ -97,14 +98,14 @@ namespace HR_LEAVEv2
             {
                 // used to display number of years worked in current job
                 Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
-                //Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 28)); // for testing
+                //Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 27)); // for testing
 
                 if (empType == "Contract")
                 {
                     // get current number of years worked for their contract and compare with their current value for years worked
 
                     currentNumYearsWorked = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
-                    //currentNumYearsWorked = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 28)); //for testing
+                    //currentNumYearsWorked = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 27)); //for testing
                     isStartOfNewContractYear = currentNumYearsWorked > yearsWorked;
                 }
 
@@ -195,11 +196,13 @@ namespace HR_LEAVEv2
                 dt.Columns.Add("accValue", typeof(string));
                 dt.Columns.Add("accType", typeof(string));
                 dt.Columns.Add("numDays", typeof(string));
+                dt.Columns.Add("annualVacationAmt", typeof(string));
+                dt.Columns.Add("maxVacationAccumulation", typeof(string));
 
                 try
                 {
                     string accSql = $@"
-                            SELECT a.leave_type as leaveType, a.accumulation_period_value as accValue, a.accumulation_type as accType, a.num_days as numDays
+                            SELECT a.leave_type as leaveType, a.accumulation_period_value as accValue, a.accumulation_type as accType, a.num_days as numDays, ep.annual_vacation_amt as annualVacationAmt, ep.max_vacation_accumulation as maxVacationAccumulation
                             FROM [dbo].[accumulations] a
                             LEFT JOIN dbo.employeeposition ep
                             ON ep.employment_type = a.employment_type
@@ -238,24 +241,41 @@ namespace HR_LEAVEv2
                         {
                             if (isStartOfNewYear || isStartOfNewContractYear)
                             {
+                                string numDays = dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString() == "Vacation" ? dt.Rows[i].ItemArray[(int)acc_enum.annualVacationAmt].ToString() :  dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString(),
+                                    sqlLeaveTypeRef = leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()];
 
                                 // employee has started new contract year or new year so their leave must be updated
                                 if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Replace")
                                 {
                                     updateSql += $@"
                                             UPDATE [dbo].[employee]
-                                            SET {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} =  {dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString()}
+                                            SET {sqlLeaveTypeRef} =  {numDays}
                                             WHERE employee_id = {Session["emp_id"].ToString()};
                                             
                                     ";
                                 } else if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Add")
                                 {
-                                    updateSql += $@"
+                                    if(dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString() == "Vacation")
+                                    {
+                                        string maxVacationAmt = dt.Rows[i].ItemArray[(int)acc_enum.maxVacationAccumulation].ToString();
+                                        // ensure amt does not go over max
+                                        updateSql += $@"
                                             UPDATE [dbo].[employee]
-                                            SET {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} =  (SELECT {leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()]} + {dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString()} FROM dbo.employee WHERE employee_id = {Session["emp_id"].ToString()})
+                                            SET {sqlLeaveTypeRef} =  
+                                                (SELECT IIF({sqlLeaveTypeRef} + {numDays} > {maxVacationAmt}, {maxVacationAmt}, {sqlLeaveTypeRef} + {numDays}) FROM dbo.employee WHERE employee_id = {Session["emp_id"].ToString()})
                                             WHERE employee_id = {Session["emp_id"].ToString()};
                                             
-                                    ";
+                                        ";
+                                    } else
+                                    {
+                                        updateSql += $@"
+                                            UPDATE [dbo].[employee]
+                                            SET {sqlLeaveTypeRef} = (SELECT {sqlLeaveTypeRef} + {numDays} FROM dbo.employee WHERE employee_id = {Session["emp_id"].ToString()})
+                                            WHERE employee_id = {Session["emp_id"].ToString()};
+                                            
+                                        ";
+                                    }
+                                    
                                 }
                             }
                         }
