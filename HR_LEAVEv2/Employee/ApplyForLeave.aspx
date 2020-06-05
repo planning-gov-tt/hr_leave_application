@@ -216,43 +216,32 @@
                 <%--Shows the files uploaded to Session--%>
                 <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align: left; margin: 0 auto; display: inline-block;">
                     Files Uploaded:
-                <asp:ListView ID="filesUploadedListView" runat="server" GroupItemCount="10">
-                    <GroupTemplate>
-                        <div id="itemPlaceholderContainer" runat="server">
-                            <div id="itemPlaceholder" runat="server"></div>
-                        </div>
-                    </GroupTemplate>
+                    <asp:ListView ID="filesUploadedListView" runat="server" GroupItemCount="10">
+                        <GroupTemplate>
+                            <div id="itemPlaceholderContainer" runat="server">
+                                <div id="itemPlaceholder" runat="server"></div>
+                            </div>
+                        </GroupTemplate>
 
-                    <ItemTemplate>
-                        <div style="margin-top: 5px;">
-                            <span>
-                                <asp:LinkButton ID="clearIndividualFileBtn" OnClick="clearIndividualFileBtn_Click" data-id='<%#Eval("file_name") %>' runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
-                                    <i class="fa fa-times" aria-hidden="true"></i>
-                                </asp:LinkButton>
-                            </span>
-                            <span><%#Eval("file_name") %></span>
-                        </div>
-                    </ItemTemplate>
-
-                    <AlternatingItemTemplate>
-                        <div style="margin-top: 5px;">
-                            <span>
-                                <asp:LinkButton ID="clearIndividualFileBtn" OnClick="clearIndividualFileBtn_Click" data-id='<%#Eval("file_name") %>' runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
-                                    <i class="fa fa-times" aria-hidden="true"></i>
-                                </asp:LinkButton>
-                            </span>
-                            <span><%#Eval("file_name") %></span>
-                        </div>
-                    </AlternatingItemTemplate>
+                        <ItemTemplate>
+                            <div style="margin-top: 5px;">
+                                <span>
+                                    <asp:LinkButton ID="clearIndividualFileBtn" OnClick="clearIndividualFileBtn_Click" data-id='<%#Eval("file_name") %>' runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                    </asp:LinkButton>
+                                </span>
+                                <span><%#Eval("file_name") %></span>
+                            </div>
+                        </ItemTemplate>
 
 
-                    <LayoutTemplate>
-                        <div id="groupPlaceholderContainer" runat="server">
-                            <div id="groupPlaceholder" runat="server"></div>
-                        </div>
-                    </LayoutTemplate>
+                        <LayoutTemplate>
+                            <div id="groupPlaceholderContainer" runat="server">
+                                <div id="groupPlaceholder" runat="server"></div>
+                            </div>
+                        </LayoutTemplate>
 
-                </asp:ListView>
+                    </asp:ListView>
                 </asp:Panel>
 
                 <br />

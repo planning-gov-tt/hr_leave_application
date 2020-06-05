@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Employee Details" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="EmployeeDetails.aspx.cs" Inherits="HR_LEAVEv2.HR.EmployeeDetails" %>
+﻿<%@ Page Title="Employee Details" MaintainScrollPositionOnPostback="true" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="EmployeeDetails.aspx.cs" Inherits="HR_LEAVEv2.HR.EmployeeDetails" %>
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
@@ -19,6 +19,73 @@
 
         #vacationAmtsTable td{
             padding-bottom:25px;
+        }
+
+        .switch
+        {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+         
+        .switch input
+        {
+            opacity: 0;
+        }
+         
+        .slider
+        {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+         
+        .slider:before
+        {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+         
+        input:checked + .slider
+        {
+            background-color: #2196F3;
+        }
+         
+        input:focus + .slider
+        {
+            box-shadow: 0 0 1px #2196F3;
+        }
+         
+        input:checked + .slider:before
+        {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+         
+        /* Rounded sliders */
+        .slider.round
+        {
+            border-radius: 34px;
+        }
+         
+        .slider.round:before
+        {
+            border-radius: 50%;
         }
 
     </style>
@@ -50,7 +117,7 @@
                     <asp:Panel ID="noChangesMadePanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-info">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
-                            <span id="Span18" runat="server">No changes made</span>
+                            <span>No changes made</span>
                         </span>
                     </asp:Panel>
 
@@ -61,7 +128,7 @@
                     <asp:Panel ID="editFullSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span9" runat="server">Employee successfully edited</span>
+                            <span>Employee successfully edited</span>
                         </span>
                     </asp:Panel>
 
@@ -69,7 +136,7 @@
                     <asp:Panel ID="editRolesSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span5" runat="server">Authorizations successfully edited</span>
+                            <span>Authorizations successfully edited</span>
                         </span>
                     </asp:Panel>
 
@@ -77,7 +144,7 @@
                      <asp:Panel ID="editLeaveSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span7" runat="server">Leave balances successfully edited</span>
+                            <span>Leave balances successfully edited</span>
                         </span>
                     </asp:Panel>
 
@@ -85,7 +152,15 @@
                      <asp:Panel ID="editEmpRecordSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span8" runat="server">Employment record(s) successfully edited</span>
+                            <span>Employment record(s) successfully edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Successful edit of employee files--%>
+                     <asp:Panel ID="editEmpFilesPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-success">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span>Employment file(s) successfully uploaded</span>
                         </span>
                     </asp:Panel>
 
@@ -95,7 +170,7 @@
                     <asp:Panel ID="fullFormSubmitSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="Span1" runat="server">Employee successfully created</span>
+                            <span>Employee successfully created</span>
                         </span>
                     </asp:Panel>
 
@@ -106,7 +181,15 @@
                     <asp:Panel ID="editEmpErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span6" runat="server">Employee not edited</span>
+                            <span>Employee not edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Error in editing employee files--%>
+                    <asp:Panel ID="editEmpFilesErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span>Files not uploaded</span>
                         </span>
                     </asp:Panel>
 
@@ -114,7 +197,7 @@
                     <asp:Panel ID="editRolesErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span10" runat="server">Authorizations not edited</span>
+                            <span>Authorizations not edited</span>
                         </span>
                     </asp:Panel>
 
@@ -122,7 +205,7 @@
                     <asp:Panel ID="editLeaveBalancesErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span11" runat="server">Leave Balances not edited</span>
+                            <span>Leave Balances not edited</span>
                         </span>
                     </asp:Panel>
 
@@ -130,7 +213,7 @@
                     <asp:Panel ID="editEmpRecordErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span12" runat="server">Employment Record(s) not edited</span>
+                            <span>Employment Record(s) not edited</span>
                         </span>
                     </asp:Panel>
 
@@ -138,7 +221,7 @@
                     <asp:Panel ID="deleteEmpRecordsErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span13" runat="server">Employment Record(s) not deleted</span>
+                            <span>Employment Record(s) not deleted</span>
                         </span>
                     </asp:Panel>
 
@@ -146,7 +229,7 @@
                     <asp:Panel ID="addEmpRecordsErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span14" runat="server">Employment Record(s) not added</span>
+                            <span>Employment Record(s) not added</span>
                         </span>
                     </asp:Panel>
 
@@ -154,7 +237,7 @@
                     <asp:Panel ID="editEndDateEmpRecordsPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span16" runat="server">End Date not added</span>
+                            <span>End Date not added</span>
                         </span>
                     </asp:Panel>
 
@@ -164,7 +247,7 @@
                     <asp:Panel ID="fullFormErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span2" runat="server">Employee not added</span>
+                            <span>Employee not added</span>
                         </span>
                     </asp:Panel>
 
@@ -172,7 +255,7 @@
                     <asp:Panel ID="duplicateIdentifierPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span15" runat="server">The entered employee ID already exists in database</span>
+                            <span>The entered employee ID already exists in database</span>
                         </span>
                     </asp:Panel>
 
@@ -180,7 +263,7 @@
                     <asp:Panel ID="emailNotFoundErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span3" runat="server">Active Directory email not found</span>
+                            <span>Active Directory email not found</span>
                         </span>
                     </asp:Panel>
 
@@ -188,7 +271,7 @@
                     <asp:Panel ID="noEmploymentRecordEnteredErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span4" runat="server">At least one Employment record must be entered</span>
+                            <span>At least one Employment record must be entered</span>
                         </span>
                     </asp:Panel>
 
@@ -363,7 +446,7 @@
         </div>
        
         <%--Employment Record form--%>
-        <div id="addEmploymentRecordContainer" class="text-center" style="background-color: #f0f0f5; padding-bottom: 10px; padding-top:5px; width:90%; margin: 0 auto;">
+        <div id="addEmploymentRecordContainer" class="text-center" style="background-color: #f0f0f5; padding-bottom: 10px; padding-top:5px; width:90%; margin: 0 auto; margin-bottom: 5px;">
             <h3>Employment Record</h3>
             <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                 <ContentTemplate>
@@ -699,21 +782,138 @@
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
+    </div>
 
-        <asp:Panel ID="submitFullFormPanel" runat="server" CssCclass="row text-center" Style="margin-top: 50px;">
+    <div class="container text-center" style="width: 50%; background-color: #e0e0eb;padding-bottom: 15px;">
+        <h3 style="margin-bottom:15px;">Allow Accumulation Past Max
+            <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
+            data-toggle="tooltip"
+            data-placement="right"
+            title="Allow employee to accumulate vacation leave past their maximum amount if a letter from PS is uploaded"></i>
+        </h3>
+
+        <%-- Create, Edit mode: shows a downloadable list of all the files associated with an employee--%>
+        <asp:Panel ID="filesToDownloadPanel" runat="server" Style="margin-bottom:15px;" Visible="false">
+
+            <label for="filesToDownloadList" style="font-size: 1.05em; display: inline;">Previously uploaded files:</label>
+
+            <asp:DropDownList ID="filesToDownloadList" runat="server"></asp:DropDownList>
+
+            <asp:LinkButton ID="btnDownloadFiles" runat="server" OnClick="btnDownloadFiles_Click" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Download file" Style="display: inline-block; margin-left: 5px;">
+            <i class="fa fa-download" aria-hidden="true"></i>
+            </asp:LinkButton>
+
+        </asp:Panel>
+
+        <label class="switch">
+            <asp:CheckBox ID="chkOnOff" runat="server" AutoPostBack="true" OnCheckedChanged="chkOnOff_CheckedChanged" />
+            <span class="slider round"></span>
+        </label>
+
+        <asp:UpdatePanel ID="disclaimerForNoFilesUploadedUpdatePanel" runat="server">
+            <ContentTemplate>
+                <asp:Panel ID="noFilesUploadedDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block; margin: 0px 5px;" role="alert" Visible="false">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <span>No Files currently uploaded. Without a letter from PS, the employee will not be able to accumulate vacation leave past their max</span>
+                </asp:Panel>
+            </ContentTemplate>
+        </asp:UpdatePanel>
+        
+        <asp:Panel ID="fileUploadPanel" runat="server" Style="margin: 15px auto; text-align: center" CssClass="row form-group" Visible="false">
+
+            <label for="FileUpload1" style="font-size: 1.05em; display: inline;">Upload letter from PS:</label>
+
+            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin: 0 auto; display: inline-block; background-color: lightgrey" AllowMultiple="true" />
+
+            <asp:LinkButton ID="uploadFilesBtn" runat="server" OnClick="uploadFilesBtn_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Upload files">
+                <i class="fa fa-upload" aria-hidden="true"></i>
+            </asp:LinkButton>
+
+            <asp:LinkButton ID="clearAllFilesBtn" runat="server" OnClientClick="return confirm('Clear all files?');" CssClass="btn btn-sm btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Clear all uploaded files" OnClick="clearAllFilesBtn_Click">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </asp:LinkButton>
+
+            <br />
+
+            <%--Shows the files uploaded to Session--%>
+            <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align: left; margin: 0 auto; display: inline-block;" Visible="false">
+                <asp:ListView ID="filesUploadedListView" runat="server" GroupItemCount="10">
+                    <GroupTemplate>
+                        <div id="itemPlaceholderContainer" runat="server">
+                            <div id="itemPlaceholder" runat="server"></div>
+                        </div>
+                    </GroupTemplate>
+
+                    <ItemTemplate>
+                        <div style="margin-top: 5px;">
+                            <span>
+                                <asp:LinkButton ID="clearIndividualFileBtn" data-id='<%#Eval("file_name") %>' OnClick="clearIndividualFileBtn_Click" runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </asp:LinkButton>
+                            </span>
+                            <span><%#Eval("file_name") %></span>
+                        </div>
+                    </ItemTemplate>
+
+
+                    <LayoutTemplate>
+                        <div id="groupPlaceholderContainer" runat="server">
+                            <div id="groupPlaceholder" runat="server"></div>
+                        </div>
+                    </LayoutTemplate>
+
+                </asp:ListView>
+            </asp:Panel>
+
+            <br />
+
+        </asp:Panel>
+        <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server" Style="margin-top:text-align:center;">
+            <ContentTemplate>
+                <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="duplicateFileNameTxt" runat="server">File name already exists</span>
+                </asp:Panel>
+
+                <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
+                </asp:Panel>
+
+                <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
+                </asp:Panel>
+
+                <asp:Panel ID="noFileUploaded" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span>No file was uploaded</span>
+                </asp:Panel>
+            </ContentTemplate>
+        </asp:UpdatePanel>
+
+    </div>
+
+    <div class="container text-center" style="display:flex; justify-content:center">
+        <asp:Panel ID="submitFullFormPanel" runat="server" CssCclass="row text-center" Style="margin-top: 30px;">
             <asp:LinkButton type="submit" ID="submitBtn" CssClass="btn btn-success" runat="server" OnClick="submitBtn_Click" ValidationGroup="submitFullFormGroup">
-                <i class="fa fa-send" aria-hidden="true"></i>
-                Submit new employee
+            <i class="fa fa-send" aria-hidden="true"></i>
+            Submit new employee
             </asp:LinkButton>
         </asp:Panel>
 
-        <asp:Panel ID="editFormPanel" runat="server" CssCclass="row text-center" Style="margin-top: 50px;">
+        <asp:Panel ID="editFormPanel" runat="server" CssCclass="row text-center" Style="margin-top: 30px;">
             <asp:LinkButton ID="editBtn" CssClass="btn btn-success" runat="server" ValidationGroup="submitFullFormGroup" OnClick="editBtn_Click">
-                <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                Save employee
+            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+            Save employee
             </asp:LinkButton>
         </asp:Panel>
     </div>
+
+
+    
+    
+
 
      <%-- End Employment Record Modal--%>
     <div class="modal fade" id="cancelEmpRecordModal" tabindex="-1" role="dialog" aria-labelledby="cancelEmpRecordTitle" aria-hidden="true">

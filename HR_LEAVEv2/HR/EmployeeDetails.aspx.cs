@@ -4,8 +4,12 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using System.Web;
+using System.Web.Configuration;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.HR
@@ -92,6 +96,9 @@ namespace HR_LEAVEv2.HR
                         throw ex;
                     }
 
+                    // set clear all files button to not visible
+                    clearAllFilesBtn.Visible = false;
+
                     if (mode == "edit")
                     {
                         // populates page and authorizes HR user based on employee's employment type
@@ -103,15 +110,17 @@ namespace HR_LEAVEv2.HR
                     {
                         this.adjustPageForCreateMode();
                     }
-                        
-                } 
+
+                }
             } else
             {
-                // set is
+                // set isEditMode
                 if (Request.QueryString["mode"] != null)
                     isEditMode = Request.QueryString["mode"] == "edit";
+
+                bool test = filesToDownloadPanel.Visible;
             }
-                
+
         }
 
         // INITIAL PREP OF PAGE BASED ON MODE
@@ -185,7 +194,7 @@ namespace HR_LEAVEv2.HR
         }
         //_________________________________________________________________________
 
-        
+
         // EMPLOYMENT RECORDS GRIDVIEW METHODS
         protected void bindGridview()
         {
@@ -202,7 +211,7 @@ namespace HR_LEAVEv2.HR
                 GridView1.DataBind();
             }
         }
-   
+
         protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
             GridView1.PageIndex = e.NewPageIndex;
@@ -222,11 +231,11 @@ namespace HR_LEAVEv2.HR
             }
             this.bindGridview();
         }
- 
+
         protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             // Executes after data is bound for each row. This method is used to make changes as to what a user sees on the gridview based on the data in the table
-    
+
             int i;
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
@@ -285,7 +294,7 @@ namespace HR_LEAVEv2.HR
                 }
                 GridView1.HeaderRow.Visible = !isTableEmpty;
             }
-                
+
 
         }
 
@@ -511,8 +520,8 @@ namespace HR_LEAVEv2.HR
                     isValidated = true;
                     end = util.getCurrentDate();
                 }
-                   
-                
+
+
             }
 
             end = isValidated ? end : DateTime.MinValue;
@@ -520,7 +529,7 @@ namespace HR_LEAVEv2.HR
         }
         //_________________________________________________________________________
 
-       
+
         // EMPLOYMENT RECORDS METHODS
         protected void showEmplomentRecordForm()
         {
@@ -566,11 +575,11 @@ namespace HR_LEAVEv2.HR
              * 5. dept
              */
             clearErrors();
-            string position_id = positionList.SelectedValue, 
-                position_name = positionList.SelectedItem.Text, 
-                startDate = txtStartDate.Text.ToString(), 
-                endDate = txtEndDate.Text.ToString(), 
-                emp_type = empTypeList.SelectedValue, 
+            string position_id = positionList.SelectedValue,
+                position_name = positionList.SelectedItem.Text,
+                startDate = txtStartDate.Text.ToString(),
+                endDate = txtEndDate.Text.ToString(),
+                emp_type = empTypeList.SelectedValue,
                 dept_id = deptList.SelectedValue,
                 dept_name = deptList.SelectedItem.Text,
                 annual_vacation_amt = annualAmtOfLeaveTxt.Text,
@@ -629,7 +638,7 @@ namespace HR_LEAVEv2.HR
                     foreach (DataRow dr in dt.Rows)
                     {
                         // once row is not deleted
-                        if(dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
+                        if (dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
                         {
                             string dtEmpType = dr.ItemArray[(int)emp_records_columns.employment_type].ToString(),
                                dtDeptId = dr.ItemArray[(int)emp_records_columns.dept_id].ToString(),
@@ -642,7 +651,7 @@ namespace HR_LEAVEv2.HR
                                 break;
                             }
                         }
-                        
+
                     }
 
                     if (!isDuplicate)
@@ -665,7 +674,7 @@ namespace HR_LEAVEv2.HR
                         else
                             invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
 
-                       
+
                     }
                     else
                         duplicateRecordPanel.Style.Add("display", "inline-block");
@@ -707,7 +716,7 @@ namespace HR_LEAVEv2.HR
 
             clearErrors();
 
-            if(ViewState["Gridview1_dataSource"] != null && Session["empRecordRowIndex"] != null)
+            if (ViewState["Gridview1_dataSource"] != null && Session["empRecordRowIndex"] != null)
             {
                 DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
                 int indexInDt = Convert.ToInt32(Session["empRecordRowIndex"]);
@@ -774,7 +783,7 @@ namespace HR_LEAVEv2.HR
                     }
                 }
             }
-            
+
 
         }
 
@@ -794,7 +803,7 @@ namespace HR_LEAVEv2.HR
                 return (DateTime.Compare(util.getCurrentDate(), DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)) < 0);
         }
 
-        protected Boolean isRecordValid(string proposedStartDate, string proposedEndDate, int index,Panel multipleActiveRecordsPanel, Panel clashingRecords)
+        protected Boolean isRecordValid(string proposedStartDate, string proposedEndDate, int index, Panel multipleActiveRecordsPanel, Panel clashingRecords)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
             // any other active records exist in order to validate the record.
@@ -819,19 +828,19 @@ namespace HR_LEAVEv2.HR
                         if (dr[(int)emp_records_columns.status].ToString() == "Active")
                             numActiveRows++;
 
-                        
+
                         DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
 
-                        DateTime dtRowEndDate = !util.isNullOrEmpty(dr[(int)emp_records_columns.actual_end_date].ToString())? DateTime.ParseExact(dr[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture): DateTime.MinValue;
+                        DateTime dtRowEndDate = !util.isNullOrEmpty(dr[(int)emp_records_columns.actual_end_date].ToString()) ? DateTime.ParseExact(dr[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
 
                         // ensure that record does not overlap with another record
                         bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
-                                 
+
 
                         // if record being checked has an end date
                         if (dtRowEndDate != DateTime.MinValue)
                         {
-                            
+
                             bool isRowStartDateInProposedPeriod = false, isRowEndDateinProposedPeriod = false;
                             // proposed actual end date is not empty
                             if (proposedAED != DateTime.MinValue)
@@ -849,14 +858,14 @@ namespace HR_LEAVEv2.HR
                             {
                                 isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowEndDate) <= 0 || DateTime.Compare(proposedSD, dtRowStartDate) <= 0;
                             }
-          
+
                             if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
                             {
-                                if(clashingRecords != null)
+                                if (clashingRecords != null)
                                     clashingRecords.Style.Add("display", "inline-block");
                                 return false;
                             }
-                                
+
                         }
                         // if record being checked is active
                         else
@@ -871,11 +880,11 @@ namespace HR_LEAVEv2.HR
                             // proposed actual end date is empty - proposed record is active
                             else
                             {
-                                if(multipleActiveRecordsPanel != null)
+                                if (multipleActiveRecordsPanel != null)
                                     multipleActiveRecordsPanel.Style.Add("display", "inline-block");
                                 return false; // proposed record is invalid since record already exists that is active and proposed record is active
                             }
-                               
+
 
                             if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
                             {
@@ -894,7 +903,7 @@ namespace HR_LEAVEv2.HR
 
                 if (numActiveRows <= 1)
                     return true;
-                else if(numActiveRows > 1 && multipleActiveRecordsPanel != null)
+                else if (numActiveRows > 1 && multipleActiveRecordsPanel != null)
                     multipleActiveRecordsPanel.Style.Add("display", "inline-block");
             }
 
@@ -992,8 +1001,8 @@ namespace HR_LEAVEv2.HR
                                         }
                                     }
                                     else
-                                        isEditedRecordValid = false; 
-                                    
+                                        isEditedRecordValid = false;
+
                                 }
                                 else if (isStartDateChanged && util.isNullOrEmpty(startDate))
                                     invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
@@ -1048,7 +1057,7 @@ namespace HR_LEAVEv2.HR
                                     editsMade.Add("Maximum accumulated Vacation leave");
                                 }
 
-                                if(isEditedRecordValid && (isActualEndDateChanged ||isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged))
+                                if (isEditedRecordValid && (isActualEndDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged))
                                 {
                                     dt.Rows[index].SetField<string>((int)emp_records_columns.isChanged, "2");
 
@@ -1056,7 +1065,7 @@ namespace HR_LEAVEv2.HR
                                     bindGridview();
 
                                     // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for adding audit log. 
-                                    Dictionary<string, HashSet<string>> recordEdits = new Dictionary < string, HashSet< string >> ();
+                                    Dictionary<string, HashSet<string>> recordEdits = new Dictionary<string, HashSet<string>>();
                                     if (Session["editedRecords"] != null)
                                     {
                                         recordEdits = (Dictionary<string, HashSet<string>>)Session["editedRecords"];
@@ -1070,8 +1079,8 @@ namespace HR_LEAVEv2.HR
                                             recordEdits.Add(dt.Rows[index][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
                                             recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
                                         }
-                                        
-                                           
+
+
                                         Session["editedRecords"] = recordEdits;
                                     } else
                                     {
@@ -1083,7 +1092,7 @@ namespace HR_LEAVEv2.HR
                                     editEmpRecordSuccTxt.InnerText = $"{String.Join(", ", editsMade.ToArray())} edits successfully made to employment record. Don't forget to save your changes";
                                     editEmploymentRecordSuccessful.Style.Add("display", "inline-block");
                                 }
-                                else if(!(isActualEndDateChanged || isStartDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isExpectedEndDateChanged))
+                                else if (!(isActualEndDateChanged || isStartDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isExpectedEndDateChanged))
                                     noEditsToRecordsMade.Style.Add("display", "inline-block");
 
                             }
@@ -1095,7 +1104,7 @@ namespace HR_LEAVEv2.HR
                         else
                             noEditsToRecordsMade.Style.Add("display", "inline-block");
                     }
-                    else if(!isAnnualAndMaxVacationAmtValidated)
+                    else if (!isAnnualAndMaxVacationAmtValidated)
                     {
                         invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
                     }
@@ -1112,7 +1121,7 @@ namespace HR_LEAVEv2.HR
         }
         //_________________________________________________________________________
 
-        
+
         // EDIT EMPLOYEE METHODS
         protected void clearErrors()
         {
@@ -1125,9 +1134,11 @@ namespace HR_LEAVEv2.HR
             editRolesSuccessPanel.Style.Add("display", "none");
             editLeaveSuccessPanel.Style.Add("display", "none");
             editEmpRecordSuccessPanel.Style.Add("display", "none");
+            editEmpFilesPanel.Style.Add("display", "none");
             fullFormSubmitSuccessPanel.Style.Add("display", "none");
 
             // ERRORS
+            editEmpFilesErrorPanel.Style.Add("display", "none");
             editEmpErrorPanel.Style.Add("display", "none");
             editRolesErrorPanel.Style.Add("display", "none");
             editLeaveBalancesErrorPanel.Style.Add("display", "none");
@@ -1189,7 +1200,7 @@ namespace HR_LEAVEv2.HR
                 1. Employee Permissions
                 2. Leave Balances
                 3. Employment Records
-                4. Employment 
+                4. Employee files
 
             *   Employment records are loaded first in order to check the employment type such that the current HR viewing the page can be authorized accordingly 
                 (the above simply means that the current HR must have contract permissions if they view a contract worker and similiarly for public service workers)
@@ -1353,7 +1364,7 @@ namespace HR_LEAVEv2.HR
 
                             while (reader.Read())
                             {
-                                foreach(KeyValuePair<string, string> kvp in leaveMapping)
+                                foreach (KeyValuePair<string, string> kvp in leaveMapping)
                                 {
                                     string colName = kvp.Value.Replace("[", "").Replace("]", "");
 
@@ -1368,6 +1379,99 @@ namespace HR_LEAVEv2.HR
                             }
 
                             ViewState["previousLeaveBalances"] = previousLeaveBalances;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                throw ex;
+            }
+
+
+            resetFiles();
+            // get employee files
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                        SELECT 
+                            (SELECT 
+					            STUFF
+					            (
+						            (SELECT ', ' + fs.file_name
+						            FROM [dbo].filestorage fs 
+						            LEFT JOIN [dbo].employeefiles ef ON ef.employee_id = ep.employee_id AND ef.leave_transaction_id IS NULL
+						            WHERE fs.file_id = ef.file_id
+						            FOR XML PATH(''))
+						            ,1
+						            ,1,
+						            ''
+					            )
+				            ) as 'files',
+                            (SELECT 
+					            STUFF
+					            (
+						            (SELECT ', ' + CAST(fs.file_id AS NVARCHAR(MAX))
+						            FROM [dbo].filestorage fs 
+						            LEFT JOIN [dbo].employeefiles ef ON ef.employee_id = ep.employee_id AND ef.leave_transaction_id IS NULL
+						            WHERE fs.file_id = ef.file_id
+						            FOR XML PATH(''))
+						            ,1
+						            ,1,
+						            ''
+					            )
+				            ) as 'files_id',
+                            ISNULL(ep.can_accumulate_past_max, 0) as can_accumulate_past_max
+                        FROM [dbo].[employeeposition] ep
+                        WHERE employee_id = {empId};
+                    ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            // store initial leave balances
+                            Dictionary<string, string> previousLeaveBalances = new Dictionary<string, string>();
+
+                            string files = string.Empty,
+                                   filesIds = string.Empty,
+                                   canAccumulatePastMax = string.Empty;
+                            while (reader.Read())
+                            {
+                                files = reader["files"].ToString();
+                                filesIds = reader["files_id"].ToString();
+                                canAccumulatePastMax = reader["can_accumulate_past_max"].ToString(); ;
+                            }
+
+                            chkOnOff.Checked = canAccumulatePastMax == "True";
+                            if (chkOnOff.Checked)
+                                fileUploadPanel.Visible = noFilesUploadedDisclaimerPanel.Visible = false;
+
+                            if (!util.isNullOrEmpty(files) && !util.isNullOrEmpty(filesIds))
+                            {
+                                string[] fileNamesArr = files.Split(',');
+                                string[] fileIdsArr = filesIds.Split(',');
+                                DataTable dt = new DataTable();
+                                dt.Columns.Add("file_id", typeof(string));
+                                dt.Columns.Add("file_name", typeof(string));
+
+                                for (int i = 0; i < fileNamesArr.Length; i++)
+                                {
+                                    dt.Rows.Add(fileIdsArr[i].Trim(), fileNamesArr[i].Trim());
+                                }
+
+                                filesToDownloadList.DataValueField = "file_id";
+                                filesToDownloadList.DataTextField = "file_name";
+                                filesToDownloadList.DataSource = dt;
+                                filesToDownloadList.DataBind();
+                                filesToDownloadPanel.Visible = true;
+                            }
+                            else
+                                filesToDownloadPanel.Visible = false;
+
                         }
                     }
                 }
@@ -1446,12 +1550,15 @@ namespace HR_LEAVEv2.HR
             DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
 
             // used to check whether any value is changed 
-            Boolean isRolesChanged, isLeaveBalancesChanged, isEmpRecordChanged;
-            isRolesChanged = isLeaveBalancesChanged = isEmpRecordChanged = false;
+            Boolean isRolesChanged, isLeaveBalancesChanged, isEmpRecordChanged, isFilesChanged, isAccumulatePastLimitStatusChanged;
+            isRolesChanged = isLeaveBalancesChanged = isEmpRecordChanged = isFilesChanged = isAccumulatePastLimitStatusChanged = false;
 
             // used to check if there was any error in changing values
-            Boolean isRolesEditSuccessful, isLeaveEditSuccessful, isEmpRecordEditSuccessful, isEmpRecordDeleteSuccessful, isEmpRecordInsertSuccessful, isEmpRecordEditFieldsSuccessful;
-            isRolesEditSuccessful = isLeaveEditSuccessful = isEmpRecordEditSuccessful = isEmpRecordDeleteSuccessful = isEmpRecordInsertSuccessful = isEmpRecordEditFieldsSuccessful = true;
+            Boolean isRolesEditSuccessful, isLeaveEditSuccessful, isEmpRecordEditSuccessful, isEmpRecordDeleteSuccessful, isEmpRecordInsertSuccessful, isEmpRecordEditFieldsSuccessful, isFileUploadSuccessful, isAccumulatePastLimitSuccessful;
+            isRolesEditSuccessful = isLeaveEditSuccessful = isEmpRecordEditSuccessful = isEmpRecordDeleteSuccessful = isEmpRecordInsertSuccessful = isEmpRecordEditFieldsSuccessful = isFileUploadSuccessful = isAccumulatePastLimitSuccessful =true;
+
+            // used to store ids of inserted files in order to add to audit log
+            List<string> uploadedFilesIds = new List<string>();
 
             // ROLES--------------------------------------------------------------------------------------------------------------------------
             if (authorizationLevelPanel.Visible)
@@ -1481,7 +1588,7 @@ namespace HR_LEAVEv2.HR
                 // used to store the initial roles loaded when in edit mode. These are used to determine the edits made for auditing purposes
                 List<string> previousRoles = new List<string>();
                 if (ViewState["previousRoles"] != null)
-                    previousRoles = (List < string > )ViewState["previousRoles"];
+                    previousRoles = (List<string>)ViewState["previousRoles"];
 
                 foreach (string role in previousRoles)
                 {
@@ -1770,7 +1877,7 @@ namespace HR_LEAVEv2.HR
                                     command.Parameters.AddWithValue("@PositionId", dr.ItemArray[(int)emp_records_columns.pos_id]);
                                     command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)emp_records_columns.start_date]);
                                     command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
-                                    if(dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
+                                    if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
                                         command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), util.getCurrentDateToday()));
                                     else
                                         command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
@@ -1852,7 +1959,7 @@ namespace HR_LEAVEv2.HR
                                     {
                                         command.Parameters.AddWithValue("@ActualEndDate", DateTime.ParseExact(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy"));
 
-                                        if(dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
+                                        if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
                                             // calculate years worked with actual end date
                                             command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), DateTime.ParseExact(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)));
                                     }
@@ -1886,9 +1993,9 @@ namespace HR_LEAVEv2.HR
                                         // create array of info about each Field edited for a given record. This array is used to create the action for an audit log
                                         if (Session["editedRecords"] != null)
                                         {
-                                            Dictionary<string, HashSet<string>> editedRecordsDict = (Dictionary < string, HashSet< string >>) Session["editedRecords"];
+                                            Dictionary<string, HashSet<string>> editedRecordsDict = (Dictionary<string, HashSet<string>>)Session["editedRecords"];
 
-                                            foreach(KeyValuePair<string, HashSet<string>> entry in editedRecordsDict)
+                                            foreach (KeyValuePair<string, HashSet<string>> entry in editedRecordsDict)
                                             {
                                                 // create List<string> with record_id and Fields edited info in it
                                                 string log = $"record_id= {entry.Key}, Fields edited= {String.Join(", ", entry.Value.ToArray())}";
@@ -1896,7 +2003,7 @@ namespace HR_LEAVEv2.HR
                                             }
                                             Session["editedRecords"] = null;
                                         }
-                                            
+
                                     }
 
                                 }
@@ -1935,22 +2042,143 @@ namespace HR_LEAVEv2.HR
 
             // END EMPLOYMENT RECORDS--------------------------------------------------------------------------------------------------------------------------
 
+            // ADD FILES--------------------------------------------------------------------------------------------------------------------------
+            if (Session["uploadedFiles"] != null)
+            {
+                List<HttpPostedFile> files = (List<HttpPostedFile>)Session["uploadedFiles"];
+
+                // save uploaded file(s)
+                foreach (HttpPostedFile uploadedFile in files)
+                {
+                    try
+                    {
+                        // upload file to db
+                        string file_name = Path.GetFileName(uploadedFile.FileName);
+                        string file_extension = Path.GetExtension(uploadedFile.FileName);
+
+                        using (Stream fs = uploadedFile.InputStream)
+                        {
+                            using (BinaryReader br = new BinaryReader(fs))
+                            {
+                                byte[] bytes = br.ReadBytes((Int32)fs.Length);
+                                string sql = $@"
+                                    INSERT INTO [dbo].[filestorage]
+                                        (
+                                        [file_data]
+                                        ,[file_name]
+                                        ,[file_extension])
+                                    OUTPUT INSERTED.file_id
+                                    VALUES
+                                        ( @FileData
+                                        ,@FileName
+                                        ,@FileExtension
+                                        );";
+                                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                                {
+                                    connection.Open();
+                                    string fileId = string.Empty;
+                                    using (SqlCommand command = new SqlCommand(sql, connection))
+                                    {
+                                        command.Parameters.AddWithValue("@FileData", bytes);
+                                        command.Parameters.AddWithValue("@FileName", file_name);
+                                        command.Parameters.AddWithValue("@FileExtension", file_extension);
+                                        fileId = command.ExecuteScalar().ToString();
+
+                                        isFileUploadSuccessful = !util.isNullOrEmpty(fileId);
+                                    }
+
+                                    if (isFileUploadSuccessful)
+                                    {
+                                        // insert record into bridge entity which associates file(s) with a given employee
+                                        sql = $@"
+                                                INSERT INTO [dbo].[employeefiles] ([file_id],[employee_id],[leave_transaction_id])
+                                                VALUES(@FileId, @EmployeeId, @TransactionId);";
+                                        using (SqlCommand command = new SqlCommand(sql, connection))
+                                        {
+                                            command.Parameters.AddWithValue("@FileId", fileId);
+                                            command.Parameters.AddWithValue("@EmployeeId", empId);
+                                            command.Parameters.AddWithValue("@TransactionId", DBNull.Value);
+                                            int rowsAffected = command.ExecuteNonQuery();
+                                            isFileUploadSuccessful = rowsAffected > 0;
+                                        }
+
+                                        // add file id to add to audit log
+                                        uploadedFilesIds.Add(fileId);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        isFileUploadSuccessful = false;
+                    }
+                }
+
+                if (isFileUploadSuccessful)
+                {
+                    // add audit log
+                    string fileActionString = String.Empty;
+                    if (uploadedFilesIds.Count > 0)
+                    {
+                        fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
+                        util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), fileActionString);
+                    }
+                    isFilesChanged = true;
+
+                    // ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
+                    try
+                    {
+
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            string status = chkOnOff.Checked ? "1" : "0";
+                            string sql = $@"
+                            UPDATE [dbo].[employeeposition]
+                            SET can_accumulate_past_max = {status}
+                            WHERE employee_id = @EmployeeId;
+                    ";
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                command.Parameters.AddWithValue("@EmployeeId", empId);
+                                int rowsAffected = command.ExecuteNonQuery();
+                                isAccumulatePastLimitSuccessful = rowsAffected > 0;
+                            }
+                            if (isAccumulatePastLimitSuccessful)
+                            {
+                                util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), "Employee can now accumulate past their limit");
+                                isAccumulatePastLimitStatusChanged = true;
+                            }
+                        }
+
+                    }
+                    catch (Exception exc)
+                    {
+                        isAccumulatePastLimitSuccessful = false;
+                    }
+                    // END ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
+                }
+            }
+
+            // END ADDITION OF FILES--------------------------------------------------------------------------------------------------------------
+
             // reset page so it is ready for new edits
             populatePage(empId);
             hideEmploymentRecordForm();
 
             // USER FEEDBACK--------------------------------------------------------------------------------------------------------------------------
-            if (!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged)
+            if (!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged && !isFilesChanged)
             {
                 noChangesMadePanel.Style.Add("display", "inline-block");
             }
             else
             {
-
                 // SUCCESS MESSAGES---------------------------------------------------------------
 
                 // general success message
-                if ((isRolesChanged && isLeaveBalancesChanged && isEmpRecordChanged) && (isRolesEditSuccessful && isLeaveEditSuccessful && isEmpRecordEditSuccessful))
+                if ((isRolesChanged && isLeaveBalancesChanged && isEmpRecordChanged && isFilesChanged && isAccumulatePastLimitStatusChanged) && (isRolesEditSuccessful && isLeaveEditSuccessful && isEmpRecordEditSuccessful && isFileUploadSuccessful && isAccumulatePastLimitSuccessful))
                     editFullSuccessPanel.Style.Add("display", "inline-block");
                 else
                 {
@@ -1966,10 +2194,17 @@ namespace HR_LEAVEv2.HR
                     if (isEmpRecordChanged && isEmpRecordEditSuccessful)
                         editEmpRecordSuccessPanel.Style.Add("display", "inline-block");
 
+                    // successful file upload edit
+                    if(isFilesChanged && isFileUploadSuccessful)
+                        editEmpFilesPanel.Style.Add("display", "inline-block");
+
+                    // successful accumulation past limit edit
+                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ENTER show msg code HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                     // ERROR MESSAGES------------------------------------------------------------------
 
                     // general error message if all aspects of edit fail
-                    if (!isRolesEditSuccessful && !isLeaveEditSuccessful && !isEmpRecordEditSuccessful)
+                    if (!isRolesEditSuccessful && !isLeaveEditSuccessful && !isEmpRecordEditSuccessful && !isFileUploadSuccessful && !isAccumulatePastLimitSuccessful)
                         editEmpErrorPanel.Style.Add("display", "inline-block");
 
                     // roles edit error
@@ -1979,6 +2214,13 @@ namespace HR_LEAVEv2.HR
                     // leave balances edit error
                     if (!isLeaveEditSuccessful)
                         editLeaveBalancesErrorPanel.Style.Add("display", "inline-block");
+
+                    // files upload error
+                    if (!isFileUploadSuccessful)
+                        editEmpFilesErrorPanel.Style.Add("display", "inline-block");
+
+                    // error accumulation past limit edit
+                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ENTER show err msg code HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                     // emp records errors
                     if (!isEmpRecordEditSuccessful)
@@ -2015,7 +2257,7 @@ namespace HR_LEAVEv2.HR
         }
         //_________________________________________________________________________
 
-        
+
         // ADD NEW EMPLOYEE METHOD
         protected void submitBtn_Click(object sender, EventArgs e)
         {
@@ -2121,7 +2363,7 @@ namespace HR_LEAVEv2.HR
                             command.Parameters.AddWithValue("@LastName", lastname);
                             command.Parameters.AddWithValue("@Email", email);
 
-                            foreach(KeyValuePair<string, string> kvp in currentLeaveBalances)
+                            foreach (KeyValuePair<string, string> kvp in currentLeaveBalances)
                             {
                                 command.Parameters.AddWithValue($"@{kvp.Key}", kvp.Value);
                             }
@@ -2301,7 +2543,252 @@ namespace HR_LEAVEv2.HR
         }
         //_________________________________________________________________________
 
-        
+        // FILE AND ALLOW ACCUMULATION PAST LIMIT METHODS
+        protected void clearFileValidationMessages()
+        {
+            duplicateFileNamesPanel.Style.Add("display", "none");
+            invalidFileTypePanel.Style.Add("display", "none");
+            fileUploadedTooLargePanel.Style.Add("display", "none");
+            noFileUploaded.Style.Add("display", "none");
+        }
+
+        protected void uploadFilesBtn_Click(object sender, EventArgs e)
+        {
+            clearFileValidationMessages();
+            // uploads file to Session storage to await upload to DB
+            if (FileUpload1.HasFiles)
+            {
+                List<string> filesTooLarge = new List<string>();
+                List<string> invalidFiles = new List<string>();
+
+                // used in edit mode to ensure files with the same name cannot be uploaded by a single user
+                List<string> duplicateFiles = new List<string>();
+
+                // used to store list of files added
+                List<HttpPostedFile> files = new List<HttpPostedFile>();
+
+                // used to show data about added files in bulleted list
+                DataTable dt = new DataTable();
+                dt.Columns.Add("file_name", typeof(string));
+
+                // used to check whether the files uploaded fit the size requirement specified in the web config
+                HttpRuntimeSection section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
+                int maxRequestLength = section != null ? section.MaxRequestLength : 4096;
+
+                // used to check whether the file(s) uploaded are of a certain format
+                List<string> allowedFileExtensions = new List<string>() { ".pdf", ".doc", ".docx" };
+
+                foreach (HttpPostedFile uploadedFile in FileUpload1.PostedFiles)
+                {
+                    string fileName = Path.GetFileName(uploadedFile.FileName).ToString(),
+                           fileExt = Path.GetExtension(uploadedFile.FileName).ToString();
+                    if (uploadedFile.ContentLength < maxRequestLength)
+                    {
+                        if (allowedFileExtensions.Contains(fileExt))
+                        {
+
+                            // check for duplicate file name
+                            if (filesToDownloadList.Items.FindByText(fileName) != null)
+                            {
+                                duplicateFiles.Add(fileName);
+                                continue;
+                            }
+                            dt.Rows.Add(fileName);
+                            files.Add(uploadedFile);
+                        }
+                        else
+                            invalidFiles.Add(fileName);
+                    }
+                    else
+                    {
+                        filesTooLarge.Add(fileName);
+
+                        if (!allowedFileExtensions.Contains(fileExt))
+                            invalidFiles.Add(fileName);
+                    }
+                }
+
+                if (invalidFiles.Count > 0)
+                {
+                    HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
+                    txt.InnerText = $"Could not upload {String.Join(", ", invalidFiles.Select(fileName => "'" + fileName + "'").ToArray())}. Invalid file type(s): {String.Join(", ", invalidFiles.Select(fileName => "'" + Path.GetExtension(fileName).ToString() + "'").ToArray())}";
+                    invalidFileTypePanel.Style.Add("display", "inline-block");
+                }
+
+                if (filesTooLarge.Count > 0)
+                {
+                    HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("fileUploadTooLargeTxt");
+                    txt.InnerText = $"Could not upload {String.Join(", ", filesTooLarge.Select(fileName => "'" + fileName + "'").ToArray())}. File(s) too large";
+                    fileUploadedTooLargePanel.Style.Add("display", "inline-block");
+                }
+
+                if (duplicateFiles.Count > 0)
+                {
+                    HtmlGenericControl txt = (HtmlGenericControl)duplicateFileNamesPanel.FindControl("duplicateFileNameTxt");
+                    txt.InnerText = $"Could not upload {String.Join(", ", duplicateFiles.Select(fileName => "'" + fileName + "'").ToArray())}. Uploaded file name(s) already exist";
+                    duplicateFileNamesPanel.Style.Add("display", "inline-block");
+                }
+
+                if (dt.Rows.Count > 0)
+                {
+
+                    // add files to session so they will persist after postback
+                    Session["uploadedFiles"] = files;
+
+                    // show files uploaded
+                    filesUploadedPanel.Visible = true;
+
+                    clearAllFilesBtn.Visible = true;
+
+                    // populate files uploaded list
+                    filesUploadedListView.DataSource = dt;
+                    filesUploadedListView.DataBind();
+
+                    noFilesUploadedDisclaimerPanel.Visible = false;
+                }
+            }
+            else
+            {
+                List<HttpPostedFile> files = null;
+
+                if (Session["uploadedFiles"] != null)
+                    files = (List<HttpPostedFile>)Session["uploadedFiles"];
+
+                if (Session["uploadedFiles"] == null || files == null || files.Count <= 0)
+                {
+                    filesUploadedPanel.Visible = false;
+                    noFileUploaded.Style.Add("display", "inline-block");
+
+                    clearAllFilesBtn.Visible = false;
+                    noFilesUploadedDisclaimerPanel.Visible = true;
+                }
+
+            }
+
+        }
+
+        protected void resetFiles()
+        {
+            clearFileValidationMessages();
+            filesUploadedPanel.Visible = false;
+            FileUpload1.Dispose();
+
+            filesUploadedListView.DataSource = new DataTable();
+            filesUploadedListView.DataBind();
+
+            Session["uploadedFiles"] = null;
+
+            clearAllFilesBtn.Visible = false;
+            if(chkOnOff.Checked)
+                noFilesUploadedDisclaimerPanel.Visible = true;
+        }
+
+        protected void clearAllFilesBtn_Click(object sender, EventArgs e)
+        {
+            // clears uploaded files from Session storage
+
+            resetFiles();
+        }
+
+        protected void clearIndividualFileBtn_Click(object sender, EventArgs e)
+        {
+            // remove an individual file from List of uploaded files in Session
+
+            LinkButton btn = sender as LinkButton;
+            string file_name = btn.Attributes["data-id"].ToString();
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("file_name", typeof(string));
+
+            // go through all files and create new datatable
+            List<HttpPostedFile> files = null;
+            if (Session["uploadedFiles"] != null)
+            {
+                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+
+                HttpPostedFile fileToRemove = files.SingleOrDefault<HttpPostedFile>(file => Path.GetFileName(file.FileName).ToString() == file_name);
+                if (fileToRemove != null)
+                    files.Remove(fileToRemove);
+
+                if (files.Count > 0)
+                {
+                    foreach (HttpPostedFile file in files)
+                    {
+                        dt.Rows.Add(Path.GetFileName(file.FileName).ToString());
+                    }
+                    Session["uploadedFiles"] = files;
+                    noFilesUploadedDisclaimerPanel.Visible = false;
+                }
+                else
+                {
+                    resetFiles();
+                }
+
+                filesUploadedListView.DataSource = dt;
+                filesUploadedListView.DataBind();
+            }
+        }
+
+        protected void btnDownloadFiles_Click(object sender, EventArgs e)
+        {
+            // downloads the files uploaded to a LA
+
+            string file = filesToDownloadList.SelectedValue.ToString();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                            SELECT file_data FROM [dbo].[filestorage] WHERE file_id = '{file}';
+                        ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            byte[] result = null;
+                            while (reader.Read())
+                            {
+                                result = (byte[])reader["file_data"];
+                            }
+                            Response.Clear();
+                            Response.AddHeader("Cache-Control", "no-cache, must-revalidate, post-check=0, pre-check=0");
+                            Response.AddHeader("Pragma", "no-cache");
+                            Response.AddHeader("Content-Description", "File Download");
+                            Response.AddHeader("Content-Type", "application/force-download");
+                            Response.AddHeader("Content-Transfer-Encoding", "binary\n");
+                            Response.AddHeader("content-disposition", "attachment;filename=" + filesToDownloadList.SelectedItem.Text);
+                            Response.BinaryWrite(result);
+                            Response.Flush();
+                            Response.Close();
+
+                        }
+                    }
+                }
+            }
+            catch (System.Threading.ThreadAbortException exf)
+            {
+                //do nothing
+                return;
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                throw ex;
+            }
+        }
+
+        protected void chkOnOff_CheckedChanged(object sender, EventArgs e)
+        {
+            fileUploadPanel.Visible = noFilesUploadedDisclaimerPanel.Visible = chkOnOff.Checked;
+
+            if (!chkOnOff.Checked)
+                resetFiles();
+        }
+
+        //_________________________________________________________________________
+
         protected void refreshForm(object sender, EventArgs e)
         {
             string pathname = string.Empty;

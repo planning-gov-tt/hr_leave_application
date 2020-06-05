@@ -1049,7 +1049,7 @@ namespace HR_LEAVEv2.Employee
                 if (invalidFiles.Count > 0)
                 {
                     HtmlGenericControl txt = (HtmlGenericControl)invalidFileTypePanel.FindControl("invalidFileTypeErrorTxt");
-                    txt.InnerText = $"Could not upload {String.Join(", ", invalidFiles.Select(fileName => "'" + fileName + "'").ToArray())}. Invalid file types: {String.Join(", ", invalidFiles.Select(fileName => "'" + Path.GetExtension(fileName).ToString() + "'").ToArray())}";
+                    txt.InnerText = $"Could not upload {String.Join(", ", invalidFiles.Select(fileName => "'" + fileName + "'").ToArray())}. Invalid file type(s): {String.Join(", ", invalidFiles.Select(fileName => "'" + Path.GetExtension(fileName).ToString() + "'").ToArray())}";
                     invalidFileTypePanel.Style.Add("display", "inline-block");
                 }
 
@@ -1367,14 +1367,12 @@ namespace HR_LEAVEv2.Employee
                                         (
                                         [file_data]
                                         ,[file_name]
-                                        ,[file_extension]
-                                        ,[uploaded_on])
+                                        ,[file_extension])
                                     OUTPUT INSERTED.file_id
                                     VALUES
                                         ( @FileData
                                         ,@FileName
                                         ,@FileExtension
-                                        ,@UploadedOn
                                         );";
                                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                                     {
@@ -1385,7 +1383,7 @@ namespace HR_LEAVEv2.Employee
                                             command.Parameters.AddWithValue("@FileData", bytes);
                                             command.Parameters.AddWithValue("@FileName", file_name);
                                             command.Parameters.AddWithValue("@FileExtension", file_extension);
-                                            command.Parameters.AddWithValue("@UploadedOn", util.getCurrentDate());
+                                            //command.Parameters.AddWithValue("@UploadedOn", util.getCurrentDate());
                                             fileid = command.ExecuteScalar().ToString();
 
                                             isFileUploadSuccessful = !util.isNullOrEmpty(fileid);
@@ -1430,7 +1428,7 @@ namespace HR_LEAVEv2.Employee
                         fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
 
                     string action = $"Submitted leave application: leave_transaction_id= {transaction_id};{fileActionString}";
-                    Boolean res = util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), action);
+                    util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), action);
 
                     // show feedback
                     submitButtonPanel.Style.Add("display", "none");
@@ -1741,14 +1739,12 @@ namespace HR_LEAVEv2.Employee
                                         (
                                         [file_data]
                                         ,[file_name]
-                                        ,[file_extension]
-                                        ,[uploaded_on])
+                                        ,[file_extension])
                                     OUTPUT INSERTED.file_id
                                     VALUES
                                         ( @FileData
                                         ,@FileName
                                         ,@FileExtension
-                                        ,@UploadedOn
                                         );";
                                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                                     {
@@ -1759,7 +1755,7 @@ namespace HR_LEAVEv2.Employee
                                             command.Parameters.AddWithValue("@FileData", bytes);
                                             command.Parameters.AddWithValue("@FileName", file_name);
                                             command.Parameters.AddWithValue("@FileExtension", file_extension);
-                                            command.Parameters.AddWithValue("@UploadedOn", util.getCurrentDate());
+                                            //.Parameters.AddWithValue("@UploadedOn", util.getCurrentDate());
                                             fileid = command.ExecuteScalar().ToString();
 
                                             isEditSuccessful = isEditSuccessful && !util.isNullOrEmpty(fileid);
