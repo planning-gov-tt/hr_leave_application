@@ -125,7 +125,8 @@ CREATE TABLE [dbo].[employeeposition] (
   [dept_id] INT,
   [years_worked] INT NOT NULL,
   [annual_vacation_amt] INT NOT NULL,
-  [max_vacation_accumulation] INT NOT NULL
+  [max_vacation_accumulation] INT NOT NULL,
+  [can_accumulate_past_max] BIT
 
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id]),
@@ -188,7 +189,7 @@ CREATE TABLE [dbo].[auditlog] (
   [affected_employee_id] NVARCHAR (10) NOT NULL,
   [affected_employee_name] NVARCHAR (60) NOT NULL,
   [action] NVARCHAR (350) NOT NULL,
-  [created_at] DATETIME NOT NULL,
+  [created_at] DATETIME DEFAULT CURRENT_TIMESTAMP,
 
   FOREIGN KEY ([acting_employee_id])
     REFERENCES [dbo].[employee] ([employee_id])
@@ -199,12 +200,12 @@ CREATE TABLE [dbo].[filestorage](
   [file_data] IMAGE NOT NULL,
   [file_name] NVARCHAR(200) NOT NULL,
   [file_extension] NVARCHAR (25) NOT NULL,
-  [uploaded_on] DATETIME NOT NULL
+  [uploaded_on] DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE [dbo].[employeefiles](
   [id] INT IDENTITY (1, 1) PRIMARY KEY,
-  [leave_transaction_id] INT NOT NULL,
+  [leave_transaction_id] INT,
   [employee_id] NVARCHAR(10) NOT NULL,
   [file_id] UNIQUEIDENTIFIER NOT NULL,
 
