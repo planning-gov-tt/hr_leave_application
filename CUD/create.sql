@@ -61,7 +61,8 @@ CREATE TABLE [dbo].[employeerole] (
 
   PRIMARY KEY ([employee_id], [role_id]),
   FOREIGN KEY ([employee_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
+    REFERENCES [dbo].[employee] ([employee_id])
+	ON DELETE CASCADE,
   FOREIGN KEY ([role_id])
     REFERENCES [dbo].[role] ([role_id])
 )
@@ -129,7 +130,8 @@ CREATE TABLE [dbo].[employeeposition] (
   [can_accumulate_past_max] BIT
 
   FOREIGN KEY ([employee_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
+    REFERENCES [dbo].[employee] ([employee_id])
+	ON DELETE CASCADE,
   FOREIGN KEY ([position_id])
     REFERENCES [dbo].[position] ([pos_id]),
   FOREIGN KEY ([employment_type])
@@ -206,12 +208,15 @@ CREATE TABLE [dbo].[filestorage](
 CREATE TABLE [dbo].[employeefiles](
   [id] INT IDENTITY (1, 1) PRIMARY KEY,
   [leave_transaction_id] INT,
+  [emp_record_id] INT,
   [employee_id] NVARCHAR(10) NOT NULL,
   [file_id] UNIQUEIDENTIFIER NOT NULL,
 
   FOREIGN KEY ([leave_transaction_id]) REFERENCES [dbo].[leavetransaction] ([transaction_id]),
+  FOREIGN KEY ([emp_record_id]) REFERENCES [dbo].[employeeposition] ([id]),
   FOREIGN KEY([employee_id]) REFERENCES [dbo].[employee] ([employee_id]),
   FOREIGN KEY([file_id]) REFERENCES [dbo].[filestorage] ([file_id])
+	ON DELETE CASCADE
 );
 
 CREATE TABLE [dbo].[notifications](
