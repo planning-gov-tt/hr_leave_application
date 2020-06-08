@@ -17,7 +17,8 @@ namespace HR_LEAVEv2
             accType = 2,
             numDays = 3,
             annualVacationAmt = 4,
-            maxVacationAccumulation = 5
+            maxVacationAccumulation = 5,
+            can_accumulate_past_max = 6
         };
 
         Boolean isStartOfNewContractYear = false,
@@ -98,14 +99,14 @@ namespace HR_LEAVEv2
             {
                 // used to display number of years worked in current job
                 Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
-                //Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 27)); // for testing
+                //Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, new DateTime(2021, 09, 27)); // for testing
 
                 if (empType == "Contract")
                 {
                     // get current number of years worked for their contract and compare with their current value for years worked
 
                     currentNumYearsWorked = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
-                    //currentNumYearsWorked = util.getNumYearsBetween(startDate, new DateTime(2022, 09, 27)); //for testing
+                    //currentNumYearsWorked = util.getNumYearsBetween(startDate, new DateTime(2021, 09, 27)); //for testing
                     isStartOfNewContractYear = currentNumYearsWorked > yearsWorked;
                 }
 
@@ -114,7 +115,7 @@ namespace HR_LEAVEv2
                     // get current number of years worked (number of new years passed)
 
                     currentNumYearsWorked = util.getCurrentDateToday().Year - startDate.Year;
-                    //currentNumYearsWorked = 2022 - startDate.Year; //for testing
+                    //currentNumYearsWorked = 2021 - startDate.Year; //for testing
                     isStartOfNewYear = currentNumYearsWorked > yearsWorked;
                 }
 
@@ -202,7 +203,7 @@ namespace HR_LEAVEv2
                 try
                 {
                     string accSql = $@"
-                            SELECT a.leave_type as leaveType, a.accumulation_period_value as accValue, a.accumulation_type as accType, a.num_days as numDays, ep.annual_vacation_amt as annualVacationAmt, ep.max_vacation_accumulation as maxVacationAccumulation
+                            SELECT a.leave_type as leaveType, a.accumulation_period_value as accValue, a.accumulation_type as accType, a.num_days as numDays, ep.annual_vacation_amt as annualVacationAmt, ep.max_vacation_accumulation as maxVacationAccumulation, ISNULL(ep.can_accumulate_past_max, 0) as can_accumulate_past_max
                             FROM [dbo].[accumulations] a
                             LEFT JOIN dbo.employeeposition ep
                             ON ep.employment_type = a.employment_type
@@ -255,7 +256,7 @@ namespace HR_LEAVEv2
                                     ";
                                 } else if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Add")
                                 {
-                                    if(dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString() == "Vacation")
+                                    if(dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString() == "Vacation" && !Convert.ToBoolean(dt.Rows[i].ItemArray[(int)acc_enum.can_accumulate_past_max].ToString()))
                                     {
                                         string maxVacationAmt = dt.Rows[i].ItemArray[(int)acc_enum.maxVacationAccumulation].ToString();
                                         // ensure amt does not go over max

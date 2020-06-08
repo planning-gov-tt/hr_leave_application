@@ -160,6 +160,8 @@ namespace HR_LEAVEv2.HR
             addEmpRecordForm.Visible = false;
             showFormBtn.Visible = true;
 
+            accPastLimitContainerPanel.Visible = true;
+
             // submit
             submitFullFormPanel.Visible = false;
             editFormPanel.Visible = true;
@@ -186,6 +188,8 @@ namespace HR_LEAVEv2.HR
             // add emp record
             addEmpRecordForm.Visible = false;
             showFormBtn.Visible = true;
+
+            accPastLimitContainerPanel.Visible = false;
 
             // submit
             submitFullFormPanel.Visible = true;
@@ -1135,9 +1139,11 @@ namespace HR_LEAVEv2.HR
             editLeaveSuccessPanel.Style.Add("display", "none");
             editEmpRecordSuccessPanel.Style.Add("display", "none");
             editEmpFilesPanel.Style.Add("display", "none");
+            editAccumulatePastMaxSuccessPanel.Style.Add("display", "none");
             fullFormSubmitSuccessPanel.Style.Add("display", "none");
 
             // ERRORS
+            editAccumulatePastMaxErrorPanel.Style.Add("display", "none");
             editEmpFilesErrorPanel.Style.Add("display", "none");
             editEmpErrorPanel.Style.Add("display", "none");
             editRolesErrorPanel.Style.Add("display", "none");
@@ -1157,7 +1163,6 @@ namespace HR_LEAVEv2.HR
             noChangesMadePanel.Style.Add("display", "none");
 
             // EMPLOYMENT RECORD
-
             invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "none");
 
             // ADD
@@ -1389,98 +1394,8 @@ namespace HR_LEAVEv2.HR
                 throw ex;
             }
 
-
-            resetFiles();
             // get employee files
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-                    string sql = $@"
-                        SELECT 
-                            (SELECT 
-					            STUFF
-					            (
-						            (SELECT ', ' + fs.file_name
-						            FROM [dbo].filestorage fs 
-						            LEFT JOIN [dbo].employeefiles ef ON ef.employee_id = ep.employee_id AND ef.leave_transaction_id IS NULL
-						            WHERE fs.file_id = ef.file_id
-						            FOR XML PATH(''))
-						            ,1
-						            ,1,
-						            ''
-					            )
-				            ) as 'files',
-                            (SELECT 
-					            STUFF
-					            (
-						            (SELECT ', ' + CAST(fs.file_id AS NVARCHAR(MAX))
-						            FROM [dbo].filestorage fs 
-						            LEFT JOIN [dbo].employeefiles ef ON ef.employee_id = ep.employee_id AND ef.leave_transaction_id IS NULL
-						            WHERE fs.file_id = ef.file_id
-						            FOR XML PATH(''))
-						            ,1
-						            ,1,
-						            ''
-					            )
-				            ) as 'files_id',
-                            ISNULL(ep.can_accumulate_past_max, 0) as can_accumulate_past_max
-                        FROM [dbo].[employeeposition] ep
-                        WHERE employee_id = {empId};
-                    ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            // store initial leave balances
-                            Dictionary<string, string> previousLeaveBalances = new Dictionary<string, string>();
-
-                            string files = string.Empty,
-                                   filesIds = string.Empty,
-                                   canAccumulatePastMax = string.Empty;
-                            while (reader.Read())
-                            {
-                                files = reader["files"].ToString();
-                                filesIds = reader["files_id"].ToString();
-                                canAccumulatePastMax = reader["can_accumulate_past_max"].ToString(); ;
-                            }
-
-                            chkOnOff.Checked = canAccumulatePastMax == "True";
-                            if (chkOnOff.Checked)
-                                fileUploadPanel.Visible = noFilesUploadedDisclaimerPanel.Visible = false;
-
-                            if (!util.isNullOrEmpty(files) && !util.isNullOrEmpty(filesIds))
-                            {
-                                string[] fileNamesArr = files.Split(',');
-                                string[] fileIdsArr = filesIds.Split(',');
-                                DataTable dt = new DataTable();
-                                dt.Columns.Add("file_id", typeof(string));
-                                dt.Columns.Add("file_name", typeof(string));
-
-                                for (int i = 0; i < fileNamesArr.Length; i++)
-                                {
-                                    dt.Rows.Add(fileIdsArr[i].Trim(), fileNamesArr[i].Trim());
-                                }
-
-                                filesToDownloadList.DataValueField = "file_id";
-                                filesToDownloadList.DataTextField = "file_name";
-                                filesToDownloadList.DataSource = dt;
-                                filesToDownloadList.DataBind();
-                                filesToDownloadPanel.Visible = true;
-                            }
-                            else
-                                filesToDownloadPanel.Visible = false;
-
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //exception logic
-                throw ex;
-            }
+            loadPreviouslyUploadedFiles(empId);
 
         }
 
@@ -2091,19 +2006,24 @@ namespace HR_LEAVEv2.HR
                                     {
                                         // insert record into bridge entity which associates file(s) with a given employee
                                         sql = $@"
-                                                INSERT INTO [dbo].[employeefiles] ([file_id],[employee_id],[leave_transaction_id])
-                                                VALUES(@FileId, @EmployeeId, @TransactionId);";
+                                                INSERT INTO [dbo].[employeefiles] ([file_id],[employee_id],[emp_record_id])
+                                                VALUES(
+                                                    @FileId, 
+                                                    @EmployeeId, 
+                                                    (
+                                                        SELECT ep.id FROM [dbo].[employeeposition] ep WHERE (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)) AND ep.employee_id = {empId}
+                                                    )
+                                                );";
                                         using (SqlCommand command = new SqlCommand(sql, connection))
                                         {
                                             command.Parameters.AddWithValue("@FileId", fileId);
                                             command.Parameters.AddWithValue("@EmployeeId", empId);
-                                            command.Parameters.AddWithValue("@TransactionId", DBNull.Value);
                                             int rowsAffected = command.ExecuteNonQuery();
                                             isFileUploadSuccessful = rowsAffected > 0;
                                         }
-
-                                        // add file id to add to audit log
-                                        uploadedFilesIds.Add(fileId);
+                                        if(isFileUploadSuccessful)
+                                            // add file id to add to audit log
+                                            uploadedFilesIds.Add(fileId);
                                     }
 
                                 }
@@ -2126,8 +2046,15 @@ namespace HR_LEAVEv2.HR
                         util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), fileActionString);
                     }
                     isFilesChanged = true;
+                }
+            }
+            // END ADDITION OF FILES--------------------------------------------------------------------------------------------------------------
 
-                    // ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
+            // ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
+            if(ViewState["prevAccPastLimitStatus"] != null)
+            {
+                if (chkOnOff.Checked != Convert.ToBoolean(ViewState["prevAccPastLimitStatus"]) && ((chkOnOff.Checked && isFilesChanged && isFileUploadSuccessful) || !chkOnOff.Checked))
+                {
                     try
                     {
 
@@ -2158,18 +2085,16 @@ namespace HR_LEAVEv2.HR
                     {
                         isAccumulatePastLimitSuccessful = false;
                     }
-                    // END ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
                 }
             }
-
-            // END ADDITION OF FILES--------------------------------------------------------------------------------------------------------------
+            // END ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
 
             // reset page so it is ready for new edits
             populatePage(empId);
             hideEmploymentRecordForm();
 
             // USER FEEDBACK--------------------------------------------------------------------------------------------------------------------------
-            if (!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged && !isFilesChanged)
+            if (!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged && !isFilesChanged && !isAccumulatePastLimitStatusChanged)
             {
                 noChangesMadePanel.Style.Add("display", "inline-block");
             }
@@ -2199,7 +2124,8 @@ namespace HR_LEAVEv2.HR
                         editEmpFilesPanel.Style.Add("display", "inline-block");
 
                     // successful accumulation past limit edit
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ENTER show msg code HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    if(isAccumulatePastLimitStatusChanged && isAccumulatePastLimitSuccessful)
+                        editAccumulatePastMaxSuccessPanel.Style.Add("display", "inline-block");
 
                     // ERROR MESSAGES------------------------------------------------------------------
 
@@ -2220,7 +2146,8 @@ namespace HR_LEAVEv2.HR
                         editEmpFilesErrorPanel.Style.Add("display", "inline-block");
 
                     // error accumulation past limit edit
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ENTER show err msg code HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    if(!isAccumulatePastLimitSuccessful)
+                        editAccumulatePastMaxErrorPanel.Style.Add("display", "inline-block");
 
                     // emp records errors
                     if (!isEmpRecordEditSuccessful)
@@ -2385,21 +2312,78 @@ namespace HR_LEAVEv2.HR
                 }
 
                 // Roles 
-                if (isInsertSuccessful)
+                // add roles to employee
+                foreach (string role in authorizations)
                 {
-                    isInsertSuccessful = false;
-                    // add roles to employee
-                    foreach (string role in authorizations)
+                    try
+                    {
+                        string sql = $@"
+                        INSERT INTO [dbo].[employeerole]
+                            ([employee_id]
+                                ,[role_id])
+                        VALUES
+                            ( @EmployeeId
+                            ,@RoleId
+                            );
+                    ";
+
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                command.Parameters.AddWithValue("@EmployeeId", emp_id);
+                                command.Parameters.AddWithValue("@RoleId", role);
+
+                                int rowsAffected = command.ExecuteNonQuery();
+                                isInsertSuccessful = isInsertSuccessful && rowsAffected > 0;
+
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // exception logic
+                        isInsertSuccessful = false;
+                        break;
+                    }
+                }
+
+                // Employment Records
+                //get data from gridview
+                /**
+                    * datatable is formatted in the folowing manner in the ItemArray:
+                    * Index:         0             1            2         3        4        5          6               7              8
+                    * Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged
+                * */
+                foreach (DataRow dr in dt.Rows)
+                {
+                    // if row is not deleted
+                    if (dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
                     {
                         try
                         {
                             string sql = $@"
-                            INSERT INTO [dbo].[employeerole]
-                               ([employee_id]
-                                  ,[role_id])
+                            INSERT INTO [dbo].[employeeposition]
+                                ([employee_id]
+                                    ,[position_id]
+                                    ,[start_date]
+                                    ,[expected_end_date]
+                                    ,[employment_type]
+                                    ,[dept_id]
+                                    ,[years_worked]
+                                    ,[annual_vacation_amt]
+                                    ,[max_vacation_accumulation])
                             VALUES
-                               ( @EmployeeId
-                                ,@RoleId
+                                ( @EmployeeId
+                                ,@PositionId
+                                ,@StartDate
+                                ,@ExpectedEndDate
+                                ,@EmploymentType
+                                ,@DeptId
+                                ,@YearsWorked
+                                ,@AnnualVacationAmt
+                                ,@MaxVacationAccumulation
                                 );
                         ";
 
@@ -2409,10 +2393,28 @@ namespace HR_LEAVEv2.HR
                                 using (SqlCommand command = new SqlCommand(sql, connection))
                                 {
                                     command.Parameters.AddWithValue("@EmployeeId", emp_id);
-                                    command.Parameters.AddWithValue("@RoleId", role);
+                                    command.Parameters.AddWithValue("@EmploymentType", dr.ItemArray[(int)emp_records_columns.employment_type]);
+                                    command.Parameters.AddWithValue("@DeptId", dr.ItemArray[(int)emp_records_columns.dept_id]);
+                                    command.Parameters.AddWithValue("@PositionId", dr.ItemArray[(int)emp_records_columns.pos_id]);
+                                    command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)emp_records_columns.start_date]);
+                                    command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
+
+                                    if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
+                                        // get number of years worked by checking start date against current date
+                                        command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), util.getCurrentDateToday()));
+                                    else
+                                        // get number of years worked from start of year to  start of year
+                                        command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
+
+                                    command.Parameters.AddWithValue("@AnnualVacationAmt", dr.ItemArray[(int)emp_records_columns.annual_vacation_amt]);
+                                    command.Parameters.AddWithValue("@MaxVacationAccumulation", dr.ItemArray[(int)emp_records_columns.max_vacation_accumulation]);
+
 
                                     int rowsAffected = command.ExecuteNonQuery();
-                                    isInsertSuccessful = rowsAffected > 0;
+                                    isInsertSuccessful = isInsertSuccessful && (rowsAffected > 0);
+                                    if (rowsAffected > 0)
+                                        fullFormSubmitSuccessPanel.Style.Add("display", "inline-block");
+            
 
                                 }
                             }
@@ -2421,95 +2423,9 @@ namespace HR_LEAVEv2.HR
                         {
                             // exception logic
                             isInsertSuccessful = false;
-                            break;
                         }
                     }
 
-                    // Employment Records
-                    if (isInsertSuccessful)
-                    {
-                        isInsertSuccessful = false;
-                        //get data from gridview
-                        /**
-                           * datatable is formatted in the folowing manner in the ItemArray:
-                           * Index:         0             1            2         3        4        5          6               7              8
-                           * Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged
-                       * */
-                        foreach (DataRow dr in dt.Rows)
-                        {
-                            // if row is not deleted
-                            if (dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
-                            {
-                                try
-                                {
-                                    string sql = $@"
-                                    INSERT INTO [dbo].[employeeposition]
-                                        ([employee_id]
-                                            ,[position_id]
-                                            ,[start_date]
-                                            ,[expected_end_date]
-                                            ,[employment_type]
-                                            ,[dept_id]
-                                            ,[years_worked]
-                                            ,[annual_vacation_amt]
-                                            ,[max_vacation_accumulation])
-                                    VALUES
-                                        ( @EmployeeId
-                                        ,@PositionId
-                                        ,@StartDate
-                                        ,@ExpectedEndDate
-                                        ,@EmploymentType
-                                        ,@DeptId
-                                        ,@YearsWorked
-                                        ,@AnnualVacationAmt
-                                        ,@MaxVacationAccumulation
-                                        );
-                                ";
-
-                                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                                    {
-                                        connection.Open();
-                                        using (SqlCommand command = new SqlCommand(sql, connection))
-                                        {
-                                            command.Parameters.AddWithValue("@EmployeeId", emp_id);
-                                            command.Parameters.AddWithValue("@EmploymentType", dr.ItemArray[(int)emp_records_columns.employment_type]);
-                                            command.Parameters.AddWithValue("@DeptId", dr.ItemArray[(int)emp_records_columns.dept_id]);
-                                            command.Parameters.AddWithValue("@PositionId", dr.ItemArray[(int)emp_records_columns.pos_id]);
-                                            command.Parameters.AddWithValue("@StartDate", dr.ItemArray[(int)emp_records_columns.start_date]);
-                                            command.Parameters.AddWithValue("@ExpectedEndDate", dr.ItemArray[(int)emp_records_columns.expected_end_date]);
-
-                                            if (dr.ItemArray[(int)emp_records_columns.employment_type].ToString() == "Contract")
-                                                // get number of years worked by checking start date against current date
-                                                command.Parameters.AddWithValue("@YearsWorked", util.getNumYearsBetween(Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]), util.getCurrentDateToday()));
-                                            else
-                                                // get number of years worked from start of year to  start of year
-                                                command.Parameters.AddWithValue("@YearsWorked", util.getCurrentDateToday().Year - Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.start_date]).Year);
-
-                                            command.Parameters.AddWithValue("@AnnualVacationAmt", dr.ItemArray[(int)emp_records_columns.annual_vacation_amt]);
-                                            command.Parameters.AddWithValue("@MaxVacationAccumulation", dr.ItemArray[(int)emp_records_columns.max_vacation_accumulation]);
-
-
-                                            int rowsAffected = command.ExecuteNonQuery();
-                                            if (rowsAffected > 0)
-                                            {
-                                                isInsertSuccessful = true;
-                                                fullFormSubmitSuccessPanel.Style.Add("display", "inline-block");
-                                            }
-                                            else
-                                                isInsertSuccessful = false;
-
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    // exception logic
-                                    isInsertSuccessful = false;
-                                }
-                            }
-
-                        }
-                    }
                 }
             }
 
@@ -2524,6 +2440,9 @@ namespace HR_LEAVEv2.HR
                 * */
                 string action = $"Created new Employee; {String.Join(", ", currentLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())} ; Permissions: {String.Join(",", authorizations.ToArray())}";
                 util.addAuditLog(Session["emp_id"].ToString(), emp_id, action);
+
+                // hide submit button if insert is successful
+                submitBtn.Visible = false;
             }
             else
             {
@@ -2540,6 +2459,8 @@ namespace HR_LEAVEv2.HR
             //scroll to top of page
             Page.MaintainScrollPositionOnPostBack = false;
             this.empDetailsContainer.Focus();
+
+            
         }
         //_________________________________________________________________________
 
@@ -2683,6 +2604,110 @@ namespace HR_LEAVEv2.HR
                 noFilesUploadedDisclaimerPanel.Visible = true;
         }
 
+        protected void loadPreviouslyUploadedFiles(string empId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                        SELECT 
+                            (SELECT 
+					            STUFF
+					            (
+						            (SELECT ', ' + fs.file_name
+						            FROM [dbo].filestorage fs 
+						            LEFT JOIN [dbo].employeefiles ef ON ef.employee_id = ep.employee_id AND ef.leave_transaction_id IS NULL AND ef.emp_record_id IS NOT NULL
+						            WHERE fs.file_id = ef.file_id
+						            FOR XML PATH(''))
+						            ,1
+						            ,1,
+						            ''
+					            )
+				            ) as 'files',
+                            (SELECT 
+					            STUFF
+					            (
+						            (SELECT ', ' + CAST(fs.file_id AS NVARCHAR(MAX))
+						            FROM [dbo].filestorage fs 
+						            LEFT JOIN [dbo].employeefiles ef ON ef.employee_id = ep.employee_id AND ef.leave_transaction_id IS NULL AND ef.emp_record_id IS NOT NULL
+						            WHERE fs.file_id = ef.file_id
+						            FOR XML PATH(''))
+						            ,1
+						            ,1,
+						            ''
+					            )
+				            ) as 'files_id',
+                            ISNULL(ep.can_accumulate_past_max, 0) as can_accumulate_past_max
+                        FROM [dbo].[employeeposition] ep
+                        WHERE employee_id = {empId};
+                    ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            // store initial leave balances
+                            Dictionary<string, string> previousLeaveBalances = new Dictionary<string, string>();
+
+                            string files = string.Empty,
+                                   filesIds = string.Empty,
+                                   canAccumulatePastMax = string.Empty;
+                            while (reader.Read())
+                            {
+                                files = reader["files"].ToString();
+                                filesIds = reader["files_id"].ToString();
+                                canAccumulatePastMax = reader["can_accumulate_past_max"].ToString(); ;
+                            }
+
+                            chkOnOff.Checked = canAccumulatePastMax == "True";
+
+                            // set viewstate variable for prev value in case of change
+                            ViewState["prevAccPastLimitStatus"] = chkOnOff.Checked;
+
+                            // hide disclaimer shown when no file is uploaded but acc past limit is true 
+                            // hide file upload panel
+                            resetFiles();
+                            noFilesUploadedDisclaimerPanel.Visible = fileUploadPanel.Visible = false;
+
+                            if (!util.isNullOrEmpty(files) && !util.isNullOrEmpty(filesIds))
+                            {
+                                string[] fileNamesArr = files.Split(',');
+                                string[] fileIdsArr = filesIds.Split(',');
+                                DataTable dt = new DataTable();
+                                dt.Columns.Add("file_id", typeof(string));
+                                dt.Columns.Add("file_name", typeof(string));
+
+                                for (int i = 0; i < fileNamesArr.Length; i++)
+                                {
+                                    dt.Rows.Add(fileIdsArr[i].Trim(), fileNamesArr[i].Trim());
+                                }
+
+                                filesToDownloadList.DataValueField = "file_id";
+                                filesToDownloadList.DataTextField = "file_name";
+                                filesToDownloadList.DataSource = dt;
+                                filesToDownloadList.DataBind();
+                                filesToDownloadPanel.Visible = true;
+                            }
+                            else
+                            {
+                                filesToDownloadList.DataSource = new DataTable();
+                                filesToDownloadList.DataBind();
+                                filesToDownloadPanel.Visible = false;
+                            }
+                                
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                throw ex;
+            }
+        }
+
         protected void clearAllFilesBtn_Click(object sender, EventArgs e)
         {
             // clears uploaded files from Session storage
@@ -2779,14 +2804,54 @@ namespace HR_LEAVEv2.HR
             }
         }
 
+        protected void btnDeleteFile_Click(object sender, EventArgs e)
+        {
+            string file = filesToDownloadList.SelectedValue.ToString();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                            BEGIN TRANSACTION;
+                                -- set employee to not be able to accumulate past max if associated file is deleted
+                                UPDATE [dbo].[employeeposition] 
+                                SET can_accumulate_past_max = 0
+                                WHERE id = (SELECT emp_record_id FROM [dbo].[employeefiles] WHERE file_id = '{file}')
+
+                                -- delete file itself
+                                DELETE FROM [dbo].[filestorage] WHERE file_id = '{file}';
+                                
+                            COMMIT;
+                        ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+
+                    // reload uploaded files
+                    if (Request.QueryString.HasKeys())
+                    {
+                        string empId = Request.QueryString["empId"];
+                        loadPreviouslyUploadedFiles(empId);
+                    }
+                        
+                }
+            }
+            catch (Exception ex)
+            {
+                //exception logic
+                throw ex;
+            }
+        }
+
         protected void chkOnOff_CheckedChanged(object sender, EventArgs e)
         {
             fileUploadPanel.Visible = noFilesUploadedDisclaimerPanel.Visible = chkOnOff.Checked;
-
             if (!chkOnOff.Checked)
                 resetFiles();
         }
-
         //_________________________________________________________________________
 
         protected void refreshForm(object sender, EventArgs e)
@@ -2831,5 +2896,6 @@ namespace HR_LEAVEv2.HR
             balanceTxt.Text = balance;
         }
 
+        
     }
 }

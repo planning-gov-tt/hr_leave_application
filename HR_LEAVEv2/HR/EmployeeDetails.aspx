@@ -157,10 +157,18 @@
                     </asp:Panel>
 
                     <%--Successful edit of employee files--%>
-                     <asp:Panel ID="editEmpFilesPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                    <asp:Panel ID="editEmpFilesPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
                         <span class="alert alert-success">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span>Employment file(s) successfully uploaded</span>
+                        </span>
+                    </asp:Panel>
+
+                    <%--Successful edit of accumulate past max--%>
+                    <asp:Panel ID="editAccumulatePastMaxSuccessPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-success">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span>Accumulate past vacation leave limit status successfully edited</span>
                         </span>
                     </asp:Panel>
 
@@ -182,6 +190,13 @@
                         <span class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>Employee not edited</span>
+                        </span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="editAccumulatePastMaxErrorPanel" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span>Accumulate past vacation leave limit status not edited</span>
                         </span>
                     </asp:Panel>
 
@@ -784,7 +799,7 @@
         </div>
     </div>
 
-    <div class="container text-center" style="width: 50%; background-color: #e0e0eb;padding-bottom: 15px;">
+    <asp:Panel ID="accPastLimitContainerPanel" runat="server" Visible="false" class="container text-center" style="width: 50%; background-color: #e0e0eb;padding-bottom: 15px;">
         <h3 style="margin-bottom:15px;">Allow Accumulation Past Max
             <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
             data-toggle="tooltip"
@@ -799,8 +814,12 @@
 
             <asp:DropDownList ID="filesToDownloadList" runat="server"></asp:DropDownList>
 
-            <asp:LinkButton ID="btnDownloadFiles" runat="server" OnClick="btnDownloadFiles_Click" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Download file" Style="display: inline-block; margin-left: 5px;">
-            <i class="fa fa-download" aria-hidden="true"></i>
+            <asp:LinkButton ID="btnDownloadFiles" runat="server" OnClick="btnDownloadFiles_Click" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Download file" Style="display: inline-block; margin-left: 5px;">
+                <i class="fa fa-download" aria-hidden="true"></i>
+            </asp:LinkButton>
+
+            <asp:LinkButton ID="btnDeleteFile" runat="server" OnClick="btnDeleteFile_Click" OnClientClick="return confirm('Delete file?');" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete file" Style="display: inline-block; margin-left: 5px;">
+            <i class="fa fa-trash-o" aria-hidden="true"></i>
             </asp:LinkButton>
 
         </asp:Panel>
@@ -812,7 +831,7 @@
 
         <asp:UpdatePanel ID="disclaimerForNoFilesUploadedUpdatePanel" runat="server">
             <ContentTemplate>
-                <asp:Panel ID="noFilesUploadedDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block; margin: 0px 5px;" role="alert" Visible="false">
+                <asp:Panel ID="noFilesUploadedDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block; margin: 0px 5px; width:450px;" role="alert" Visible="false">
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                     <span>No Files currently uploaded. Without a letter from PS, the employee will not be able to accumulate vacation leave past their max</span>
                 </asp:Panel>
@@ -892,7 +911,7 @@
             </ContentTemplate>
         </asp:UpdatePanel>
 
-    </div>
+    </asp:Panel>
 
     <div class="container text-center" style="display:flex; justify-content:center">
         <asp:Panel ID="submitFullFormPanel" runat="server" CssCclass="row text-center" Style="margin-top: 30px;">

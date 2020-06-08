@@ -139,6 +139,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel editEmpFilesPanel;
         
         /// <summary>
+        /// editAccumulatePastMaxSuccessPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel editAccumulatePastMaxSuccessPanel;
+        
+        /// <summary>
         /// fullFormSubmitSuccessPanel control.
         /// </summary>
         /// <remarks>
@@ -155,6 +164,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel editEmpErrorPanel;
+        
+        /// <summary>
+        /// editAccumulatePastMaxErrorPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel editAccumulatePastMaxErrorPanel;
         
         /// <summary>
         /// editEmpFilesErrorPanel control.
@@ -1012,6 +1030,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.LinkButton showFormBtn;
         
         /// <summary>
+        /// accPastLimitContainerPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel accPastLimitContainerPanel;
+        
+        /// <summary>
         /// filesToDownloadPanel control.
         /// </summary>
         /// <remarks>
@@ -1037,6 +1064,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.LinkButton btnDownloadFiles;
+        
+        /// <summary>
+        /// btnDeleteFile control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnDeleteFile;
         
         /// <summary>
         /// chkOnOff control.
