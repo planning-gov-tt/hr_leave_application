@@ -1,0 +1,1030 @@
+{
+	"_type": "Project",
+	"_id": "AAAAAAFF+h6SjaM2Hec=",
+	"name": "Untitled",
+	"ownedElements": [
+		{
+			"_type": "UMLModel",
+			"_id": "AAAAAAFF+qBWK6M3Z8Y=",
+			"_parent": {
+				"$ref": "AAAAAAFF+h6SjaM2Hec="
+			},
+			"name": "Model",
+			"ownedElements": [
+				{
+					"_type": "UMLClassDiagram",
+					"_id": "AAAAAAFF+qBtyKM79qY=",
+					"_parent": {
+						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
+					},
+					"name": "Main",
+					"defaultDiagram": true
+				}
+			]
+		},
+		{
+			"_type": "FCFlowchart",
+			"_id": "AAAAAAFylMq5s0Ik+Oc=",
+			"_parent": {
+				"$ref": "AAAAAAFF+h6SjaM2Hec="
+			},
+			"name": "Flowchart1",
+			"ownedElements": [
+				{
+					"_type": "FCFlowchartDiagram",
+					"_id": "AAAAAAFylMq5s0IlsGY=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "FlowchartDiagram1",
+					"ownedViews": [
+						{
+							"_type": "FCProcessView",
+							"_id": "AAAAAAFylMrPzUIriFk=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylMrPzEIpWwY="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylMrPzUIsDWg=",
+									"_parent": {
+										"$ref": "AAAAAAFylMrPzUIriFk="
+									},
+									"font": "Arial;13;0",
+									"left": 386,
+									"top": 90,
+									"width": 101,
+									"height": 39,
+									"text": "Employee Submits Paper Application",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 376,
+							"top": 80,
+							"width": 121,
+							"height": 72,
+							"nameLabel": {
+								"$ref": "AAAAAAFylMrPzUIsDWg="
+							}
+						},
+						{
+							"_type": "FCProcessView",
+							"_id": "AAAAAAFylMsv20I1YnM=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylMsv20Izhq0="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylMsv20I29mk=",
+									"_parent": {
+										"$ref": "AAAAAAFylMsv20I1YnM="
+									},
+									"font": "Arial;13;0",
+									"left": 378,
+									"top": 546,
+									"width": 117,
+									"height": 39,
+									"text": "Paper Application is physically sent to HR for processing",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 368,
+							"top": 536,
+							"width": 137,
+							"height": 59,
+							"nameLabel": {
+								"$ref": "AAAAAAFylMsv20I29mk="
+							}
+						},
+						{
+							"_type": "FCProcessView",
+							"_id": "AAAAAAFylMuraEJCTac=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylMuraEJAyb8="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylMuraUJD7ko=",
+									"_parent": {
+										"$ref": "AAAAAAFylMuraEJCTac="
+									},
+									"font": "Arial;13;0",
+									"left": 402,
+									"top": 658,
+									"width": 62.15625,
+									"height": 39,
+									"text": "HR receives application",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 392,
+							"top": 648,
+							"width": 82.15625,
+							"height": 59,
+							"nameLabel": {
+								"$ref": "AAAAAAFylMuraUJD7ko="
+							}
+						},
+						{
+							"_type": "FCDecisionView",
+							"_id": "AAAAAAFylMvmjUJLuDk=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylMvmjUJJNKI="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylMvmjUJMT7g=",
+									"_parent": {
+										"$ref": "AAAAAAFylMvmjUJLuDk="
+									},
+									"font": "Arial;13;0",
+									"left": 393.548583984375,
+									"top": 384.5,
+									"width": 83.09716796875,
+									"height": 65,
+									"text": "Is Application recommended by Supervisor?",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 352,
+							"top": 352,
+							"width": 166.1943359375,
+							"height": 130,
+							"nameLabel": {
+								"$ref": "AAAAAAFylMvmjUJMT7g="
+							}
+						},
+						{
+							"_type": "FCProcessView",
+							"_id": "AAAAAAFylMxS1EJV59A=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylMxS1EJTZE0="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylMxS1EJWnvA=",
+									"_parent": {
+										"$ref": "AAAAAAFylMxS1EJV59A="
+									},
+									"font": "Arial;13;0",
+									"left": 378,
+									"top": 218,
+									"width": 109,
+									"height": 52,
+									"text": "Application is sent to immediate supervisor for review",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 368,
+							"top": 208,
+							"width": 129,
+							"height": 72,
+							"nameLabel": {
+								"$ref": "AAAAAAFylMxS1EJWnvA="
+							}
+						},
+						{
+							"_type": "FCProcessView",
+							"_id": "AAAAAAFylM7lyUKQqDk=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylM7lyUKO8jU="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylM7lyUKRvSA=",
+									"_parent": {
+										"$ref": "AAAAAAFylM7lyUKQqDk="
+									},
+									"font": "Arial;13;0",
+									"left": 642,
+									"top": 402,
+									"width": 93,
+									"height": 26,
+									"text": "Application is denied",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 632,
+							"top": 392,
+							"width": 113,
+							"height": 59,
+							"nameLabel": {
+								"$ref": "AAAAAAFylM7lyUKRvSA="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylM9s00KeCFI=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylM9s00KcMIg="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylM9s00KfkDU=",
+									"_parent": {
+										"$ref": "AAAAAAFylM9s00KeCFI="
+									},
+									"model": {
+										"$ref": "AAAAAAFylM9s00KcMIg="
+									},
+									"font": "Arial;13;0",
+									"left": 566,
+									"top": 395,
+									"width": 16.6181640625,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFylM9s00KeCFI="
+									},
+									"edgePosition": 1,
+									"text": "No"
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylM7lyUKQqDk="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylMvmjUJLuDk="
+							},
+							"lineStyle": 2,
+							"points": "517:416;632:416",
+							"nameLabel": {
+								"$ref": "AAAAAAFylM9s00KfkDU="
+							}
+						},
+						{
+							"_type": "FCProcessView",
+							"_id": "AAAAAAFylM/wckK18Q0=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylM/wckKzb9k="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylM/wckK2gow=",
+									"_parent": {
+										"$ref": "AAAAAAFylM/wckK18Q0="
+									},
+									"font": "Arial;13;0",
+									"left": 842,
+									"top": 410,
+									"width": 57.80810546875,
+									"height": 26,
+									"text": "Employee is notified",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 832,
+							"top": 400,
+							"width": 77.80810546875,
+							"height": 46,
+							"nameLabel": {
+								"$ref": "AAAAAAFylM/wckK2gow="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNAxZULCmh0=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNAxZULA8Ek="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNAxZULD+mQ=",
+									"_parent": {
+										"$ref": "AAAAAAFylNAxZULCmh0="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNAxZULA8Ek="
+									},
+									"visible": false,
+									"font": "Arial;13;0",
+									"left": 788,
+									"top": 401,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNAxZULCmh0="
+									},
+									"edgePosition": 1
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylM/wckK18Q0="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylM7lyUKQqDk="
+							},
+							"lineStyle": 2,
+							"points": "744:422;832:422",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNAxZULD+mQ="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNBgPULO93o=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNBgPULMPuU="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNBgPULP5IE=",
+									"_parent": {
+										"$ref": "AAAAAAFylNBgPULO93o="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNBgPULMPuU="
+									},
+									"font": "Arial;13;0",
+									"left": 439,
+									"top": 501,
+									"width": 21.20751953125,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNBgPULO93o="
+									},
+									"edgePosition": 1,
+									"text": "Yes"
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylMsv20I1YnM="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylMvmjUJLuDk="
+							},
+							"lineStyle": 2,
+							"points": "435:481;435:536",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNBgPULP5IE="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNB2lULYKNg=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNB2lELWUGo="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNB2lULZT7o=",
+									"_parent": {
+										"$ref": "AAAAAAFylNB2lULYKNg="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNB2lELWUGo="
+									},
+									"visible": false,
+									"font": "Arial;13;0",
+									"left": 446,
+									"top": 308,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNB2lULYKNg="
+									},
+									"edgePosition": 1
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylMvmjUJLuDk="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylMxS1EJV59A="
+							},
+							"lineStyle": 2,
+							"points": "432:279;432:352",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNB2lULZT7o="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNCBBELhlls=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNCBBELfmuY="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNCBBELi0bY=",
+									"_parent": {
+										"$ref": "AAAAAAFylNCBBELhlls="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNCBBELfmuY="
+									},
+									"visible": false,
+									"font": "Arial;13;0",
+									"left": 449,
+									"top": 172,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNCBBELhlls="
+									},
+									"edgePosition": 1
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylMxS1EJV59A="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylMrPzUIriFk="
+							},
+							"lineStyle": 2,
+							"points": "435:151;435:208",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNCBBELi0bY="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNC3jULs/2E=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNC3jULq+tg="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNC3jULtVEE=",
+									"_parent": {
+										"$ref": "AAAAAAFylNC3jULs/2E="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNC3jULq+tg="
+									},
+									"visible": false,
+									"font": "Arial;13;0",
+									"left": 449,
+									"top": 614,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNC3jULs/2E="
+									},
+									"edgePosition": 1
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylMuraEJCTac="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylMsv20I1YnM="
+							},
+							"lineStyle": 2,
+							"points": "435:594;435:648",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNC3jULtVEE="
+							}
+						},
+						{
+							"_type": "FCDecisionView",
+							"_id": "AAAAAAFylNDBhUL1MEc=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNDBhULzCBE="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylNDBhUL2jo8=",
+									"_parent": {
+										"$ref": "AAAAAAFylNDBhUL1MEc="
+									},
+									"font": "Arial;13;0",
+									"left": 399.798583984375,
+									"top": 778,
+									"width": 63.59716796875,
+									"height": 52,
+									"text": "Is Application approved by HR?",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 368,
+							"top": 752,
+							"width": 127.1943359375,
+							"height": 104,
+							"nameLabel": {
+								"$ref": "AAAAAAFylNDBhUL2jo8="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNFVhkMPUf0=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNFVhkMNe/0="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNFVhkMQqh4=",
+									"_parent": {
+										"$ref": "AAAAAAFylNFVhkMPUf0="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNFVhkMNe/0="
+									},
+									"visible": false,
+									"font": "Arial;13;0",
+									"left": 446,
+									"top": 722,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNFVhkMPUf0="
+									},
+									"edgePosition": 1
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylNDBhUL1MEc="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylMuraEJCTac="
+							},
+							"lineStyle": 2,
+							"points": "432:706;432:752",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNFVhkMQqh4="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNFhVkMYX6U=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNFhVkMWc+U="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNFhVkMZUUY=",
+									"_parent": {
+										"$ref": "AAAAAAFylNFhVkMYX6U="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNFhVkMWc+U="
+									},
+									"font": "Arial;13;0",
+									"left": 575,
+									"top": 808,
+									"width": 16.6181640625,
+									"height": 13,
+									"alpha": -4.54914865016304,
+									"distance": 86.14522621712709,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNFhVkMYX6U="
+									},
+									"edgePosition": 1,
+									"text": "No"
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylM7lyUKQqDk="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylNDBhUL1MEc="
+							},
+							"lineStyle": 2,
+							"points": "494:800;668:800;668:450",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNFhVkMZUUY="
+							}
+						},
+						{
+							"_type": "FCProcessView",
+							"_id": "AAAAAAFylNHRVkMmw9o=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNHRVkMkEgs="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAFylNHRVkMn67Q=",
+									"_parent": {
+										"$ref": "AAAAAAFylNHRVkMmw9o="
+									},
+									"font": "Arial;13;0",
+									"left": 402,
+									"top": 922,
+									"width": 63.59716796875,
+									"height": 39,
+									"text": "Application is Approved",
+									"wordWrap": true
+								}
+							],
+							"font": "Arial;13;0",
+							"left": 392,
+							"top": 912,
+							"width": 83.59716796875,
+							"height": 59,
+							"nameLabel": {
+								"$ref": "AAAAAAFylNHRVkMn67Q="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNH/d0MwhPA=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNH/d0Mu784="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNH/d0Mx36E=",
+									"_parent": {
+										"$ref": "AAAAAAFylNH/d0MwhPA="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNH/d0Mu784="
+									},
+									"font": "Arial;13;0",
+									"left": 436,
+									"top": 876,
+									"width": 21.20751953125,
+									"height": 13,
+									"alpha": 1.5707963267948966,
+									"distance": 15,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNH/d0MwhPA="
+									},
+									"edgePosition": 1,
+									"text": "Yes"
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylNHRVkMmw9o="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylNDBhUL1MEc="
+							},
+							"lineStyle": 2,
+							"points": "432:855;432:912",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNH/d0Mx36E="
+							}
+						},
+						{
+							"_type": "FCFlowView",
+							"_id": "AAAAAAFylNJsWEM+NOE=",
+							"_parent": {
+								"$ref": "AAAAAAFylMq5s0IlsGY="
+							},
+							"model": {
+								"$ref": "AAAAAAFylNJsWEM8fyM="
+							},
+							"subViews": [
+								{
+									"_type": "EdgeLabelView",
+									"_id": "AAAAAAFylNJsWEM/VIM=",
+									"_parent": {
+										"$ref": "AAAAAAFylNJsWEM+NOE="
+									},
+									"model": {
+										"$ref": "AAAAAAFylNJsWEM8fyM="
+									},
+									"font": "Arial;13;0",
+									"left": 663,
+									"top": 944,
+									"width": 16.6181640625,
+									"height": 13,
+									"alpha": -4.642849523888266,
+									"distance": 201.48697228356974,
+									"hostEdge": {
+										"$ref": "AAAAAAFylNJsWEM+NOE="
+									},
+									"edgePosition": 1,
+									"text": "No"
+								}
+							],
+							"font": "Arial;13;0",
+							"head": {
+								"$ref": "AAAAAAFylM/wckK18Q0="
+							},
+							"tail": {
+								"$ref": "AAAAAAFylNHRVkMmw9o="
+							},
+							"lineStyle": 2,
+							"points": "475:936;872:936;872:445",
+							"nameLabel": {
+								"$ref": "AAAAAAFylNJsWEM/VIM="
+							}
+						}
+					]
+				},
+				{
+					"_type": "FCProcess",
+					"_id": "AAAAAAFylMrPzEIpWwY=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "Employee Submits Paper Application",
+					"ownedElements": [
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNCBBELfmuY=",
+							"_parent": {
+								"$ref": "AAAAAAFylMrPzEIpWwY="
+							},
+							"source": {
+								"$ref": "AAAAAAFylMrPzEIpWwY="
+							},
+							"target": {
+								"$ref": "AAAAAAFylMxS1EJTZE0="
+							}
+						}
+					]
+				},
+				{
+					"_type": "FCProcess",
+					"_id": "AAAAAAFylMsv20Izhq0=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "Paper Application is physically sent to HR for processing",
+					"ownedElements": [
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNC3jULq+tg=",
+							"_parent": {
+								"$ref": "AAAAAAFylMsv20Izhq0="
+							},
+							"source": {
+								"$ref": "AAAAAAFylMsv20Izhq0="
+							},
+							"target": {
+								"$ref": "AAAAAAFylMuraEJAyb8="
+							}
+						}
+					]
+				},
+				{
+					"_type": "FCProcess",
+					"_id": "AAAAAAFylMuraEJAyb8=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "HR receives application",
+					"ownedElements": [
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNFVhkMNe/0=",
+							"_parent": {
+								"$ref": "AAAAAAFylMuraEJAyb8="
+							},
+							"source": {
+								"$ref": "AAAAAAFylMuraEJAyb8="
+							},
+							"target": {
+								"$ref": "AAAAAAFylNDBhULzCBE="
+							}
+						}
+					]
+				},
+				{
+					"_type": "FCDecision",
+					"_id": "AAAAAAFylMvmjUJJNKI=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "Is Application recommended by Supervisor?",
+					"ownedElements": [
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylM9s00KcMIg=",
+							"_parent": {
+								"$ref": "AAAAAAFylMvmjUJJNKI="
+							},
+							"name": "No",
+							"source": {
+								"$ref": "AAAAAAFylMvmjUJJNKI="
+							},
+							"target": {
+								"$ref": "AAAAAAFylM7lyUKO8jU="
+							}
+						},
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNBgPULMPuU=",
+							"_parent": {
+								"$ref": "AAAAAAFylMvmjUJJNKI="
+							},
+							"name": "Yes",
+							"source": {
+								"$ref": "AAAAAAFylMvmjUJJNKI="
+							},
+							"target": {
+								"$ref": "AAAAAAFylMsv20Izhq0="
+							}
+						}
+					]
+				},
+				{
+					"_type": "FCProcess",
+					"_id": "AAAAAAFylMxS1EJTZE0=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "Application is sent to immediate supervisor for review",
+					"ownedElements": [
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNB2lELWUGo=",
+							"_parent": {
+								"$ref": "AAAAAAFylMxS1EJTZE0="
+							},
+							"source": {
+								"$ref": "AAAAAAFylMxS1EJTZE0="
+							},
+							"target": {
+								"$ref": "AAAAAAFylMvmjUJJNKI="
+							}
+						}
+					]
+				},
+				{
+					"_type": "FCProcess",
+					"_id": "AAAAAAFylM7lyUKO8jU=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "Application is denied",
+					"ownedElements": [
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNAxZULA8Ek=",
+							"_parent": {
+								"$ref": "AAAAAAFylM7lyUKO8jU="
+							},
+							"source": {
+								"$ref": "AAAAAAFylM7lyUKO8jU="
+							},
+							"target": {
+								"$ref": "AAAAAAFylM/wckKzb9k="
+							}
+						}
+					]
+				},
+				{
+					"_type": "FCProcess",
+					"_id": "AAAAAAFylM/wckKzb9k=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "Employee is notified"
+				},
+				{
+					"_type": "FCDecision",
+					"_id": "AAAAAAFylNDBhULzCBE=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "Is Application approved by HR?",
+					"ownedElements": [
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNFhVkMWc+U=",
+							"_parent": {
+								"$ref": "AAAAAAFylNDBhULzCBE="
+							},
+							"name": "No",
+							"source": {
+								"$ref": "AAAAAAFylNDBhULzCBE="
+							},
+							"target": {
+								"$ref": "AAAAAAFylM7lyUKO8jU="
+							}
+						},
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNH/d0Mu784=",
+							"_parent": {
+								"$ref": "AAAAAAFylNDBhULzCBE="
+							},
+							"name": "Yes",
+							"source": {
+								"$ref": "AAAAAAFylNDBhULzCBE="
+							},
+							"target": {
+								"$ref": "AAAAAAFylNHRVkMkEgs="
+							}
+						}
+					]
+				},
+				{
+					"_type": "FCProcess",
+					"_id": "AAAAAAFylNHRVkMkEgs=",
+					"_parent": {
+						"$ref": "AAAAAAFylMq5s0Ik+Oc="
+					},
+					"name": "Application is Approved",
+					"ownedElements": [
+						{
+							"_type": "FCFlow",
+							"_id": "AAAAAAFylNJsWEM8fyM=",
+							"_parent": {
+								"$ref": "AAAAAAFylNHRVkMkEgs="
+							},
+							"name": "No",
+							"source": {
+								"$ref": "AAAAAAFylNHRVkMkEgs="
+							},
+							"target": {
+								"$ref": "AAAAAAFylM/wckKzb9k="
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}
