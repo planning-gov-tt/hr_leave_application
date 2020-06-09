@@ -160,8 +160,6 @@ namespace HR_LEAVEv2.HR
             addEmpRecordForm.Visible = false;
             showFormBtn.Visible = true;
 
-            accPastLimitContainerPanel.Visible = true;
-
             // submit
             submitFullFormPanel.Visible = false;
             editFormPanel.Visible = true;
@@ -1394,8 +1392,16 @@ namespace HR_LEAVEv2.HR
                 throw ex;
             }
 
-            // get employee files
-            loadPreviouslyUploadedFiles(empId);
+            if(dataTable.Rows[0].ItemArray[(int)emp_records_columns.status].ToString() == "Active")
+            {
+                accPastLimitContainerPanel.Visible = true;
+                loadPreviouslyUploadedFiles(empId); // get employee file
+            }
+                
+            else
+            {
+                accPastLimitContainerPanel.Visible = false;
+            }
 
         }
 
@@ -2011,7 +2017,7 @@ namespace HR_LEAVEv2.HR
                                                     @FileId, 
                                                     @EmployeeId, 
                                                     (
-                                                        SELECT ep.id FROM [dbo].[employeeposition] ep WHERE (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)) AND ep.employee_id = {empId}
+                                                        SELECT ep.id FROM [dbo].[employeeposition] ep WHERE (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)) AND ep.employee_id = @EmployeeId
                                                     )
                                                 );";
                                         using (SqlCommand command = new SqlCommand(sql, connection))

@@ -98,12 +98,12 @@ namespace HR_LEAVEv2.HR
                 }
                 else
                 {
-                    string emp_type = string.Empty;
+                    List<string> emp_type = new List<string>();
                     // HR 2 and HR 3
                     if (permissions.Contains("contract_permissions"))
-                        emp_type = "Contract";
-                    else if (permissions.Contains("public_officer_permissions"))
-                        emp_type = "Public Service";
+                        emp_type.Add("'Contract'");
+                    if (permissions.Contains("public_officer_permissions"))
+                        emp_type.Add("'Public Service'");
 
                     if (ViewState["viewActive"] != null)
                     {
@@ -128,6 +128,8 @@ namespace HR_LEAVEv2.HR
                         SELECT *
                         FROM(
                             SELECT
+                                -- partition is used to get only the topmost row in employment records whether active or not. This is so
+                                -- inactive employees can be seen by the appropriate HR employees
                                 ROW_NUMBER() OVER(PARTITION BY ep.employee_id ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum,
                                 e.employee_id, 
                                 e.ihris_id, 
@@ -136,6 +138,8 @@ namespace HR_LEAVEv2.HR
                                 ep.employment_type,
                                 '{activeLabel}' as isActive, 
                                 'label {bootstrapClass}' as bootstrapClass,
+
+                                -- check to ensure HR is active
 	                            (SELECT IIF(start_date <= GETDATE() AND (actual_end_date IS NULL OR GETDATE() <= actual_end_date), 'Yes', 'No')
 		                            FROM (
 			                            SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.start_date, hr_ep.actual_end_date
@@ -159,7 +163,7 @@ namespace HR_LEAVEv2.HR
                                 ) 
                         ) Employees
 
-                        WHERE RowNum = 1 AND employment_type='{emp_type}' AND Employees.is_hr_active = 'Yes';
+                        WHERE RowNum = 1 AND employment_type IN ({String.Join(", ", emp_type.ToArray())}) AND Employees.is_hr_active = 'Yes';
                     ";
                 }
 
