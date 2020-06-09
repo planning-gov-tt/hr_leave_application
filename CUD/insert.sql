@@ -15,8 +15,8 @@ INSERT INTO [dbo].[permission] ([permission_id]) VALUES
 ('approve_vacation'),
 ('contract_permissions'),
 ('public_officer_permissions'),
-('assign_role'),
-('admin_permissions');
+('admin_permissions'),
+('assign_role');
 
 
 INSERT INTO [dbo].[role] ([role_id]) VALUES
@@ -61,10 +61,8 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 ('hr_contract', 'contract_permissions'),
 
 ('hr_public_officer', 'public_officer_permissions'),
-
-('admin', 'admin_permissions');
-
-
+('admin', 'admin_permissions')
+;
 
 INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [paternity], [pre_retirement]) VALUES 
 -- IT
@@ -116,6 +114,7 @@ INSERT INTO [dbo].[employeerole] ([employee_id], [role_id]) VALUES
 --Clint Ramoutar
 ('115245', 'emp'),
 ('115245', 'sup'),
+('115245', 'admin'),
 --Christopher Sahadeo
 ('3', 'emp'),
 -- Dale Cudjoe
@@ -257,12 +256,13 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 ('Personal'),
 ('Casual'),
 ('Vacation'),
-('No Pay'),
 ('Bereavement'),
 ('Maternity'),
 ('Paternity'),
 ('Pre-retirement'),
-('Paid');
+('Paid'),
+('No Pay');
+
 
 SET IDENTITY_INSERT [dbo].[department] ON;
 
@@ -298,70 +298,70 @@ INSERT INTO [dbo].[employmenttype] ([type_id]) VALUES
 
 SET IDENTITY_INSERT [dbo].[employeeposition] ON;
 
-INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start_date], [expected_end_date], [actual_end_date], [employment_type], [dept_id], [years_worked]) VALUES
+INSERT INTO [dbo].[employeeposition] ([id], [employee_id], [position_id], [start_date], [expected_end_date], [actual_end_date], [employment_type], [dept_id], [years_worked], [annual_vacation_amt], [max_vacation_accumulation]) VALUES
 -- Tristan Sankar
-(1, '1', 5, '20190927', '20200927', NULL, 'Contract', 1, 0),
+(1, '1', 5, '20190927', '20200927', NULL, 'Contract', 1, 0, 20, 60),
 -- Christopher Sahadeo
-(2, '3', 5, '20190927', '20200927', NULL, 'Public Service', 1, 0),
+(2, '3', 5, '20190927', '20200927', NULL, 'Public Service', 1, 0, 21, 60),
 
 -- multiple periods of employment for one person- Clint
-(3, '115245', 6, '20101005', '20131005', '20131007', 'Contract', 1, 3),
-(4, '115245', 6, '20131015', '20161015', '20161018', 'Contract', 1, 3),
-(5, '115245', 6, '20171120', '20201120', NULL, 'Contract', 1, 2),
+(3, '115245', 6, '20101005', '20131005', '20131007', 'Contract', 1, 3, 20, 60),
+(4, '115245', 6, '20131015', '20161015', '20161018', 'Contract', 1, 3, 20, 60),
+(5, '115245', 6, '20171120', '20201120', NULL, 'Contract', 1, 2, 20, 60),
 
 -- contract and public servant
 --Pauline Solozano
-(7, '38137', 7, '20160927', '20201225', NULL, 'Contract', 2, 3),
+(7, '38137', 7, '20160927', '20201225', NULL, 'Contract', 2, 3, 20, 60),
 --Usha Balkaran
-(8, '05356', 7, '20160927', '20201225', NULL, 'Public Service', 2, 2),
+(8, '05356', 7, '20160927', '20201225', NULL, 'Public Service', 2, 2, 21, 60),
 
 --more seed data
 --Dale Cudjoe
-(9, '184164', 6, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(9, '184164', 6, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 --Charmaine Carmichael
-(10, '11948', 7, '20191025', '20221025', NULL, 'Public Service', 2, 0),
+(10, '11948', 7, '20191025', '20221025', NULL, 'Public Service', 2, 0, 21, 60),
 
 --HR Director- Melanie Noel
-(11, '83612', 4, '20180927', '20210927', NULL, 'Public Service', 2, 1),
+(11, '83612', 4, '20180927', '20210927', NULL, 'Public Service', 2, 1, 28, 90),
 
 --PS
-(12, '07525', 8, '20191025', '20221025', NULL, 'Public Service', 4, 0),
+(12, '07525', 8, '20191025', '20221025', NULL, 'Public Service', 4, 0, 28, 90),
 
 --Minister
-(13, '4', 9, '20191025', '20221025', NULL, 'Public Service', 4, 0),
+(13, '4', 9, '20191025', '20221025', NULL, 'Public Service', 4, 0, 28, 90),
 
 -- Nazmoon Khan
-(14, '01548', 7, '20180927', '20210927', NULL, 'Public Service', 2, 1),
+(14, '01548', 7, '20180927', '20210927', NULL, 'Public Service', 2, 1, 21, 60),
 
 --Nandani 
-(15, '157778', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(15, '157778', 1, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --Kene Bryan 
-(16, '123337', 4, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(16, '123337', 4, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --Rishi Boodoo
-(17, '161720', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(17, '161720', 1, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --Carlisle Mckay
-(18, '159118', 6, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(18, '159118', 6, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --Rohini Singh
-(19, '15067', 6, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(19, '15067', 6, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --Kelly DeLandro
-(20, '140480', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(20, '140480', 1, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --Pele St Hill
-(21, '34521', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(21, '34521', 1, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --Deneyse Outar
-(22, '12454', 2, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(22, '12454', 2, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --Melissa Bynoe
-(23, '42352', 1, '20180927', '20210927', NULL, 'Contract', 1, 1),
+(23, '42352', 1, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60),
 
 --StacyAnn Drakes
-(24, '67689', 1, '20180927', '20210927', NULL, 'Contract', 1, 1)
+(24, '67689', 1, '20180927', '20210927', NULL, 'Contract', 1, 1, 20, 60)
 ;
 
 SET IDENTITY_INSERT [dbo].[employeeposition] OFF;

@@ -61,7 +61,8 @@ CREATE TABLE [dbo].[employeerole] (
 
   PRIMARY KEY ([employee_id], [role_id]),
   FOREIGN KEY ([employee_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
+    REFERENCES [dbo].[employee] ([employee_id])
+	ON DELETE CASCADE,
   FOREIGN KEY ([role_id])
     REFERENCES [dbo].[role] ([role_id])
 )
@@ -124,9 +125,13 @@ CREATE TABLE [dbo].[employeeposition] (
   [employment_type] NVARCHAR (15) NOT NULL,
   [dept_id] INT NOT NULL,
   [years_worked] INT NOT NULL,
+  [annual_vacation_amt] INT NOT NULL,
+  [max_vacation_accumulation] INT NOT NULL,
+  [can_accumulate_past_max] BIT
 
   FOREIGN KEY ([employee_id])
-    REFERENCES [dbo].[employee] ([employee_id]),
+    REFERENCES [dbo].[employee] ([employee_id])
+	ON DELETE CASCADE,
   FOREIGN KEY ([position_id])
     REFERENCES [dbo].[position] ([pos_id]),
   FOREIGN KEY ([employment_type])
@@ -186,7 +191,7 @@ CREATE TABLE [dbo].[auditlog] (
   [affected_employee_id] NVARCHAR (10) NOT NULL,
   [affected_employee_name] NVARCHAR (60) NOT NULL,
   [action] NVARCHAR (350) NOT NULL,
-  [created_at] DATETIME NOT NULL,
+  [created_at] DATETIME DEFAULT CURRENT_TIMESTAMP,
 
   FOREIGN KEY ([acting_employee_id])
     REFERENCES [dbo].[employee] ([employee_id])
@@ -197,18 +202,21 @@ CREATE TABLE [dbo].[filestorage](
   [file_data] IMAGE NOT NULL,
   [file_name] NVARCHAR(200) NOT NULL,
   [file_extension] NVARCHAR (25) NOT NULL,
-  [uploaded_on] DATETIME NOT NULL
+  [uploaded_on] DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE [dbo].[employeefiles](
   [id] INT IDENTITY (1, 1) PRIMARY KEY,
-  [leave_transaction_id] INT NOT NULL,
+  [leave_transaction_id] INT,
+  [emp_record_id] INT,
   [employee_id] NVARCHAR(10) NOT NULL,
   [file_id] UNIQUEIDENTIFIER NOT NULL,
 
   FOREIGN KEY ([leave_transaction_id]) REFERENCES [dbo].[leavetransaction] ([transaction_id]),
+  FOREIGN KEY ([emp_record_id]) REFERENCES [dbo].[employeeposition] ([id]),
   FOREIGN KEY([employee_id]) REFERENCES [dbo].[employee] ([employee_id]),
   FOREIGN KEY([file_id]) REFERENCES [dbo].[filestorage] ([file_id])
+	ON DELETE CASCADE
 );
 
 CREATE TABLE [dbo].[notifications](
