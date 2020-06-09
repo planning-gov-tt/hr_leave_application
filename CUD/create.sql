@@ -122,7 +122,7 @@ CREATE TABLE [dbo].[employeeposition] (
   [expected_end_date] DATETIME NOT NULL,
   [actual_end_date] DATETIME,
   [employment_type] NVARCHAR (15) NOT NULL,
-  [dept_id] INT,
+  [dept_id] INT NOT NULL,
   [years_worked] INT NOT NULL,
 
   FOREIGN KEY ([employee_id])
