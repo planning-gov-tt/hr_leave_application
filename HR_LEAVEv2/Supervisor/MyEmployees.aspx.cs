@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Net.Mail;
 using System.Web;
 using System.Web.Services;
@@ -291,11 +292,14 @@ namespace HR_LEAVEv2.Supervisor
         {
             invalidStartDatePanel.Style.Add("display", "none");
             startDateIsWeekendPanel.Style.Add("display", "none");
+            startDateIsHoliday.Style.Add("display", "none");
             invalidEndDatePanel.Style.Add("display", "none");
             endDateIsWeekendPanel.Style.Add("display", "none");
+            endDateIsHoliday.Style.Add("display", "none");
             dateComparisonPanel.Style.Add("display", "none");
             successfulAlert.Style.Add("display", "none");
             unsuccessfulAlert.Style.Add("display", "none");
+            unsuccessfulEmailAlertPanel.Style.Add("display", "none");
         }
 
         protected Boolean validateDates(string startDate, string endDate)
@@ -303,6 +307,7 @@ namespace HR_LEAVEv2.Supervisor
             DateTime start, end;
             start = end = DateTime.MinValue;
             Boolean isValidated = true;
+            List<string> holidaysInBetween = new List<string>();
 
             // validate start date is a date
             if (!DateTime.TryParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start))
@@ -312,6 +317,15 @@ namespace HR_LEAVEv2.Supervisor
             }
             else
             {
+                // ensure start date is not a holiday
+                holidaysInBetween = util.getHolidaysBetween(start, start);
+                if (holidaysInBetween.Count > 0)
+                {
+                    startDateIsHolidayTxt.InnerText = $"Start date cannot be on {holidaysInBetween.ElementAt(0)}";
+                    startDateIsHoliday.Style.Add("display", "inline-block");
+                    isValidated = false;
+                }
+               
                 // ensure start date is not a weekend
                 if (start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
                 {
@@ -328,6 +342,15 @@ namespace HR_LEAVEv2.Supervisor
             }
             else
             {
+                // ensure end date is not a holiday
+                holidaysInBetween = util.getHolidaysBetween(end, end);
+                if (holidaysInBetween.Count > 0)
+                {
+                    endDateIsHolidayTxt.InnerText = $"End date cannot be on {holidaysInBetween.ElementAt(0)}";
+                    endDateIsHoliday.Style.Add("display", "inline-block");
+                    isValidated = false;
+                }
+
                 // ensure end date is not weekend
                 if (end.DayOfWeek == DayOfWeek.Saturday || end.DayOfWeek == DayOfWeek.Sunday)
                 {
@@ -419,7 +442,11 @@ namespace HR_LEAVEv2.Supervisor
                         recipient = emailOfEmpBeingAlerted
                     }
                 );
-                isAlertSentSuccessful = isAlertSentSuccessful && util.sendMail(message);
+
+                if (!util.sendMail(message))
+                {
+                    unsuccessfulEmailAlertPanel.Style.Add("display", "inline-block");
+                }
 
                 if (isAlertSentSuccessful)
                     successfulAlert.Style.Add("display", "inline-block");

@@ -226,7 +226,7 @@
 
             </div>
 
-            <%--Modal to view employee details--%>
+            <%--Modal to remind employee to submit leave--%>
             <div class="modal fade" id="submitLeaveAlertModal" tabindex="-1" role="dialog" aria-labelledby="submitLeaveAlertTitle" aria-hidden="true">
 
                 <div class="modal-dialog" role="document" style="width: 45%;">
@@ -270,6 +270,17 @@
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>Start date is not valid</span>
                                         </asp:Panel>
+
+                                        <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span id="startDateIsHolidayTxt" runat="server"></span>
+                                        </asp:Panel>
+
+                                        <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span id="endDateIsHolidayTxt" runat="server"></span>
+                                        </asp:Panel>
+
                                         <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>Start date is on the weekend</span>
@@ -292,6 +303,11 @@
                                         <asp:Panel ID="successfulAlert" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
                                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                                             <span>Successfully submitted alert</span>
+                                        </asp:Panel>
+
+                                         <asp:Panel ID="unsuccessfulEmailAlertPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span>Email alert could not be sent</span>
                                         </asp:Panel>
 
                                         <asp:Panel ID="unsuccessfulAlert" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">

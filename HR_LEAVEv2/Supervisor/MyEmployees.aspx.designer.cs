@@ -175,6 +175,42 @@ namespace HR_LEAVEv2.Supervisor {
         protected global::System.Web.UI.WebControls.Panel invalidStartDatePanel;
         
         /// <summary>
+        /// startDateIsHoliday control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel startDateIsHoliday;
+        
+        /// <summary>
+        /// startDateIsHolidayTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl startDateIsHolidayTxt;
+        
+        /// <summary>
+        /// endDateIsHoliday control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel endDateIsHoliday;
+        
+        /// <summary>
+        /// endDateIsHolidayTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl endDateIsHolidayTxt;
+        
+        /// <summary>
         /// startDateIsWeekendPanel control.
         /// </summary>
         /// <remarks>
@@ -218,6 +254,15 @@ namespace HR_LEAVEv2.Supervisor {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel successfulAlert;
+        
+        /// <summary>
+        /// unsuccessfulEmailAlertPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel unsuccessfulEmailAlertPanel;
         
         /// <summary>
         /// unsuccessfulAlert control.

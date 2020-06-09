@@ -226,7 +226,7 @@ namespace HR_LEAVEv2.Employee
                 } 
 
                 // inform user that there are holidays in between the leave period applied for
-                List<string> holidaysInBetween = getHolidaysInLeavePeriod(start, end);
+                List<string> holidaysInBetween = util.getHolidaysBetween(start, end);
                 if (holidaysInBetween.Count > 0)
                 {
                     holidayInAppliedTimeTxt.InnerText = $"The following public holiday(s) occur during your leave period: {String.Join(", ", holidaysInBetween.ToArray())}";
@@ -234,7 +234,7 @@ namespace HR_LEAVEv2.Employee
                 }
 
                 // ensure start date is not a holiday
-                holidaysInBetween = getHolidaysInLeavePeriod(start, start);
+                holidaysInBetween = util.getHolidaysBetween(start, start);
                 if (holidaysInBetween.Count > 0)
                 {
                     startDateIsHolidayTxt.InnerText = $"Start date cannot be on {holidaysInBetween.ElementAt(0)}";
@@ -242,7 +242,7 @@ namespace HR_LEAVEv2.Employee
                     isValidated = false;
                 }
                 // ensure end date is not a holiday
-                holidaysInBetween = getHolidaysInLeavePeriod(end, end);
+                holidaysInBetween = util.getHolidaysBetween(end, end);
                 if (holidaysInBetween.Count > 0)
                 {
                     endDateIsHolidayTxt.InnerText = $"End date cannot be on {holidaysInBetween.ElementAt(0)}";
@@ -333,52 +333,12 @@ namespace HR_LEAVEv2.Employee
             return isValidated;
         }
 
-        protected IEnumerable<DateTime> EachCalendarDay(DateTime startDate, DateTime endDate)
-        {
-            for (var date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1))
-                yield
-            return date;
-        }
-
-        protected List<string> getHolidaysInLeavePeriod(DateTime start, DateTime end)
-        {
-            // returns a List<string> containing the names of holidays which fall in between the leave period specified
-
-            Dictionary<string, DateTime> publicHolidays = new Dictionary<string, DateTime>() {
-                    { "New Years", new DateTime(util.getCurrentDate().Year, 1, 1) },
-                    { "New Years Day", new DateTime(util.getCurrentDate().Year + 1, 1, 1) },
-                    { "Shouter Baptist Day", new DateTime(util.getCurrentDate().Year, 3, 30) },
-                    { "Good Friday", new DateTime(util.getCurrentDate().Year, 4, 10) },
-                    { "Easter Monday", new DateTime(util.getCurrentDate().Year, 4, 13) },
-                    { "Indian Arrival Day", new DateTime(util.getCurrentDate().Year, 5, 30) },
-                    { "Corpus Christi", new DateTime(util.getCurrentDate().Year, 6, 11) },
-                    { "Labour Day", new DateTime(util.getCurrentDate().Year, 6, 19) },
-                    { "Emancipation Day", new DateTime(util.getCurrentDate().Year, 8, 1) },
-                    { "Independence Day", new DateTime(util.getCurrentDate().Year, 8, 31) },
-                    { "Republic Day", new DateTime(util.getCurrentDate().Year, 9, 24) },
-                    { "Christmas Day", new DateTime(util.getCurrentDate().Year, 12, 25) },
-                    { "Boxing Day", new DateTime(util.getCurrentDate().Year, 12, 26) },
-                };
-
-            List<string> holidaysInBetween = new List<string>();
-            foreach (DateTime day in EachCalendarDay(start, end))
-            {
-                foreach (KeyValuePair<string, DateTime> holiday in publicHolidays)
-                {
-                    if (DateTime.Compare(day, holiday.Value) == 0)
-                        holidaysInBetween.Add(holiday.Key);
-                }
-            }
-
-            return holidaysInBetween;
-        }
-
-        protected int getNumWeekendsInLeavePeriod(DateTime start, DateTime end)
+        public int getNumWeekendsBetween(DateTime start, DateTime end)
         {
             // returns an int containing the number of weekend days which fall in between the leave period specified
 
             int numWeekends = 0;
-            foreach (DateTime day in EachCalendarDay(start, end))
+            foreach (DateTime day in util.EachCalendarDay(start, end))
             {
                 if (day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday)
                     numWeekends++;
@@ -523,14 +483,14 @@ namespace HR_LEAVEv2.Employee
                 //numDaysAppliedFor.Text = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1).ToString() : "0";
 
                 // reduces the number of days applied for if holidays fall in between the leave period applied for
-                List<string> holidays = getHolidaysInLeavePeriod(start, end);
+                List<string> holidays = util.getHolidaysBetween(start, end);
                 if (holidays.Count > 0)
                     numDays = numDays - holidays.Count;
                 //numDaysAppliedFor.Text = $"{ Convert.ToInt32(numDaysAppliedFor.Text) - holidays.Count}";
 
                 // if leave type is not no pay or sick then minus weekends from count
                 if (!typeOfLeave.SelectedValue.Equals("No Pay") && !typeOfLeave.SelectedValue.Equals("Sick"))
-                    numDays = numDays - getNumWeekendsInLeavePeriod(start, end);
+                    numDays = numDays - getNumWeekendsBetween(start, end);
 
                 numDaysAppliedFor.Text = numDays.ToString();
                 validateLeave(typeOfLeave.SelectedValue);

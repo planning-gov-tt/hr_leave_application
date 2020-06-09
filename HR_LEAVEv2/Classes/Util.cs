@@ -60,6 +60,46 @@ namespace HR_LEAVEv2.Classes
             
         }
 
+        public IEnumerable<DateTime> EachCalendarDay(DateTime startDate, DateTime endDate)
+        {
+            for (var date = startDate.Date; date.Date <= endDate.Date; date = date.AddDays(1))
+                yield
+            return date;
+        }
+
+        public List<string> getHolidaysBetween(DateTime start, DateTime end)
+        {
+            // returns a List<string> containing the names of holidays which fall in between the leave period specified
+
+            Dictionary<string, DateTime> publicHolidays = new Dictionary<string, DateTime>() {
+                    { "New Years", new DateTime(getCurrentDate().Year, 1, 1) },
+                    { "New Years Day", new DateTime(getCurrentDate().Year + 1, 1, 1) },
+                    { "Shouter Baptist Day", new DateTime(getCurrentDate().Year, 3, 30) },
+                    { "Good Friday", new DateTime(getCurrentDate().Year, 4, 10) },
+                    { "Easter Monday", new DateTime(getCurrentDate().Year, 4, 13) },
+                    { "Indian Arrival Day", new DateTime(getCurrentDate().Year, 5, 30) },
+                    { "Corpus Christi", new DateTime(getCurrentDate().Year, 6, 11) },
+                    { "Labour Day", new DateTime(getCurrentDate().Year, 6, 19) },
+                    { "Emancipation Day", new DateTime(getCurrentDate().Year, 8, 1) },
+                    { "Independence Day", new DateTime(getCurrentDate().Year, 8, 31) },
+                    { "Republic Day", new DateTime(getCurrentDate().Year, 9, 24) },
+                    { "Christmas Day", new DateTime(getCurrentDate().Year, 12, 25) },
+                    { "Boxing Day", new DateTime(getCurrentDate().Year, 12, 26) },
+                };
+
+            List<string> holidaysInBetween = new List<string>();
+            foreach (DateTime day in EachCalendarDay(start, end))
+            {
+                foreach (KeyValuePair<string, DateTime> holiday in publicHolidays)
+                {
+                    if (DateTime.Compare(day, holiday.Value) == 0)
+                        holidaysInBetween.Add(holiday.Key);
+                }
+            }
+
+            return holidaysInBetween;
+        }
+
         public Dictionary<string, string> getLeaveTypeMapping()
         {
             // returns a dictionary with the leave type (type_id) as the Key and the column name representing the leave balance as the value
