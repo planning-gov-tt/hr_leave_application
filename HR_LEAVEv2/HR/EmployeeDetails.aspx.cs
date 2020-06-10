@@ -1392,7 +1392,7 @@ namespace HR_LEAVEv2.HR
                 throw ex;
             }
 
-            if(dataTable.Rows[0].ItemArray[(int)emp_records_columns.status].ToString() == "Active")
+            if (dataTable != null && dataTable.Rows.Count > 0 && dataTable.Rows[0].ItemArray[(int)emp_records_columns.status].ToString() == "Active")
             {
                 accPastLimitContainerPanel.Visible = true;
                 loadPreviouslyUploadedFiles(empId); // get employee file
