@@ -62,35 +62,28 @@ namespace HR_LEAVEv2
 
             currentNumYearsWorked = -1;
             // get years worked
-            try
-            {
-                string sql = $@"
-                            SELECT ep.start_date as startDate, ep.years_worked as yearsWorked, ep.employment_type as employmentType
-                            FROM dbo.employeeposition ep
-                            WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {Session["emp_id"].ToString()};
-                        ;
-                    ";
+            string sql = $@"
+                        SELECT ep.start_date as startDate, ep.years_worked as yearsWorked, ep.employment_type as employmentType
+                        FROM dbo.employeeposition ep
+                        WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {Session["emp_id"].ToString()};
+                    ;
+                ";
 
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
-                                startDate = Convert.ToDateTime(reader["startDate"]);
-                                yearsWorked = Convert.ToInt32(reader["yearsWorked"]);
-                                empType = reader["employmentType"].ToString();
-                            }
+                            startDate = Convert.ToDateTime(reader["startDate"]);
+                            yearsWorked = Convert.ToInt32(reader["yearsWorked"]);
+                            empType = reader["employmentType"].ToString();
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
             }
 
 

@@ -86,19 +86,39 @@ namespace HR_LEAVEv2.Admin
 
                 // get data about the table's columns like data type, maximum length(if applicable) and whether it is nullable
                 // this data is then used in generating the form used to create and update data
-                try
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    string sql = $@"
+                        SELECT COL.COLUMN_NAME, 
+                                COL.DATA_TYPE,
+                                ISNULL(COL.CHARACTER_MAXIMUM_LENGTH, -1),
+                                COL.IS_NULLABLE
+                        FROM INFORMATION_SCHEMA.COLUMNS COL
+                        WHERE COL.TABLE_NAME = '{selectedTable}'
+                    ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            DataTable dt = new DataTable();
+                            adapter.Fill(dt);
+
+                            TableMetaData = dt;
+
+                        }
+                    }
+                }
+
+                // get data from db for the selected table and bid
+                if (TableData == null)
                 {
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                     {
                         connection.Open();
                         string sql = $@"
-                            SELECT COL.COLUMN_NAME, 
-                                   COL.DATA_TYPE,
-                                   ISNULL(COL.CHARACTER_MAXIMUM_LENGTH, -1),
-                                   COL.IS_NULLABLE
-                            FROM INFORMATION_SCHEMA.COLUMNS COL
-                            WHERE COL.TABLE_NAME = '{selectedTable}'
-                        ";
+                        SELECT * FROM dbo.{selectedTable};
+                    ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
                             using (SqlDataAdapter adapter = new SqlDataAdapter(command))
@@ -106,52 +126,17 @@ namespace HR_LEAVEv2.Admin
                                 DataTable dt = new DataTable();
                                 adapter.Fill(dt);
 
-                                TableMetaData = dt;
+                                TableData = dt;
+
+                                if (dt.Rows.Count <= 0)
+                                    noDataPanel.Style.Add("display", "inline-block");
+                                else
+                                    searchPanel.Visible = true;
 
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    //exception logic
-                    throw ex;
-                }
-
-                // get data from db for the selected table and bid
-                if (TableData == null)
-                {
-                    try
-                    {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                        {
-                            connection.Open();
-                            string sql = $@"
-                            SELECT * FROM dbo.{selectedTable};
-                        ";
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                                {
-                                    DataTable dt = new DataTable();
-                                    adapter.Fill(dt);
-
-                                    TableData = dt;
-
-                                    if (dt.Rows.Count <= 0)
-                                        noDataPanel.Style.Add("display", "inline-block");
-                                    else
-                                        searchPanel.Visible = true;
-
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        throw ex;
-                    }
+                    
                 }
 
                 // must destroy and recreate form on every postback
