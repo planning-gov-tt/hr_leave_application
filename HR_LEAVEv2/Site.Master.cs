@@ -45,8 +45,9 @@ namespace HR_LEAVEv2
                 string username = auth.getUserInfoFromActiveDirectory(Session["emp_email"].ToString());
                 username = util.isNullOrEmpty(username) ? "User not in Active Directory" : username;
                 Session["emp_username"] = username;
-            }
-                
+            }else
+                Session["emp_username"] = "Anon";
+
             // store employee's id in Session
             if (Session["emp_id"] == null && Session["emp_email"] != null)
                 Session["emp_id"] = auth.getUserEmployeeId(Session["emp_email"].ToString());
@@ -129,28 +130,32 @@ namespace HR_LEAVEv2
                 if (permissions.Contains("sup_permissions"))
                 {
                     supervisorPanel.Style.Add("display", "block");
-                } else
+                }
+                else
                     supervisorPanel.Style.Add("display", "none");
 
                 // HR 1 or HR 2
                 if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
                 {
                     hr1_hr2Panel.Style.Add("display", "block");
-                } else
+                }
+                else
                     hr1_hr2Panel.Style.Add("display", "none");
 
                 // HR 3
                 if (permissions.Contains("hr3_permissions"))
                 {
                     hr3Panel.Style.Add("display", "block");
-                } else
+                }
+                else
                     hr3Panel.Style.Add("display", "none");
 
                 // Admin
                 if (permissions.Contains("admin_permissions"))
                 {
                     adminPanel.Style.Add("display", "block");
-                } else
+                }
+                else
                     adminPanel.Style.Add("display", "none");
 
             }
@@ -219,7 +224,7 @@ namespace HR_LEAVEv2
                     throw ex;
                 }
 
-                if(dt.Rows.Count > 0)
+                if (dt.Rows.Count > 0)
                 {
                     // once employee is active and accumulations exist
                     Dictionary<string, string> leaveTypeMapping = util.getLeaveTypeMapping();
@@ -231,15 +236,15 @@ namespace HR_LEAVEv2
 
                         // accValue of 0- Update at the start of new contract year
                         // accValue of 1- Update at the start of the new year
-                        if(dt.Rows[i].ItemArray[(int)acc_enum.accValue].ToString() == "0" || dt.Rows[i].ItemArray[(int)acc_enum.accValue].ToString() == "1")
+                        if (dt.Rows[i].ItemArray[(int)acc_enum.accValue].ToString() == "0" || dt.Rows[i].ItemArray[(int)acc_enum.accValue].ToString() == "1")
                         {
                             if (isStartOfNewYear || isStartOfNewContractYear)
                             {
-                                string numDays = dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString() == "Vacation" ? dt.Rows[i].ItemArray[(int)acc_enum.annualVacationAmt].ToString() :  dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString(),
+                                string numDays = dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString() == "Vacation" ? dt.Rows[i].ItemArray[(int)acc_enum.annualVacationAmt].ToString() : dt.Rows[i].ItemArray[(int)acc_enum.numDays].ToString(),
                                     sqlLeaveTypeRef = leaveTypeMapping[dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString()];
 
                                 // employee has started new contract year or new year so their leave must be updated
-                                if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Replace")
+                                if (dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Replace")
                                 {
                                     updateSql += $@"
                                             UPDATE [dbo].[employee]
@@ -247,9 +252,10 @@ namespace HR_LEAVEv2
                                             WHERE employee_id = {Session["emp_id"].ToString()};
                                             
                                     ";
-                                } else if(dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Add")
+                                }
+                                else if (dt.Rows[i].ItemArray[(int)acc_enum.accType].ToString() == "Add")
                                 {
-                                    if(dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString() == "Vacation" && !Convert.ToBoolean(dt.Rows[i].ItemArray[(int)acc_enum.can_accumulate_past_max].ToString()))
+                                    if (dt.Rows[i].ItemArray[(int)acc_enum.leaveType].ToString() == "Vacation" && !Convert.ToBoolean(dt.Rows[i].ItemArray[(int)acc_enum.can_accumulate_past_max].ToString()))
                                     {
                                         string maxVacationAmt = dt.Rows[i].ItemArray[(int)acc_enum.maxVacationAccumulation].ToString();
                                         // ensure amt does not go over max
@@ -260,7 +266,8 @@ namespace HR_LEAVEv2
                                             WHERE employee_id = {Session["emp_id"].ToString()};
                                             
                                         ";
-                                    } else
+                                    }
+                                    else
                                     {
                                         updateSql += $@"
                                             UPDATE [dbo].[employee]
@@ -269,14 +276,14 @@ namespace HR_LEAVEv2
                                             
                                         ";
                                     }
-                                    
+
                                 }
                             }
                         }
-                    }       
+                    }
                 }
 
-                if(isStartOfNewContractYear || isStartOfNewYear)
+                if (isStartOfNewContractYear || isStartOfNewYear)
                 {
                     updateSql += $@"
 
@@ -303,7 +310,7 @@ namespace HR_LEAVEv2
                         throw ex;
                     }
                 }
-                
+
 
 
                 // set number of notifications
