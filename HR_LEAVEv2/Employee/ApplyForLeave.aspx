@@ -117,7 +117,12 @@
 
                         <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span6" runat="server">No files currently uploaded. More than 2 days of consecutive sick leave requires a medical leave of absence.</span>
+                            <span id="Span6">No files currently uploaded. More than 2 days of consecutive sick leave requires a medical leave of absence</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="moreThan7DaysConsecutiveCasualLeave" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span17">No files currently uploaded. More than 7 days of consecutive casual leave requires supporting documentation</span>
                         </asp:Panel>
 
                         <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">

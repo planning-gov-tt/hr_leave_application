@@ -296,11 +296,9 @@ namespace HR_LEAVEv2.Employee
                     if (typeOfLeave.SelectedValue.Equals("Sick"))
                     {
 
-                        //todo: if sick days span a weekend, warn user
-
                         // ensure that if employee applies for more than two days consecutive sick leave, they are warned that they must
                         // upload a file (medical)
-                        if ((end - start).Days + 1 > 2)
+                        if (getNumDaysBetween(start, end) > 2)
                         {
                             List<HttpPostedFile> files = null;
                             if (Session["uploadedFiles"] != null)
@@ -325,6 +323,28 @@ namespace HR_LEAVEv2.Employee
                         {
                             invalidSickLeaveStartDate.Style.Add("display", "inline-block");
                             isValidated = false;
+                        }
+                    }
+
+                    if (typeOfLeave.SelectedValue.Equals("Casual"))
+                    {
+                        if (getNumDaysBetween(start, end) > 7)
+                        {
+                            List<HttpPostedFile> files = null;
+                            if (Session["uploadedFiles"] != null)
+                            {
+                                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                                if (files.Count == 0)
+                                {
+                                    moreThan7DaysConsecutiveCasualLeave.Style.Add("display", "inline-block");
+                                    isValidated = false;
+                                }
+                            }
+                            else
+                            {
+                                moreThan7DaysConsecutiveCasualLeave.Style.Add("display", "inline-block");
+                                isValidated = false;
+                            }
                         }
                     }
                 }
@@ -464,18 +484,9 @@ namespace HR_LEAVEv2.Employee
             return isValid == "Yes" && util.isNullOrEmpty(errTxt);
         }
 
-        protected void populateDaysTaken()
+        protected int getNumDaysBetween(DateTime start, DateTime end)
         {
-            // populates the value for the number of days applied for 
-            DateTime start = DateTime.MinValue,
-                    end = DateTime.MinValue;
-
-            Boolean isStartDateFilled = DateTime.TryParseExact(txtFrom.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start),
-                    isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
-
-            // if type of leave has been selected (typeOfLeave.SelectedIndex == 0 when no leave type has been selected as yet) and the dates are valid
-            // OR if the start and end date are filled
-            if ((typeOfLeave.SelectedIndex != 0 && validateDates(txtFrom.Text, txtTo.Text)) || (isStartDateFilled && isEndDateFilled))
+            if(start != DateTime.MinValue && end != DateTime.MinValue)
             {
                 int numDays = 0;
                 // checks to see if the amt of days in between the start and the end is greater than 0, otherwise the value will be 0
@@ -492,7 +503,26 @@ namespace HR_LEAVEv2.Employee
                 if (!typeOfLeave.SelectedValue.Equals("No Pay") && !typeOfLeave.SelectedValue.Equals("Sick"))
                     numDays = numDays - getNumWeekendsBetween(start, end);
 
-                numDaysAppliedFor.Text = numDays.ToString();
+                return numDays;
+            }
+            return -1;
+        }
+
+        protected void populateDaysTaken()
+        {
+            // populates the value for the number of days applied for 
+            DateTime start = DateTime.MinValue,
+                    end = DateTime.MinValue;
+
+            Boolean isStartDateFilled = DateTime.TryParseExact(txtFrom.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start),
+                    isEndDateFilled = DateTime.TryParseExact(txtTo.Text, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
+
+            // if type of leave has been selected (typeOfLeave.SelectedIndex == 0 when no leave type has been selected as yet) and the dates are valid
+            // OR if the start and end date are filled
+            if ((typeOfLeave.SelectedIndex != 0 && validateDates(txtFrom.Text, txtTo.Text)) || (isStartDateFilled && isEndDateFilled))
+            {
+               
+                numDaysAppliedFor.Text = getNumDaysBetween(start, end).ToString();
                 validateLeave(typeOfLeave.SelectedValue);
             }
         }
@@ -527,6 +557,8 @@ namespace HR_LEAVEv2.Employee
             invalidSickLeaveStartDate.Style.Add("display", "none");
 
             moreThan2DaysConsecutiveSickLeave.Style.Add("display", "none");
+
+            moreThan7DaysConsecutiveCasualLeave.Style.Add("display", "none");
 
             startDateIsWeekend.Style.Add("display", "none");
 
@@ -1051,6 +1083,10 @@ namespace HR_LEAVEv2.Employee
 
                             // show disclaimer
                             submitHardCopyOfMedicalDisclaimerPanel.Style.Add("display", "inline-block");
+                        }
+                        if(typeOfLeave.SelectedValue == "Casual")
+                        {
+                            moreThan7DaysConsecutiveCasualLeave.Style.Add("display", "none");
                         }
 
                         validateLeave(typeOfLeave.SelectedValue);
