@@ -218,7 +218,13 @@ namespace HR_LEAVEv2.UserControls
                             supervisor_id = '{Session["emp_id"]}'
                     ";
 
-                    // ensure that the current HR viewing data is active
+                    // ensure that the current supervisor viewing data is active
+                    /* the following statement checks the start and actual end dates for the supervisor in order to find out whether they are active
+                     * 
+                     * The partition is used to get the active record's start and actual end date. After getting these dates, it checks the following conditions:
+                     *          actual_end_date IS NULL OR (start_date <= GETDATE() AND actual_end_date IS NOT NULL AND GETDATE() <= actual_end_date)
+                     * 
+                     * */
                     whereBindGridView += $@"
                         AND ((SELECT actual_end_date
 							FROM (
@@ -320,10 +326,12 @@ namespace HR_LEAVEv2.UserControls
                         AND (relevant_ep.employment_type IN {employmentTypes})          
                     ";
 
-                    // ensure that only leave applications submitted during the period of their current active record gets shown
-                    //whereBindGridView += $@" AND lt.created_at >= ep.start_date AND lt.created_at <= GETDATE()";
-
-                    // ensure that the current HR viewing data is active
+                    /* the following statement checks the start and actual end dates for the HR in order to find out whether they are active
+                     * 
+                     * The partition is used to get the active record's start and actual end date. After getting these dates, it checks the following conditions:
+                     *          actual_end_date IS NULL OR (start_date <= GETDATE() AND actual_end_date IS NOT NULL AND GETDATE() <= actual_end_date)
+                     * 
+                     * */
                     whereBindGridView += $@"
                         AND ((SELECT actual_end_date
 							FROM (
