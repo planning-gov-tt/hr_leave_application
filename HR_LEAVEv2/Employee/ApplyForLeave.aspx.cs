@@ -1029,7 +1029,7 @@ namespace HR_LEAVEv2.Employee
 
                 if (dt.Rows.Count > 0)
                 {
-
+                    clearAllFilesBtn.Visible = true;
                     // add files to session so they will persist after postback
                     Session["uploadedFiles"] = files;
 
@@ -1062,6 +1062,8 @@ namespace HR_LEAVEv2.Employee
                     }
 
                 }
+                else
+                    clearAllFilesBtn.Visible = false;
             }
             else
             {
@@ -1082,6 +1084,8 @@ namespace HR_LEAVEv2.Employee
 
             filesUploadedPanel.Visible = false;
             FileUpload1.Dispose();
+
+            clearAllFilesBtn.Visible = false;
 
             filesUploadedListView.DataSource = new DataTable();
             filesUploadedListView.DataBind();
@@ -1179,6 +1183,8 @@ namespace HR_LEAVEv2.Employee
                 }
                 else
                 {
+                    clearAllFilesBtn.Visible = false;
+
                     Session["uploadedFiles"] = null;
                     filesUploadedPanel.Visible = false;
                     if (mode == "apply")
@@ -1606,7 +1612,7 @@ namespace HR_LEAVEv2.Employee
                             updateLeaveBalance = string.Empty;
 
                         if (!isSupCommentsChanged && isHrCommentsChanged)
-                            comments = $"hr_comment = @HrComment,";
+                            comments = $"hr_comment = @HrComments,";
                         if (isSupCommentsChanged && !isHrCommentsChanged)
                             comments = $"sup_comment = @SupervisorComments,";
                         if (isSupCommentsChanged && isHrCommentsChanged)
@@ -1750,12 +1756,21 @@ namespace HR_LEAVEv2.Employee
                         }
                     }
                 }
-
+                Page.MaintainScrollPositionOnPostBack = false;
                 if (isEditSuccessful)
+                {
                     successfulSubmitEditsMsgPanel.Visible = true;
-                else
-                    errorEditingApplicationPanel.Visible = true;
+                    successfulSubmitEditsMsgPanel.Focus();
+                }
 
+                else
+                {
+                    errorEditingApplicationPanel.Visible = true;
+                    errorEditingApplicationPanel.Focus();
+                }
+                    
+
+                
                 // add audit log
                 List<string> actionString = new List<string>();
 
@@ -1776,7 +1791,9 @@ namespace HR_LEAVEv2.Employee
             }
             else
             {
+                Page.MaintainScrollPositionOnPostBack = false;
                 noEditsMadePanel.Visible = true;
+                noEditsMadePanel.Focus();
             }
 
             // hide submit button
@@ -1810,7 +1827,7 @@ namespace HR_LEAVEv2.Employee
         protected void refreshForm(object sender, EventArgs e)
         {
             // refreshes form by redirecting back to the page
-            Response.Redirect("~/Employee/ApplyForLeave.aspx");
+            Response.Redirect($"~{Request.Url.PathAndQuery}");
         }
 
         protected void returnToPreviousBtn_Click(object sender, EventArgs e)
@@ -1833,6 +1850,8 @@ namespace HR_LEAVEv2.Employee
                 filesNeededForConversionToPaidPanel.Visible = true;
             }
         }
+
+
 
         //protected void disableForm()
         //{

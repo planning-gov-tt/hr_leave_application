@@ -37,16 +37,16 @@ namespace HR_LEAVEv2.Employee
             try
             {
                 string sql= $@"
-                    SELECT [id],
-                           [notification_header], 
-                           [notification], 
-                           IIF([is_read] = 'No', 'Unread', 'Read') AS status,
-                           IIF([is_read] = 'No', 'label-primary', 'label-default') AS bootstrap_class,
-                           [is_read], 
-                           FORMAT([created_at],  'h:mmtt MMM dd yyyy') AS created_at
-                    FROM [dbo].[notifications] 
-                    WHERE [employee_id] = '{Session["emp_id"].ToString()}'
-                    ORDER BY [created_at] DESC;
+                    SELECT n.[id],
+                           n.[notification_header], 
+                           n.[notification], 
+                           IIF(n.[is_read] = 'No', 'Unread', 'Read') AS status,
+                           IIF(n.[is_read] = 'No', 'label-primary', 'label-default') AS bootstrap_class,
+                           n.[is_read], 
+                           FORMAT(n.[created_at],  'h:mmtt MMM dd yyyy') AS created_at
+                    FROM [dbo].[notifications] n
+                    WHERE n.[employee_id] = '{Session["emp_id"].ToString()}'
+                    ORDER BY n.[created_at] DESC;
                 ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))

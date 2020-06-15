@@ -45,13 +45,8 @@
         </asp:Panel>
         <div id="applyForLeaveContainer" class="container-fluid text-center">
             <%--View mode: Shows date and time leave application was submitted--%>
-            <asp:Panel ID="submittedOnPanel" CssClass="row" runat="server">
+            <asp:Panel ID="submittedOnPanel" CssClass="row" runat="server" Style="margin-bottom: 35px;">
                 <asp:Label ID="submittedOnTxt" runat="server"></asp:Label>
-            </asp:Panel>
-            <%--View mode: Shows status of leave application--%>
-            <asp:Panel ID="statusPanel" Style="display: block; margin-top: 35px; margin-bottom: 10px;" runat="server">
-                <label for="statustxt" style="font-size: 1.2em">Status:</label>
-                <asp:Label ID="statusTxt" runat="server" Style="display: inline; margin: 0 auto; text-align: center; font-size: 1.05em;"></asp:Label>
             </asp:Panel>
 
             <%--Apply mode: Shows the current leave balance of employee --%>
@@ -64,6 +59,141 @@
                         <TWebControl:LeaveCountUserControlBS4 ID="LeaveCountUserControl" runat="server"></TWebControl:LeaveCountUserControlBS4>
                     </ContentTemplate>
                 </asp:UpdatePanel>
+            </asp:Panel>
+
+             <%--Apply mode: Shows any necessary validation messages to user --%>
+            <div class="row" id="validationRow" style="margin-bottom:5px;">
+                <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server">
+                    <ContentTemplate>
+                        <asp:Panel ID="startDateIsBeforeStartOfActiveRecord" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="startDateIsBeforeStartOfActiveRecordTxt" runat="server"></span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="startDateIsHolidayTxt" runat="server"></span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="endDateIsHolidayTxt" runat="server"></span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="startDateIsWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span4" runat="server">Start date is on the weekend</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="endDateIsWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span5" runat="server">End date is on the weekend</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="startDateBeforeTodayValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="startDateBeforeTodayValidationMsg" runat="server">Start date cannot be before today</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="fileUploadNeededPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span15" runat="server">No files currently uploaded. Upload supporting documentation to submit your application</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span6" runat="server">No files currently uploaded. More than 2 days of consecutive sick leave requires a medical leave of absence.</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="invalidVacationStartDateMsg" runat="server">You must request vacation leave at least a month before the start date</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="invalidLeaveTypeTxt" runat="server"></span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span3" runat="server">Could not verify supervisor</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="errorInsertingFilesToDbPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span7" runat="server">Error inserting files into database</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="errorSendingEmailNotifications" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span11" runat="server">Error sending email notifications</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="errorSendingInHouseNotifications" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span12" runat="server">Error sending in-application notifications</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="errorSubmittingLeaveApplicationPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span8" runat="server">Error submitting leave application</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 5px 5px;" role="alert">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span id="successMsg" runat="server">Application successfully submitted</span>
+                            <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />
+                        </asp:Panel>
+
+                        <asp:Panel ID="noEditsMadePanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block;" role="alert" Visible="false">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            <span id="Span9" runat="server">No edits made</span>
+                            <asp:Button ID="Button2" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="returnToPreviousBtn_Click" />
+                            <asp:Button ID="refreshEditPageBtnNoEditsMade" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="refreshForm"/>
+                        </asp:Panel>
+
+                        <asp:Panel ID="successfulSubmitEditsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span id="Span2" runat="server">Edits successfully made</span>
+                            <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="returnToPreviousBtn_Click" />
+                            <asp:Button ID="refreshEditPageBtn" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="refreshForm" />
+                        </asp:Panel>
+
+                        <asp:Panel ID="errorEditingApplicationPanel" runat="server" CssClass="row alert alert-danger" Style="display: inline-block;" role="alert" Visible="false">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="Span14" runat="server">Error editing application</span>
+                            <asp:Button ID="Button3" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="returnToPreviousBtn_Click" />
+                            <asp:Button ID="refreshEditPageBtnErrMade" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="refreshForm"/>
+                        </asp:Panel>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+            </div>
+
+             <%--View mode: Shows status of leave application--%>
+            <asp:Panel ID="statusPanel" Style="display: block; margin-bottom: 10px;" runat="server">
+                <label for="statustxt" style="font-size: 1.2em">Status:</label>
+                <asp:Label ID="statusTxt" runat="server" Style="display: inline; margin: 0 auto; text-align: center; font-size: 1.05em;"></asp:Label>
             </asp:Panel>
 
             <%--View mode: Shows the start and end date of leave application--%>
@@ -201,18 +331,40 @@
 
                 <label for="FileUpload1" style="font-size: 1.2em; display: inline;">Upload Files:</label>
 
-                <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin: 0 auto; display: inline-block; background-color: lightgrey" AllowMultiple="true" />
+                <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin: 0 auto; display: inline-block; background-color: lightgrey" AllowMultiple="true"/>
 
                 <asp:LinkButton ID="uploadFilesBtn" runat="server" OnClick="uploadBtn_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Upload files">
                 <i class="fa fa-upload" aria-hidden="true"></i>
                 </asp:LinkButton>
 
-                <asp:LinkButton ID="clearAllFilesBtn" runat="server" OnClick="clearUploadedFiles_Click" OnClientClick="return confirm('Clear all files?');" CssClass="btn btn-sm btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Clear all uploaded files">
+                <asp:LinkButton ID="clearAllFilesBtn" runat="server" OnClick="clearUploadedFiles_Click" OnClientClick="return confirm('Clear all files?');" 
+                    CssClass="btn btn-sm btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Clear all uploaded files" Visible="false">
                 <i class="fa fa-times" aria-hidden="true"></i>
                 </asp:LinkButton>
 
-                <br />
+                <div class="row" style="margin-top: 5px;">
+                    <asp:UpdatePanel ID="UpdatePanel4" runat="server">
+                        <ContentTemplate>
+                            <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span id="duplicateFileNameTxt" runat="server">File name already exists</span>
+                            </asp:Panel>
 
+                            <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
+                            </asp:Panel>
+
+                            <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
+                            </asp:Panel>
+                        </ContentTemplate>
+                    </asp:UpdatePanel>
+                </div>
+                
+                    
+                
                 <%--Shows the files uploaded to Session--%>
                 <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align: left; margin: 0 auto; display: inline-block;">
                     Files Uploaded:
@@ -243,8 +395,6 @@
 
                     </asp:ListView>
                 </asp:Panel>
-
-                <br />
 
             </asp:Panel>
 
@@ -286,17 +436,17 @@
                 <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                     <ContentTemplate>
 
-                        <asp:Panel ID="daysTakenDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin: 0px 5px; width: 450px;" role="alert">
+                        <asp:Panel ID="daysTakenDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin: 10px 5px; width: 450px;" role="alert">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                             <span id="Span10" runat="server">Disclaimer: days applied for may not be completely accurate and is subject to change. Consult HR for further information</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="holidayInAppliedTimePeriodPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin: 0px 5px; width: 450px;" role="alert">
+                        <asp:Panel ID="holidayInAppliedTimePeriodPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin: 10px 5px; width: 450px;" role="alert">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                             <span id="holidayInAppliedTimeTxt" runat="server"></span>
                         </asp:Panel>
 
-                        <asp:Panel ID="submitHardCopyOfMedicalDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin: 0px 5px; width: 450px;" role="alert">
+                        <asp:Panel ID="submitHardCopyOfMedicalDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: none; margin: 10px 5px; width: 450px;" role="alert">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                             <span id="Span13" runat="server">A hard copy of your medical leave must also be submitted to HR</span>
                         </asp:Panel>
@@ -305,140 +455,17 @@
                 </asp:UpdatePanel>
             </div>
 
-            <%--Apply mode: Shows any necessary validation messages to user --%>
-            <div class="row" id="validationRow">
-                <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server">
-                    <ContentTemplate>
-                        <asp:Panel ID="startDateIsBeforeStartOfActiveRecord" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="startDateIsBeforeStartOfActiveRecordTxt" runat="server"></span>
-                        </asp:Panel>
+            <asp:Panel ID="submitButtonPanel" runat="server" CssClass="row form-group">
+                <asp:LinkButton ID="cancelBtn" runat="server" Text="Cancel" Style="margin-right: 35px;" CssClass="btn btn-danger" OnClick="refreshForm" CausesValidation="False">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        Cancel
+                </asp:LinkButton>
 
-                        <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="startDateIsHolidayTxt" runat="server"></span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="endDateIsHolidayTxt" runat="server"></span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="startDateIsWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span4" runat="server">Start date is on the weekend</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="endDateIsWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span5" runat="server">End date is on the weekend</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="startDateBeforeTodayValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="startDateBeforeTodayValidationMsg" runat="server">Start date cannot be before today</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="fileUploadNeededPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span15" runat="server">No files currently uploaded. Upload supporting documentation to submit your application</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span6" runat="server">No files currently uploaded. More than 2 days of consecutive sick leave requires a medical leave of absence.</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="invalidVacationStartDateMsg" runat="server">You must request vacation leave at least a month before the start date</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span1" runat="server">Sick leave cannot be taken in advance</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="invalidLeaveTypeTxt" runat="server"></span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="duplicateFileNameTxt" runat="server">File name already exists</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span3" runat="server">Could not verify supervisor</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="errorInsertingFilesToDbPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span7" runat="server">Error inserting files into database</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="errorSendingEmailNotifications" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span11" runat="server">Error sending email notifications</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="errorSendingInHouseNotifications" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span12" runat="server">Error sending in-application notifications</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="errorSubmittingLeaveApplicationPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
-                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span id="Span8" runat="server">Error submitting leave application</span>
-                        </asp:Panel>
-
-                        <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0 5px;" role="alert">
-                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span id="successMsg" runat="server">Application successfully submitted</span>
-                            <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />
-                        </asp:Panel>
-
-                        <asp:Panel ID="submitButtonPanel" runat="server" CssClass="row form-group">
-                            <asp:LinkButton ID="cancelBtn" runat="server" Text="Cancel" Style="margin-right: 35px;" CssClass="btn btn-danger" OnClick="refreshForm" CausesValidation="False">
-                                 <i class="fa fa-times" aria-hidden="true"></i>
-                                 Cancel
-                            </asp:LinkButton>
-
-                            <asp:LinkButton ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click">
-                                 <i class="fa fa-send" aria-hidden="true"></i>
-                                 Submit
-                            </asp:LinkButton>
-                        </asp:Panel>
-                    </ContentTemplate>
-                </asp:UpdatePanel>
-            </div>
+                <asp:LinkButton ID="submitBtn" runat="server" Text="Submit" CssClass="btn btn-success" OnClick="submitLeaveApplication_Click">
+                        <i class="fa fa-send" aria-hidden="true"></i>
+                        Submit
+                </asp:LinkButton>
+            </asp:Panel>
 
             <%--Edit mode: contains submit button and validaation messages for edits made--%>
             <asp:Panel ID="submitEditsPanel" runat="server" CssClass="row" Style="margin-top: 15px;">
@@ -446,24 +473,6 @@
                 <i class="fa fa-floppy-o" aria-hidden="true"></i>
                 Save edit(s)
                 </asp:LinkButton>
-
-                <asp:Panel ID="noEditsMadePanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block;" role="alert" Visible="false">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    <span id="Span9" runat="server">No edits made</span>
-                    <asp:Button ID="Button2" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="returnToPreviousBtn_Click" />
-                </asp:Panel>
-
-                <asp:Panel ID="successfulSubmitEditsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
-                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                    <span id="Span2" runat="server">Edits successfully made</span>
-                    <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="returnToPreviousBtn_Click" />
-                </asp:Panel>
-
-                <asp:Panel ID="errorEditingApplicationPanel" runat="server" CssClass="row alert alert-danger" Style="display: inline-block;" role="alert" Visible="false">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="Span14" runat="server">Error editing application</span>
-                    <asp:Button ID="Button3" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="returnToPreviousBtn_Click" />
-                </asp:Panel>
 
             </asp:Panel>
 
