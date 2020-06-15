@@ -121,7 +121,15 @@ namespace HR_LEAVEv2.HR
                 {
                     // add files to session so they will persist after postback
                     Session["uploadedFile"] = Path.GetFileName(fileToBeUploaded.FileName);
-                    FileUpload1.SaveAs(Path.Combine(Server.MapPath("~/Assets/temp"), FileUpload1.FileName));
+                    try
+                    {
+                        Directory.CreateDirectory("C:/ProgramData/HRLS/temp");
+                    } catch(Exception exc)
+                    {
+                        throw exc;
+                    }
+                    
+                    FileUpload1.SaveAs(Path.Combine("C:/ProgramData/HRLS/temp", FileUpload1.FileName));
                     uploadedFile.Visible = true;
                     uploadedFile.Text = $"Uploaded file: <strong>{Path.GetFileName(fileToBeUploaded.FileName)}</strong>";
                     chooseTablePanel.Visible = true;
@@ -137,8 +145,8 @@ namespace HR_LEAVEv2.HR
         protected void deleteUploadedFile()
         {
             resetUploadDataPage();
-            if (Session["uploadedFile"] != null && File.Exists(Path.Combine(Server.MapPath("~/Assets/temp"), Session["uploadedFile"].ToString())))
-                File.Delete(Path.Combine(Server.MapPath("~/Assets/temp"), Session["uploadedFile"].ToString()));
+            if (Session["uploadedFile"] != null && File.Exists(Path.Combine("C:/ProgramData/HRLS/temp", Session["uploadedFile"].ToString())))
+                File.Delete(Path.Combine("C:/ProgramData/HRLS/temp", Session["uploadedFile"].ToString()));
             Session["uploadedFile"] = null;
             clearFileBtn.Visible = uploadedFile.Visible = false;
             FileUpload1.Dispose();
@@ -327,7 +335,7 @@ namespace HR_LEAVEv2.HR
             Boolean isUploadSuccessful = false;
             if (Session["uploadedFile"] != null)
             {
-                string filePath = Path.Combine(Server.MapPath("~/Assets/temp"), Session["uploadedFile"].ToString());
+                string filePath = Path.Combine("C:/ProgramData/HRLS/temp", Session["uploadedFile"].ToString());
                 if (File.Exists(filePath))
                 {
                     // get metadata about table's columns like column name, data type, maximum length(if applicable) and whether it is nullable

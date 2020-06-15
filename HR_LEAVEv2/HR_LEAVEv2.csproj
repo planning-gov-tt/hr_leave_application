@@ -128,7 +128,6 @@
   <ItemGroup>
     <Content Include="AccessDenied.aspx" />
     <Content Include="Admin\Settings.aspx" />
-    <Content Include="Assets\anonAccountProfilePicPlaceholder.jpg" />
     <Content Include="Employee\About.aspx" />
     <Content Include="Assets\mopd_logo.jpg" />
     <Content Include="Content\bootstrap.css" />
