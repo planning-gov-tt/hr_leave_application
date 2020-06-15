@@ -779,7 +779,7 @@ namespace HR_LEAVEv2.Admin
                 areDatesValid = areDatesValid && validateDates(data["start_date"], data["actual_end_date"], invalidActualEndDatePanel, actualEndDateOnWeekend, dateComparisonActualValidationMsgPanel);
 
             bool isNewRecordValid = true,
-                 isAnnualAndMaxVacationAmtValid = false;
+                 isAnnualAndMaxVacationAmtValid = true;
 
             // validate record if employment record to ensure more than one active record is not added
             // both start date and actual end date will already be validated in the proper form of d/MM/yyyy
@@ -898,7 +898,7 @@ namespace HR_LEAVEv2.Admin
                 areDatesValid = areDatesValid && validateDates(data["start_date"], data["actual_end_date"], invalidActualEndDatePanel, actualEndDateOnWeekend, dateComparisonActualValidationMsgPanel);
 
             bool isEditedRecordValid = true,
-                 isAnnualAndMaxVacationAmtValid = false; ;
+                 isAnnualAndMaxVacationAmtValid = true;
             // validate record if employment record to ensure more than one active record is not added
             // both start date and actual end date will be validated in the proper form of d/MM/yyyy
             if (selectedTable == "employeeposition")

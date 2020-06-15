@@ -328,14 +328,14 @@ namespace HR_LEAVEv2.Classes
             //smtp.Credentials = new NetworkCredential("hr.leave@planning.gov.tt", "p@ssword1");
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
-            try
-            {
-                smtp.Send(message);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            //try
+            //{
+            //    smtp.Send(message);
+            //}
+            //catch (Exception ex)
+            //{
+            //    return false;
+            //}
 
             return true;
         }
