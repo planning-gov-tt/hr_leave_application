@@ -17,5 +17,10 @@ namespace HR_LEAVEv2
             }
                 
         }
+
+        protected void applyForLeaveRedirectBtn_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Employee/ApplyForLeave.aspx");
+        }
     }
 }
