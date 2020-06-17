@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Notifications" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Notifications.aspx.cs" Inherits="HR_LEAVEv2.Employee.Notifications" %>
+﻿<%@ Page Title="Notifications" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Notifications.aspx.cs" Inherits="HR_LEAVEv2.Employee.Notifications" MaintainScrollPositionOnPostback="true" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <h1><%: Title %></h1>
 
@@ -19,7 +19,7 @@
             Mark all as unread
         </asp:LinkButton>
 
-        <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="10" Style="text-align:left;">
+        <asp:ListView ID="notificationsListView" runat="server" OnPagePropertiesChanging="notificationsListView_PagePropertiesChanging" GroupItemCount="10" Style="text-align:left;">
             <EmptyDataTemplate>
                 <div class="alert alert-info text-center" role="alert" style="display:inline-block; margin:0 auto">
                     <i class="fa fa-info-circle"></i>
@@ -72,7 +72,7 @@
 
         </asp:ListView>
 
-        <asp:DataPager ID="DataPager1" PagedControlID="ListView1" PageSize="10" runat="server" >
+        <asp:DataPager ID="DataPager1" PagedControlID="notificationsListView" PageSize="10" runat="server" >
             <Fields>
                 <asp:NumericPagerField ButtonType="Link" />
             </Fields>

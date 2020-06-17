@@ -63,8 +63,8 @@ namespace HR_LEAVEv2.Employee
                         markAllAsUnread.Visible = numRead.Length > 0;
                         deleteAllNotifsBtn.Visible = dt.Rows.Count > 0;
 
-                        ListView1.DataSource = dt;
-                        ListView1.DataBind();
+                        notificationsListView.DataSource = dt;
+                        notificationsListView.DataBind();
                     }
                 }
             }
@@ -76,11 +76,11 @@ namespace HR_LEAVEv2.Employee
             resetNumNotifications();
         }
 
-        protected void ListView1_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
+        protected void notificationsListView_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
         {
             // set current page startindex, max rows and rebind to false  
             DataPager1.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
-            // Rebind the ListView1  
+            // Rebind the notificationsListView  
             bindListView();
         }
 
