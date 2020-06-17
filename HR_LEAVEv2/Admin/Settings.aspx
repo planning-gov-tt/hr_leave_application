@@ -27,7 +27,7 @@
     <h1><%: Title %></h1>
     <div style="margin: 0 auto; margin-top: 30px; width:90%;text-align:center">
         <div class="row">
-            <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="true" OnSelectedIndexChanged="DropDownList1_SelectedIndexChanged">
+            <asp:DropDownList ID="tableSelectionDdl" runat="server" AutoPostBack="true" OnSelectedIndexChanged="tableSelectionDdl_SelectedIndexChanged">
                 <asp:ListItem Value="-">Choose a Table</asp:ListItem>
                 <asp:ListItem Value="assignment">Assignment</asp:ListItem>
                 <asp:ListItem Value="accumulations">Accumulations</asp:ListItem>

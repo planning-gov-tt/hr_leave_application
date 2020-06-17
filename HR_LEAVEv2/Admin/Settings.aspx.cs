@@ -65,7 +65,7 @@ namespace HR_LEAVEv2.Admin
             if(permissions == null || !permissions.Contains("admin_permissions"))
                 Response.Redirect("~/AccessDenied.aspx");
 
-            selectedTable = DropDownList1.SelectedValue.ToString() != "-" ? DropDownList1.SelectedValue.ToString() : string.Empty;
+            selectedTable = tableSelectionDdl.SelectedValue.ToString() != "-" ? tableSelectionDdl.SelectedValue.ToString() : string.Empty;
             addPanel.Visible = !util.isNullOrEmpty(selectedTable);
             TableMetaData = !util.isNullOrEmpty(selectedTable) ? TableMetaData : null;
 
@@ -720,7 +720,7 @@ namespace HR_LEAVEv2.Admin
         }
         /* __________________________________________________________________________*/
 
-        protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
+        protected void tableSelectionDdl_SelectedIndexChanged(object sender, EventArgs e)
         {
             clearSearch();
             dataBeforeEdit = null;
@@ -739,7 +739,7 @@ namespace HR_LEAVEv2.Admin
                 generateForm(TableMetaData);
             else
             {
-                if (searchString != null || util.isNullOrEmpty(searchString))
+                if (!util.isNullOrEmpty(searchString))
                     searchForData(searchString);
                 else
                     bindGridview();
@@ -875,7 +875,6 @@ namespace HR_LEAVEv2.Admin
             // edit record
             clearValidationErrors();
                 
-
             // get data
             ControlCollection t = formPlaceholder.Controls;
 
