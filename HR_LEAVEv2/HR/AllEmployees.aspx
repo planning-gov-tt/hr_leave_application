@@ -208,7 +208,7 @@
 
                             <asp:Panel ID="errorPanel" runat="server" CssClass="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                <span>Employment Type and employee position info could not be loaded</span>
+                                <span>Employment Type and Employee Position info could not be loaded</span>
                             </asp:Panel>
 
 
@@ -219,7 +219,7 @@
 
                             <div id="leaveBalancesDetails" runat="server"></div>
 
-                            <asp:Panel ID="leaveBalancesErrorPanel" runat="server" CssClass="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
+                            <asp:Panel ID="leaveBalancesErrorPanel" runat="server" CssClass="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em" Visible="false">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>Leave balances could not be loaded</span>
                             </asp:Panel>

@@ -323,15 +323,20 @@ namespace HR_LEAVEv2.HR
 
         protected EmpDetails getEmpDetails(string emp_id)
         {
-            /* returns JSON object containing all the employee details. Returns data including Employee Position and Employee Employment type but if the data is not available
+            /* returns EmpDetails object containing all the employee details. Returns data including Employee Position and Employee Employment type but if the data is not available
              * then by default, only basic employee info is returned 
             */
             Util util = new Util();
             EmpDetails empDetails = null;
-            try
+
+            if(ViewState["viewActive"] != null)
             {
-                string sql = $@"
-                        SELECT TOP 1 e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email,e.vacation,e.personal, e.casual, e.sick, ep.employment_type, ep.start_date, p.pos_name
+                if (Convert.ToBoolean(ViewState["viewActive"]))
+                {
+                    try
+                    {
+                        string sql = $@"
+                        SELECT TOP 1 e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, e.vacation, e.personal, e.casual, e.sick, ep.employment_type, ep.start_date, p.pos_name
                         FROM [dbo].[employee] e
 
                         RIGHT JOIN [dbo].employeeposition ep
@@ -344,99 +349,102 @@ namespace HR_LEAVEv2.HR
                         ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC;
                     ";
 
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-                {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                         {
-                            if (reader.HasRows)
+                            connection.Open();
+                            using (SqlCommand command = new SqlCommand(sql, connection))
                             {
-                                while (reader.Read())
+                                using (SqlDataReader reader = command.ExecuteReader())
                                 {
-                                    empDetails = new EmpDetails
+                                    if (reader.HasRows)
                                     {
-                                        emp_id = reader["employee_id"].ToString(),
-                                        ihris_id = reader["ihris_id"].ToString(),
-                                        name = reader["name"].ToString(),
-                                        email = reader["email"].ToString(),
-                                        vacation = reader["vacation"].ToString(),
-                                        personal = reader["personal"].ToString(),
-                                        casual = reader["casual"].ToString(),
-                                        sick = reader["sick"].ToString(),
-                                        employment_type = reader["employment_type"].ToString(),
-                                        start_date = (DateTime)reader["start_date"],
-                                        position = reader["pos_name"].ToString(),
-                                        isCompleteRecord = '1'
-                                    };
-                                }
+                                        while (reader.Read())
+                                        {
+                                            empDetails = new EmpDetails
+                                            {
+                                                emp_id = reader["employee_id"].ToString(),
+                                                ihris_id = reader["ihris_id"].ToString(),
+                                                name = reader["name"].ToString(),
+                                                email = reader["email"].ToString(),
+                                                vacation = reader["vacation"].ToString(),
+                                                personal = reader["personal"].ToString(),
+                                                casual = reader["casual"].ToString(),
+                                                sick = reader["sick"].ToString(),
+                                                employment_type = reader["employment_type"].ToString(),
+                                                start_date = (DateTime)reader["start_date"],
+                                                position = reader["pos_name"].ToString(),
+                                                isCompleteRecord = '1'
+                                            };
+                                        }
 
-                                string leaveBalancesDetailsStr = $@"
-                                <div>
-                                     <h4 style = 'display: inline'>Sick Leave Balance:</h4>
-                                     <span> {empDetails.sick} </span>
-                                </div>
-                            ";
-                                // set appropriate leave balance details based on employment type
-                                if (empDetails.employment_type == "Contract")
-                                {
-                                    // is employee in first 11 months of contract?
-                                    DateTime startDate = empDetails.start_date;
-                                    DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
+                                        string leaveBalancesDetailsStr = $@"
+                                            <div>
+                                                 <h4 style = 'display: inline'>Sick Leave Balance:</h4>
+                                                 <span> {empDetails.sick} </span>
+                                            </div>
+                                        ";
+                                        // set appropriate leave balance details based on employment type
+                                        if (empDetails.employment_type == "Contract")
+                                        {
+                                            // is employee in first 11 months of contract?
+                                            DateTime startDate = empDetails.start_date;
+                                            DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
 
-                                    if (DateTime.Compare(util.getCurrentDateToday(), elevenMonthsFromStartDate) < 0)
-                                        // display personal 
-                                        leaveBalancesDetailsStr += $@"
-                                        <div>
-                                            <h4 style='display: inline'>Personal Leave Balance:</h4>
-                                            <span>{empDetails.personal}</span>
-                                        </div>
-                                     ";
-                                    else
-                                    {
-                                        // display vacation 
-                                        leaveBalancesDetailsStr += $@"
-                                        <div>
-                                            <h4 style='display: inline'>Vacation Leave Balance:</h4>
-                                            <span>{empDetails.vacation}</span>
-                                        </div>
-                                     ";
+                                            if (DateTime.Compare(util.getCurrentDateToday(), elevenMonthsFromStartDate) < 0)
+                                                // display personal 
+                                                leaveBalancesDetailsStr += $@"
+                                                    <div>
+                                                        <h4 style='display: inline'>Personal Leave Balance:</h4>
+                                                        <span>{empDetails.personal}</span>
+                                                    </div>
+                                                 ";
+                                            else
+                                            {
+                                                // display vacation 
+                                                leaveBalancesDetailsStr += $@"
+                                                    <div>
+                                                        <h4 style='display: inline'>Vacation Leave Balance:</h4>
+                                                        <span>{empDetails.vacation}</span>
+                                                    </div>
+                                                 ";
+                                            }
+
+                                        }
+                                        else if (empDetails.employment_type == "Public Service")
+                                        {
+                                            // public service employees- show casual and vacation
+                                            leaveBalancesDetailsStr += $@"
+                                                <div>
+                                                    <h4 style='display: inline'>Casual Leave Balance:</h4>
+                                                    <span>{empDetails.casual}</span>
+                                                </div>
+                                                <div>
+                                                    <h4 style='display: inline'>Vacation Leave Balance:</h4>
+                                                    <span>{empDetails.vacation}</span>
+                                                </div>
+                                             ";
+                                        }
+
+                                        empDetails.leave_balances = leaveBalancesDetailsStr;
                                     }
-
                                 }
-                                else if (empDetails.employment_type == "Public Service")
-                                {
-                                    // public service employees- show casual and vacation
-                                    leaveBalancesDetailsStr += $@"
-                                        <div>
-                                            <h4 style='display: inline'>Casual Leave Balance:</h4>
-                                            <span>{empDetails.casual}</span>
-                                        </div>
-                                        <div>
-                                            <h4 style='display: inline'>Vacation Leave Balance:</h4>
-                                            <span>{empDetails.vacation}</span>
-                                        </div>
-                                     ";
-                                }
-
-                                empDetails.leave_balances = leaveBalancesDetailsStr;
-                            }     
+                            }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        return null;
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                return null;
-            }
-
+            
+            // loads basic employee info including all leave balances if employee is inactive
             if (empDetails == null)
             {
                 try
                 {
                     string sql = $@"
-                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
+                        SELECT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, e.vacation, e.personal, e.casual, e.sick
                         FROM [dbo].[employee] e
                         WHERE e.employee_id = {emp_id};
                     ";
@@ -456,8 +464,46 @@ namespace HR_LEAVEv2.HR
                                         ihris_id = reader["ihris_id"].ToString(),
                                         name = reader["name"].ToString(),
                                         email = reader["email"].ToString(),
+                                        vacation = reader["vacation"].ToString(),
+                                        personal = reader["personal"].ToString(),
+                                        casual = reader["casual"].ToString(),
+                                        sick = reader["sick"].ToString(),
                                         isCompleteRecord = '0'
                                     };
+
+                                    //display sick
+                                    string leaveBalancesDetailsStr = $@"
+                                            <div>
+                                                 <h4 style = 'display: inline'>Sick Leave Balance:</h4>
+                                                 <span> {empDetails.sick} </span>
+                                            </div>
+                                        ";
+
+                                    //display personal
+                                    leaveBalancesDetailsStr += $@"
+                                            <div>
+                                                <h4 style='display: inline'>Personal Leave Balance:</h4>
+                                                <span>{empDetails.personal}</span>
+                                            </div>
+                                            ";
+                                       
+                                    // display vacation 
+                                    leaveBalancesDetailsStr += $@"
+                                            <div>
+                                                <h4 style='display: inline'>Vacation Leave Balance:</h4>
+                                                <span>{empDetails.vacation}</span>
+                                            </div>
+                                            ";
+                                       
+                                    // display casual
+                                    leaveBalancesDetailsStr += $@"
+                                            <div>
+                                                <h4 style='display: inline'>Casual Leave Balance:</h4>
+                                                <span>{empDetails.casual}</span>
+                                            </div>
+                                            ";
+
+                                    empDetails.leave_balances = leaveBalancesDetailsStr;
                                 }
                             }
                         }
@@ -516,7 +562,6 @@ namespace HR_LEAVEv2.HR
                 if(details.isCompleteRecord == '1')
                 {
                     errorPanel.Visible = false;
-                    leaveBalancesErrorPanel.Visible = false;
                     positionDetails.Visible = true;
                     empPositionDetails.InnerText = details.position;
                     empTypeDetails.InnerText = details.employment_type;
@@ -524,7 +569,6 @@ namespace HR_LEAVEv2.HR
                 else if(details.isCompleteRecord == '0')
                 {
                     errorPanel.Visible = true;
-                    leaveBalancesErrorPanel.Visible = true;
                     positionDetails.Visible = false;
                 }
             }

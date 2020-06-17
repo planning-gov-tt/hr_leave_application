@@ -48,7 +48,7 @@
         </div>
         <div class="container" style="width: 100%; margin-top: 55px;">
 
-            <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;">
+            <asp:ListView ID="employeesListView" runat="server" OnPagePropertiesChanging="employeesListView_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;">
 
                 <EmptyDataTemplate>
                     <div class="alert alert-info text-center" role="alert" style="width: 30%; margin: auto">
@@ -107,9 +107,9 @@
 
                                 <%--button to show employee details--%>
                                 <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
-                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                    <asp:LinkButton ID="openDetailsBtn" runat="server" emp_id='<%#Eval("employee_id")%>' CssClass="btn btn-primary" OnClick="openDetailsBtn_Click" >
                                         <i class="fa fa-address-card-o" aria-hidden="true"></i>
-                                    </button>
+                                    </asp:LinkButton>
                                 </span>
 
                                 <%--button to go to employee's leave logs--%>
@@ -154,7 +154,7 @@
 
             </asp:ListView>
 
-            <asp:DataPager ID="DataPager1" PagedControlID="ListView1" PageSize="8" runat="server">
+            <asp:DataPager ID="employeesDataPager" PagedControlID="employeesListView" PageSize="8" runat="server">
                 <Fields>
                     <asp:NumericPagerField ButtonType="Link" />
                 </Fields>
@@ -168,58 +168,53 @@
                     <div class="modal-content">
 
                         <div class="modal-header text-center">
-
                             <h2 class="modal-title" id="empDetailsTitle" style="display: inline; width: 150px;">
-                                <span id="empNameDetails"></span>
+                                <span id="empNameDetails" runat="server"></span>
                             </h2>
-
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-
                         </div>
 
                         <div class="modal-body text-center">
-
                             <h3>Details</h3>
 
                             <div>
                                 <h4 style="display: inline">Employee ID:</h4>
-                                <span id="empIdDetails"></span>
+                                <span id="empIdDetails" runat="server"></span>
                             </div>
 
                             <div>
                                 <h4 style="display: inline">IHRIS ID:</h4>
-                                <span id="ihrisIdDetails"></span>
+                                <span id="ihrisIdDetails" runat="server"></span>
                             </div>
 
                             <div>
                                 <h4 style="display: inline">Email:</h4>
-                                <span id="emailDetails"></span>
+                                <span id="emailDetails" runat="server"></span>
                             </div>
 
-                            <div id="positionDetails">
-                                <div>
-                                    <h4 style="display: inline">Employee Type:</h4>
-                                    <span id="empTypeDetails"></span>
-                                </div>
-                                <div>
-                                    <h4 style="display: inline">Employee Position:</h4>
-                                    <span id="empPositionDetails"></span>
-                                </div>
+                            <div>
+                                <h4 style="display: inline">Employee Type:</h4>
+                                <span id="empTypeDetails" runat="server"></span>
+                            </div>
+
+                            <div>
+                                <h4 style="display: inline">Employee Position:</h4>
+                                <span id="empPositionDetails" runat="server"></span>
                             </div>
 
                             <hr style="width: 45%;" />
 
+
                             <h3>Leave Balances</h3>
 
-                            <div id="leaveBalancesDetails"></div>
-                        </div>
+                            <div id="leaveBalancesDetails" runat="server"></div>
 
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
-
                     </div>
 
                 </div>
@@ -344,30 +339,6 @@
         * load, the event handlers must be rebinded. 
         */
         Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
-            $('.show-details-btn').click(function () {
-                $('#empNameDetails').text("");
-                $('#empIdDetails').text("");
-                $('#ihrisIdDetails').text("");
-                $('#emailDetails').text("");
-                $('#vacationDetails').text("");
-                $('#personalDetails').text("");
-                $('#casualDetails').text("");
-                $('#sickDetails').text("");
-                $.ajax({
-                    type: "POST",
-                    url: '<%= ResolveUrl("MyEmployees.aspx/getEmpDetails") %>',
-                    contentType: "application/json; charset=utf-8",
-                    data: "{'emp_id':'" + $(this).attr("emp_id") + "'}",
-                    dataType: "json",
-                    success: function (data) {
-                        populateModal(JSON.parse(data.d));
-                    },
-                    error: function (result) {
-                        alert('Unable to load data: ' + result.responseText);
-                    }
-                });
-            });
-
             if ($('#<%= searchTxtbox.ClientID %>').val() != "")
                 $('#clearSearchBtn').show();
             else
@@ -382,19 +353,6 @@
                 $(this).hide();
             });
         });
-
-
-        function populateModal(data) {
-            //populate modal
-            $('#empNameDetails').text(data.name);
-            $('#empIdDetails').text(data.emp_id);
-            $('#ihrisIdDetails').text(data.ihris_id);
-            $('#emailDetails').text(data.email);
-            $('#empPositionDetails').text(data.position);
-            $('#empTypeDetails').text(data.employment_type);
-            $('#leaveBalancesDetails').html(data.leave_balances);
-
-        }
     </script>
 
 

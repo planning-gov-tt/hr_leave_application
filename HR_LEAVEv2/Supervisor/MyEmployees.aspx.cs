@@ -17,7 +17,7 @@ namespace HR_LEAVEv2.Supervisor
     public partial class MyEmployees : System.Web.UI.Page
     {
         Util util = new Util();
-        class EmpDetails
+        protected class EmpDetails
         {
             public string emp_id { get; set; }
             public string ihris_id { get; set; }
@@ -93,8 +93,8 @@ namespace HR_LEAVEv2.Supervisor
                         DataTable dt = new DataTable();
                         ad.Fill(dt);
 
-                        ListView1.DataSource = dt;
-                        ListView1.DataBind();
+                        employeesListView.DataSource = dt;
+                        employeesListView.DataBind();
 
                     }
                 }
@@ -105,11 +105,11 @@ namespace HR_LEAVEv2.Supervisor
             }
         }
 
-        protected void ListView1_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
+        protected void employeesListView_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
         {
             // set current page startindex,max rows and rebind to false  
-            DataPager1.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
-            // Rebind the ListView1  
+            employeesDataPager.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
+            // Rebind the employeesListView  
             bindListView();
         }
 
@@ -145,8 +145,8 @@ namespace HR_LEAVEv2.Supervisor
 
                         DataTable dt = new DataTable();
                         ad.Fill(dt);
-                        ListView1.DataSource = dt;
-                        ListView1.DataBind();
+                        employeesListView.DataSource = dt;
+                        employeesListView.DataBind();
                     }
                 }
             }
@@ -166,11 +166,9 @@ namespace HR_LEAVEv2.Supervisor
             searchForEmployee(searchTxtbox.Text);
         }
 
-        [WebMethod]
-        public static string getEmpDetails(string emp_id)
+        protected EmpDetails getEmpDetails(string emp_id)
         {
-            /* returns JSON object containing all the employee details. Returns data including Employee Position and Employee Employment type but if the data is not available
-             * then by default, only basic employee info is returned 
+            /* returns EmpDetails object containing all the employee details. Since only active employees are shown, the top employment record will correspond to the most recent and relevant info
             */
             EmpDetails empDetails = null;
             Util util = new Util();
@@ -273,10 +271,10 @@ namespace HR_LEAVEv2.Supervisor
             }
             catch (Exception ex)
             {
-                return "ERROR";
+                return null;
             }
 
-            return JsonConvert.SerializeObject(empDetails);
+            return empDetails;
         }
 
         protected void openLeaveLogsBtn_ServerClick(object sender, EventArgs e)
@@ -457,5 +455,25 @@ namespace HR_LEAVEv2.Supervisor
                 unsuccessfulAlert.Style.Add("display", "inline-block");
         }
 
+        protected void openDetailsBtn_Click(object sender, EventArgs e)
+        {
+            LinkButton lb = sender as LinkButton;
+            string empId = lb.Attributes["emp_id"].ToString();
+
+            // get details
+            EmpDetails details = getEmpDetails(empId);
+
+            if (details != null)
+            {
+                empNameDetails.InnerText = details.name;
+                empIdDetails.InnerText = details.emp_id;
+                ihrisIdDetails.InnerText = details.ihris_id;
+                emailDetails.InnerText = details.email;
+                leaveBalancesDetails.InnerHtml = details.leave_balances;
+                empPositionDetails.InnerText = details.position;
+                empTypeDetails.InnerText = details.employment_type;
+            }
+            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#empDetailsModal').modal({'show':true});", true);
+        }
     }
 }
