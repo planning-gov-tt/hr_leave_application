@@ -111,9 +111,9 @@
 
                                 <%--button to show employee details--%>
                                 <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
-                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
+                                    <asp:LinkButton ID="openDetailsBtn" runat="server" emp_id='<%#Eval("employee_id")%>' CssClass="btn btn-primary" OnClick="openDetailsBtn_Click" >
                                         <i class="fa fa-address-card-o" aria-hidden="true"></i>
-                                    </button>
+                                    </asp:LinkButton>
                                 </span>
 
                                 <%--button to go to employee's leave logs--%>
@@ -170,7 +170,7 @@
 
                         <div class="modal-header text-center">
                             <h2 class="modal-title" id="empDetailsTitle" style="display: inline; width: 150px;">
-                                <span id="empNameDetails"></span>
+                                <span id="empNameDetails" runat="server"></span>
                             </h2>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -182,34 +182,34 @@
 
                             <div>
                                 <h4 style="display: inline">Employee ID:</h4>
-                                <span id="empIdDetails"></span>
+                                <span id="empIdDetails" runat="server"></span>
                             </div>
 
                             <div>
                                 <h4 style="display: inline">IHRIS ID:</h4>
-                                <span id="ihrisIdDetails"></span>
+                                <span id="ihrisIdDetails" runat="server"></span>
                             </div>
 
                             <div>
                                 <h4 style="display: inline">Email:</h4>
-                                <span id="emailDetails"></span>
+                                <span id="emailDetails" runat="server"></span>
                             </div>
 
-                            <div id="positionDetails">
+                            <div id="positionDetails" runat="server">
                                 <div>
                                     <h4 style="display: inline">Employee Type:</h4>
-                                    <span id="empTypeDetails"></span>
+                                    <span id="empTypeDetails" runat="server"></span>
                                 </div>
                                 <div>
                                     <h4 style="display: inline">Employee Position:</h4>
-                                    <span id="empPositionDetails"></span>
+                                    <span id="empPositionDetails" runat="server"></span>
                                 </div>
                             </div>
 
-                            <div id="errorPanel" class="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
+                            <asp:Panel ID="errorPanel" runat="server" CssClass="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>Employment Type and employee position info could not be loaded</span>
-                            </div>
+                            </asp:Panel>
 
 
                             <hr style="width: 45%;" />
@@ -217,12 +217,12 @@
 
                             <h3>Leave Balances</h3>
 
-                            <div id="leaveBalancesDetails"></div>
+                            <div id="leaveBalancesDetails" runat="server"></div>
 
-                            <div id="leaveBalancesErrorPanel" class="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
+                            <asp:Panel ID="leaveBalancesErrorPanel" runat="server" CssClass="alert alert-info" style="margin: 5px 0px; display: inline-block; font-size: 0.90em">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>Leave balances could not be loaded</span>
-                            </div>
+                            </asp:Panel>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -241,32 +241,6 @@
         */
         Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
 
-            $('.show-details-btn').click(function () {
-                $('#empNameDetails').text("");
-                $('#empIdDetails').text("");
-                $('#ihrisIdDetails').text("");
-                $('#emailDetails').text("");
-                $('#vacationDetails').text("");
-                $('#personalDetails').text("");
-                $('#casualDetails').text("");
-                $('#sickDetails').text("");
-                $('#empTypeDetails').text("");
-                $('#empPositionDetails').text("");
-                $.ajax({
-                    type: "POST",
-                    url: '<%= ResolveUrl("AllEmployees.aspx/getEmpDetails") %>',
-                    contentType: "application/json; charset=utf-8",
-                    data: "{'emp_id':'" + $(this).attr("emp_id") + "'}",
-                    dataType: "json",
-                    success: function (data) {
-                        populateModal(JSON.parse(data.d));
-                    },
-                    error: function (result) {
-                        alert('Unable to load data: ' + result.responseText);
-                    }
-                });
-            });
-
             if ($('#<%= searchTxtbox.ClientID %>').val() != "")
                 $('#clearSearchBtn').show();
             else
@@ -282,29 +256,6 @@
             });
            
         });
-
-        function populateModal(data) {
-            //populate modal
-            $('#empNameDetails').text(data.name);
-            $('#empIdDetails').text(data.emp_id);
-            $('#ihrisIdDetails').text(data.ihris_id);
-            $('#emailDetails').text(data.email);
-            $('#leaveBalancesDetails').html(data.leave_balances);
-            if (data.isCompleteRecord == '1') {
-                $('#errorPanel').hide();
-                $('#leaveBalancesErrorPanel').hide();
-
-                $('#positionDetails').show();
-                $('#empPositionDetails').text(data.position);
-
-                $('#empTypeDetails').text(data.employment_type);            
-            } else {
-                $('#positionDetails').hide();
-                $('#errorPanel').show();
-                $('#leaveBalancesErrorPanel').show();
-            }
-
-        }
         
     </script>
 

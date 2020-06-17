@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Web;
 using System.Web.Services;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.HR
@@ -15,7 +16,7 @@ namespace HR_LEAVEv2.HR
     {
         
         List<string> permissions = null;
-        class EmpDetails
+        protected class EmpDetails
         {
             public char isCompleteRecord { get; set; }
             public string emp_id { get; set; }
@@ -320,8 +321,7 @@ namespace HR_LEAVEv2.HR
             searchForEmployee(searchTxtbox.Text);
         }
 
-        [WebMethod]
-        public static string getEmpDetails(string emp_id)
+        protected EmpDetails getEmpDetails(string emp_id)
         {
             /* returns JSON object containing all the employee details. Returns data including Employee Position and Employee Employment type but if the data is not available
              * then by default, only basic employee info is returned 
@@ -428,7 +428,7 @@ namespace HR_LEAVEv2.HR
             }
             catch (Exception ex)
             {
-                return "ERROR";
+                return null;
             }
 
             if (empDetails == null)
@@ -465,11 +465,11 @@ namespace HR_LEAVEv2.HR
                 }
                 catch (Exception ex)
                 {
-                    return "ERROR";
+                    return null;
                 }
             }
 
-            return JsonConvert.SerializeObject(empDetails);
+            return empDetails;
         }
 
         protected void newEmployeeBtn_Click(object sender, EventArgs e)
@@ -494,6 +494,41 @@ namespace HR_LEAVEv2.HR
             LinkButton lb = sender as LinkButton;
             string empEmail = lb.Attributes["empEmail"].ToString();
             Response.Redirect($"~/HR/AllEmployeeLeaveApplications?empEmail={empEmail}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
+        }
+
+        protected void openDetailsBtn_Click(object sender, EventArgs e)
+        {
+            // populate modal and show employee details
+
+            LinkButton lb = sender as LinkButton;
+            string empId = lb.Attributes["emp_id"].ToString();
+
+            // get details
+            EmpDetails details = getEmpDetails(empId);
+
+            if(details != null)
+            {
+                empNameDetails.InnerText = details.name;
+                empIdDetails.InnerText = details.emp_id;
+                ihrisIdDetails.InnerText = details.ihris_id;
+                emailDetails.InnerText = details.email;
+                leaveBalancesDetails.InnerHtml = details.leave_balances;
+                if(details.isCompleteRecord == '1')
+                {
+                    errorPanel.Visible = false;
+                    leaveBalancesErrorPanel.Visible = false;
+                    positionDetails.Visible = true;
+                    empPositionDetails.InnerText = details.position;
+                    empTypeDetails.InnerText = details.employment_type;
+                }
+                else if(details.isCompleteRecord == '0')
+                {
+                    errorPanel.Visible = true;
+                    leaveBalancesErrorPanel.Visible = true;
+                    positionDetails.Visible = false;
+                }
+            }
+            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#empDetailsModal').modal({'show':true});", true);
         }
     }
 }
