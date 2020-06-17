@@ -61,19 +61,41 @@ namespace HR_LEAVEv2.Employee
                 if (Session["permissions"] == null)
                     Response.Redirect("~/AccessDenied.aspx");
 
+                /*~~~~~~~~~~~Files INITIALIZATION~~~~~~~~~~~~~~~*/
+
                 // used to maintain state for files after they have been uploaded but before the employee submits the LA
                 Session["uploadedFiles"] = null;
+                // no files currently uploaded
+                filesUploadedPanel.Visible = false;
+
+                /*~~~~~~~~~~~Files INITIALIZATION~~~~~~~~~~~~~~~*/
+
+
+
+                /*~~~~~~~~~~~Supervisor DDL INITIALIZATION~~~~~~~~~~~~~~~*/
 
                 // add parameters to Stored Procedure used to get all the relevant supervisors for an employee
                 supervisorDataSource.SelectParameters.Add("empId", Session["emp_id"].ToString());
-                filesUploadedPanel.Visible = false;
 
-                if(mode == "apply")
+                /*~~~~~~~~~~~Supervisor DDL INITIALIZATION~~~~~~~~~~~~~~~*/
+
+
+
+                /* 3 modes available:
+                 *      1. apply
+                 *      2. view
+                 *      3. edit
+                 **/      
+                if (mode == "apply")
                 {
+
+                    /*~~~~~~~~~~~Leave type DDL INITIALIZATION~~~~~~~~~~~~~~~*/
+
+                    // reset typeOfLeave ddl for new data
                     typeOfLeave.DataSource = null;
                     typeOfLeave.DataBind();
 
-                    // populate dropdown containing leave types
+                    // populate typeOfLeave ddl with relevant leave types
                     try
                     {
                         string sql = $@"
@@ -109,7 +131,11 @@ namespace HR_LEAVEv2.Employee
                     {
                         throw ex;
                     }
+                    /*~~~~~~~~~~~Leave type DDL INITIALIZATION~~~~~~~~~~~~~~~*/
 
+
+
+                    /*~~~~~~~~~~~Active Record of Employee applying for leave POPULATION~~~~~~~~~~~~~~~*/
 
                     // populate active record start date to ensure employee does not submit for leave before the start of their employment
                     DateTime activeRecordStartDate = DateTime.MinValue;
@@ -147,12 +173,21 @@ namespace HR_LEAVEv2.Employee
                         if (activeRecordStartDate != DateTime.MinValue)
                             ActiveRecordStartDate = activeRecordStartDate != null ? activeRecordStartDate.ToString("d/MM/yyyy") : string.Empty;
                     }
+                    /*~~~~~~~~~~~Active Record of Employee applying for leave POPULATION~~~~~~~~~~~~~~~*/
+
+
+
+                    /*~~~~~~~~~~~Page in Apply mode INITIALIZATION~~~~~~~~~~~~~~~*/
 
                     // display normal leave application form
                     this.adjustPageForApplyMode();
 
-                } else 
+                    /*~~~~~~~~~~~Page in Apply mode INITIALIZATION~~~~~~~~~~~~~~~*/
+
+                }
+                else 
                 {
+                    // id of leave application to either be edited or viewed
                     string leaveId = Request.QueryString["leaveId"];
 
                     // populates page and authorizes user based on: their permissions, whether the leave application was submitted to them as a supervisor or various HR criteria
@@ -176,6 +211,7 @@ namespace HR_LEAVEv2.Employee
                     
             }
 
+            // hides apply for leave page and shows disclaimer if employee is inactive
             if (mode == "apply")
             {
                 container.Visible = !util.isNullOrEmpty(ActiveRecordStartDate);
@@ -326,6 +362,7 @@ namespace HR_LEAVEv2.Employee
                         }
                     }
 
+                    // if type of leave is Casual then ensure employee cannot take more than 7 consecutive days leave
                     if (typeOfLeave.SelectedValue.Equals("Casual"))
                     {
                         if (getNumDaysBetween(start, end) > 7)
@@ -371,6 +408,7 @@ namespace HR_LEAVEv2.Employee
         {
             // returns a Boolean representing whether the type of leave selected is valid. The appropriate validation message is also constructed and 
             // shown to the user
+
             invalidLeaveTypePanel.Style.Add("display", "none");
             invalidLeaveTypeTxt.InnerText = string.Empty;
 
@@ -486,12 +524,12 @@ namespace HR_LEAVEv2.Employee
 
         protected int getNumDaysBetween(DateTime start, DateTime end)
         {
+            // gets the number of days being applied for and includes type of leave in this evaluation
             if(start != DateTime.MinValue && end != DateTime.MinValue)
             {
                 int numDays = 0;
                 // checks to see if the amt of days in between the start and the end is greater than 0, otherwise the value will be 0
                 numDays = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1) : 0;
-                //numDaysAppliedFor.Text = ((end - start).Days + 1) > 0 ? ((end - start).Days + 1).ToString() : "0";
 
                 // reduces the number of days applied for if holidays fall in between the leave period applied for
                 List<string> holidays = util.getHolidaysBetween(start, end);
@@ -511,6 +549,7 @@ namespace HR_LEAVEv2.Employee
         protected void populateDaysTaken()
         {
             // populates the value for the number of days applied for 
+
             DateTime start = DateTime.MinValue,
                     end = DateTime.MinValue;
 
@@ -530,6 +569,7 @@ namespace HR_LEAVEv2.Employee
         protected Boolean validateSupervisor(string supId)
         {
             // returns a Boolean representing whether the supervisor is valid (has an id that is not -1)
+
             invalidSupervisor.Style.Add("display", "none");
             if (supId == "-1")
                 invalidSupervisor.Style.Add("display", "inline-block");
@@ -1074,6 +1114,7 @@ namespace HR_LEAVEv2.Employee
 
                     if (mode == "apply")
                     {
+                        // hide file upload needed panel if shown
                         fileUploadNeededPanel.Style.Add("display", "none");
 
                         if (typeOfLeave.SelectedValue == "Sick")
@@ -1084,10 +1125,8 @@ namespace HR_LEAVEv2.Employee
                             // show disclaimer
                             submitHardCopyOfMedicalDisclaimerPanel.Style.Add("display", "inline-block");
                         }
-                        if(typeOfLeave.SelectedValue == "Casual")
-                        {
+                        else if(typeOfLeave.SelectedValue == "Casual")
                             moreThan7DaysConsecutiveCasualLeave.Style.Add("display", "none");
-                        }
 
                         validateLeave(typeOfLeave.SelectedValue);
                     }
@@ -1127,6 +1166,7 @@ namespace HR_LEAVEv2.Employee
             filesUploadedListView.DataBind();
 
             Session["uploadedFiles"] = null;
+
             if (mode == "apply")
             {
                 validateDates(txtFrom.Text, txtTo.Text);
@@ -1219,6 +1259,7 @@ namespace HR_LEAVEv2.Employee
                 }
                 else
                 {
+                    // no uploaded files left
                     clearAllFilesBtn.Visible = false;
 
                     Session["uploadedFiles"] = null;
@@ -1452,14 +1493,14 @@ namespace HR_LEAVEv2.Employee
 
         protected void sendNotifications()
         {
-            // sends both email and in application notifs to the relevant users
+            // sends both email and in application notifs to the relevant users when an employee submits a leave application
 
             Boolean isEmailNotifsSentSuccessfully = false,
                     isInAppNotifsSentSuccessfully = false;
 
             // send email notifications
 
-            // send email to supervisor to let them know an employee has submitted an email
+            // send email to supervisor to let them know an employee has submitted a LA
             // get supervisor's email in order to send then a message notifying them that an employee has submitted an application
             string supEmail = string.Empty;
 
@@ -1594,6 +1635,7 @@ namespace HR_LEAVEv2.Employee
         // EDIT MODE: LA EDITED
         protected void submitEditsBtn_Click(object sender, EventArgs e)
         {
+            // allows supervisor or HR to edit fields in an employee's LA including uploaded additional files
             Boolean isSupCommentsChanged = false,
                 isHrCommentsChanged = false,
                 isDaysTakenChanged = false,
@@ -1839,7 +1881,7 @@ namespace HR_LEAVEv2.Employee
 
         
         // METHODS FIRED WHEN FORM INPUTS CHANGE
-        protected void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        protected void supervisorSelect_SelectedIndexChanged(object sender, EventArgs e)
         {
             // validates supervisor whenever the user changes the supervisor value
             validateSupervisor(supervisorSelect.SelectedValue);

@@ -481,6 +481,42 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span8;
         
         /// <summary>
+        /// errorEditingApplicationPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel errorEditingApplicationPanel;
+        
+        /// <summary>
+        /// Span14 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span14;
+        
+        /// <summary>
+        /// Button3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button Button3;
+        
+        /// <summary>
+        /// refreshEditPageBtnErrMade control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button refreshEditPageBtnErrMade;
+        
+        /// <summary>
         /// successMsgPanel control.
         /// </summary>
         /// <remarks>
@@ -506,42 +542,6 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button submitAnotherLA;
-        
-        /// <summary>
-        /// noEditsMadePanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel noEditsMadePanel;
-        
-        /// <summary>
-        /// Span9 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span9;
-        
-        /// <summary>
-        /// Button2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button2;
-        
-        /// <summary>
-        /// refreshEditPageBtnNoEditsMade control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button refreshEditPageBtnNoEditsMade;
         
         /// <summary>
         /// successfulSubmitEditsMsgPanel control.
@@ -580,40 +580,40 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.Button refreshEditPageBtn;
         
         /// <summary>
-        /// errorEditingApplicationPanel control.
+        /// noEditsMadePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel errorEditingApplicationPanel;
+        protected global::System.Web.UI.WebControls.Panel noEditsMadePanel;
         
         /// <summary>
-        /// Span14 control.
+        /// Span9 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span14;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span9;
         
         /// <summary>
-        /// Button3 control.
+        /// Button2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button3;
+        protected global::System.Web.UI.WebControls.Button Button2;
         
         /// <summary>
-        /// refreshEditPageBtnErrMade control.
+        /// refreshEditPageBtnNoEditsMade control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button refreshEditPageBtnErrMade;
+        protected global::System.Web.UI.WebControls.Button refreshEditPageBtnNoEditsMade;
         
         /// <summary>
         /// statusPanel control.
@@ -832,13 +832,13 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.WebControls.LinkButton convertToPaidLeave;
         
         /// <summary>
-        /// UpdatePanel2 control.
+        /// convertToPaidLeaveUpdatePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanel2;
+        protected global::System.Web.UI.UpdatePanel convertToPaidLeaveUpdatePanel;
         
         /// <summary>
         /// filesNeededForConversionToPaidPanel control.
@@ -848,15 +848,6 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel filesNeededForConversionToPaidPanel;
-        
-        /// <summary>
-        /// Span16 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span16;
         
         /// <summary>
         /// supervisorSelectUserControlPanel control.
@@ -1102,13 +1093,13 @@ namespace HR_LEAVEv2.Employee {
         protected global::System.Web.UI.HtmlControls.HtmlTextArea hrCommentsTxt;
         
         /// <summary>
-        /// UpdatePanel1 control.
+        /// disclaimerUpdatePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
+        protected global::System.Web.UI.UpdatePanel disclaimerUpdatePanel;
         
         /// <summary>
         /// daysTakenDisclaimerPanel control.
@@ -1118,15 +1109,6 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel daysTakenDisclaimerPanel;
-        
-        /// <summary>
-        /// Span10 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span10;
         
         /// <summary>
         /// holidayInAppliedTimePeriodPanel control.
@@ -1154,15 +1136,6 @@ namespace HR_LEAVEv2.Employee {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel submitHardCopyOfMedicalDisclaimerPanel;
-        
-        /// <summary>
-        /// Span13 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span13;
         
         /// <summary>
         /// submitButtonPanel control.
