@@ -38,6 +38,31 @@ namespace HR_LEAVEv2.HR
             max_vacation_accumulation = 13
         };
 
+        private DataTable empRecordsDataSource
+        {
+            get { return ViewState["empRecordsDataSource"] != null ? ViewState["empRecordsDataSource"] as DataTable : null; } 
+            set { ViewState["empRecordsDataSource"] = value; }
+        }
+
+        private int recordBeingEdited
+        {
+            get { return ViewState["recordBeingEdited"] != null ? Convert.ToInt32(ViewState["recordBeingEdited"]) : -1; }
+            set { ViewState["recordBeingEdited"] = value; }
+        }
+
+        private List<string> previousRoles
+        {
+            get { return ViewState["previousRoles"] != null ? (List<string>)ViewState["previousRoles"] : null; }
+            set { ViewState["previousRoles"] = value; }
+        }
+        private Dictionary<string, string> previousLeaveBalances
+        {
+            get { return ViewState["previousLeaveBalances"] != null ? (Dictionary<string, string>)ViewState["previousLeaveBalances"] : null; }
+            set { ViewState["previousLeaveBalances"] = value; }
+        }
+
+
+        
         public bool isEditMode { get; set; }
 
         // used to check if user can view page 
@@ -57,7 +82,7 @@ namespace HR_LEAVEv2.HR
             if (!this.IsPostBack)
             {
 
-                ViewState["Gridview1_dataSource"] = null;
+                empRecordsDataSource = null;
                 if (Request.QueryString.HasKeys())
                 {
                     string mode = Request.QueryString["mode"];
@@ -86,8 +111,8 @@ namespace HR_LEAVEv2.HR
                                     if (util.isLeaveTypeWithoutBalance(dr.ItemArray[0].ToString()))
                                         dr.Delete();
                                 }
-                                ListView1.DataSource = dt;
-                                ListView1.DataBind();
+                                leaveBalancesListView.DataSource = dt;
+                                leaveBalancesListView.DataBind();
                             }
                         }
                     }
@@ -201,40 +226,40 @@ namespace HR_LEAVEv2.HR
         protected void bindGridview()
         {
             // sets data for gridview table
-            DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+            DataTable dt = empRecordsDataSource;
             if (dt != null)
             {
                 DataView dataView = dt.AsDataView();
                 dataView.Sort = "start_date DESC, actual_end_date ASC";
                 dt = dataView.ToTable();
 
-                ViewState["Gridview1_dataSource"] = dt;
-                GridView1.DataSource = dt;
-                GridView1.DataBind();
+                empRecordsDataSource = dt;
+                empRecordGridView.DataSource = dt;
+                empRecordGridView.DataBind();
             }
         }
 
-        protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        protected void empRecordGridView_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
-            GridView1.PageIndex = e.NewPageIndex;
+            empRecordGridView.PageIndex = e.NewPageIndex;
             this.bindGridview();
         }
 
-        protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        protected void empRecordGridView_RowDeleting(object sender, GridViewDeleteEventArgs e)
         {
-            DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+            DataTable dt = empRecordsDataSource;
             if (dt != null)
             {
                 // sets isChanged to 1
                 int indexOfRowInDt = e.RowIndex;
                 dt.Rows[indexOfRowInDt].SetField<string>((int)emp_records_columns.isChanged, "1");
-                ViewState["Gridview1_dataSource"] = dt;
+                empRecordsDataSource = dt;
 
             }
             this.bindGridview();
         }
 
-        protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+        protected void empRecordGridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             // Executes after data is bound for each row. This method is used to make changes as to what a user sees on the gridview based on the data in the table
 
@@ -266,25 +291,25 @@ namespace HR_LEAVEv2.HR
 
                 // hide end employment record button if actual_end_date is already populated
                 i = GetColumnIndexByName(e.Row, "actual_end_date");
-                LinkButton endEmpRecordBtn = (LinkButton)e.Row.FindControl("endEmpRecordBtn");
+                LinkButton endEmpRecordActionBtn = (LinkButton)e.Row.FindControl("endEmpRecordActionBtn");
                 if (!util.isNullOrEmpty(e.Row.Cells[i].Text.ToString()))
-                    endEmpRecordBtn.Visible = false;
+                    endEmpRecordActionBtn.Visible = false;
                 else
-                    endEmpRecordBtn.Visible = true;
+                    endEmpRecordActionBtn.Visible = true;
             }
         }
 
-        protected void GridView1_DataBound(object sender, EventArgs e)
+        protected void empRecordGridView_DataBound(object sender, EventArgs e)
         {
             // this function executes after all data is bound for the Gridview containing employment records
             // it checks to see if all rows are deleted (isChanged = 1)
             // if the above condition is true then it hides the header row of the gridview
-            if (GridView1.HeaderRow != null)
+            if (empRecordGridView.HeaderRow != null)
             {
                 bool isTableEmpty = true;
-                if (ViewState["Gridview1_dataSource"] != null)
+                if (empRecordsDataSource != null)
                 {
-                    DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+                    DataTable dt = empRecordsDataSource;
                     if (dt.Rows.Count > 0)
                     {
                         foreach (DataRow row in dt.Rows)
@@ -294,13 +319,13 @@ namespace HR_LEAVEv2.HR
                         }
                     }
                 }
-                GridView1.HeaderRow.Visible = !isTableEmpty;
+                empRecordGridView.HeaderRow.Visible = !isTableEmpty;
             }
 
 
         }
 
-        protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+        protected void empRecordGridView_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             // this method fires whenever an Action button is clicked in the Gridview
 
@@ -326,7 +351,7 @@ namespace HR_LEAVEv2.HR
                 clearErrors();
 
                 // check if record was being edited before
-                if (ViewState["record_being_edited"] != null)
+                if (recordBeingEdited != -1)
                 {
                     // if a record was being edited before and another record is clicked to be edited then remove the highlight from previously selected record
                     removeHighlightFromEditedRecord();
@@ -354,9 +379,9 @@ namespace HR_LEAVEv2.HR
 
                 // these search strings are neccessary since the FindByText method will not match ASCII characters. For eg. a single quote in any of the inputs (position,
                 // employment type or departmen would cause an error ). As such, these search strins must be sanitized for COVID-19
-                string posSearchString = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "pos_name")].Text.ToString(),
-                    emptypeSearchString = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "employment_type")].Text.ToString(),
-                    deptSearchString = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "dept_name")].Text.ToString();
+                string posSearchString = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "pos_name")].Text.ToString(),
+                    emptypeSearchString = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "employment_type")].Text.ToString(),
+                    deptSearchString = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "dept_name")].Text.ToString();
 
                 // sanitize search strings for any ASCII characters (and COVID-19) that may cause trouble with the FindByText function below
                 // such as single quote ('), double quote ("), open bracket and close bracket
@@ -374,11 +399,11 @@ namespace HR_LEAVEv2.HR
                 // position
                 positionList.Items.FindByText(posSearchString).Selected = true;
                 // start date
-                txtStartDate.Text = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "start_date")].Text.ToString();
+                txtStartDate.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "start_date")].Text.ToString();
                 // expected end date (if any)
-                txtEndDate.Text = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "expected_end_date")].Text.ToString();
+                txtEndDate.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "expected_end_date")].Text.ToString();
                 // actual end date (if any)
-                string actualEndDate = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "actual_end_date")].Text.ToString();
+                string actualEndDate = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "actual_end_date")].Text.ToString();
 
                 // show actual end date textbox if actual end date is populated
                 if (!util.isNullOrEmpty(actualEndDate))
@@ -388,16 +413,16 @@ namespace HR_LEAVEv2.HR
                 }
 
                 // annual vacation amt
-                annualAmtOfLeaveTxt.Text = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "annual_vacation_amt")].Text.ToString();
+                annualAmtOfLeaveTxt.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "annual_vacation_amt")].Text.ToString();
 
                 // max vacation accumulation possible
-                maxAmtOfLeaveTxt.Text = GridView1.Rows[index].Cells[GetColumnIndexByName(GridView1.Rows[index], "max_vacation_accumulation")].Text.ToString();
+                maxAmtOfLeaveTxt.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "max_vacation_accumulation")].Text.ToString();
 
                 // highlight row being edited
-                GridView1.Rows[index].CssClass = "highlighted-record";
+                empRecordGridView.Rows[index].CssClass = "highlighted-record";
 
                 // to be used when saving edits made to employment record to DataTable dt for Employment Records. User must still save all their changes
-                ViewState["record_being_edited"] = index;
+                recordBeingEdited = index;
             }
 
         }
@@ -552,11 +577,11 @@ namespace HR_LEAVEv2.HR
 
         protected void removeHighlightFromEditedRecord()
         {
-            if (ViewState["record_being_edited"] != null)
+            if (recordBeingEdited != -1)
             {
-                int index = Convert.ToInt32(ViewState["record_being_edited"].ToString());
-                GridView1.Rows[index].CssClass = GridView1.Rows[index].CssClass.Replace("highlighted-record", "");
-                ViewState["record_being_edited"] = null;
+                int index = Convert.ToInt32(recordBeingEdited.ToString());
+                empRecordGridView.Rows[index].CssClass = empRecordGridView.Rows[index].CssClass.Replace("highlighted-record", "");
+                recordBeingEdited = -1;
             }
         }
 
@@ -594,7 +619,7 @@ namespace HR_LEAVEv2.HR
             {
 
                 DataTable dt;
-                if (ViewState["Gridview1_dataSource"] == null)
+                if (empRecordsDataSource == null)
                 {
                     // if there is no pre-existing data table (no previous employment records), then create the columns for the new data table
                     dt = new DataTable();
@@ -615,7 +640,7 @@ namespace HR_LEAVEv2.HR
                 }
                 else
                     // get pre-existing data table
-                    dt = ViewState["Gridview1_dataSource"] as DataTable;
+                    dt = empRecordsDataSource;
 
                 isRecordAllowed = isRecordValid(startDate, string.Empty, -1, multipleActiveRecordsAddRecordPanel, startDateClashAddRecordPanel);
 
@@ -671,7 +696,7 @@ namespace HR_LEAVEv2.HR
                             else
                                 //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
                                 dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger", annualVacationLeaveAmt, maxVacationLeaveAmt);
-                            ViewState["Gridview1_dataSource"] = dt;
+                            empRecordsDataSource = dt;
                         }
                         else
                             invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
@@ -718,9 +743,9 @@ namespace HR_LEAVEv2.HR
 
             clearErrors();
 
-            if (ViewState["Gridview1_dataSource"] != null && Session["empRecordRowIndex"] != null)
+            if (empRecordsDataSource != null && Session["empRecordRowIndex"] != null)
             {
-                DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+                DataTable dt = empRecordsDataSource;
                 int indexInDt = Convert.ToInt32(Session["empRecordRowIndex"]);
 
                 string startDate = Convert.ToDateTime(dt.Rows[indexInDt][(int)emp_records_columns.start_date]).ToString("d/MM/yyyy");
@@ -749,7 +774,7 @@ namespace HR_LEAVEv2.HR
                             dt.Rows[indexInDt][(int)emp_records_columns.status_class] = "label-danger";
                         }
 
-                        ViewState["Gridview1_dataSource"] = dt;
+                        empRecordsDataSource = dt;
                         this.bindGridview();
 
                         // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for audit logs
@@ -810,7 +835,7 @@ namespace HR_LEAVEv2.HR
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
             // any other active records exist in order to validate the record.
 
-            if (ViewState["Gridview1_dataSource"] != null)
+            if (empRecordsDataSource != null)
             {
                 int numActiveRows = 0, currIndex = 0;
 
@@ -821,7 +846,7 @@ namespace HR_LEAVEv2.HR
                         proposedAED = !util.isNullOrEmpty(proposedEndDate) ? DateTime.ParseExact(proposedEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
 
 
-                DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+                DataTable dt = empRecordsDataSource;
                 foreach (DataRow dr in dt.Rows)
                 {
                     // once the record is not deleted and is not the record currently being edited (the record to which the proposed end date will belong to)
@@ -918,7 +943,7 @@ namespace HR_LEAVEv2.HR
             // edits the selected record
 
             clearErrors();
-            if (ViewState["record_being_edited"] != null)
+            if (recordBeingEdited != -1)
             {
 
                 // the values being proposed for edit. These may or may not have been changed so must be checked in order to know which to edit or not
@@ -942,11 +967,11 @@ namespace HR_LEAVEv2.HR
                 Boolean isAnnualAndMaxVacationAmtValidated = Convert.ToInt32(max_amt_of_vacation_accumulation) > Convert.ToInt32(annual_vacation_amt);
 
                 // index of record being edited
-                int index = Convert.ToInt32(ViewState["record_being_edited"].ToString());
+                int index = recordBeingEdited;
 
-                if (ViewState["Gridview1_dataSource"] != null)
+                if (empRecordsDataSource != null)
                 {
-                    DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+                    DataTable dt = empRecordsDataSource;
                     if (isStartAndExpectedEndDateValidated && isActualEndDateValidated && isAnnualAndMaxVacationAmtValidated)
                     {
                         // check if any values are changed and edit relevant values in datatable
@@ -1063,7 +1088,7 @@ namespace HR_LEAVEv2.HR
                                 {
                                     dt.Rows[index].SetField<string>((int)emp_records_columns.isChanged, "2");
 
-                                    ViewState["Gridview1_dataSource"] = dt;
+                                    empRecordsDataSource = dt;
                                     bindGridview();
 
                                     // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for adding audit log. 
@@ -1253,7 +1278,7 @@ namespace HR_LEAVEv2.HR
                         dataTable = new DataTable();
                         sqlDataAdapter.Fill(dataTable);
 
-                        ViewState["Gridview1_dataSource"] = dataTable;
+                        empRecordsDataSource = dataTable;
                         this.bindGridview();
                     }
                 }
@@ -1318,7 +1343,7 @@ namespace HR_LEAVEv2.HR
                             }
 
                             // store initial roles
-                            List<string> previousRoles = new List<string>();
+                            previousRoles = new List<string>();
                             if (supervisorCheck.Checked)
                                 previousRoles.Add("sup");
                             if (hr1Check.Checked)
@@ -1331,9 +1356,6 @@ namespace HR_LEAVEv2.HR
                                 previousRoles.Add("hr_contract");
                             if (publicServiceCheck.Checked)
                                 previousRoles.Add("hr_public_officer");
-
-
-                            ViewState["previousRoles"] = previousRoles;
                         }
                     }
                 }
@@ -1363,7 +1385,7 @@ namespace HR_LEAVEv2.HR
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             // store initial leave balances
-                            Dictionary<string, string> previousLeaveBalances = new Dictionary<string, string>();
+                            previousLeaveBalances = new Dictionary<string, string>();
 
                             while (reader.Read())
                             {
@@ -1381,7 +1403,6 @@ namespace HR_LEAVEv2.HR
                                 empNameHeader.InnerText = reader["employee_name"].ToString();
                             }
 
-                            ViewState["previousLeaveBalances"] = previousLeaveBalances;
                         }
                     }
                 }
@@ -1397,7 +1418,6 @@ namespace HR_LEAVEv2.HR
                 accPastLimitContainerPanel.Visible = true;
                 loadPreviouslyUploadedFiles(empId); // get employee file
             }
-                
             else
             {
                 accPastLimitContainerPanel.Visible = false;
@@ -1423,7 +1443,7 @@ namespace HR_LEAVEv2.HR
              * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
              * Authorizations
              *  -Deleting roles
-             *      Since the previous roles held by the employee is stored in ViewState["previousRoles"], the current roles being submitted to edit are used to find out which roles were deleted. As such,
+             *      Since the previous roles held by the employee is stored in previousRoles, the current roles being submitted to edit are used to find out which roles were deleted. As such,
              *     only those roles which were removed from the employee would actually be deleted. No extra calls to the db are made to delete roles which the employee did not have
              *  -Add Audit log for deleted roles
              *  -Adding roles
@@ -1468,7 +1488,7 @@ namespace HR_LEAVEv2.HR
             List<string> authorizations = new List<string>();
 
             //Employment Records
-            DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+            DataTable dt = empRecordsDataSource;
 
             // used to check whether any value is changed 
             Boolean isRolesChanged, isLeaveBalancesChanged, isEmpRecordChanged, isFilesChanged, isAccumulatePastLimitStatusChanged;
@@ -1507,15 +1527,15 @@ namespace HR_LEAVEv2.HR
                 List<string> deletedRoles = new List<string>();
 
                 // used to store the initial roles loaded when in edit mode. These are used to determine the edits made for auditing purposes
-                List<string> previousRoles = new List<string>();
-                if (ViewState["previousRoles"] != null)
-                    previousRoles = (List<string>)ViewState["previousRoles"];
-
-                foreach (string role in previousRoles)
+                if(previousRoles != null)
                 {
-                    if (!authorizations.Contains(role))
-                        deletedRoles.Add(role);
+                    foreach (string role in previousRoles)
+                    {
+                        if (!authorizations.Contains(role))
+                            deletedRoles.Add(role);
+                    }
                 }
+                
 
                 if (deletedRoles.Count > 0)
                 {
@@ -1561,11 +1581,16 @@ namespace HR_LEAVEv2.HR
                 // previous roles holds the employee's previous roles. The following code looks at the previous roles and checks which roles were added to the employee
                 // As such, addedRoles contains the list of all roles added to the employee that were not previously there
                 List<string> addedRoles = new List<string>();
-                foreach (string role in authorizations)
+
+                if(previousRoles != null)
                 {
-                    if (!previousRoles.Contains(role))
-                        addedRoles.Add(role);
+                    foreach (string role in authorizations)
+                    {
+                        if (!previousRoles.Contains(role))
+                            addedRoles.Add(role);
+                    }
                 }
+                
 
                 if (addedRoles.Count > 0)
                 {
@@ -1638,15 +1663,16 @@ namespace HR_LEAVEv2.HR
             Dictionary<string, string> editedLeaveBalances = new Dictionary<string, string>();
 
             // used to store the initial leave balances loaded when in edit mode. These are used to determine the edits made for auditing purposes
-            Dictionary<string, string> previousLeaveBalances = new Dictionary<string, string>();
-            if (ViewState["previousLeaveBalances"] != null)
-                previousLeaveBalances = (Dictionary<string, string>)ViewState["previousLeaveBalances"];
-
-            foreach (KeyValuePair<string, string> entry in previousLeaveBalances)
+            
+            if(previousLeaveBalances != null)
             {
-                if (currentLeaveBalances[entry.Key] != previousLeaveBalances[entry.Key])
-                    editedLeaveBalances[entry.Key] = currentLeaveBalances[entry.Key];
+                foreach (KeyValuePair<string, string> entry in previousLeaveBalances)
+                {
+                    if (currentLeaveBalances[entry.Key] != previousLeaveBalances[entry.Key])
+                        editedLeaveBalances[entry.Key] = currentLeaveBalances[entry.Key];
+                }
             }
+            
 
             if (editedLeaveBalances.Keys.Count > 0)
             {
@@ -2251,7 +2277,7 @@ namespace HR_LEAVEv2.HR
             }
 
             // Employment Records
-            DataTable dt = ViewState["Gridview1_dataSource"] as DataTable;
+            DataTable dt = empRecordsDataSource;
 
             Boolean isInsertSuccessful = false,
                 isDuplicateIdentifier = false;
@@ -2653,8 +2679,6 @@ namespace HR_LEAVEv2.HR
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            // store initial leave balances
-                            Dictionary<string, string> previousLeaveBalances = new Dictionary<string, string>();
 
                             string files = string.Empty,
                                    filesIds = string.Empty,
@@ -2878,7 +2902,7 @@ namespace HR_LEAVEv2.HR
         protected ListViewItem getSelectedLeaveBalanceListViewItem(string leaveType)
         {
             // get item 
-            foreach (ListViewItem item in ListView1.Items)
+            foreach (ListViewItem item in leaveBalancesListView.Items)
             {
                 HiddenField id = (HiddenField)item.FindControl("leaveTypeHiddenField");
                 if (id.Value == leaveType)

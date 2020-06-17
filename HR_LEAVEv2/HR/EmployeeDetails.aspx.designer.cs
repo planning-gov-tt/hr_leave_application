@@ -76,13 +76,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel validationRowPanel;
         
         /// <summary>
-        /// UpdatePanel2 control.
+        /// validationMessagesPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanel2;
+        protected global::System.Web.UI.UpdatePanel validationMessagesPanel;
         
         /// <summary>
         /// noChangesMadePanel control.
@@ -301,22 +301,22 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel empBasicInfoPanel;
         
         /// <summary>
-        /// RegularExpressionValidator11 control.
+        /// empIdRegExpValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator11;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator empIdRegExpValidator;
         
         /// <summary>
-        /// RequiredFieldValidator4 control.
+        /// empIdReqFieldValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator4;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator empIdReqFieldValidator;
         
         /// <summary>
         /// employeeIdInput control.
@@ -328,22 +328,22 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.TextBox employeeIdInput;
         
         /// <summary>
-        /// RegularExpressionValidator12 control.
+        /// ihrisIDRegExpValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator12;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator ihrisIDRegExpValidator;
         
         /// <summary>
-        /// RequiredFieldValidator5 control.
+        /// ihrisIdReqFieldValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator5;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator ihrisIdReqFieldValidator;
         
         /// <summary>
         /// ihrisNumInput control.
@@ -355,22 +355,22 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.TextBox ihrisNumInput;
         
         /// <summary>
-        /// RegularExpressionValidator13 control.
+        /// emailRegExpValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator13;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator emailRegExpValidator;
         
         /// <summary>
-        /// RequiredFieldValidator6 control.
+        /// emailReqFieldValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator6;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator emailReqFieldValidator;
         
         /// <summary>
         /// adEmailInput control.
@@ -481,22 +481,22 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.CheckBox publicServiceCheck;
         
         /// <summary>
-        /// ListView1 control.
+        /// leaveBalancesListView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ListView ListView1;
+        protected global::System.Web.UI.WebControls.ListView leaveBalancesListView;
         
         /// <summary>
-        /// UpdatePanel1 control.
+        /// empRecordUpdatePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
+        protected global::System.Web.UI.UpdatePanel empRecordUpdatePanel;
         
         /// <summary>
         /// addEmpRecordForm control.
@@ -517,13 +517,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.DropDownList empTypeList;
         
         /// <summary>
-        /// SqlDataSource3 control.
+        /// employmentTypeDataSource control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.SqlDataSource SqlDataSource3;
+        protected global::System.Web.UI.WebControls.SqlDataSource employmentTypeDataSource;
         
         /// <summary>
         /// deptList control.
@@ -535,13 +535,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.DropDownList deptList;
         
         /// <summary>
-        /// SqlDataSource2 control.
+        /// deptDataSource control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.SqlDataSource SqlDataSource2;
+        protected global::System.Web.UI.WebControls.SqlDataSource deptDataSource;
         
         /// <summary>
         /// positionList control.
@@ -553,13 +553,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.DropDownList positionList;
         
         /// <summary>
-        /// SqlDataSource1 control.
+        /// positionDataSource control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.SqlDataSource SqlDataSource1;
+        protected global::System.Web.UI.WebControls.SqlDataSource positionDataSource;
         
         /// <summary>
         /// txtStartDate control.
@@ -571,13 +571,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.TextBox txtStartDate;
         
         /// <summary>
-        /// CalendarExtender1 control.
+        /// startDateCalendarExtender control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::AjaxControlToolkit.CalendarExtender CalendarExtender1;
+        protected global::AjaxControlToolkit.CalendarExtender startDateCalendarExtender;
         
         /// <summary>
         /// startDateRequiredValidator control.
@@ -598,13 +598,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.TextBox txtEndDate;
         
         /// <summary>
-        /// CalendarExtender2 control.
+        /// expectedEndDateCalendarExtender control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::AjaxControlToolkit.CalendarExtender CalendarExtender2;
+        protected global::AjaxControlToolkit.CalendarExtender expectedEndDateCalendarExtender;
         
         /// <summary>
         /// endDateRequiredValidator control.
@@ -634,13 +634,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.TextBox txtActualEndDate;
         
         /// <summary>
-        /// CalendarExtender3 control.
+        /// actualEndDateCalendarExtender control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::AjaxControlToolkit.CalendarExtender CalendarExtender3;
+        protected global::AjaxControlToolkit.CalendarExtender actualEndDateCalendarExtender;
         
         /// <summary>
         /// annualAmtOfLeaveTxt control.
@@ -661,13 +661,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator annualAmtOfLeaveReqValidator;
         
         /// <summary>
-        /// RegularExpressionValidator1 control.
+        /// annualAmtOfLeaveRegExpValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator1;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator annualAmtOfLeaveRegExpValidator;
         
         /// <summary>
         /// maxAmtOfLeaveTxt control.
@@ -688,13 +688,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator maxAmtOfLeaveReqValidator;
         
         /// <summary>
-        /// RegularExpressionValidator2 control.
+        /// maxAmtOfLeaveRegExpValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator2;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator maxAmtOfLeaveRegExpValidator;
         
         /// <summary>
         /// invalidAnnualOrMaximumVacationLeaveAmtPanel control.
@@ -769,15 +769,6 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel startDateIsWeekendPanel;
         
         /// <summary>
-        /// Span19 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span19;
-        
-        /// <summary>
         /// endDateIsWeekendPanel control.
         /// </summary>
         /// <remarks>
@@ -787,31 +778,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel endDateIsWeekendPanel;
         
         /// <summary>
-        /// Span20 control.
+        /// recordEditEndDateBeforeStartDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span20;
-        
-        /// <summary>
-        /// duplicateRecordPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel duplicateRecordPanel;
-        
-        /// <summary>
-        /// Span17 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span17;
+        protected global::System.Web.UI.WebControls.Panel recordEditEndDateBeforeStartDate;
         
         /// <summary>
         /// recordEditEndDateInvalidPanel control.
@@ -832,13 +805,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel recordEditEndDateOnWeekend;
         
         /// <summary>
-        /// Span22 control.
+        /// duplicateRecordPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span22;
+        protected global::System.Web.UI.WebControls.Panel duplicateRecordPanel;
         
         /// <summary>
         /// startDateClashEditRecordPanel control.
@@ -850,15 +823,6 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel startDateClashEditRecordPanel;
         
         /// <summary>
-        /// Span26 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span26;
-        
-        /// <summary>
         /// employmentRecordClashPanel control.
         /// </summary>
         /// <remarks>
@@ -866,15 +830,6 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel employmentRecordClashPanel;
-        
-        /// <summary>
-        /// Span28 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span28;
         
         /// <summary>
         /// startDateClashAddRecordPanel control.
@@ -886,15 +841,6 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel startDateClashAddRecordPanel;
         
         /// <summary>
-        /// Span27 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span27;
-        
-        /// <summary>
         /// multipleActiveRecordsAddRecordPanel control.
         /// </summary>
         /// <remarks>
@@ -904,15 +850,6 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsAddRecordPanel;
         
         /// <summary>
-        /// Span25 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span25;
-        
-        /// <summary>
         /// multipleActiveRecordsEditRecordPanel control.
         /// </summary>
         /// <remarks>
@@ -920,33 +857,6 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsEditRecordPanel;
-        
-        /// <summary>
-        /// Span23 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span23;
-        
-        /// <summary>
-        /// recordEditEndDateBeforeStartDate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel recordEditEndDateBeforeStartDate;
-        
-        /// <summary>
-        /// noEditsToRecordsMade control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel noEditsToRecordsMade;
         
         /// <summary>
         /// editUnsuccessful control.
@@ -976,6 +886,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl editEmpRecordSuccTxt;
         
         /// <summary>
+        /// noEditsToRecordsMade control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noEditsToRecordsMade;
+        
+        /// <summary>
         /// cancelNewRecordBtn control.
         /// </summary>
         /// <remarks>
@@ -1003,13 +922,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.LinkButton editRecordBtn;
         
         /// <summary>
-        /// GridView1 control.
+        /// empRecordGridView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView GridView1;
+        protected global::System.Web.UI.WebControls.GridView empRecordGridView;
         
         /// <summary>
         /// addEmpRecordBtn control.
@@ -1264,13 +1183,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.LinkButton editBtn;
         
         /// <summary>
-        /// UpdatePanel3 control.
+        /// endEmpRecordUpdatePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanel3;
+        protected global::System.Web.UI.UpdatePanel endEmpRecordUpdatePanel;
         
         /// <summary>
         /// txtEmpRecordEndDate control.
@@ -1343,15 +1262,6 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsEndRecordPanel;
-        
-        /// <summary>
-        /// Span24 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span24;
         
         /// <summary>
         /// closeEndEmpRecordModalBtn control.
