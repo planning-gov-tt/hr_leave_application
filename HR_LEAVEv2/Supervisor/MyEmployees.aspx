@@ -58,7 +58,7 @@
                 </EmptyDataTemplate>
 
                 <EmptyItemTemplate>
-                    </td>
+                    <td />
                 </EmptyItemTemplate>
 
                 <GroupTemplate>

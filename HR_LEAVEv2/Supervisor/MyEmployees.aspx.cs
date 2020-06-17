@@ -1,5 +1,4 @@
 ﻿using HR_LEAVEv2.Classes;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -8,7 +7,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net.Mail;
 using System.Web;
-using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -17,6 +15,8 @@ namespace HR_LEAVEv2.Supervisor
     public partial class MyEmployees : System.Web.UI.Page
     {
         Util util = new Util();
+
+        // used to retrieve employee details for display in modal
         protected class EmpDetails
         {
             public string emp_id { get; set; }
@@ -45,6 +45,7 @@ namespace HR_LEAVEv2.Supervisor
             }
         }
 
+        // LISTVIEW METHODS _________________________________________________________________________________________
         protected void bindListView()
         {
             try
@@ -112,7 +113,10 @@ namespace HR_LEAVEv2.Supervisor
             // Rebind the employeesListView  
             bindListView();
         }
+        // END LISTVIEW METHODS _________________________________________________________________________________________
 
+        
+        // SEARCH METHODS _________________________________________________________________________________________
         protected void searchForEmployee(string searchStr)
         {
             try
@@ -165,7 +169,10 @@ namespace HR_LEAVEv2.Supervisor
         {
             searchForEmployee(searchTxtbox.Text);
         }
+        // END SEARCH METHODS _________________________________________________________________________________________
 
+
+        // OPEN DETAILS METHODS _________________________________________________________________________________________
         protected EmpDetails getEmpDetails(string emp_id)
         {
             /* returns EmpDetails object containing all the employee details. Since only active employees are shown, the top employment record will correspond to the most recent and relevant info
@@ -276,7 +283,30 @@ namespace HR_LEAVEv2.Supervisor
 
             return empDetails;
         }
+        protected void openDetailsBtn_Click(object sender, EventArgs e)
+        {
+            LinkButton lb = sender as LinkButton;
+            string empId = lb.Attributes["emp_id"].ToString();
 
+            // get details
+            EmpDetails details = getEmpDetails(empId);
+
+            if (details != null)
+            {
+                empNameDetails.InnerText = details.name;
+                empIdDetails.InnerText = details.emp_id;
+                ihrisIdDetails.InnerText = details.ihris_id;
+                emailDetails.InnerText = details.email;
+                leaveBalancesDetails.InnerHtml = details.leave_balances;
+                empPositionDetails.InnerText = details.position;
+                empTypeDetails.InnerText = details.employment_type;
+            }
+            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#empDetailsModal').modal({'show':true});", true);
+        }
+        // END OPEN DETAILS METHODS _________________________________________________________________________________________
+
+
+        // OPEN LEAVE LOGS _________________________________________________________________________________________
         protected void openLeaveLogsBtn_ServerClick(object sender, EventArgs e)
         {
             // opens employee's leave logs
@@ -285,7 +315,10 @@ namespace HR_LEAVEv2.Supervisor
             string empEmail = lb.Attributes["empEmail"].ToString();
             Response.Redirect($"~/Supervisor/MyEmployeeLeaveApplications?empEmail={empEmail}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
         }
+        // END OPEN LEAVE LOGS _________________________________________________________________________________________
 
+
+        // REMIND EMPLOYEE TO SUBMIT LEAVE METHODS _________________________________________________________________________________________
         protected void clearSubmitAlertValidationErrors()
         {
             invalidStartDatePanel.Style.Add("display", "none");
@@ -454,26 +487,8 @@ namespace HR_LEAVEv2.Supervisor
             else
                 unsuccessfulAlert.Style.Add("display", "inline-block");
         }
+        // END REMIND EMPLOYEE TO SUBMIT LEAVE METHODS _________________________________________________________________________________________
 
-        protected void openDetailsBtn_Click(object sender, EventArgs e)
-        {
-            LinkButton lb = sender as LinkButton;
-            string empId = lb.Attributes["emp_id"].ToString();
 
-            // get details
-            EmpDetails details = getEmpDetails(empId);
-
-            if (details != null)
-            {
-                empNameDetails.InnerText = details.name;
-                empIdDetails.InnerText = details.emp_id;
-                ihrisIdDetails.InnerText = details.ihris_id;
-                emailDetails.InnerText = details.email;
-                leaveBalancesDetails.InnerHtml = details.leave_balances;
-                empPositionDetails.InnerText = details.position;
-                empTypeDetails.InnerText = details.employment_type;
-            }
-            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#empDetailsModal').modal({'show':true});", true);
-        }
     }
 }
