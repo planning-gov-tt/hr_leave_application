@@ -1,12 +1,10 @@
 ﻿using HR_LEAVEv2.Classes;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web;
-using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -16,6 +14,8 @@ namespace HR_LEAVEv2.HR
     {
         
         List<string> permissions = null;
+
+        // used to retrieve employee details for display in modal
         protected class EmpDetails
         {
             public char isCompleteRecord { get; set; }
@@ -53,6 +53,7 @@ namespace HR_LEAVEv2.HR
             }
         }
 
+        // LISTVIEW METHODS _________________________________________________________________________________________
         protected void bindListView()
         {
             try
@@ -198,7 +199,10 @@ namespace HR_LEAVEv2.HR
             // Rebind the employeesListView  
             bindListView();
         }
+        // END LISTVIEW METHODS _________________________________________________________________________________________
 
+
+        // SEARCH METHODS _________________________________________________________________________________________
         protected void searchForEmployee(string searchStr)
         {
             try
@@ -247,12 +251,12 @@ namespace HR_LEAVEv2.HR
                 }
                 else
                 {
-                    string emp_type = string.Empty;
+                    List<string> emp_type = new List<string>();
                     // HR 2 and HR 3
                     if (permissions.Contains("contract_permissions"))
-                        emp_type = "Contract";
-                    else if (permissions.Contains("public_officer_permissions"))
-                        emp_type = "Public Service";
+                        emp_type.Add("Contract");
+                    if (permissions.Contains("public_officer_permissions"))
+                        emp_type.Add("Public Service");
 
                     if (ViewState["viewActive"] != null)
                     {
@@ -277,7 +281,7 @@ namespace HR_LEAVEv2.HR
                             JOIN employeeposition ep
                             ON ep.employee_id = e.employee_id
                             WHERE e.employee_id <> {Session["emp_id"].ToString()} 
-                                AND ep.employment_type='{emp_type}'
+                                AND ep.employment_type IN ({String.Join(", ", emp_type.ToArray())})
                                 AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
                                 AND e.employee_id {isActive} 
                                 (
@@ -320,7 +324,31 @@ namespace HR_LEAVEv2.HR
         {
             searchForEmployee(searchTxtbox.Text);
         }
+        // END SEARCH METHODS _________________________________________________________________________________________
 
+
+        // ADD NEW EMPLOYEE _________________________________________________________________________________________
+        protected void newEmployeeBtn_Click(object sender, EventArgs e)
+        {
+            // redirects to create new employee page
+            Response.Redirect("~/HR/EmployeeDetails.aspx?mode=create");
+        }
+        // END ADD NEW EMPLOYEE _________________________________________________________________________________________
+
+
+        // CHANGE EMPLOYEES TO VIEW (INACTIVE OR ACTIVE)_________________________________________________________________________________________
+        protected void employeeStatusDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // change the type of employees to view, Active or Inactive
+            Session["viewForAllEmployees"] = employeeStatusDropDown.SelectedValue;
+            ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
+            employeesDataPager.SetPageProperties(0, 8, false);
+            bindListView();
+        }
+        // END CHANGE EMPLOYEES TO VIEW (INACTIVE OR ACTIVE)_________________________________________________________________________________________
+
+
+        // EMPLOYEE DETAILS METHODS_________________________________________________________________________________________
         protected EmpDetails getEmpDetails(string emp_id)
         {
             /* returns EmpDetails object containing all the employee details. Returns data including Employee Position and Employee Employment type but if the data is not available
@@ -517,31 +545,6 @@ namespace HR_LEAVEv2.HR
 
             return empDetails;
         }
-
-        protected void newEmployeeBtn_Click(object sender, EventArgs e)
-        {
-            // redirects to create new employee page
-            Response.Redirect("~/HR/EmployeeDetails.aspx?mode=create");
-        }
-
-        protected void employeeStatusDropDown_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // change the type of employees to view, Active or Inactive
-            Session["viewForAllEmployees"] = employeeStatusDropDown.SelectedValue;
-            ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
-            employeesDataPager.SetPageProperties(0, 8, false);
-            bindListView();
-        }
-
-        protected void openLeaveLogsBtn_Click(object sender, EventArgs e)
-        {
-            // opens employee's leave logs
-
-            LinkButton lb = sender as LinkButton;
-            string empEmail = lb.Attributes["empEmail"].ToString();
-            Response.Redirect($"~/HR/AllEmployeeLeaveApplications?empEmail={empEmail}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
-        }
-
         protected void openDetailsBtn_Click(object sender, EventArgs e)
         {
             // populate modal and show employee details
@@ -552,21 +555,21 @@ namespace HR_LEAVEv2.HR
             // get details
             EmpDetails details = getEmpDetails(empId);
 
-            if(details != null)
+            if (details != null)
             {
                 empNameDetails.InnerText = details.name;
                 empIdDetails.InnerText = details.emp_id;
                 ihrisIdDetails.InnerText = details.ihris_id;
                 emailDetails.InnerText = details.email;
                 leaveBalancesDetails.InnerHtml = details.leave_balances;
-                if(details.isCompleteRecord == '1')
+                if (details.isCompleteRecord == '1')
                 {
                     errorPanel.Visible = false;
                     positionDetails.Visible = true;
                     empPositionDetails.InnerText = details.position;
                     empTypeDetails.InnerText = details.employment_type;
                 }
-                else if(details.isCompleteRecord == '0')
+                else if (details.isCompleteRecord == '0')
                 {
                     errorPanel.Visible = true;
                     positionDetails.Visible = false;
@@ -574,5 +577,20 @@ namespace HR_LEAVEv2.HR
             }
             ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#empDetailsModal').modal({'show':true});", true);
         }
+        // END EMPLOYEE DETAILS METHODS_________________________________________________________________________________________
+
+
+        // OPEN LEAVE LOGS_________________________________________________________________________________________
+        protected void openLeaveLogsBtn_Click(object sender, EventArgs e)
+        {
+            // opens employee's leave logs
+
+            LinkButton lb = sender as LinkButton;
+            string empEmail = lb.Attributes["empEmail"].ToString();
+            Response.Redirect($"~/HR/AllEmployeeLeaveApplications?empEmail={empEmail}&returnUrl={HttpContext.Current.Request.Url.PathAndQuery}");
+        }
+        // END OPEN LEAVE LOGS_________________________________________________________________________________________
+
+
     }
 }
