@@ -124,12 +124,14 @@ namespace HR_LEAVEv2.HR
                     // the following sql ensures that out of all an employees employment records, only the most recent one (the most recently ended) is considered for if the employee can be accessed
                     // by the current HR.
 
+                    /* Partition and row_number is used to separate the data by employee id since employeeposition table can have multiple records from the same employee. After separating the data by employee, the employment 
+                     * records are ordered by actual end date, effectively creating a sorted list with the most recent record at row number = 1. This will allow HR to be able to view the relevant employees 
+                     * (Contract or Public Service) regardless of whether they are active or not.
+                     */
                     sql = $@"
                         SELECT *
                         FROM(
                             SELECT
-                                -- partition is used to get only the topmost row in employment records whether active or not. This is so
-                                -- inactive employees can be seen by the appropriate HR employees
                                 ROW_NUMBER() OVER(PARTITION BY ep.employee_id ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum,
                                 e.employee_id, 
                                 e.ihris_id, 
