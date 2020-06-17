@@ -72,7 +72,7 @@
 
         </asp:ListView>
 
-        <asp:DataPager ID="DataPager1" PagedControlID="notificationsListView" PageSize="10" runat="server" >
+        <asp:DataPager ID="notificationsDataPager" PagedControlID="notificationsListView" PageSize="10" runat="server" >
             <Fields>
                 <asp:NumericPagerField ButtonType="Link" />
             </Fields>

@@ -44,7 +44,7 @@ namespace HR_LEAVEv2.HR
                 if (Session["viewForAllEmployees"] != null)
                 {
                     employeeStatusDropDown.SelectedValue = Session["viewForAllEmployees"].ToString();
-                    DataPager1.SetPageProperties(0, 8, false);
+                    employeesDataPager.SetPageProperties(0, 8, false);
                 }
 
                 ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
@@ -179,8 +179,8 @@ namespace HR_LEAVEv2.HR
                         DataTable dt = new DataTable();
                         ad.Fill(dt);
 
-                        ListView1.DataSource = dt;
-                        ListView1.DataBind();
+                        employeesListView.DataSource = dt;
+                        employeesListView.DataBind();
                     }
                 }
             }
@@ -190,11 +190,11 @@ namespace HR_LEAVEv2.HR
             }
         }
 
-        protected void ListView1_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
+        protected void employeesListView_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
         {
             // set current page startindex,max rows and rebind to false  
-            DataPager1.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
-            // Rebind the ListView1  
+            employeesDataPager.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
+            // Rebind the employeesListView  
             bindListView();
         }
 
@@ -299,8 +299,8 @@ namespace HR_LEAVEv2.HR
 
                         DataTable dt = new DataTable();
                         ad.Fill(dt);
-                        ListView1.DataSource = dt;
-                        ListView1.DataBind();
+                        employeesListView.DataSource = dt;
+                        employeesListView.DataBind();
                     }
                 }
             }
@@ -483,7 +483,7 @@ namespace HR_LEAVEv2.HR
             // change the type of employees to view, Active or Inactive
             Session["viewForAllEmployees"] = employeeStatusDropDown.SelectedValue;
             ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
-            DataPager1.SetPageProperties(0, 8, false);
+            employeesDataPager.SetPageProperties(0, 8, false);
             bindListView();
         }
 

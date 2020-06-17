@@ -13,13 +13,13 @@ namespace HR_LEAVEv2.HR {
     public partial class AllEmployees {
         
         /// <summary>
-        /// Panel1 control.
+        /// searchBarPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel Panel1;
+        protected global::System.Web.UI.WebControls.Panel searchBarPanel;
         
         /// <summary>
         /// searchTxtbox control.
@@ -40,13 +40,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.LinkButton searchBtn;
         
         /// <summary>
-        /// LinkButton1 control.
+        /// addNewEmployeeBtn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton LinkButton1;
+        protected global::System.Web.UI.WebControls.LinkButton addNewEmployeeBtn;
         
         /// <summary>
         /// employeeStatusDropDown control.
@@ -58,21 +58,21 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.DropDownList employeeStatusDropDown;
         
         /// <summary>
-        /// ListView1 control.
+        /// employeesListView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ListView ListView1;
+        protected global::System.Web.UI.WebControls.ListView employeesListView;
         
         /// <summary>
-        /// DataPager1 control.
+        /// employeesDataPager control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DataPager DataPager1;
+        protected global::System.Web.UI.WebControls.DataPager employeesDataPager;
     }
 }

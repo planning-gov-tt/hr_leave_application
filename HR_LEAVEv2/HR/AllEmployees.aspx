@@ -15,7 +15,7 @@
             <div class="row text-center" style="margin-top: 20px;">
 
                 <%--Search bar--%>
-                <asp:Panel ID="Panel1" runat="server" DefaultButton="searchBtn" CssClass="input-group" Width="510px" Style="margin: 0 auto;">
+                <asp:Panel ID="searchBarPanel" runat="server" DefaultButton="searchBtn" CssClass="input-group" Width="510px" Style="margin: 0 auto;">
                     <asp:TextBox ID="searchTxtbox" runat="server" CssClass="form-control" placeholder="Search Employee" aria-label="Search Employee" aria-describedby="basic-addon2" OnTextChanged="searchTxtbox_TextChanged"></asp:TextBox>
                     <div class="input-group-addon">
                         <asp:LinkButton ID="searchBtn" runat="server" OnClick="searchBtn_Click">
@@ -26,12 +26,14 @@
                     </div>
                 </asp:Panel>
 
+                <%--Clear Search Btn--%>
                 <button id="clearSearchBtn" class="btn btn-primary" style="display: none; margin-top: 15px; margin-right: 5px;">
                     <i class="fa fa-times"></i>
                     Clear Search
                 </button>
 
-                <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-primary" OnClick="newEmployeeBtn_Click" Style="margin-top: 15px; margin-right:5px;">
+                <%--Add new Employee Btn--%>
+                <asp:LinkButton ID="addNewEmployeeBtn" runat="server" CssClass="btn btn-primary" OnClick="newEmployeeBtn_Click" Style="margin-top: 15px; margin-right:5px;">
                     <i class="fa fa-plus"></i>
                     Add new Employee
                 </asp:LinkButton>
@@ -48,7 +50,7 @@
 
         <div class="container" style="margin-top: 30px;">
 
-            <asp:ListView ID="ListView1" runat="server" OnPagePropertiesChanging="ListView1_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;">
+            <asp:ListView ID="employeesListView" runat="server" OnPagePropertiesChanging="employeesListView_PagePropertiesChanging" GroupItemCount="4" Style="height: 85%;">
                 <EmptyDataTemplate>
                     <div class="alert alert-info text-center" role="alert" style="width: 30%; margin: auto">
                         <i class="fa fa-info-circle"></i>
@@ -128,85 +130,12 @@
                                     </button>
                                 </a>
 
-                                
-
                             </div>
 
                         </div>
 
                     </td>
                 </ItemTemplate>
-
-                <AlternatingItemTemplate>
-                    <td align="center">
-
-                        <div class="custom-card" style="margin-left: 20px; margin-right: 20px; position: relative;">
-
-                            <%--employee icon--%>
-                            <div class="custom-card-header"><i class="fa fa-user-circle custom-no-dp-header-icon"></i></div>
-
-                            <%--employee name--%>
-                            <h4 style="margin-top: 10px; margin-bottom:0px;">
-                                <strong><asp:Label runat="server" ID="Label2" Text='<%#Eval("Name") %>'></asp:Label></strong>
-                            </h4>
-
-                            <%--employee details--%>
-                            <div class="custom-card-body">
-
-                                <%--badge showing whether employee is active or inactive--%>
-                                <div class='<%#Eval("bootstrapClass") %>'><%#Eval("isActive") %></div>
-
-                                <%--employee ID--%>
-                                <div>
-                                    <h5 style="display: inline;" class="custom-card-body-header-text">Employee ID:</h5>
-                                    <asp:Label runat="server" ID="Label3" Text='<%#Eval("employee_id") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </div>
-
-                                <%--IHRIS ID--%>
-                                <div>
-                                    <h5 style="display: inline;" class="custom-card-body-header-text">IHRIS ID:</h5>
-                                    <asp:Label runat="server" ID="Label5" Text='<%#Eval("ihris_id") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </div>
-
-                                <%--email--%>
-                                <div>
-                                    <h5 class="custom-card-body-header-text">Email:</h5>
-                                    <asp:Label runat="server" ID="Label6" Text='<%#Eval("email") %>' CssClass="custom-card-body-text"></asp:Label>
-                                </div>
-
-                            </div>
-
-                            <div class="custom-card-footer">
-
-                                <%--button to show employee details--%>
-                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Details">
-                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-primary show-details-btn" data-toggle="modal" data-target="#empDetailsModal">
-                                        <i class="fa fa-address-card-o" aria-hidden="true"></i>
-                                    </button>
-                                </span>
-
-                                <%--button to go to employee's leave logs--%>
-                                <span class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Open Leave Logs">
-                                    <asp:LinkButton ID="openLeaveLogsBtn" empEmail='<%#Eval("email") %>' class="btn btn-primary" runat="server" OnClick="openLeaveLogsBtn_Click" style="margin-left: 5px;">
-                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
-                                    </asp:LinkButton>
-                                </span>
-
-                                <%--button to edit employee--%>
-                                <a href="EmployeeDetails.aspx?mode=edit&empId=<%#Eval("employee_id") %>" class="content-tooltipped" data-toggle="tooltip" data-placement="top" title="Edit">
-                                    <button emp_id='<%#Eval("employee_id") %>' type="button" class="btn btn-warning edit-employee-btn" style="margin-left: 5px; color: black;">
-                                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                                    </button>
-                                </a>
-
-                                
-
-                            </div>
-
-                        </div>
-
-                    </td>
-                </AlternatingItemTemplate>
 
                 <LayoutTemplate>
                     <table style="width: 100%;">
@@ -228,7 +157,7 @@
 
             </asp:ListView>
 
-            <asp:DataPager ID="DataPager1" PagedControlID="ListView1" PageSize="8" runat="server">
+            <asp:DataPager ID="employeesDataPager" PagedControlID="employeesListView" PageSize="8" runat="server">
                 <Fields>
                     <asp:NumericPagerField ButtonType="Link" />
                 </Fields>

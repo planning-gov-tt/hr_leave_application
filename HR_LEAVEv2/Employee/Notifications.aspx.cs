@@ -79,7 +79,7 @@ namespace HR_LEAVEv2.Employee
         protected void notificationsListView_PagePropertiesChanging(object sender, PagePropertiesChangingEventArgs e)
         {
             // set current page startindex, max rows and rebind to false  
-            DataPager1.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
+            notificationsDataPager.SetPageProperties(e.StartRowIndex, e.MaximumRows, false);
             // Rebind the notificationsListView  
             bindListView();
         }
