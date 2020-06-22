@@ -261,54 +261,61 @@
                                     </asp:Panel>
 
                                     <div style="margin-top: 15px">
-                                        <asp:Panel ID="invalidStartDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                        <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                                        <asp:Panel ID="invalidStartDatePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>Start date is not valid</span>
                                         </asp:Panel>
 
-                                        <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                                        <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span id="startDateIsHolidayTxt" runat="server"></span>
                                         </asp:Panel>
 
-                                        <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px 5px;" role="alert">
+                                        <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span id="endDateIsHolidayTxt" runat="server"></span>
                                         </asp:Panel>
 
-                                        <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                        <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>Start date is on the weekend</span>
                                         </asp:Panel>
 
-                                        <asp:Panel ID="invalidEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                        <asp:Panel ID="invalidEndDatePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>End date is not valid</span>
                                         </asp:Panel>
 
-                                        <asp:Panel ID="endDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                        <asp:Panel ID="endDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>End date is on the weekend</span>
                                         </asp:Panel>
-                                        <asp:Panel ID="dateComparisonPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                                        <asp:Panel ID="dateComparisonPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>End date cannot be before start date</span>
                                         </asp:Panel>
+                                        <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
-                                        <asp:Panel ID="successfulAlert" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
+
+                                        <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS MESSAGE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                                        <asp:Panel ID="successfulAlert" runat="server" CssClass="row alert alert-success validation-msg" role="alert">
                                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                                             <span>Successfully submitted alert</span>
                                         </asp:Panel>
+                                        <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS MESSAGE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
-                                         <asp:Panel ID="unsuccessfulEmailAlertPanel" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                                        <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FAILURE MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                                         <asp:Panel ID="unsuccessfulEmailAlertPanel" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>Email alert could not be sent</span>
                                         </asp:Panel>
 
-                                        <asp:Panel ID="unsuccessfulAlert" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 0px 5px;" role="alert">
+                                        <asp:Panel ID="unsuccessfulAlert" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                             <span>Alert could not be submitted</span>
                                         </asp:Panel>
+                                        <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FAILURE MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
 
                                     </div>
