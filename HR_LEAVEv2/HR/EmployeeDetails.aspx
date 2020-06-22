@@ -597,42 +597,42 @@
 
 
                                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                                <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="invalidEndDateValidationMsg" runat="server">Expected end date is not valid</span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span id="dateComparisonValidationMsg" runat="server">Expected end date cannot precede start date</span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>Start date is on the weekend</span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="endDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="endDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>Expected end date is on the weekend</span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="recordEditEndDateBeforeStartDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="recordEditEndDateBeforeStartDate" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>Actual end date cannot be before start date</span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="recordEditEndDateInvalidPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="recordEditEndDateInvalidPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>Actual end date is not valid</span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="recordEditEndDateOnWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="recordEditEndDateOnWeekend" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>Actual end date is on the weekend</span>
                                 </asp:Panel>
@@ -640,20 +640,20 @@
 
 
                                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORD VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                                <asp:Panel ID="duplicateRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="duplicateRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>Cannot add duplicate record</span>
                                 </asp:Panel>
                                 
 
-                                <asp:Panel ID="startDateClashEditRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="startDateClashEditRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
                                         Record not edited since the current employment record's start date falls within the time period of another employment record
                                     </span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="employmentRecordClashPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="employmentRecordClashPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
                                         Record not edited since the edit would result in a clash between employment records. This means that the edit causes more than one employment
@@ -661,7 +661,7 @@
                                     </span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="startDateClashAddRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="startDateClashAddRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
                                         Record not added since the current employment record's period would result in an overlap with another employment record. Employment records must be non
@@ -669,7 +669,7 @@
                                     </span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="multipleActiveRecordsAddRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="multipleActiveRecordsAddRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
                                         Record not added since this would result in two employment records being marked active simultaneously. Edit employment records accordingly 
@@ -677,7 +677,7 @@
                                     </span>
                                 </asp:Panel>
 
-                                <asp:Panel ID="multipleActiveRecordsEditRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="multipleActiveRecordsEditRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
                                         Actual end date not edited since the date entered would result in two employment records being marked active simultaneously. Edit employment records accordingly 
@@ -688,7 +688,7 @@
                                 
 
                                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FAILURE MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                                <asp:Panel ID="editUnsuccessful" runat="server" CssClass="row alert alert-danger" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="editUnsuccessful" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>Edits could not be made</span>
                                 </asp:Panel>
@@ -696,7 +696,7 @@
 
 
                                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                                <asp:Panel ID="editEmploymentRecordSuccessful" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="editEmploymentRecordSuccessful" runat="server" CssClass="row alert alert-success validation-msg" role="alert">
                                     <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                                     <span id="editEmpRecordSuccTxt" runat="server"></span>
                                 </asp:Panel>
@@ -704,7 +704,7 @@
 
 
                                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NO EDITS MADE MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                                <asp:Panel ID="noEditsToRecordsMade" runat="server" CssClass="row alert alert-info" Style="display: none; margin: 5px;" role="alert">
+                                <asp:Panel ID="noEditsToRecordsMade" runat="server" CssClass="row alert alert-info validation-msg" role="alert">
                                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                                     <span>No Edits made</span>
                                 </asp:Panel>
@@ -932,24 +932,24 @@
             </asp:Panel>
         </asp:Panel>
 
-        <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server" Style="text-align:center;">
+        <asp:UpdatePanel ID="filesUpdatePanel" runat="server" Style="text-align:center;">
             <ContentTemplate>
-                <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="duplicateFileNameTxt" runat="server">File name already exists</span>
                 </asp:Panel>
 
-                <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
                 </asp:Panel>
 
-                <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
                 </asp:Panel>
 
-                <asp:Panel ID="noFileUploaded" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="noFileUploaded" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span>No file was uploaded</span>
                 </asp:Panel>
@@ -998,24 +998,27 @@
                                 </div>
                             </div>
 
-                            <asp:Panel ID="invalidEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                            <asp:Panel ID="invalidEndDatePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>End date is not valid</span>
                             </asp:Panel>
-                            <asp:Panel ID="emptyEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+
+                            <asp:Panel ID="emptyEndDatePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>No end date is entered</span>
                             </asp:Panel>
-                            <asp:Panel ID="actualEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
-                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                    <span id="Span21" runat="server">Actual end date is on the weekend</span>
-                                </asp:Panel>
-                            <asp:Panel ID="endDateBeforeStartDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+
+                            <asp:Panel ID="actualEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span>Actual end date is on the weekend</span>
+                            </asp:Panel>
+
+                            <asp:Panel ID="endDateBeforeStartDatePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>End date cannot be before start date</span>
                             </asp:Panel>
 
-                            <asp:Panel ID="multipleActiveRecordsEndRecordPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                            <asp:Panel ID="multipleActiveRecordsEndRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span>
                                     Actual end date not edited since the date entered would result in two employment records being marked active simultaneously. Edit employment records accordingly 

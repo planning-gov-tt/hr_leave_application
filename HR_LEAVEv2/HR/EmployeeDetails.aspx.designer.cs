@@ -1084,13 +1084,13 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.ListView filesUploadedListView;
         
         /// <summary>
-        /// applyModeFeedbackUpdatePanel control.
+        /// filesUpdatePanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel applyModeFeedbackUpdatePanel;
+        protected global::System.Web.UI.UpdatePanel filesUpdatePanel;
         
         /// <summary>
         /// duplicateFileNamesPanel control.
@@ -1244,15 +1244,6 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel actualEndDateIsWeekendPanel;
-        
-        /// <summary>
-        /// Span21 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl Span21;
         
         /// <summary>
         /// endDateBeforeStartDatePanel control.

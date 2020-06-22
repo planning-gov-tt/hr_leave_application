@@ -1492,8 +1492,8 @@ namespace HR_LEAVEv2.HR
             DataTable dt = empRecordsDataSource;
 
             // used to check whether any value is changed 
-            Boolean isRolesChanged, isLeaveBalancesChanged, isEmpRecordChanged, isFilesChanged, isAccumulatePastLimitStatusChanged;
-            isRolesChanged = isLeaveBalancesChanged = isEmpRecordChanged = isFilesChanged = isAccumulatePastLimitStatusChanged = false;
+            Boolean isRolesChanged, isLeaveBalancesChanged, isEmpRecordChanged, isFilesChanged, isAccumulatePastLimitStatusChangedInDb;
+            isRolesChanged = isLeaveBalancesChanged = isEmpRecordChanged = isFilesChanged = isAccumulatePastLimitStatusChangedInDb = false;
 
             // used to check if there was any error in changing values
             Boolean isRolesEditSuccessful, isLeaveEditSuccessful, isEmpRecordEditSuccessful, isEmpRecordDeleteSuccessful, isEmpRecordInsertSuccessful, isEmpRecordEditFieldsSuccessful, isFileUploadSuccessful, isAccumulatePastLimitSuccessful;
@@ -2109,7 +2109,7 @@ namespace HR_LEAVEv2.HR
                             if (isAccumulatePastLimitSuccessful)
                             {
                                 util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), "Employee can now accumulate past their limit");
-                                isAccumulatePastLimitStatusChanged = true;
+                                isAccumulatePastLimitStatusChangedInDb = true;
                             }
                         }
 
@@ -2123,14 +2123,15 @@ namespace HR_LEAVEv2.HR
             // END ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
 
             // reset page so it is ready for new edits
+            Boolean isAccumulatePastLimitStatusChangedOnScreen = chkOnOff.Checked != Convert.ToBoolean(ViewState["prevAccPastLimitStatus"]);
             populatePage(empId);
             hideEmploymentRecordForm();
 
             // USER FEEDBACK--------------------------------------------------------------------------------------------------------------------------
-            if (!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged && !isFilesChanged && !isAccumulatePastLimitStatusChanged)
+            if (!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged && !isFilesChanged && !isAccumulatePastLimitStatusChangedInDb)
             {
                 noChangesMadePanel.Style.Add("display", "inline-block");
-                if (!isAccumulatePastLimitStatusChanged && !isFilesChanged)
+                if (!isAccumulatePastLimitStatusChangedInDb && !isFilesChanged && isAccumulatePastLimitStatusChangedOnScreen)
                 {
                     noChangesMadeToAccStatus.Style.Add("display", "inline-block");
                 }
@@ -2140,7 +2141,7 @@ namespace HR_LEAVEv2.HR
                 // SUCCESS MESSAGES---------------------------------------------------------------
 
                 // general success message
-                if ((isRolesChanged && isLeaveBalancesChanged && isEmpRecordChanged && isFilesChanged && isAccumulatePastLimitStatusChanged) && (isRolesEditSuccessful && isLeaveEditSuccessful && isEmpRecordEditSuccessful && isFileUploadSuccessful && isAccumulatePastLimitSuccessful))
+                if ((isRolesChanged && isLeaveBalancesChanged && isEmpRecordChanged && isFilesChanged && isAccumulatePastLimitStatusChangedInDb) && (isRolesEditSuccessful && isLeaveEditSuccessful && isEmpRecordEditSuccessful && isFileUploadSuccessful && isAccumulatePastLimitSuccessful))
                     editFullSuccessPanel.Style.Add("display", "inline-block");
                 else
                 {
@@ -2161,7 +2162,7 @@ namespace HR_LEAVEv2.HR
                         editEmpFilesPanel.Style.Add("display", "inline-block");
 
                     // successful accumulation past limit edit
-                    if (isAccumulatePastLimitStatusChanged && isAccumulatePastLimitSuccessful)
+                    if (isAccumulatePastLimitStatusChangedInDb && isAccumulatePastLimitSuccessful)
                         editAccumulatePastMaxSuccessPanel.Style.Add("display", "inline-block");
 
                     // ERROR MESSAGES------------------------------------------------------------------
