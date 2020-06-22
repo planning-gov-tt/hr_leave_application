@@ -1184,6 +1184,7 @@ namespace HR_LEAVEv2.HR
 
             // NO CHANGES MADE
             noChangesMadePanel.Style.Add("display", "none");
+            noChangesMadeToAccStatus.Style.Add("display", "none");
 
             // EMPLOYMENT RECORD
             invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "none");
@@ -2129,6 +2130,10 @@ namespace HR_LEAVEv2.HR
             if (!isRolesChanged && !isLeaveBalancesChanged && !isEmpRecordChanged && !isFilesChanged && !isAccumulatePastLimitStatusChanged)
             {
                 noChangesMadePanel.Style.Add("display", "inline-block");
+                if (!isAccumulatePastLimitStatusChanged && !isFilesChanged)
+                {
+                    noChangesMadeToAccStatus.Style.Add("display", "inline-block");
+                }
             }
             else
             {
@@ -2152,11 +2157,11 @@ namespace HR_LEAVEv2.HR
                         editEmpRecordSuccessPanel.Style.Add("display", "inline-block");
 
                     // successful file upload edit
-                    if(isFilesChanged && isFileUploadSuccessful)
+                    if (isFilesChanged && isFileUploadSuccessful)
                         editEmpFilesPanel.Style.Add("display", "inline-block");
 
                     // successful accumulation past limit edit
-                    if(isAccumulatePastLimitStatusChanged && isAccumulatePastLimitSuccessful)
+                    if (isAccumulatePastLimitStatusChanged && isAccumulatePastLimitSuccessful)
                         editAccumulatePastMaxSuccessPanel.Style.Add("display", "inline-block");
 
                     // ERROR MESSAGES------------------------------------------------------------------
@@ -2178,7 +2183,7 @@ namespace HR_LEAVEv2.HR
                         editEmpFilesErrorPanel.Style.Add("display", "inline-block");
 
                     // error accumulation past limit edit
-                    if(!isAccumulatePastLimitSuccessful)
+                    if (!isAccumulatePastLimitSuccessful)
                         editAccumulatePastMaxErrorPanel.Style.Add("display", "inline-block");
 
                     // emp records errors

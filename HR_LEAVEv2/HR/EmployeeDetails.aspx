@@ -130,6 +130,14 @@
                         </span>
                     </asp:Panel>
 
+                    <%--No file uploaded but accumulate past max status changed--%>
+                    <asp:Panel ID="noChangesMadeToAccStatus" runat="server" CssClass="emp-details-validation-msg" role="alert">
+                        <span class="alert alert-info">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            <span>No Files uploaded. Cannot allow employee to accumulate leave past max without letter from PS</span>
+                        </span>
+                    </asp:Panel>
+
                     <%--SUCCESSES---------------------------------------------------------------------------------------------%>
 
                     <%--EDIT EMPLOYEE SUCCESSES-------------------------------------------------------------------------------%>
@@ -303,8 +311,8 @@
             </asp:UpdatePanel>
         </asp:Panel>
 
-        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-bottom: 15px;" CausesValidation="false">
-                <i class="fa fa-times" aria-hidden="true"></i>
+        <asp:LinkButton ID="clearFormBtn" runat="server" OnClick="refreshForm" CssClass="btn btn-primary" Style="margin-bottom: 15px; outline:none; border:none;" CausesValidation="false">
+                <i class="fa fa-refresh" aria-hidden="true"></i>
                 <span runat="server" id ="clearFormTxt">Clear Form</span>
         </asp:LinkButton>
 
@@ -922,9 +930,6 @@
 
                 </asp:ListView>
             </asp:Panel>
-
-            <br />
-
         </asp:Panel>
 
         <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server" Style="text-align:center;">
