@@ -333,6 +333,7 @@
                 <%--apply mode--%>
                 <asp:Panel ID="supervisorSelectUserControlPanel" runat="server" Style="display: inline;">
                     <ajaxToolkit:ComboBox ID="supervisorSelect"
+                        BorderStyle="Solid" BorderColor="#cccccc" BorderWidth="1px"
                         runat="server" AutoPostBack="true" DropDownStyle="DropDownList"
                         AutoCompleteMode="SuggestAppend"
                         DataSourceID="supervisorDataSource"

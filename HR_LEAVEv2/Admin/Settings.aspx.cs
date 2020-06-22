@@ -6,7 +6,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -350,6 +349,9 @@ namespace HR_LEAVEv2.Admin
                 TextBox tb = new TextBox();
                 tb.ID = $"text_{colName}_{selectedTable}";
                 tb.Width = new Unit("400px");
+                tb.BorderStyle = BorderStyle.Solid;
+                tb.BorderColor = ColorTranslator.FromHtml("#cccccc");
+                tb.BorderWidth = new Unit("1px");
 
                 tdList[tdListIndex].Controls.Add(tb);
                 tdListIndex++;
