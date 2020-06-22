@@ -835,7 +835,7 @@
                         </Columns>
                     </asp:GridView>
 
-                    <asp:Panel ID="addEmpRecordBtn" runat="server" CssClass="btn-group" role="group" Style="margin-top: 10px;">
+                    <asp:Panel ID="addEmpRecordBtn" runat="server" CssClass="btn-group" role="group">
                         <asp:LinkButton runat="server" ID="showFormBtn" class="btn btn-primary" Text="Add" OnClick="showFormBtn_Click" CausesValidation="false">
                                  <i class="fa fa-plus" aria-hidden="true"></i>
                                  Add
