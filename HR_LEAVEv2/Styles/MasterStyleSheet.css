@@ -237,3 +237,8 @@ a, a:active, a:focus, button, button:active, button:focus{
     display:none;
 }
 /* end style to hide elements*/
+
+.validation-msg{
+    display: none; 
+    margin: 5px 5px;
+}

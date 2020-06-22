@@ -14,9 +14,6 @@
             margin-right:5px;
         }
 
-        .apply-for-leave-validation-msg{
-            display: none; margin: 5px 5px;
-        }
     </style>
     
     <asp:Panel ID="container" runat="server" Visible="true">
@@ -70,47 +67,47 @@
                 <asp:UpdatePanel ID="applyModeFeedbackUpdatePanel" runat="server">
                     <ContentTemplate>
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                        <asp:Panel ID="startDateIsBeforeStartOfActiveRecord" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="startDateIsBeforeStartOfActiveRecord" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="startDateIsBeforeStartOfActiveRecordTxt" runat="server"></span>
                         </asp:Panel>
 
-                        <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="startDateIsHoliday" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="startDateIsHolidayTxt" runat="server"></span>
                         </asp:Panel>
 
-                        <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="endDateIsHoliday" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="endDateIsHolidayTxt" runat="server"></span>
                         </asp:Panel>
 
-                        <asp:Panel ID="startDateIsWeekend" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="startDateIsWeekend" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>Start date is on the weekend</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="endDateIsWeekend" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="endDateIsWeekend" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>End date is on the weekend</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="startDateBeforeTodayValidationMsgPanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="startDateBeforeTodayValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="startDateBeforeTodayValidationMsg" runat="server">Start date cannot be before today</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="dateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
                         </asp:Panel>
@@ -118,17 +115,17 @@
 
 
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FILE UPLOAD NEEDED VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                        <asp:Panel ID="fileUploadNeededPanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="fileUploadNeededPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>No files currently uploaded. Upload supporting documentation to submit your application</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>No files currently uploaded. More than 2 days of consecutive sick leave requires a medical leave of absence</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="moreThan7DaysConsecutiveCasualLeave" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="moreThan7DaysConsecutiveCasualLeave" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>No files currently uploaded. More than 7 days of consecutive casual leave requires supporting documentation</span>
                         </asp:Panel>
@@ -136,17 +133,17 @@
 
 
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~LEAVE TYPE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                        <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="invalidVacationStartDateMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="invalidVacationStartDateMsg" runat="server">You must request vacation leave at least a month before the start date</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="invalidSickLeaveStartDate" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>Sick leave cannot be taken in advance</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="invalidLeaveTypePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span id="invalidLeaveTypeTxt" runat="server"></span>
                         </asp:Panel>
@@ -154,7 +151,7 @@
 
 
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUPERVISOR VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                        <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="invalidSupervisor" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>Could not verify supervisor</span>
                         </asp:Panel>
@@ -162,22 +159,22 @@
 
 
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ERROR MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                        <asp:Panel ID="errorInsertingFilesToDbPanel" runat="server" CssClass="row alert alert-danger apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="errorInsertingFilesToDbPanel" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>Error inserting files into database</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="errorSendingEmailNotifications" runat="server" CssClass="row alert alert-danger apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="errorSendingEmailNotifications" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>Error sending email notifications</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="errorSendingInHouseNotifications" runat="server" CssClass="row alert alert-danger apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="errorSendingInHouseNotifications" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>Error sending in-application notifications</span>
                         </asp:Panel>
 
-                        <asp:Panel ID="errorSubmittingLeaveApplicationPanel" runat="server" CssClass="row alert alert-danger apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="errorSubmittingLeaveApplicationPanel" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                             <span>Error submitting leave application</span>
                         </asp:Panel>
@@ -192,7 +189,7 @@
 
 
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                        <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success apply-for-leave-validation-msg" role="alert">
+                        <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success validation-msg" role="alert">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span id="successMsg" runat="server">Application successfully submitted</span>
                             <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />
@@ -381,17 +378,17 @@
                     <asp:UpdatePanel ID="fileValidationMsgsUpdatePanel" runat="server">
                         <ContentTemplate>
                             <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FILE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                            <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                            <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span id="duplicateFileNameTxt" runat="server">File name already exists</span>
                             </asp:Panel>
 
-                            <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                            <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
                             </asp:Panel>
 
-                            <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning apply-for-leave-validation-msg" role="alert">
+                            <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
                             </asp:Panel>

@@ -23,6 +23,7 @@
             cursor:pointer;
             outline:none;
         }
+
     </style>
     <h1><%: Title %></h1>
     <div style="margin: 0 auto; margin-top: 30px; width:90%;text-align:center">
@@ -70,82 +71,94 @@
             <asp:UpdatePanel ID="validationPanel" runat="server" Style="margin-bottom:15px;">
 
                 <ContentTemplate>
-
-                    <asp:Panel ID="createSuccessfulPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
+                     <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                    <asp:Panel ID="createSuccessfulPanel" runat="server" CssClass="row alert alert-success validation-msg" role="alert">
                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                         <span>Insert Successful</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="createUnsuccessfulPanel" runat="server" class="alert alert-danger text-center" role="alert" style="display:none; margin:0 5px">
+                    <asp:Panel ID="editSuccessfulPanel" runat="server" CssClass="row alert alert-success validation-msg" role="alert">
+                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                        <span>Edit Successful</span>
+                    </asp:Panel>
+                     <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+
+
+                    <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FAILURE MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                    <asp:Panel ID="createUnsuccessfulPanel" runat="server" class="alert alert-danger text-center validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle"></i>
                         Insert could not be completed
                     </asp:Panel>
 
-                    <asp:Panel ID="editSuccessfulPanel" runat="server" CssClass="row alert alert-success" Style="display: none; margin: 0px 5px;" role="alert">
-                        <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                        <span>Edit Successful</span>
-                    </asp:Panel>
-
-                    <asp:Panel ID="editUnsuccessfulPanel" runat="server" class="alert alert-danger text-center" role="alert" style="display:none; margin:0 5px">
+                    <asp:Panel ID="editUnsuccessfulPanel" runat="server" class="alert alert-danger text-center validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle"></i>
                         Edit could not be completed
                     </asp:Panel>
+                     <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FAILURE MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
-                    <asp:Panel ID="clashingRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+
+                    <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORDS VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                    <asp:Panel ID="clashingRecordsPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Employment record being inserted/edited clashes with another employment record</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="multipleActiveRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="multipleActiveRecordsPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Employment record being inserted/edited would result in multiple active records</span>
                     </asp:Panel>
+                    <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORDS VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
-                    <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+
+                    <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                    <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Start date is not valid</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="invalidExpectedEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="invalidExpectedEndDatePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Expected end date is not valid</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="dateComparisonExpectedValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="dateComparisonExpectedValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Expected end date cannot precede start date</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="dateComparisonActualValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="dateComparisonActualValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Actual end date cannot precede start date</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="startDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Start date is on the weekend</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="expectedEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="expectedEndDateIsWeekendPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Expected end date is on the weekend</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="invalidActualEndDatePanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="invalidActualEndDatePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Actual end date is not valid</span>
                     </asp:Panel>
 
-                    <asp:Panel ID="actualEndDateOnWeekend" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                    <asp:Panel ID="actualEndDateOnWeekend" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Actual end date is on the weekend</span>
                     </asp:Panel>
+                    <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
-                    <asp:Panel ID="invalidAnnualOrMaximumVacationLeaveAmtPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+
+                    <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ANNUAL OR MAX VACATION LEAVE AMT VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                    <asp:Panel ID="invalidAnnualOrMaximumVacationLeaveAmtPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Annual amount of vacation leave cannot be more than maximum accumulated vacation leave</span>
                     </asp:Panel>
-
+                    <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ANNUAL OR MAX VACATION LEAVE AMT VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
                 </ContentTemplate>
 
             </asp:UpdatePanel>
@@ -192,23 +205,23 @@
             <div class="row">
                 <asp:UpdatePanel ID="UpdatePanel1" runat="server" Style="margin-bottom: 10px; margin-top:10px;">
                     <ContentTemplate>
-                        <asp:Panel ID="noDataPanel" runat="server" class="alert alert-info text-center" role="alert" Style="display: none; margin: 0px 5px">
+                        <asp:Panel ID="noDataPanel" runat="server" class="alert alert-info text-center validation-msg" role="alert">
                             <i class="fa fa-info-circle"></i>
                             No Data available
                         </asp:Panel>
 
-                        <asp:Panel ID="noTableSelectedPanel" runat="server" class="alert alert-info text-center" role="alert" Style="display: none; margin: 0px 5px">
+                        <asp:Panel ID="noTableSelectedPanel" runat="server" class="alert alert-info text-center validation-msg" role="alert">
                             <i class="fa fa-info-circle"></i>
                             No Table selected
                         </asp:Panel>
 
-                        <asp:Panel ID="deleteUnsuccessfulPanel" runat="server" class="alert alert-danger text-center" role="alert" Style="display: none; margin: 0px 5px">
+                        <asp:Panel ID="deleteUnsuccessfulPanel" runat="server" class="alert alert-danger text-center validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle"></i>
                             Delete could not be completed
                             <i class="fa fa-times-circle" id="deleteUnsuccessfulMsgCancelBtn" style="margin-left: 11px; color: #484848;"></i>
                         </asp:Panel>
 
-                        <asp:Panel ID="deleteSuccessfulPanel" runat="server" class="alert alert-success text-center" role="alert" Style="display: none; margin: 0px 5px">
+                        <asp:Panel ID="deleteSuccessfulPanel" runat="server" class="alert alert-success text-center validation-msg" role="alert">
                             <i class="fa fa-thumbs-up"></i>
                             Delete successful
                             <i class="fa fa-times-circle" id="deleteSuccessfulMsgCancelBtn" style="margin-left: 11px; color: #484848;"></i>
