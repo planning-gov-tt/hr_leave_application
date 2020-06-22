@@ -147,39 +147,42 @@
 
             <ContentTemplate>
 
-                <asp:Panel ID="emptyGridViewMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; width: 500px; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="emptyGridViewMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" Style="width: 500px;" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="validationMsg" runat="server">No leave data available</span>
                 </asp:Panel>
 
-                <asp:Panel ID="invalidSubmittedFromDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+
+                <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
+                <asp:Panel ID="invalidSubmittedFromDate" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidSubmittedFromDateMsg" runat="server">Submitted from date is not valid</span>
                 </asp:Panel>
 
-                <asp:Panel ID="invalidSubmittedToDate" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="invalidSubmittedToDate" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidSubmittedToDateMsg" runat="server">Submitted to date is not valid</span>
                 </asp:Panel>
 
-                <asp:Panel ID="submittedDateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="submittedDateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="submittedDateComparisonValidationMsg" runat="server">Submitted to date cannot precede submitted from</span>
                 </asp:Panel>
-                <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="invalidStartDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidStartDateValidationMsg" runat="server">Start date is not valid</span>
                 </asp:Panel>
 
-                <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="invalidEndDateValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="invalidEndDateValidationMsg" runat="server">End date is not valid</span>
                 </asp:Panel>
 
-                <asp:Panel ID="appliedForDateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 0px 5px;" role="alert">
+                <asp:Panel ID="appliedForDateComparisonValidationMsgPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="dateComparisonValidationMsg" runat="server">End date cannot precede start date</span>
                 </asp:Panel> 
+                <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
                               
             </ContentTemplate>
 
