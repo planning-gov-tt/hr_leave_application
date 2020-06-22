@@ -130,69 +130,6 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel noFileUploaded;
         
         /// <summary>
-        /// successfulDataInsertPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel successfulDataInsertPanel;
-        
-        /// <summary>
-        /// typeErrorPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel typeErrorPanel;
-        
-        /// <summary>
-        /// typeErrorTxt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl typeErrorTxt;
-        
-        /// <summary>
-        /// maxLengthErrorPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel maxLengthErrorPanel;
-        
-        /// <summary>
-        /// maxLengthErrorTxt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl maxLengthErrorTxt;
-        
-        /// <summary>
-        /// nullableErrorPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel nullableErrorPanel;
-        
-        /// <summary>
-        /// nullableErrorTxt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl nullableErrorTxt;
-        
-        /// <summary>
         /// clashingRecordsPanel control.
         /// </summary>
         /// <remarks>
@@ -373,13 +310,58 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl actualEndDateIsWeekendTxt;
         
         /// <summary>
-        /// wrongTablePanel control.
+        /// nullableErrorPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel wrongTablePanel;
+        protected global::System.Web.UI.WebControls.Panel nullableErrorPanel;
+        
+        /// <summary>
+        /// nullableErrorTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl nullableErrorTxt;
+        
+        /// <summary>
+        /// typeErrorPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel typeErrorPanel;
+        
+        /// <summary>
+        /// typeErrorTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl typeErrorTxt;
+        
+        /// <summary>
+        /// maxLengthErrorPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel maxLengthErrorPanel;
+        
+        /// <summary>
+        /// maxLengthErrorTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl maxLengthErrorTxt;
         
         /// <summary>
         /// invalidAnnualOrMaximumVacationLeaveAmtPanel control.
@@ -400,6 +382,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl invalidAnnualOrMaximumVacationLeaveAmtTxt;
         
         /// <summary>
+        /// wrongTablePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel wrongTablePanel;
+        
+        /// <summary>
         /// unsuccessfulInsertPanel control.
         /// </summary>
         /// <remarks>
@@ -407,5 +398,14 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel unsuccessfulInsertPanel;
+        
+        /// <summary>
+        /// successfulDataInsertPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel successfulDataInsertPanel;
     }
 }
