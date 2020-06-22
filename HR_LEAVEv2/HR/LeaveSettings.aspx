@@ -8,6 +8,14 @@
         #currentAccSettingsDiv th, td {
             text-align: center;
         }
+        #currentAccSettingsDiv th{
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        #currentAccSettingsDiv tr, td{
+            border:none;
+        }
     </style>
 
     <h1><%: Title %></h1>

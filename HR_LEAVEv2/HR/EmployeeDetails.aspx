@@ -7,6 +7,15 @@
             text-align: center;
         }
 
+        #addEmploymentRecordContainer th{
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        #addEmploymentRecordContainer tr, td{
+            border:none;
+        }
+
         .emp-details-validation-msg{
             display: none; 
             margin: 0 5px;

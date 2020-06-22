@@ -8,8 +8,17 @@
         text-align:center;
     }
 
+    #gridViewContainer th{
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+    #gridViewContainer tr, td{
+        border:none;
+    }
+
     .inactive-employee-LA{
-        background-color: #e0e0eb;
+        background-color: #ebebf5;
     }
 </style>
 
