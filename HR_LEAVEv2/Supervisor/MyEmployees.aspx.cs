@@ -15,6 +15,7 @@ namespace HR_LEAVEv2.Supervisor
     public partial class MyEmployees : System.Web.UI.Page
     {
         Util util = new Util();
+        User user = new User();
 
         // used to retrieve employee details for display in modal
         protected class EmpDetails
@@ -32,6 +33,18 @@ namespace HR_LEAVEv2.Supervisor
             public string employment_type { get; set; }
             public string position { get; set; }
         };
+
+        private string empEmailToAlert
+        {
+            get { return ViewState["empEmailToAlert"] != null ? ViewState["empEmailToAlert"].ToString() : null; }
+            set { ViewState["empEmailToAlert"] = value; }
+        }
+
+        private string empIdToAlert
+        {
+            get { return ViewState["empIdToAlert"] != null ? ViewState["empIdToAlert"].ToString() : null; }
+            set { ViewState["empIdToAlert"] = value; }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -64,7 +77,7 @@ namespace HR_LEAVEv2.Supervisor
 		                    FROM (
 			                    SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date, sup_ep.start_date
 			                    FROM dbo.employeeposition sup_ep
-			                    WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}' 
+			                    WHERE sup_ep.employee_id = '{user.currUserId}' 
 		                    ) SUP_INFO
 		                    WHERE RowNum = 1
 	                    ) as 'is_sup_active'
@@ -75,7 +88,7 @@ namespace HR_LEAVEv2.Supervisor
                     JOIN [dbo].assignment a
                     ON Employees.employee_id = a.supervisee_id
 
-                    WHERE Employees.is_sup_active = 'Yes' AND a.supervisor_id = '{Session["emp_id"].ToString()}' AND Employees.employee_id IN
+                    WHERE Employees.is_sup_active = 'Yes' AND a.supervisor_id = '{user.currUserId}' AND Employees.employee_id IN
                     (
                         select ep.employee_id
                         from dbo.employeeposition ep
@@ -127,7 +140,7 @@ namespace HR_LEAVEv2.Supervisor
                             FROM dbo.employee e
                             JOIN [dbo].assignment a
                             ON e.employee_id = a.supervisee_id
-                            WHERE a.supervisor_id = {Session["emp_id"].ToString()} 
+                            WHERE a.supervisor_id = {user.currUserId} 
                                 AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
                                 AND e.employee_id IN
                                 (
@@ -410,12 +423,15 @@ namespace HR_LEAVEv2.Supervisor
             validateDates(txtFrom.Text, txtTo.Text);
         }
 
+        
         protected void submitLeaveAlertBtn_Click(object sender, EventArgs e)
         {
+            // shows modal where actual dates for employee to be reminded are entered
+
             ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#submitLeaveAlertModal').modal({'show':true, 'backdrop':'static', 'keyboard':false});", true);
             LinkButton lb = sender as LinkButton;
-            ViewState["empEmailToAlert"] = lb.Attributes["empEmail"].ToString();
-            ViewState["empIdToAlert"] = lb.Attributes["empId"].ToString();
+            empEmailToAlert = lb.Attributes["empEmail"].ToString();
+            empIdToAlert = lb.Attributes["empId"].ToString();
 
             clearSubmitAlertValidationErrors();
             txtFrom.Text = txtTo.Text = string.Empty;
@@ -431,15 +447,13 @@ namespace HR_LEAVEv2.Supervisor
             string startDate = txtFrom.Text,
                    endDate = txtTo.Text;
 
-            if (ViewState["empEmailToAlert"] != null && ViewState["empIdToAlert"] != null && validateDates(startDate, endDate))
+            if (empEmailToAlert != null && empIdToAlert != null && validateDates(startDate, endDate))
             {
-                string emailOfEmpBeingAlerted = ViewState["empEmailToAlert"].ToString(),
-                       idOfEmpBeingAlerted = ViewState["empIdToAlert"].ToString();
                 Boolean isAlertSentSuccessful = false;
 
                 // send inhouse alert via notif
                 string notif_header = $"Leave Application Requested",
-                       notification = $"This is a reminder from {Session["emp_username"].ToString()} to submit a leave application for the period of {startDate} to {endDate}";
+                       notification = $"This is a reminder from {user.currUserName} to submit a leave application for the period of {startDate} to {endDate}";
                 try
                 {
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -448,7 +462,7 @@ namespace HR_LEAVEv2.Supervisor
 
                         string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{notif_header}', '{notification}', 'No', '{idOfEmpBeingAlerted}', '{util.getCurrentDate()}');
+                                VALUES('{notif_header}', '{notification}', 'No', '{empIdToAlert}', '{util.getCurrentDate()}');
                             ";
                         using (SqlCommand command = new SqlCommand(sql, connection))
                         {
@@ -466,11 +480,11 @@ namespace HR_LEAVEv2.Supervisor
                 MailMessage message = util.getAlertEmpToSubmitLeave(
                     new Util.EmailDetails
                     {
-                        supervisor_name = Session["emp_username"].ToString(),
+                        supervisor_name = user.currUserName,
                         start_date = startDate,
                         end_date = endDate,
                         subject = $"Reminder to Submit Leave Application",
-                        recipient = emailOfEmpBeingAlerted
+                        recipient = empEmailToAlert
                     }
                 );
 
