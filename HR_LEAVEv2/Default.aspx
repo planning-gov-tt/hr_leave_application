@@ -17,7 +17,7 @@
         </asp:Panel>
         <asp:Panel ID="yearsWorkedPanel" runat="server" Style="margin: 50px auto; width: 100%; text-align:center;" Visible="false">
             <i class="fa fa-trophy fa-2x" style="display:inline; margin-right:5px;"></i>
-            <span style="font-size:2.2em;">Years Worked : <%= numYearsWorked %></span>
+            <span style="font-size:2.2em;">Years Worked : <%= numYearsWorked.ToString() %></span>
         </asp:Panel>
     </div>
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HR_LEAVEv2.Classes;
+using System;
 using System.Collections.Generic;
 using System.Web.UI;
 
@@ -6,16 +7,21 @@ namespace HR_LEAVEv2
 {
     public partial class _Default : Page
     {
-        public string numYearsWorked;
+        public int numYearsWorked;
+        User user = new User();
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["currNumYearsWorked"] != null)
+
+            if (user.currUserNumYearsWorked != -1)
             {
-                numYearsWorked = Session["currNumYearsWorked"].ToString();
-                if (Convert.ToInt32(numYearsWorked) > 0)
+
+                numYearsWorked = user.currUserNumYearsWorked;
+                if (numYearsWorked > 0)
                     yearsWorkedPanel.Visible = true;
             }
-                
+            else
+                yearsWorkedPanel.Visible = applyForLeaveCtaPanel.Visible = false;                
         }
 
         protected void applyForLeaveRedirectBtn_Click(object sender, EventArgs e)

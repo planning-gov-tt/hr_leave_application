@@ -15,6 +15,7 @@ namespace HR_LEAVEv2.Admin
     public partial class Settings : System.Web.UI.Page
     {
         Util util = new Util();
+        User user = new User();
 
         string selectedTable = string.Empty;
 
@@ -294,7 +295,7 @@ namespace HR_LEAVEv2.Admin
                             primaryKeys.Add($"{row.Cells[1].Text.ToString()}");
 
                         // add audit log
-                        util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), $"Admin deleted record with id = {String.Join(", ", primaryKeys.ToArray())} from {selectedTable}");
+                        util.addAuditLog(user.currUserId, user.currUserId, $"Admin deleted record with id = {String.Join(", ", primaryKeys.ToArray())} from {selectedTable}");
                     }
                         
                     else
@@ -860,7 +861,7 @@ namespace HR_LEAVEv2.Admin
                     for (int i = 0; i < insertedData.Columns.Count; i++)
                         idPairings.Add($"{insertedData.Columns[i].ColumnName} = {insertedData.Rows[0].ItemArray[i].ToString()}");
                     string action = $"Admin created record with {String.Join(", ", idPairings.ToArray())} in {selectedTable}";
-                    util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), action);
+                    util.addAuditLog(user.currUserId, user.currUserId, action);
                 }            
                 else
                     createUnsuccessfulPanel.Style.Add("display", "inline-block");
@@ -1023,7 +1024,7 @@ namespace HR_LEAVEv2.Admin
                     foreach(string key in primaryKeys)
                         idPairings.Add($"{key} = {dataBeforeEdit[key]}");
                     string action = $"Admin edited record with {String.Join(", ", idPairings.ToArray())} in {selectedTable}";
-                    util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), action);
+                    util.addAuditLog(user.currUserId, user.currUserId, action);
                 }
                 else
                     editUnsuccessfulPanel.Style.Add("display", "inline-block");

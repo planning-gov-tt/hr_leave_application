@@ -218,6 +218,7 @@
       <DependentUpon>Settings.aspx</DependentUpon>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Classes\User.cs" />
     <Compile Include="Classes\Util.cs" />
     <Compile Include="Employee\About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>

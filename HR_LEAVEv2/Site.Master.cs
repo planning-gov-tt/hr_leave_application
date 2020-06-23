@@ -26,6 +26,7 @@ namespace HR_LEAVEv2
 
         int currentNumYearsWorked = -1;
         Util util = new Util();
+        User user = new User();
 
 
         protected void Page_Init(object sender, EventArgs e)
@@ -35,26 +36,26 @@ namespace HR_LEAVEv2
             Auth auth = new Auth();
 
             // store employee's email in Session variable once it is empty, ie. the first time the Master page is loaded
-            if (Session["emp_email"] == null)
-                Session["emp_email"] = auth.getEmailOfSignedInUserFromActiveDirectory();
+            if (user.currUserEmail == null)
+                user.currUserEmail = auth.getEmailOfSignedInUserFromActiveDirectory();
 
             // if Session["emp_email"] is not null after getting call to auth.getEmailOfSignedInUserFromActiveDirectory() or 
             // if the user info has been gotten already then set username of current user
-            if (Session["emp_email"] != null)
+            if (user.currUserEmail != null)
             {
-                string username = auth.getUserInfoFromActiveDirectory(Session["emp_email"].ToString());
+                string username = auth.getUserInfoFromActiveDirectory(user.currUserEmail);
                 username = util.isNullOrEmpty(username) ? "User not in Active Directory" : username;
-                Session["emp_username"] = username;
+                user.currUserName = username;
             }else
-                Session["emp_username"] = "Anon";
+                user.currUserName = "Anon";
 
             // store employee's id in Session
-            if (Session["emp_id"] == null && Session["emp_email"] != null)
-                Session["emp_id"] = auth.getUserEmployeeId(Session["emp_email"].ToString());
+            if (user.currUserId == null && user.currUserEmail != null)
+                user.currUserId = auth.getUserEmployeeId(user.currUserEmail);
 
             // store employee's permissions in Session
-            if (Session["permissions"] == null && Session["emp_id"] != null)
-                Session["permissions"] = auth.getUserPermissions(Session["emp_id"].ToString());
+            if (Session["permissions"] == null && user.currUserId != null)
+                Session["permissions"] = auth.getUserPermissions(user.currUserId);
 
 
             DateTime startDate = DateTime.MinValue;
@@ -66,7 +67,7 @@ namespace HR_LEAVEv2
             string sql = $@"
                         SELECT ep.start_date as startDate, ep.years_worked as yearsWorked, ep.employment_type as employmentType
                         FROM dbo.employeeposition ep
-                        WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {Session["emp_id"].ToString()};
+                        WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {user.currUserId};
                     ;
                 ";
 
@@ -92,7 +93,7 @@ namespace HR_LEAVEv2
             if (startDate != DateTime.MinValue && yearsWorked != -1 && !util.isNullOrEmpty(empType))
             {
                 // used to display number of years worked in current job
-                Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
+                user.currUserNumYearsWorked = util.getNumYearsBetween(startDate, util.getCurrentDateToday());
                 //Session["currNumYearsWorked"] = util.getNumYearsBetween(startDate, new DateTime(2021, 09, 27)); // for testing
 
                 if (empType == "Contract")
@@ -180,7 +181,7 @@ namespace HR_LEAVEv2
                     ddlSelectUser.DataSource = rdr;
                     ddlSelectUser.DataBind();
                 }
-                ddlSelectUser.SelectedValue = Session["emp_email"].ToString();
+                ddlSelectUser.SelectedValue = user.currUserEmail;
                 // END DEVELOPMENT PURPOSES CODE --------------------------------------------------------
 
 
@@ -205,7 +206,7 @@ namespace HR_LEAVEv2
                             FROM [dbo].[accumulations] a
                             LEFT JOIN dbo.employeeposition ep
                             ON ep.employment_type = a.employment_type
-                            WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {Session["emp_id"].ToString()};
+                            WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {user.currUserId};
                         ;
                     ";
 
@@ -249,7 +250,7 @@ namespace HR_LEAVEv2
                                     updateSql += $@"
                                             UPDATE [dbo].[employee]
                                             SET {sqlLeaveTypeRef} =  {numDays}
-                                            WHERE employee_id = {Session["emp_id"].ToString()};
+                                            WHERE employee_id = {user.currUserId};
                                             
                                     ";
                                 }
@@ -262,8 +263,8 @@ namespace HR_LEAVEv2
                                         updateSql += $@"
                                             UPDATE [dbo].[employee]
                                             SET {sqlLeaveTypeRef} =  
-                                                (SELECT IIF({sqlLeaveTypeRef} + {numDays} > {maxVacationAmt}, {maxVacationAmt}, {sqlLeaveTypeRef} + {numDays}) FROM dbo.employee WHERE employee_id = {Session["emp_id"].ToString()})
-                                            WHERE employee_id = {Session["emp_id"].ToString()};
+                                                (SELECT IIF({sqlLeaveTypeRef} + {numDays} > {maxVacationAmt}, {maxVacationAmt}, {sqlLeaveTypeRef} + {numDays}) FROM dbo.employee WHERE employee_id = {user.currUserId})
+                                            WHERE employee_id = {user.currUserId};
                                             
                                         ";
                                     }
@@ -271,8 +272,8 @@ namespace HR_LEAVEv2
                                     {
                                         updateSql += $@"
                                             UPDATE [dbo].[employee]
-                                            SET {sqlLeaveTypeRef} = (SELECT {sqlLeaveTypeRef} + {numDays} FROM dbo.employee WHERE employee_id = {Session["emp_id"].ToString()})
-                                            WHERE employee_id = {Session["emp_id"].ToString()};
+                                            SET {sqlLeaveTypeRef} = (SELECT {sqlLeaveTypeRef} + {numDays} FROM dbo.employee WHERE employee_id = {user.currUserId})
+                                            WHERE employee_id = {user.currUserId};
                                             
                                         ";
                                     }
@@ -289,7 +290,7 @@ namespace HR_LEAVEv2
 
                         UPDATE [dbo].[employeeposition]
                         SET years_worked = {currentNumYearsWorked}
-                        WHERE employee_id = {Session["emp_id"].ToString()};
+                        WHERE employee_id = {user.currUserId};
                                     
                         COMMIT;
                         ";
@@ -318,7 +319,7 @@ namespace HR_LEAVEv2
                 try
                 {
                     string sql = $@"
-                        SELECT COUNT([is_read]) AS 'num_notifs' FROM [dbo].[notifications] where [is_read] = 'No' AND [employee_id] = '{Session["emp_id"]}';
+                        SELECT COUNT([is_read]) AS 'num_notifs' FROM [dbo].[notifications] where [is_read] = 'No' AND [employee_id] = '{user.currUserId}';
                     ";
 
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -349,8 +350,11 @@ namespace HR_LEAVEv2
         protected void indexChanged(object sender, EventArgs e)
         {
             // sets user data when switching between users with dropdown used in development
-            Session["emp_email"] = ddlSelectUser.SelectedItem.Text;
-            Session["emp_id"] = Session["permissions"] = null;
+            user.currUserEmail = ddlSelectUser.SelectedItem.Text;
+            user.currUserId = null;
+            user.currUserNumYearsWorked = -1;
+            user.currUserName = null;
+            Session["permissions"] = null;
             Response.Redirect(Request.RawUrl);
         }
     }
