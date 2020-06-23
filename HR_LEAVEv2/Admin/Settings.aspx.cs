@@ -61,7 +61,7 @@ namespace HR_LEAVEv2.Admin
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if(user.permissions == null || (user.permissions != null && !user.permissions.Contains("admin_permissions")))
+            if(user.hasNoPermissions() || !user.isAdmin())
                 Response.Redirect("~/AccessDenied.aspx");
 
             selectedTable = tableSelectionDdl.SelectedValue.ToString() != "-" ? tableSelectionDdl.SelectedValue.ToString() : string.Empty;

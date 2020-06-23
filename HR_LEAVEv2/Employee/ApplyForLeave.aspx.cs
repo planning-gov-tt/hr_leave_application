@@ -65,7 +65,7 @@ namespace HR_LEAVEv2.Employee
 
             if (!IsPostBack)
             {
-                if (user.permissions == null)
+                if (user.hasNoPermissions())
                     Response.Redirect("~/AccessDenied.aspx");
 
                 /*~~~~~~~~~~~Files INITIALIZATION~~~~~~~~~~~~~~~*/
@@ -719,7 +719,7 @@ namespace HR_LEAVEv2.Employee
                 supCommentsTxt.Disabled = false;
 
             // adjust page to allow HR to leave comments or edit the number of days applied for
-            if (user.permissions != null && (user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions")))
+            if (user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions"))
             {
                 hrCommentsTxt.Disabled = false;
                 numDaysAppliedForEditTxt.Visible = true;
@@ -842,71 +842,8 @@ namespace HR_LEAVEv2.Employee
                             }
 
                             // check permissions of current user
-                            if (!user.permissions.Contains("hr1_permissions"))
-                            {
-                                // HR 2, HR 3, Supervisors, Employees and every combination
-
-
-                                if (user.currUserId == null || user.currUserId != ltDetails.empId)
-                                {
-                                    // All combinations of HR 2, HR 3, Supervisor and Employee that did not submit the application. This means that only people with HR 2 privileges or 
-                                    // the supervisor who the LA was submitted to can see it
-
-                                    // HR 3
-                                    // HR 3 should not have access to leave application data
-                                    if (user.permissions.Contains("hr3_permissions"))
-                                        Response.Redirect("~/AccessDenied.aspx");
-
-                                    // HR 2
-                                    if (user.permissions.Contains("hr2_permissions"))
-                                    {
-                                        if (!util.isNullOrEmpty(ltDetails.empType))
-                                        {
-                                            // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
-                                            if (
-                                                (
-                                                    //check if hr can view applications from the relevant employment type 
-                                                    (ltDetails.empType == "Contract" && !user.permissions.Contains("contract_permissions"))
-                                                    ||
-                                                    (ltDetails.empType == "Public Service" && !user.permissions.Contains("public_officer_permissions"))
-                                                )
-
-                                                ||
-
-                                                (
-                                                    //check if hr can view applications of the relevant leave type
-                                                    (ltDetails.typeOfLeave == "Sick" && !user.permissions.Contains("approve_sick"))
-                                                    ||
-                                                    (ltDetails.typeOfLeave == "Vacation" && !user.permissions.Contains("approve_vacation"))
-                                                    ||
-                                                    (ltDetails.typeOfLeave == "Casual" && !user.permissions.Contains("approve_casual"))
-                                                )
-                                               )
-                                               Response.Redirect("~/AccessDenied.aspx");
-                                        } else
-                                            Response.Redirect("~/AccessDenied.aspx");
-                                    }
-                                    else
-                                    {
-                                        // if emp trying to view LA is supervisor 
-                                        if (user.permissions.Contains("sup_permissions"))
-                                        {
-                                            //LA was not submitted to them
-                                            if (user.currUserId == null || user.currUserId != ltDetails.supId)
-                                                Response.Redirect("~/AccessDenied.aspx");
-                                        }
-                                        else
-                                        {
-                                            // if another emp trying to view LA and they did not submit the LA
-                                            if (user.currUserId == null || user.currUserId != ltDetails.empId)
-                                                Response.Redirect("~/AccessDenied.aspx");
-                                        }
-
-                                    }
-
-                                }
-
-                            }
+                            if(!user.isUserAllowedToViewOrEditLeaveApplication(ltDetails.empId, ltDetails.empType, ltDetails.supId, ltDetails.typeOfLeave))
+                                Response.Redirect("~/AccessDenied.aspx");
 
                             //populate form
                             empIdHiddenTxt.Value = ltDetails.empId;
