@@ -9,6 +9,7 @@ namespace HR_LEAVEv2.Employee
 {
     public partial class Notifications : System.Web.UI.Page
     {
+        User user = new User();
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["permissions"] == null)
@@ -25,7 +26,7 @@ namespace HR_LEAVEv2.Employee
             Util util = new Util();
 
             Label numNotifs = (Label)Master.FindControl("num_notifications");
-            int numUnread = Convert.ToInt32(util.resetNumNotifications(Session["emp_id"].ToString()));
+            int numUnread = Convert.ToInt32(util.resetNumNotifications(user.currUserId));
             markAllAsRead.Visible = numUnread > 0;
             numNotifs.Text = numUnread.ToString();
             System.Web.UI.UpdatePanel up = (System.Web.UI.UpdatePanel)Master.FindControl("notificationsUpdatePanel");
@@ -45,7 +46,7 @@ namespace HR_LEAVEv2.Employee
                            n.[is_read], 
                            FORMAT(n.[created_at],  'h:mmtt MMM dd yyyy') AS created_at
                     FROM [dbo].[notifications] n
-                    WHERE n.[employee_id] = '{Session["emp_id"].ToString()}'
+                    WHERE n.[employee_id] = '{user.currUserId}'
                     ORDER BY n.[created_at] DESC;
                 ";
 
@@ -179,7 +180,7 @@ namespace HR_LEAVEv2.Employee
             {
                 string sql = $@"
                     DELETE FROM [dbo].[notifications] 
-                    WHERE [employee_id] = '{Session["emp_id"]}';
+                    WHERE [employee_id] = '{user.currUserId}';
                 ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -205,7 +206,7 @@ namespace HR_LEAVEv2.Employee
                 string sql = $@"
                     UPDATE [dbo].[notifications] 
                     SET [is_read] = 'Yes'
-                    WHERE [employee_id] = '{Session["emp_id"]}';
+                    WHERE [employee_id] = '{user.currUserId}';
                 ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -231,7 +232,7 @@ namespace HR_LEAVEv2.Employee
                 string sql = $@"
                     UPDATE [dbo].[notifications] 
                     SET [is_read] = 'No'
-                    WHERE [employee_id] = '{Session["emp_id"]}';
+                    WHERE [employee_id] = '{user.currUserId}';
                 ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
