@@ -13,6 +13,7 @@ namespace HR_LEAVEv2.HR
     public partial class LeaveSettings : System.Web.UI.Page
     {
         Util util = new Util();
+        User user = new User();
         protected void Page_Load(object sender, EventArgs e)
         {
             List<string> permissions = (List<string>)Session["permissions"];
@@ -104,7 +105,7 @@ namespace HR_LEAVEv2.HR
             }
 
             if (isDeleteSuccessful)
-                util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), $"Deleted accumulation; id = {id}");
+                util.addAuditLog(user.currUserId, user.currUserId, $"Deleted accumulation; id = {id}");
 
             this.bindGridview();
         }
@@ -226,7 +227,7 @@ namespace HR_LEAVEv2.HR
 
             // add audit logs
             if (isInsertSuccessful)
-                util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), $"Added new accumulation; id = {id}");
+                util.addAuditLog(user.currUserId, user.currUserId, $"Added new accumulation; id = {id}");
 
             bindGridview();
         }
