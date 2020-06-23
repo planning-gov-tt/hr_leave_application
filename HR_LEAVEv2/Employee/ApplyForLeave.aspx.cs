@@ -17,7 +17,8 @@ namespace HR_LEAVEv2.Employee
     public partial class ApplyForLeave : System.Web.UI.Page
     {
         string mode = string.Empty; // used to determine what mode the user will view the apply page in
-        Util util = new Util(); 
+        Util util = new Util();
+        User user = new User();
 
         // this class is used to store the loaded data from the db in the process of populating fields on the page when accessing this page from 'view' mode
         protected class LeaveTransactionDetails
@@ -48,6 +49,12 @@ namespace HR_LEAVEv2.Employee
             set { ViewState["activeRecordStartDate"] = value; }
         }
 
+        private List<HttpPostedFile> uploadedFiles
+        {
+            get { return Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null; }
+            set { Session["uploadedFiles"] = value; }
+        }
+
         // used for determining how much days is too much days to apply for based on a user's leave balance
         const int MAX_DAYS_PAST_BALANCE = 10;
 
@@ -64,7 +71,7 @@ namespace HR_LEAVEv2.Employee
                 /*~~~~~~~~~~~Files INITIALIZATION~~~~~~~~~~~~~~~*/
 
                 // used to maintain state for files after they have been uploaded but before the employee submits the LA
-                Session["uploadedFiles"] = null;
+                uploadedFiles = null;
                 // no files currently uploaded
                 filesUploadedPanel.Visible = false;
 
@@ -75,7 +82,7 @@ namespace HR_LEAVEv2.Employee
                 /*~~~~~~~~~~~Supervisor DDL INITIALIZATION~~~~~~~~~~~~~~~*/
 
                 // add parameters to Stored Procedure used to get all the relevant supervisors for an employee
-                supervisorDataSource.SelectParameters.Add("empId", Session["emp_id"].ToString());
+                supervisorDataSource.SelectParameters.Add("empId", user.currUserId);
 
                 /*~~~~~~~~~~~Supervisor DDL INITIALIZATION~~~~~~~~~~~~~~~*/
 
@@ -108,7 +115,7 @@ namespace HR_LEAVEv2.Employee
                         JOIN dbo.emptypeleavetype elt
                         ON elt.employment_type = ep.employment_type
 
-                        WHERE e.employee_id = '{Session["emp_id"].ToString()}'
+                        WHERE e.employee_id = '{user.currUserId}'
                         ORDER BY elt.leave_type DESC;
                     ";
 
@@ -147,7 +154,7 @@ namespace HR_LEAVEv2.Employee
                             string sql = $@"
                         SELECT ep.start_date
                         FROM dbo.employeeposition ep
-                        WHERE ep.employee_id = '{Session["emp_id"].ToString()}' AND (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date))
+                        WHERE ep.employee_id = '{user.currUserId}' AND (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date))
                     ";
                             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                             {
@@ -337,9 +344,9 @@ namespace HR_LEAVEv2.Employee
                         if (getNumDaysBetween(start, end) > 2)
                         {
                             List<HttpPostedFile> files = null;
-                            if (Session["uploadedFiles"] != null)
+                            if (uploadedFiles != null)
                             {
-                                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                                files = uploadedFiles;
                                 if (files.Count == 0)
                                 {
                                     moreThan2DaysConsecutiveSickLeave.Style.Add("display", "inline-block");
@@ -368,9 +375,9 @@ namespace HR_LEAVEv2.Employee
                         if (getNumDaysBetween(start, end) > 7)
                         {
                             List<HttpPostedFile> files = null;
-                            if (Session["uploadedFiles"] != null)
+                            if (uploadedFiles != null)
                             {
-                                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                                files = uploadedFiles;
                                 if (files.Count == 0)
                                 {
                                     moreThan7DaysConsecutiveCasualLeave.Style.Add("display", "inline-block");
@@ -415,7 +422,7 @@ namespace HR_LEAVEv2.Employee
             string isValid = string.Empty,
                    errTxt = string.Empty;
 
-            List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null;
+            List<HttpPostedFile> files = uploadedFiles;
             if (!util.isNullOrEmpty(typeOfLeaveSelected))
             {
                 Dictionary<string, string> leaveBalanceMappings = util.getLeaveTypeMapping();
@@ -438,7 +445,7 @@ namespace HR_LEAVEv2.Employee
                         FROM dbo.employee e
                         JOIN dbo.employeeposition ep
                         ON e.employee_id = ep.employee_id
-                        WHERE e.employee_id = '{Session["emp_id"].ToString()}';
+                        WHERE e.employee_id = '{user.currUserId}';
                     ";
 
                         using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -708,7 +715,7 @@ namespace HR_LEAVEv2.Employee
             fileUploadPanel.Visible = true;
 
             // if supervisor on leave application, then they can leave a comment
-            if (Session["emp_id"].ToString() == ltDetails.supId)
+            if (user.currUserId == ltDetails.supId)
                 supCommentsTxt.Disabled = false;
 
             // adjust page to allow HR to leave comments or edit the number of days applied for
@@ -843,7 +850,7 @@ namespace HR_LEAVEv2.Employee
                                 // HR 2, HR 3, Supervisors, Employees and every combination
 
 
-                                if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.empId)
+                                if (user.currUserId == null || user.currUserId != ltDetails.empId)
                                 {
                                     // All combinations of HR 2, HR 3, Supervisor and Employee that did not submit the application. This means that only people with HR 2 privileges or 
                                     // the supervisor who the LA was submitted to can see it
@@ -888,13 +895,13 @@ namespace HR_LEAVEv2.Employee
                                         if (permissions.Contains("sup_permissions"))
                                         {
                                             //LA was not submitted to them
-                                            if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.supId)
+                                            if (user.currUserId == null || user.currUserId != ltDetails.supId)
                                                 Response.Redirect("~/AccessDenied.aspx");
                                         }
                                         else
                                         {
                                             // if another emp trying to view LA and they did not submit the LA
-                                            if (Session["emp_id"] == null || Session["emp_id"].ToString() != ltDetails.empId)
+                                            if (user.currUserId == null || user.currUserId != ltDetails.empId)
                                                 Response.Redirect("~/AccessDenied.aspx");
                                         }
 
@@ -1103,7 +1110,7 @@ namespace HR_LEAVEv2.Employee
                 {
                     clearAllFilesBtn.Visible = true;
                     // add files to session so they will persist after postback
-                    Session["uploadedFiles"] = files;
+                    uploadedFiles = files;
 
                     // show files uploaded
                     filesUploadedPanel.Visible = true;
@@ -1144,10 +1151,10 @@ namespace HR_LEAVEv2.Employee
             {
                 List<HttpPostedFile> files = null;
 
-                if (Session["uploadedFiles"] != null)
-                    files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                if (uploadedFiles != null)
+                    files = uploadedFiles;
 
-                if (Session["uploadedFiles"] == null || files == null || files.Count <= 0)
+                if (uploadedFiles == null || files == null || files.Count <= 0)
                     filesUploadedPanel.Visible = false;
             }
 
@@ -1165,7 +1172,7 @@ namespace HR_LEAVEv2.Employee
             filesUploadedListView.DataSource = new DataTable();
             filesUploadedListView.DataBind();
 
-            Session["uploadedFiles"] = null;
+            uploadedFiles = null;
 
             if (mode == "apply")
             {
@@ -1241,9 +1248,9 @@ namespace HR_LEAVEv2.Employee
 
             // go through all files and create new datatable
             List<HttpPostedFile> files = null;
-            if (Session["uploadedFiles"] != null)
+            if (uploadedFiles != null)
             {
-                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                files = uploadedFiles;
 
                 HttpPostedFile fileToRemove = files.SingleOrDefault<HttpPostedFile>(file => Path.GetFileName(file.FileName).ToString() == file_name);
                 if (fileToRemove != null)
@@ -1255,14 +1262,14 @@ namespace HR_LEAVEv2.Employee
                     {
                         dt.Rows.Add(Path.GetFileName(file.FileName).ToString());
                     }
-                    Session["uploadedFiles"] = files;
+                    uploadedFiles = files;
                 }
                 else
                 {
                     // no uploaded files left
                     clearAllFilesBtn.Visible = false;
 
-                    Session["uploadedFiles"] = null;
+                    uploadedFiles = null;
                     filesUploadedPanel.Visible = false;
                     if (mode == "apply")
                     {
@@ -1313,7 +1320,7 @@ namespace HR_LEAVEv2.Employee
             clearSubmitLeaveApplicationErrors();
 
             // get values from form controls
-            string empId = Session["emp_id"].ToString(), // employee id
+            string empId = user.currUserId, // employee id
                 leaveType = typeOfLeave.SelectedValue, // type of leave
                 startDate = txtFrom.Text.ToString(), // start date
                 endDate = txtTo.Text.ToString(), // end date
@@ -1321,7 +1328,7 @@ namespace HR_LEAVEv2.Employee
                 comments = empCommentsTxt.Value.Length > 0 ? empCommentsTxt.Value.ToString() : null; // employee comments
 
             // uploaded files
-            List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null;
+            List<HttpPostedFile> files = uploadedFiles;
 
             // validate form values using these booleans
             Boolean isValidated, isLeaveApplicationInsertSuccessful, isFileUploadSuccessful, areFilesUploaded;
@@ -1441,7 +1448,7 @@ namespace HR_LEAVEv2.Employee
                                             using (SqlCommand command = new SqlCommand(sql, connection))
                                             {
                                                 command.Parameters.AddWithValue("@FileId", fileid);
-                                                command.Parameters.AddWithValue("@EmployeeId", Session["emp_id"].ToString());
+                                                command.Parameters.AddWithValue("@EmployeeId", user.currUserId);
                                                 command.Parameters.AddWithValue("@TransactionId", transaction_id);
                                                 int rowsAffected = command.ExecuteNonQuery();
                                                 isFileUploadSuccessful = rowsAffected > 0;
@@ -1471,7 +1478,7 @@ namespace HR_LEAVEv2.Employee
                         fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
 
                     string action = $"Submitted leave application: leave_transaction_id= {transaction_id};{fileActionString}";
-                    util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), action);
+                    util.addAuditLog(user.currUserId, user.currUserId, action);
 
                     // show feedback
                     submitButtonPanel.Style.Add("display", "none");
@@ -1534,13 +1541,13 @@ namespace HR_LEAVEv2.Employee
             MailMessage message = util.getSupervisorViewEmployeeSubmittedLeaveApplication(
                 new Util.EmailDetails
                 {
-                    employee_name = Session["emp_username"].ToString(),
+                    employee_name = user.currUserName,
                     date_submitted = util.getCurrentDate().ToString("d/MM/yyyy h:mm tt"),
                     start_date = txtFrom.Text.ToString(),
                     end_date = txtTo.Text.ToString(),
                     days_taken = numDaysAppliedFor.Text,
                     type_of_leave = typeOfLeave.SelectedValue,
-                    subject = $"{Session["emp_username"].ToString()} Submitted Leave Application",
+                    subject = $"{user.currUserName} Submitted Leave Application",
                     recipient = supEmail
                 }
                 );
@@ -1558,7 +1565,7 @@ namespace HR_LEAVEv2.Employee
                     days_taken = numDaysAppliedFor.Text,
                     type_of_leave = typeOfLeave.SelectedValue,
                     subject = "Submitted Leave Application",
-                    recipient = Session["emp_email"].ToString()
+                    recipient = user.currUserEmail
                 }
                 );
             isEmailNotifsSentSuccessfully = isEmailNotifsSentSuccessfully && util.sendMail(message);
@@ -1574,7 +1581,7 @@ namespace HR_LEAVEv2.Employee
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('Submitted Leave Application',@Notification, 'No', '{Session["emp_id"].ToString()}', '{util.getCurrentDate()}');
+                                VALUES('Submitted Leave Application',@Notification, 'No', '{user.currUserId}', '{util.getCurrentDate()}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -1598,11 +1605,11 @@ namespace HR_LEAVEv2.Employee
 
                     string sql = $@"
                                 INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
-                                VALUES('{Session["emp_username"].ToString()} Submitted Leave Application',@Notification, 'No', '{supervisorSelect.SelectedValue.ToString()}', '{util.getCurrentDate()}');
+                                VALUES('{user.currUserName} Submitted Leave Application',@Notification, 'No', '{supervisorSelect.SelectedValue.ToString()}', '{util.getCurrentDate()}');
                             ";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        command.Parameters.AddWithValue("@Notification", $"{Session["emp_username"].ToString()} submitted a leave application for {numDaysAppliedFor.Text} day(s) {typeOfLeave.SelectedValue} leave");
+                        command.Parameters.AddWithValue("@Notification", $"{user.currUserName} submitted a leave application for {numDaysAppliedFor.Text} day(s) {typeOfLeave.SelectedValue} leave");
                         int rowsAffected = command.ExecuteNonQuery();
                         isInAppNotifsSentSuccessfully = rowsAffected > 0;
                     }
@@ -1624,7 +1631,7 @@ namespace HR_LEAVEv2.Employee
         {
             // resets the number of notifications for the current user
             Label num_notifs = (Label)Master.FindControl("num_notifications");
-            num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
+            num_notifs.Text = util.resetNumNotifications(user.currUserId);
 
             System.Web.UI.UpdatePanel up = (System.Web.UI.UpdatePanel)Master.FindControl("notificationsUpdatePanel");
             up.Update();
@@ -1665,7 +1672,7 @@ namespace HR_LEAVEv2.Employee
             daysTaken = numDaysAppliedForEditTxt.Text;
             isDaysTakenChanged = ViewState["daysTaken"].ToString() != daysTaken;
 
-            List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null;
+            List<HttpPostedFile> files = uploadedFiles;
             areFilesUploaded = files != null;
             List<string> uploadedFilesIds = null;
 
@@ -1716,7 +1723,7 @@ namespace HR_LEAVEv2.Employee
                             BEGIN TRANSACTION;
                                 UPDATE [dbo].leavetransaction 
                                 SET 
-                                    [hr_manager_id] = '{Session["emp_id"]}', 
+                                    [hr_manager_id] = '{user.currUserId}', 
                                     [hr_manager_edit_date] = CURRENT_TIMESTAMP,
                                     {comments}
                                     leave_type = '{typeOfLeaveTxt.Text}',
@@ -1865,7 +1872,7 @@ namespace HR_LEAVEv2.Employee
 
                 string action = $"Edited leave application; leave transaction id= {leaveId}, {String.Join(", ", actionString.ToArray())}";
 
-                util.addAuditLog(Session["emp_id"].ToString(), empIdHiddenTxt.Value, action);
+                util.addAuditLog(user.currUserId, empIdHiddenTxt.Value, action);
             }
             else
             {
@@ -1917,7 +1924,7 @@ namespace HR_LEAVEv2.Employee
 
         protected void convertToPaidLeave_Click(object sender, EventArgs e)
         {
-            List<HttpPostedFile> files = Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null;
+            List<HttpPostedFile> files = uploadedFiles;
             if(files != null)
             {
                 // convert
