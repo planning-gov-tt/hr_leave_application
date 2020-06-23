@@ -28,11 +28,10 @@ namespace HR_LEAVEv2.Classes
             public string subject { get; set; }
         }
 
-        public Boolean isNullOrEmpty(string s)
-        {
-            return String.IsNullOrEmpty(s) || String.IsNullOrWhiteSpace(s) || s == "&nbsp;";
-        }
 
+
+        // _______________________________________________________________________________________________________________________________________________
+        // DATE METHODS
         public DateTime getCurrentDate()
         {
             return DateTime.Now;
@@ -99,7 +98,10 @@ namespace HR_LEAVEv2.Classes
 
             return holidaysInBetween;
         }
+        // _______________________________________________________________________________________________________________________________________________
 
+        // _______________________________________________________________________________________________________________________________________________
+        // LEAVE TYPE METHODS
         public Dictionary<string, string> getLeaveTypeMapping()
         {
             // returns a dictionary with the leave type (type_id) as the Key and the column name representing the leave balance as the value
@@ -159,57 +161,10 @@ namespace HR_LEAVEv2.Classes
             }
             return leaveTypes;
         }
+        // _______________________________________________________________________________________________________________________________________________
 
-        public string getSqlForCalculatingQualifiedField(string leaveTypeToBeCompared ,string empId)
-        {
-            // returns the sql representing the IIF statement that determines whether a LA is qualified or not based on the applied for leave type and the corresponding leave balance
-
-            // get all leave types
-            List<string> leaveTypes = getListOfAllLeaveTypes();
-            Dictionary<string, string> leaveTypeMappings = getLeaveTypeMapping();
-            List<string> conditionalList = new List<string>();
-
-            foreach(string leaveType in leaveTypes)
-            {
-                // if leave type has no balance then it is automatically qualified
-                if (isLeaveTypeWithoutBalance(leaveType))
-                    conditionalList.Add($"('{leaveTypeToBeCompared}' = '{leaveType}')");
-
-                // check if the number of days applied for is less than the number of days available in the corresponding leave balance
-                else
-                    conditionalList.Add($"('{leaveTypeToBeCompared}' = '{leaveType}' AND @DaysTaken <= e.{leaveTypeMappings[leaveType]})");
-            }
-
-            return $@"
-                    (
-                        SELECT IIF(({String.Join(" OR ", conditionalList.ToArray())}), 'Yes', 'No')
-                        FROM [dbo].[employee] e
-                        WHERE e.employee_id = {empId}
-                    )
-                ";
-        }
-
-        public string sanitizeStringForAsciiCharacters(string str)
-        {
-            // sanitize search strings for any ASCII characters that may cause trouble 
-            // single quote ('), double quote ("), open bracket and close bracket
-
-            // single quote
-            str = str.Replace("&#39;", "'");
-
-            //double quote
-            str = str.Replace("&#34;", "\"");
-
-            //open bracket
-            str = str.Replace("&#40;", "(");
-
-            //close bracket
-            str = str.Replace("&#41;", ")");
-
-            return str;
-
-        }
-
+        // _______________________________________________________________________________________________________________________________________________
+        // NOTIFICATIONS METHODS
         public string resetNumNotifications(string employee_id)
         {
             /* What this function does:
@@ -252,7 +207,11 @@ namespace HR_LEAVEv2.Classes
 
             return count;
         }
+        // _______________________________________________________________________________________________________________________________________________
 
+
+        // _______________________________________________________________________________________________________________________________________________
+        // AUDITING METHODS
         public Boolean addAuditLog(string actingEmployeeId, string affectedEmployeeId, string action)
         {
             string hostName = getLocalHostName();
@@ -302,6 +261,11 @@ namespace HR_LEAVEv2.Classes
         {
             return Dns.GetHostEntry(hostName).AddressList[0].ToString();
         }
+        // _______________________________________________________________________________________________________________________________________________
+
+
+        // _______________________________________________________________________________________________________________________________________________
+        // EMAIL METHODS
 
         public MailMessage getNewMailMessage(string subject, List<string> recipients)
         {
@@ -339,7 +303,8 @@ namespace HR_LEAVEv2.Classes
 
             return true;
         }
-
+        
+        // returns mail message containing body of email reminding employee to submit leave
         public MailMessage getAlertEmpToSubmitLeave(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -361,10 +326,8 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * supervisor view: approved LA
-         * Get the email body for the email sent to a supervisor when their employee's LA is approved
-         **/
+         /* supervisor view: approved LA
+         * Get the email body for the email sent to a supervisor when their employee's LA is approved */
         public MailMessage getSupervisorViewLeaveApplicationApproved(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -439,10 +402,9 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * employee view: approved LA
-         * Get the email body for the email sent to an employee when their LA is approved
-         **/
+
+         /* employee view: approved LA
+         * Get the email body for the email sent to an employee when their LA is approved */
         public MailMessage getEmployeeViewLeaveApplicationApproved(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -517,10 +479,8 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * supervisor view: not approved LA
-         * Get the email body for the email sent to a supervisor when their employee's LA is not approved
-         **/
+        /* supervisor view: not approved LA
+         * Get the email body for the email sent to a supervisor when their employee's LA is not approved */
         public MailMessage getSupervisorViewLeaveApplicationNotApproved(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -596,10 +556,8 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * employee view: not approved LA
-         * Get the email body for the email sent to an employee when their LA is not approved
-         **/
+        /*employee view: not approved LA
+         * Get the email body for the email sent to an employee when their LA is not approved */
         public MailMessage getEmployeeViewLeaveApplicationNotApproved(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -674,10 +632,8 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * HR view: recommended LA
-         * Get the email body for the email sent to HR when a LA is recommended by an employee's supervisor
-         **/
+        /*HR view: recommended LA
+         * Get the email body for the email sent to HR when a LA is recommended by an employee's supervisor */
         public MailMessage getHRViewLeaveApplicationRecommended(EmailDetails details)
         {
             List<string> recipients = new List<string>(details.recipient.Split(';'));
@@ -757,10 +713,8 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * employee view: recommended LA
-         * Get the email body for the email sent to an employee when a LA is recommended by their supervisor
-         **/
+        /* employee view: recommended LA
+         * Get the email body for the email sent to an employee when a LA is recommended by their supervisor */
         public MailMessage getEmployeeViewLeaveApplicationRecommended(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -835,10 +789,8 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * employee view: not recommended LA
-         * Get the email body for the email sent to an employee when a LA is not recommended by their supervisor
-         **/
+        /*  employee view: not recommended LA
+         * Get the email body for the email sent to an employee when a LA is not recommended by their supervisor */
         public MailMessage getEmployeeViewLeaveApplicationNotRecommended(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -912,10 +864,8 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * supervisor view: submitted LA
-         * Get the email body for the email sent to a supervisor when an employee submits a LA
-         **/
+        /* supervisor view: submitted LA
+         * Get the email body for the email sent to a supervisor when an employee submits a LA */
         public MailMessage getSupervisorViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -986,10 +936,8 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*
-         * employee view: submitted LA
-         * Get the email body for the email sent to an employee when they submit a LA
-         **/
+        /* employee view: submitted LA
+         * Get the email body for the email sent to an employee when they submit a LA */
         public MailMessage getEmployeeViewEmployeeSubmittedLeaveApplication(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
@@ -1058,7 +1006,68 @@ namespace HR_LEAVEv2.Classes
                         ";
             return msg;
         }
+        // _______________________________________________________________________________________________________________________________________________
 
 
+        // _______________________________________________________________________________________________________________________________________________
+        // STRING METHODS
+        public string sanitizeStringForAsciiCharacters(string str)
+        {
+            // sanitize search strings for any ASCII characters that may cause trouble 
+            // single quote ('), double quote ("), open bracket and close bracket
+
+            // single quote
+            str = str.Replace("&#39;", "'");
+
+            //double quote
+            str = str.Replace("&#34;", "\"");
+
+            //open bracket
+            str = str.Replace("&#40;", "(");
+
+            //close bracket
+            str = str.Replace("&#41;", ")");
+
+            return str;
+
+        }
+        public Boolean isNullOrEmpty(string s)
+        {
+            return String.IsNullOrEmpty(s) || String.IsNullOrWhiteSpace(s) || s == "&nbsp;";
+        }
+        // _______________________________________________________________________________________________________________________________________________
+
+
+        // _______________________________________________________________________________________________________________________________________________
+        // QUALIFIED METHOD
+        public string getSqlForCalculatingQualifiedField(string leaveTypeToBeCompared, string empId)
+        {
+            // returns the sql representing the IIF statement that determines whether a LA is qualified or not based on the applied for leave type and the corresponding leave balance
+
+            // get all leave types
+            List<string> leaveTypes = getListOfAllLeaveTypes();
+            Dictionary<string, string> leaveTypeMappings = getLeaveTypeMapping();
+            List<string> conditionalList = new List<string>();
+
+            foreach (string leaveType in leaveTypes)
+            {
+                // if leave type has no balance then it is automatically qualified
+                if (isLeaveTypeWithoutBalance(leaveType))
+                    conditionalList.Add($"('{leaveTypeToBeCompared}' = '{leaveType}')");
+
+                // check if the number of days applied for is less than the number of days available in the corresponding leave balance
+                else
+                    conditionalList.Add($"('{leaveTypeToBeCompared}' = '{leaveType}' AND @DaysTaken <= e.{leaveTypeMappings[leaveType]})");
+            }
+
+            return $@"
+                    (
+                        SELECT IIF(({String.Join(" OR ", conditionalList.ToArray())}), 'Yes', 'No')
+                        FROM [dbo].[employee] e
+                        WHERE e.employee_id = {empId}
+                    )
+                ";
+        }
+        // _______________________________________________________________________________________________________________________________________________
     }
 }
