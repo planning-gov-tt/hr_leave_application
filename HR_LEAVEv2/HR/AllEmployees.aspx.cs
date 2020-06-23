@@ -12,7 +12,7 @@ namespace HR_LEAVEv2.HR
 {
     public partial class AllEmployees : System.Web.UI.Page
     {
-        
+        User user = new User();
         List<string> permissions = null;
 
         // used to retrieve employee details for display in modal
@@ -33,6 +33,17 @@ namespace HR_LEAVEv2.HR
             public string position { get; set; }
         };
 
+        private string typeOfEmpToView
+        {
+            get { return Session["viewForAllEmployees"] != null ? Session["viewForAllEmployees"].ToString() : null; }
+            set { Session["viewForAllEmployees"] = value; }
+        }
+
+        private Boolean viewActive
+        {
+            get { return typeOfEmpToView != null ? typeOfEmpToView == "Active" : true; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             permissions = (List<string>)Session["permissions"];
@@ -42,13 +53,12 @@ namespace HR_LEAVEv2.HR
             if (!IsPostBack)
             {
                 // persists option for which type of employees to view, active or inactive
-                if (Session["viewForAllEmployees"] != null)
+                if (typeOfEmpToView != null)
                 {
-                    employeeStatusDropDown.SelectedValue = Session["viewForAllEmployees"].ToString();
+                    employeeStatusDropDown.SelectedValue = typeOfEmpToView;
                     employeesDataPager.SetPageProperties(0, 8, false);
                 }
 
-                ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
                 bindListView();
             }
         }
@@ -63,21 +73,17 @@ namespace HR_LEAVEv2.HR
                 if (permissions.Contains("hr1_permissions"))
                 {
 
-                    if (ViewState["viewActive"] != null)
+                    if(viewActive)
                     {
-                        if(Convert.ToBoolean(ViewState["viewActive"]))
-                        {
-                            isActive = "IN";
-                            activeLabel = "Active";
-                            bootstrapClass = "label-success";
-                        }
-                        else
-                        {
-                            isActive = "NOT IN";
-                            activeLabel = "Inactive";
-                            bootstrapClass = "label-danger";
-                        }
-                            
+                        isActive = "IN";
+                        activeLabel = "Active";
+                        bootstrapClass = "label-success";
+                    }
+                    else
+                    {
+                        isActive = "NOT IN";
+                        activeLabel = "Inactive";
+                        bootstrapClass = "label-danger";
                     }
                         
 
@@ -87,7 +93,7 @@ namespace HR_LEAVEv2.HR
                             DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
                             FROM dbo.employee e
 
-                            WHERE e.employee_id <> {Session["emp_id"].ToString()} AND e.employee_id {isActive} 
+                            WHERE e.employee_id <> {user.currUserId} AND e.employee_id {isActive} 
                             (
                                 select ep.employee_id
                                 from dbo.employeeposition ep
@@ -107,20 +113,17 @@ namespace HR_LEAVEv2.HR
                     if (permissions.Contains("public_officer_permissions"))
                         emp_type.Add("'Public Service'");
 
-                    if (ViewState["viewActive"] != null)
+                    if (viewActive)
                     {
-                        if (Convert.ToBoolean(ViewState["viewActive"]))
-                        {
-                            isActive = "IN";
-                            activeLabel = "Active";
-                            bootstrapClass = "label-success";
-                        }
-                        else
-                        {
-                            isActive = "NOT IN";
-                            activeLabel = "Inactive";
-                            bootstrapClass = "label-danger";
-                        }
+                        isActive = "IN";
+                        activeLabel = "Active";
+                        bootstrapClass = "label-success";
+                    }
+                    else
+                    {
+                        isActive = "NOT IN";
+                        activeLabel = "Inactive";
+                        bootstrapClass = "label-danger";
                     }
 
                     // the following sql ensures that out of all an employees employment records, only the most recent one (the most recently ended) is considered for if the employee can be accessed
@@ -148,7 +151,7 @@ namespace HR_LEAVEv2.HR
 		                            FROM (
 			                            SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.start_date, hr_ep.actual_end_date
 			                            FROM dbo.employeeposition hr_ep
-			                            WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
+			                            WHERE hr_ep.employee_id = '{user.currUserId}' 
 		                            ) HR_INFO
 		                          WHERE RowNum = 1) as 'is_hr_active'
 
@@ -157,7 +160,7 @@ namespace HR_LEAVEv2.HR
                                 JOIN employeeposition ep
                                 ON ep.employee_id = e.employee_id
 
-                                WHERE ep.employee_id <> '{Session["emp_id"].ToString()}' AND ep.employee_id {isActive}
+                                WHERE ep.employee_id <> '{user.currUserId}' AND ep.employee_id {isActive}
                                 (
                                     select ep.employee_id
                                     from dbo.employeeposition ep
@@ -213,21 +216,18 @@ namespace HR_LEAVEv2.HR
                 if (permissions.Contains("hr1_permissions"))
                 {
                     // HR 1
-                    if (ViewState["viewActive"] != null)
-                    {
-                        if (Convert.ToBoolean(ViewState["viewActive"]))
-                        {
-                            isActive = "IN";
-                            activeLabel = "Active";
-                            bootstrapClass = "label-success";
-                        }
-                        else
-                        {
-                            isActive = "NOT IN";
-                            activeLabel = "Inactive";
-                            bootstrapClass = "label-danger";
-                        }
 
+                    if (viewActive)
+                    {
+                        isActive = "IN";
+                        activeLabel = "Active";
+                        bootstrapClass = "label-success";
+                    }
+                    else
+                    {
+                        isActive = "NOT IN";
+                        activeLabel = "Inactive";
+                        bootstrapClass = "label-danger";
                     }
 
 
@@ -237,7 +237,7 @@ namespace HR_LEAVEv2.HR
                             DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
                             FROM dbo.employee e
 
-                            WHERE e.employee_id <> {Session["emp_id"].ToString()} 
+                            WHERE e.employee_id <> {user.currUserId} 
                                 AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
                                 AND e.employee_id {isActive} 
                                 (
@@ -258,20 +258,17 @@ namespace HR_LEAVEv2.HR
                     if (permissions.Contains("public_officer_permissions"))
                         emp_type.Add("Public Service");
 
-                    if (ViewState["viewActive"] != null)
+                    if (viewActive)
                     {
-                        if (Convert.ToBoolean(ViewState["viewActive"]))
-                        {
-                            isActive = "IN";
-                            activeLabel = "Active";
-                            bootstrapClass = "label-success";
-                        }
-                        else
-                        {
-                            isActive = "NOT IN";
-                            activeLabel = "Inactive";
-                            bootstrapClass = "label-danger";
-                        }
+                        isActive = "IN";
+                        activeLabel = "Active";
+                        bootstrapClass = "label-success";
+                    }
+                    else
+                    {
+                        isActive = "NOT IN";
+                        activeLabel = "Inactive";
+                        bootstrapClass = "label-danger";
                     }
 
                     sql = $@"
@@ -280,7 +277,7 @@ namespace HR_LEAVEv2.HR
                             FROM dbo.employee e
                             JOIN employeeposition ep
                             ON ep.employee_id = e.employee_id
-                            WHERE e.employee_id <> {Session["emp_id"].ToString()} 
+                            WHERE e.employee_id <> {user.currUserId} 
                                 AND ep.employment_type IN ({String.Join(", ", emp_type.ToArray())})
                                 AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
                                 AND e.employee_id {isActive} 
@@ -340,8 +337,7 @@ namespace HR_LEAVEv2.HR
         protected void employeeStatusDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
             // change the type of employees to view, Active or Inactive
-            Session["viewForAllEmployees"] = employeeStatusDropDown.SelectedValue;
-            ViewState["viewActive"] = employeeStatusDropDown.SelectedValue == "Active";
+            typeOfEmpToView = employeeStatusDropDown.SelectedValue;
             employeesDataPager.SetPageProperties(0, 8, false);
             bindListView();
         }
@@ -357,112 +353,109 @@ namespace HR_LEAVEv2.HR
             Util util = new Util();
             EmpDetails empDetails = null;
 
-            if(ViewState["viewActive"] != null)
+            if (viewActive)
             {
-                if (Convert.ToBoolean(ViewState["viewActive"]))
+                try
                 {
-                    try
+                    string sql = $@"
+                    SELECT TOP 1 e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, e.vacation, e.personal, e.casual, e.sick, ep.employment_type, ep.start_date, p.pos_name
+                    FROM [dbo].[employee] e
+
+                    RIGHT JOIN [dbo].employeeposition ep
+                    ON e.employee_id = ep.employee_id
+
+                    INNER JOIN [dbo].position p
+                    ON ep.position_id = p.pos_id
+
+                    WHERE e.employee_id = {emp_id}
+                    ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC;
+                ";
+
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                     {
-                        string sql = $@"
-                        SELECT TOP 1 e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, e.vacation, e.personal, e.casual, e.sick, ep.employment_type, ep.start_date, p.pos_name
-                        FROM [dbo].[employee] e
-
-                        RIGHT JOIN [dbo].employeeposition ep
-                        ON e.employee_id = ep.employee_id
-
-                        INNER JOIN [dbo].position p
-                        ON ep.position_id = p.pos_id
-
-                        WHERE e.employee_id = {emp_id}
-                        ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC;
-                    ";
-
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        connection.Open();
+                        using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            connection.Open();
-                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                using (SqlDataReader reader = command.ExecuteReader())
+                                if (reader.HasRows)
                                 {
-                                    if (reader.HasRows)
+                                    while (reader.Read())
                                     {
-                                        while (reader.Read())
+                                        empDetails = new EmpDetails
                                         {
-                                            empDetails = new EmpDetails
-                                            {
-                                                emp_id = reader["employee_id"].ToString(),
-                                                ihris_id = reader["ihris_id"].ToString(),
-                                                name = reader["name"].ToString(),
-                                                email = reader["email"].ToString(),
-                                                vacation = reader["vacation"].ToString(),
-                                                personal = reader["personal"].ToString(),
-                                                casual = reader["casual"].ToString(),
-                                                sick = reader["sick"].ToString(),
-                                                employment_type = reader["employment_type"].ToString(),
-                                                start_date = (DateTime)reader["start_date"],
-                                                position = reader["pos_name"].ToString(),
-                                                isCompleteRecord = '1'
-                                            };
-                                        }
+                                            emp_id = reader["employee_id"].ToString(),
+                                            ihris_id = reader["ihris_id"].ToString(),
+                                            name = reader["name"].ToString(),
+                                            email = reader["email"].ToString(),
+                                            vacation = reader["vacation"].ToString(),
+                                            personal = reader["personal"].ToString(),
+                                            casual = reader["casual"].ToString(),
+                                            sick = reader["sick"].ToString(),
+                                            employment_type = reader["employment_type"].ToString(),
+                                            start_date = (DateTime)reader["start_date"],
+                                            position = reader["pos_name"].ToString(),
+                                            isCompleteRecord = '1'
+                                        };
+                                    }
 
-                                        string leaveBalancesDetailsStr = $@"
-                                            <div>
-                                                 <h4 style = 'display: inline'>Sick Leave Balance:</h4>
-                                                 <span> {empDetails.sick} </span>
-                                            </div>
-                                        ";
-                                        // set appropriate leave balance details based on employment type
-                                        if (empDetails.employment_type == "Contract")
-                                        {
-                                            // is employee in first 11 months of contract?
-                                            DateTime startDate = empDetails.start_date;
-                                            DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
+                                    string leaveBalancesDetailsStr = $@"
+                                        <div>
+                                                <h4 style = 'display: inline'>Sick Leave Balance:</h4>
+                                                <span> {empDetails.sick} </span>
+                                        </div>
+                                    ";
+                                    // set appropriate leave balance details based on employment type
+                                    if (empDetails.employment_type == "Contract")
+                                    {
+                                        // is employee in first 11 months of contract?
+                                        DateTime startDate = empDetails.start_date;
+                                        DateTime elevenMonthsFromStartDate = startDate.AddMonths(11);
 
-                                            if (DateTime.Compare(util.getCurrentDateToday(), elevenMonthsFromStartDate) < 0)
-                                                // display personal 
-                                                leaveBalancesDetailsStr += $@"
-                                                    <div>
-                                                        <h4 style='display: inline'>Personal Leave Balance:</h4>
-                                                        <span>{empDetails.personal}</span>
-                                                    </div>
-                                                 ";
-                                            else
-                                            {
-                                                // display vacation 
-                                                leaveBalancesDetailsStr += $@"
-                                                    <div>
-                                                        <h4 style='display: inline'>Vacation Leave Balance:</h4>
-                                                        <span>{empDetails.vacation}</span>
-                                                    </div>
-                                                 ";
-                                            }
-
-                                        }
-                                        else if (empDetails.employment_type == "Public Service")
-                                        {
-                                            // public service employees- show casual and vacation
+                                        if (DateTime.Compare(util.getCurrentDateToday(), elevenMonthsFromStartDate) < 0)
+                                            // display personal 
                                             leaveBalancesDetailsStr += $@"
                                                 <div>
-                                                    <h4 style='display: inline'>Casual Leave Balance:</h4>
-                                                    <span>{empDetails.casual}</span>
+                                                    <h4 style='display: inline'>Personal Leave Balance:</h4>
+                                                    <span>{empDetails.personal}</span>
                                                 </div>
+                                                ";
+                                        else
+                                        {
+                                            // display vacation 
+                                            leaveBalancesDetailsStr += $@"
                                                 <div>
                                                     <h4 style='display: inline'>Vacation Leave Balance:</h4>
                                                     <span>{empDetails.vacation}</span>
                                                 </div>
-                                             ";
+                                                ";
                                         }
 
-                                        empDetails.leave_balances = leaveBalancesDetailsStr;
                                     }
+                                    else if (empDetails.employment_type == "Public Service")
+                                    {
+                                        // public service employees- show casual and vacation
+                                        leaveBalancesDetailsStr += $@"
+                                            <div>
+                                                <h4 style='display: inline'>Casual Leave Balance:</h4>
+                                                <span>{empDetails.casual}</span>
+                                            </div>
+                                            <div>
+                                                <h4 style='display: inline'>Vacation Leave Balance:</h4>
+                                                <span>{empDetails.vacation}</span>
+                                            </div>
+                                            ";
+                                    }
+
+                                    empDetails.leave_balances = leaveBalancesDetailsStr;
                                 }
                             }
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        return null;
-                    }
+                }
+                catch (Exception ex)
+                {
+                    return null;
                 }
             }
             
