@@ -81,14 +81,9 @@ namespace HR_LEAVEv2.HR
 
         public bool isEditMode { get; set; }
 
-        // used to check if user can view page 
-        List<string> permissions = null;
-
         protected void Page_Load(object sender, EventArgs e)
         {
-            permissions = (List<string>)Session["permissions"];
-
-            if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
+            if (user.permissions == null || (user.permissions != null && !(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions") || user.permissions.Contains("hr3_permissions"))))
                 Response.Redirect("~/AccessDenied.aspx");
 
             // validator for end date when adding employment records
@@ -185,15 +180,15 @@ namespace HR_LEAVEv2.HR
             // authorizations
             // if hr 1 then authorizations can be edited
 
-            if (permissions.Contains("hr1_permissions"))
+            if (user.permissions.Contains("hr1_permissions"))
             {
                 authorizationLevelPanel.Visible = true;
             }
             else
             {
-                if (permissions.Contains("hr2_permissions"))
+                if (user.permissions.Contains("hr2_permissions"))
                     hr1CheckDiv.Visible = false;
-                else if (permissions.Contains("hr3_permissions"))
+                else if (user.permissions.Contains("hr3_permissions"))
                     hr1CheckDiv.Visible = hr2CheckDiv.Visible = false;
             }
 
@@ -1311,11 +1306,11 @@ namespace HR_LEAVEv2.HR
             {
                 string empType = dataTable.Rows[0].ItemArray[(int)emp_records_columns.employment_type].ToString();
 
-                if (!permissions.Contains("hr1_permissions"))
+                if (!user.permissions.Contains("hr1_permissions"))
                 {
                     // the HR 2, HR 3 must have permissions to view data for the same employment type as for the employee who submitted the application
                     //check if hr can view applications from the relevant employment type 
-                    if (util.isNullOrEmpty(empType) || (empType == "Contract" && !permissions.Contains("contract_permissions")) || (empType == "Public Service" && !permissions.Contains("public_officer_permissions")))
+                    if (util.isNullOrEmpty(empType) || (empType == "Contract" && !user.permissions.Contains("contract_permissions")) || (empType == "Public Service" && !user.permissions.Contains("public_officer_permissions")))
                         Response.Redirect("~/AccessDenied.aspx");
                 }
             }

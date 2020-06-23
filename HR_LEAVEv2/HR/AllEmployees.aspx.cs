@@ -13,7 +13,6 @@ namespace HR_LEAVEv2.HR
     public partial class AllEmployees : System.Web.UI.Page
     {
         User user = new User();
-        List<string> permissions = null;
 
         // used to retrieve employee details for display in modal
         protected class EmpDetails
@@ -46,8 +45,7 @@ namespace HR_LEAVEv2.HR
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            permissions = (List<string>)Session["permissions"];
-            if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions" ) || permissions.Contains("hr3_permissions")))
+            if (user.permissions == null || (user.permissions != null && !(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions" ) || user.permissions.Contains("hr3_permissions"))))
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)
@@ -70,7 +68,7 @@ namespace HR_LEAVEv2.HR
             {
                 string sql;
                 string isActive = "IN", activeLabel = "Active", bootstrapClass = "label-success";
-                if (permissions.Contains("hr1_permissions"))
+                if (user.permissions.Contains("hr1_permissions"))
                 {
 
                     if(viewActive)
@@ -108,9 +106,9 @@ namespace HR_LEAVEv2.HR
                 {
                     List<string> emp_type = new List<string>();
                     // HR 2 and HR 3
-                    if (permissions.Contains("contract_permissions"))
+                    if (user.permissions.Contains("contract_permissions"))
                         emp_type.Add("'Contract'");
-                    if (permissions.Contains("public_officer_permissions"))
+                    if (user.permissions.Contains("public_officer_permissions"))
                         emp_type.Add("'Public Service'");
 
                     if (viewActive)
@@ -213,7 +211,7 @@ namespace HR_LEAVEv2.HR
 
                 string sql;
                 string isActive = "IN", activeLabel = "Active", bootstrapClass = "label-success";
-                if (permissions.Contains("hr1_permissions"))
+                if (user.permissions.Contains("hr1_permissions"))
                 {
                     // HR 1
 
@@ -253,9 +251,9 @@ namespace HR_LEAVEv2.HR
                 {
                     List<string> emp_type = new List<string>();
                     // HR 2 and HR 3
-                    if (permissions.Contains("contract_permissions"))
+                    if (user.permissions.Contains("contract_permissions"))
                         emp_type.Add("Contract");
-                    if (permissions.Contains("public_officer_permissions"))
+                    if (user.permissions.Contains("public_officer_permissions"))
                         emp_type.Add("Public Service");
 
                     if (viewActive)

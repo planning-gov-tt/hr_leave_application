@@ -12,7 +12,7 @@ namespace HR_LEAVEv2.Employee
         User user = new User();
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["permissions"] == null)
+            if (user.permissions == null)
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)

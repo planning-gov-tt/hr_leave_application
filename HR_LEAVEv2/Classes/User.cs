@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 
 namespace HR_LEAVEv2.Classes
@@ -27,6 +28,12 @@ namespace HR_LEAVEv2.Classes
         {
             get { return HttpContext.Current.Session["currNumYearsWorked"] != null ? Convert.ToInt32(HttpContext.Current.Session["currNumYearsWorked"]) : -1; }
             set { HttpContext.Current.Session["currNumYearsWorked"] = value; }
+        }
+
+        public List<string> permissions
+        {
+            get { return HttpContext.Current.Session["permissions"] != null ? (List<string>)HttpContext.Current.Session["permissions"] : null; }
+            set { HttpContext.Current.Session["permissions"] = value; }
         }
     }
 }

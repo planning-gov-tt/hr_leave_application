@@ -65,7 +65,7 @@ namespace HR_LEAVEv2.Employee
 
             if (!IsPostBack)
             {
-                if (Session["permissions"] == null)
+                if (user.permissions == null)
                     Response.Redirect("~/AccessDenied.aspx");
 
                 /*~~~~~~~~~~~Files INITIALIZATION~~~~~~~~~~~~~~~*/
@@ -719,8 +719,7 @@ namespace HR_LEAVEv2.Employee
                 supCommentsTxt.Disabled = false;
 
             // adjust page to allow HR to leave comments or edit the number of days applied for
-            List<string> permissions = (List<string>)Session["permissions"];
-            if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
+            if (user.permissions != null && (user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions")))
             {
                 hrCommentsTxt.Disabled = false;
                 numDaysAppliedForEditTxt.Visible = true;
@@ -843,9 +842,7 @@ namespace HR_LEAVEv2.Employee
                             }
 
                             // check permissions of current user
-                            List<string> permissions = (List<string>)Session["permissions"];
-
-                            if (!permissions.Contains("hr1_permissions"))
+                            if (!user.permissions.Contains("hr1_permissions"))
                             {
                                 // HR 2, HR 3, Supervisors, Employees and every combination
 
@@ -857,11 +854,11 @@ namespace HR_LEAVEv2.Employee
 
                                     // HR 3
                                     // HR 3 should not have access to leave application data
-                                    if (permissions.Contains("hr3_permissions"))
+                                    if (user.permissions.Contains("hr3_permissions"))
                                         Response.Redirect("~/AccessDenied.aspx");
 
                                     // HR 2
-                                    if (permissions.Contains("hr2_permissions"))
+                                    if (user.permissions.Contains("hr2_permissions"))
                                     {
                                         if (!util.isNullOrEmpty(ltDetails.empType))
                                         {
@@ -869,20 +866,20 @@ namespace HR_LEAVEv2.Employee
                                             if (
                                                 (
                                                     //check if hr can view applications from the relevant employment type 
-                                                    (ltDetails.empType == "Contract" && !permissions.Contains("contract_permissions"))
+                                                    (ltDetails.empType == "Contract" && !user.permissions.Contains("contract_permissions"))
                                                     ||
-                                                    (ltDetails.empType == "Public Service" && !permissions.Contains("public_officer_permissions"))
+                                                    (ltDetails.empType == "Public Service" && !user.permissions.Contains("public_officer_permissions"))
                                                 )
 
                                                 ||
 
                                                 (
                                                     //check if hr can view applications of the relevant leave type
-                                                    (ltDetails.typeOfLeave == "Sick" && !permissions.Contains("approve_sick"))
+                                                    (ltDetails.typeOfLeave == "Sick" && !user.permissions.Contains("approve_sick"))
                                                     ||
-                                                    (ltDetails.typeOfLeave == "Vacation" && !permissions.Contains("approve_vacation"))
+                                                    (ltDetails.typeOfLeave == "Vacation" && !user.permissions.Contains("approve_vacation"))
                                                     ||
-                                                    (ltDetails.typeOfLeave == "Casual" && !permissions.Contains("approve_casual"))
+                                                    (ltDetails.typeOfLeave == "Casual" && !user.permissions.Contains("approve_casual"))
                                                 )
                                                )
                                                Response.Redirect("~/AccessDenied.aspx");
@@ -892,7 +889,7 @@ namespace HR_LEAVEv2.Employee
                                     else
                                     {
                                         // if emp trying to view LA is supervisor 
-                                        if (permissions.Contains("sup_permissions"))
+                                        if (user.permissions.Contains("sup_permissions"))
                                         {
                                             //LA was not submitted to them
                                             if (user.currUserId == null || user.currUserId != ltDetails.supId)

@@ -16,8 +16,7 @@ namespace HR_LEAVEv2.HR
         User user = new User();
         protected void Page_Load(object sender, EventArgs e)
         {
-            List<string> permissions = (List<string>)Session["permissions"];
-            if (permissions == null || !(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions")))
+            if (user.permissions == null || (user.permissions != null && !(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions"))))
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)

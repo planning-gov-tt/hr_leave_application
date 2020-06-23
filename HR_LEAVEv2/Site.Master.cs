@@ -54,8 +54,8 @@ namespace HR_LEAVEv2
                 user.currUserId = auth.getUserEmployeeId(user.currUserEmail);
 
             // store employee's permissions in Session
-            if (Session["permissions"] == null && user.currUserId != null)
-                Session["permissions"] = auth.getUserPermissions(user.currUserId);
+            if (user.permissions == null && user.currUserId != null)
+                user.permissions = auth.getUserPermissions(user.currUserId);
 
 
             DateTime startDate = DateTime.MinValue;
@@ -121,14 +121,12 @@ namespace HR_LEAVEv2
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            List<string> permissions = (List<string>)Session["permissions"];
-
-            if (permissions != null)
+            if (user.permissions != null)
             {
                 // set displays based on what role a user plays 
 
                 // supervisor
-                if (permissions.Contains("sup_permissions"))
+                if (user.permissions.Contains("sup_permissions"))
                 {
                     supervisorPanel.Style.Add("display", "block");
                 }
@@ -136,7 +134,7 @@ namespace HR_LEAVEv2
                     supervisorPanel.Style.Add("display", "none");
 
                 // HR 1 or HR 2
-                if (permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions"))
+                if (user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions"))
                 {
                     hr1_hr2Panel.Style.Add("display", "block");
                 }
@@ -144,7 +142,7 @@ namespace HR_LEAVEv2
                     hr1_hr2Panel.Style.Add("display", "none");
 
                 // HR 3
-                if (permissions.Contains("hr3_permissions"))
+                if (user.permissions.Contains("hr3_permissions"))
                 {
                     hr3Panel.Style.Add("display", "block");
                 }
@@ -152,7 +150,7 @@ namespace HR_LEAVEv2
                     hr3Panel.Style.Add("display", "none");
 
                 // Admin
-                if (permissions.Contains("admin_permissions"))
+                if (user.permissions.Contains("admin_permissions"))
                 {
                     adminPanel.Style.Add("display", "block");
                 }
@@ -354,7 +352,7 @@ namespace HR_LEAVEv2
             user.currUserId = null;
             user.currUserNumYearsWorked = -1;
             user.currUserName = null;
-            Session["permissions"] = null;
+            user.permissions = null;
             Response.Redirect(Request.RawUrl);
         }
     }
