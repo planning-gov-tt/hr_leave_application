@@ -17,7 +17,7 @@ namespace HR_LEAVEv2.HR
     public partial class EmployeeDetails : System.Web.UI.Page
     {
         Util util = new Util();
-
+        User user = new User();
         // the following enum is used when getting or setting data in datatables 
         // as related to the employment records
         enum emp_records_columns
@@ -60,9 +60,25 @@ namespace HR_LEAVEv2.HR
             get { return ViewState["previousLeaveBalances"] != null ? (Dictionary<string, string>)ViewState["previousLeaveBalances"] : null; }
             set { ViewState["previousLeaveBalances"] = value; }
         }
+        private List<HttpPostedFile> uploadedFiles
+        {
+            get { return Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null; }
+            set { Session["uploadedFiles"] = value; }
+        }
 
+        // stores index of record currently being edited
+        private int empRecordBeingEditedRowIndex
+        {
+            get { return Session["empRecordRowIndex"] != null ? Convert.ToInt32(Session["empRecordRowIndex"]) : -1; }
+            set { Session["empRecordRowIndex"] = value; }
+        }
 
-        
+        private Dictionary<string, HashSet<string>> editedRecords
+        {
+            get { return Session["editedRecords"] != null ? (Dictionary<string, HashSet<string>>)Session["editedRecords"] : null; }
+            set { Session["editedRecords"] = value; }
+        }
+
         public bool isEditMode { get; set; }
 
         // used to check if user can view page 
@@ -338,7 +354,7 @@ namespace HR_LEAVEv2.HR
 
                 // store data about row which must be edited
                 int index = Convert.ToInt32(e.CommandArgument);
-                Session["empRecordRowIndex"] = index;
+                empRecordBeingEditedRowIndex = index;
 
                 // show modal
                 ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('show');", true);
@@ -743,10 +759,10 @@ namespace HR_LEAVEv2.HR
 
             clearErrors();
 
-            if (empRecordsDataSource != null && Session["empRecordRowIndex"] != null)
+            if (empRecordsDataSource != null && empRecordBeingEditedRowIndex != -1)
             {
                 DataTable dt = empRecordsDataSource;
-                int indexInDt = Convert.ToInt32(Session["empRecordRowIndex"]);
+                int indexInDt = empRecordBeingEditedRowIndex;
 
                 string startDate = Convert.ToDateTime(dt.Rows[indexInDt][(int)emp_records_columns.start_date]).ToString("d/MM/yyyy");
                 DateTime end = validateActualEndDate(startDate, txtEmpRecordEndDate.Text, invalidEndDatePanel, actualEndDateIsWeekendPanel, endDateBeforeStartDatePanel, emptyEndDatePanel);
@@ -779,9 +795,9 @@ namespace HR_LEAVEv2.HR
 
                         // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for audit logs
                         Dictionary<string, HashSet<string>> recordEdits = new Dictionary<string, HashSet<string>>();
-                        if (Session["editedRecords"] != null)
+                        if (editedRecords != null)
                         {
-                            recordEdits = (Dictionary<string, HashSet<string>>)Session["editedRecords"];
+                            recordEdits = editedRecords;
 
                             // record already exists
                             if (recordEdits.Keys.Contains(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()))
@@ -794,16 +810,16 @@ namespace HR_LEAVEv2.HR
                             }
 
 
-                            Session["editedRecords"] = recordEdits;
+                            editedRecords = recordEdits;
                         }
                         else
                         {
                             recordEdits.Add(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
                             recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
-                            Session["editedRecords"] = recordEdits;
+                            editedRecords = recordEdits;
                         }
 
-                        Session["empRecordRowIndex"] = null;
+                        empRecordBeingEditedRowIndex = -1;
 
                         // hide modal
                         ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('hide');", true);
@@ -1093,9 +1109,9 @@ namespace HR_LEAVEv2.HR
 
                                     // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for adding audit log. 
                                     Dictionary<string, HashSet<string>> recordEdits = new Dictionary<string, HashSet<string>>();
-                                    if (Session["editedRecords"] != null)
+                                    if (editedRecords != null)
                                     {
-                                        recordEdits = (Dictionary<string, HashSet<string>>)Session["editedRecords"];
+                                        recordEdits = editedRecords;
 
                                         // record already exists
                                         if (recordEdits.Keys.Contains(dt.Rows[index][(int)emp_records_columns.record_id].ToString()))
@@ -1108,12 +1124,12 @@ namespace HR_LEAVEv2.HR
                                         }
 
 
-                                        Session["editedRecords"] = recordEdits;
+                                        editedRecords = recordEdits;
                                     } else
                                     {
                                         recordEdits.Add(dt.Rows[index][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
                                         recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
-                                        Session["editedRecords"] = recordEdits;
+                                        editedRecords = recordEdits;
                                     }
 
                                     editEmpRecordSuccTxt.InnerText = $"{String.Join(", ", editsMade.ToArray())} edits successfully made to employment record. Don't forget to save your changes";
@@ -1143,7 +1159,7 @@ namespace HR_LEAVEv2.HR
         {
             // closes modal where employee can end an employment record (populate the actual end date field)
 
-            Session["empRecordRowIndex"] = null;
+            empRecordBeingEditedRowIndex = -1;
             ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('hide');", true);
         }
         //_________________________________________________________________________
@@ -1576,7 +1592,7 @@ namespace HR_LEAVEv2.HR
                     * Roles deleted
                     * */
                     string action = $"Edited roles; Roles Deleted= {String.Join(", ", deletedRoles.ToArray())}";
-                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
+                    util.addAuditLog(user.currUserId, empId, action);
                 }
 
                 // previous roles holds the employee's previous roles. The following code looks at the previous roles and checks which roles were added to the employee
@@ -1636,7 +1652,7 @@ namespace HR_LEAVEv2.HR
                     * Roles added
                     * */
                     string action = $"Edited roles; Roles Added= {String.Join(", ", addedRoles.ToArray())}";
-                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
+                    util.addAuditLog(user.currUserId, empId, action);
                 }
 
                 // there was a change made to the roles
@@ -1710,7 +1726,7 @@ namespace HR_LEAVEv2.HR
                 * Leave Balance edited and the value which it was changed to
                 * */
                 string action = $"Edited leave balances; {String.Join(", ", editedLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())}";
-                util.addAuditLog(Session["emp_id"].ToString(), empId, action);
+                util.addAuditLog(user.currUserId, empId, action);
 
                 // leave balances were changed
                 isLeaveBalancesChanged = true;
@@ -1773,7 +1789,7 @@ namespace HR_LEAVEv2.HR
                     * ID of Employment Records deleted
                     * */
                     string action = $"Deleted employment records; {String.Join(", ", deletedRecords.Select(lb => "id =" + lb).ToArray())}";
-                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
+                    util.addAuditLog(user.currUserId, empId, action);
                 }
 
                 // a list to contain the ids of added employment records. This list is used to create audit logs for addition of records
@@ -1862,7 +1878,7 @@ namespace HR_LEAVEv2.HR
                     * ID of Employment Records added
                     * */
                     string action = $"Added employment records; {String.Join(", ", addedRecords.Select(lb => "id =" + lb).ToArray())}";
-                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
+                    util.addAuditLog(user.currUserId, empId, action);
                 }
 
                 int numEditedRecords = 0;
@@ -1939,9 +1955,9 @@ namespace HR_LEAVEv2.HR
                                         numEditedRecords++;
 
                                         // create array of info about each Field edited for a given record. This array is used to create the action for an audit log
-                                        if (Session["editedRecords"] != null)
+                                        if (editedRecords != null)
                                         {
-                                            Dictionary<string, HashSet<string>> editedRecordsDict = (Dictionary<string, HashSet<string>>)Session["editedRecords"];
+                                            Dictionary<string, HashSet<string>> editedRecordsDict = editedRecords;
 
                                             foreach (KeyValuePair<string, HashSet<string>> entry in editedRecordsDict)
                                             {
@@ -1949,7 +1965,7 @@ namespace HR_LEAVEv2.HR
                                                 string log = $"record_id= {entry.Key}, Fields edited= {String.Join(", ", entry.Value.ToArray())}";
                                                 editedEmpRecordsLog.Add(log);
                                             }
-                                            Session["editedRecords"] = null;
+                                            editedRecords = null;
                                         }
 
                                     }
@@ -1974,7 +1990,7 @@ namespace HR_LEAVEv2.HR
                     * ID of Employment Records edited and the end date added
                     * */
                     string action = $"Edited employment records; {String.Join("; ", editedEmpRecordsLog.ToArray())}";
-                    util.addAuditLog(Session["emp_id"].ToString(), empId, action);
+                    util.addAuditLog(user.currUserId, empId, action);
                 }
 
                 if (deletedRecords.Count > 0 || addedRecords.Count > 0 || numEditedRecords > 0)
@@ -1991,9 +2007,9 @@ namespace HR_LEAVEv2.HR
             // END EMPLOYMENT RECORDS--------------------------------------------------------------------------------------------------------------------------
 
             // ADD FILES--------------------------------------------------------------------------------------------------------------------------
-            if (Session["uploadedFiles"] != null)
+            if (uploadedFiles != null)
             {
-                List<HttpPostedFile> files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                List<HttpPostedFile> files = uploadedFiles;
 
                 // save uploaded file(s)
                 foreach (HttpPostedFile uploadedFile in files)
@@ -2076,7 +2092,7 @@ namespace HR_LEAVEv2.HR
                     if (uploadedFilesIds.Count > 0)
                     {
                         fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
-                        util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), fileActionString);
+                        util.addAuditLog(user.currUserId, user.currUserId, fileActionString);
                     }
                     isFilesChanged = true;
                 }
@@ -2108,7 +2124,7 @@ namespace HR_LEAVEv2.HR
                             }
                             if (isAccumulatePastLimitSuccessful)
                             {
-                                util.addAuditLog(Session["emp_id"].ToString(), Session["emp_id"].ToString(), "Employee can now accumulate past their limit");
+                                util.addAuditLog(user.currUserId, user.currUserId, "Employee can now accumulate past their limit");
                                 isAccumulatePastLimitStatusChangedInDb = true;
                             }
                         }
@@ -2477,7 +2493,7 @@ namespace HR_LEAVEv2.HR
                 * Employee permissions
                 * */
                 string action = $"Created new Employee; {String.Join(", ", currentLeaveBalances.Select(lb => lb.Key + "=" + lb.Value).ToArray())} ; Permissions: {String.Join(",", authorizations.ToArray())}";
-                util.addAuditLog(Session["emp_id"].ToString(), emp_id, action);
+                util.addAuditLog(user.currUserId, emp_id, action);
 
                 // hide submit button if insert is successful
                 submitBtn.Visible = false;
@@ -2592,7 +2608,7 @@ namespace HR_LEAVEv2.HR
                 {
 
                     // add files to session so they will persist after postback
-                    Session["uploadedFiles"] = files;
+                    uploadedFiles = files;
 
                     // show files uploaded
                     filesUploadedPanel.Visible = true;
@@ -2610,10 +2626,10 @@ namespace HR_LEAVEv2.HR
             {
                 List<HttpPostedFile> files = null;
 
-                if (Session["uploadedFiles"] != null)
-                    files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                if (uploadedFiles != null)
+                    files = uploadedFiles;
 
-                if (Session["uploadedFiles"] == null || files == null || files.Count <= 0)
+                if (uploadedFiles == null || files == null || files.Count <= 0)
                 {
                     filesUploadedPanel.Visible = false;
                     noFileUploaded.Style.Add("display", "inline-block");
@@ -2635,7 +2651,7 @@ namespace HR_LEAVEv2.HR
             filesUploadedListView.DataSource = new DataTable();
             filesUploadedListView.DataBind();
 
-            Session["uploadedFiles"] = null;
+            uploadedFiles = null;
 
             clearAllFilesBtn.Visible = false;
             if(chkOnOff.Checked)
@@ -2763,9 +2779,9 @@ namespace HR_LEAVEv2.HR
 
             // go through all files and create new datatable
             List<HttpPostedFile> files = null;
-            if (Session["uploadedFiles"] != null)
+            if (uploadedFiles != null)
             {
-                files = (List<HttpPostedFile>)Session["uploadedFiles"];
+                files = uploadedFiles;
 
                 HttpPostedFile fileToRemove = files.SingleOrDefault<HttpPostedFile>(file => Path.GetFileName(file.FileName).ToString() == file_name);
                 if (fileToRemove != null)
@@ -2777,7 +2793,7 @@ namespace HR_LEAVEv2.HR
                     {
                         dt.Rows.Add(Path.GetFileName(file.FileName).ToString());
                     }
-                    Session["uploadedFiles"] = files;
+                    uploadedFiles = files;
                     noFilesUploadedDisclaimerPanel.Visible = false;
                 }
                 else
