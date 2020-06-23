@@ -10,6 +10,7 @@ namespace HR_LEAVEv2.UserControls
     public partial class LeaveCountUserControlBS4 : System.Web.UI.UserControl
     {
         Util util = new Util();
+        User user = new User();
         private class EmployeeDetails
         {
             public string sick { get; set; }
@@ -49,7 +50,7 @@ namespace HR_LEAVEv2.UserControls
                             FROM [dbo].[employee] e
                             LEFT JOIN [dbo].employeeposition ep
                             ON e.employee_id = ep.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
-                            WHERE e.[employee_id] = '{Session["emp_id"]}'
+                            WHERE e.[employee_id] = '{user.currUserId}'
                             ;
                         ";
                     using (SqlCommand cmd = new SqlCommand(getEmpDetailsSql, con))
@@ -135,7 +136,7 @@ namespace HR_LEAVEv2.UserControls
                                             string updateVacationSql = $@"
                                                 UPDATE [dbo].employee 
                                                 SET vacation = '{updatedVacation}', personal = '0'
-                                                WHERE employee_id = '{Session["emp_id"]}';
+                                                WHERE employee_id = '{user.currUserId}';
                                             ";
                                             using (SqlCommand cmd = new SqlCommand(updateVacationSql, con))
                                             {

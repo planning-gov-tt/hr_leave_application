@@ -16,6 +16,7 @@ namespace HR_LEAVEv2.UserControls
     public partial class MainGridView : System.Web.UI.UserControl
     {
         Util util = new Util();
+        User user = new User();
 
         // used to identify which data and action buttons to show to user
         public string gridViewType { get; set; } // "emp", "sup", "hr"
@@ -141,6 +142,18 @@ namespace HR_LEAVEv2.UserControls
             set { ViewState["LAfromActiveInactiveEmp"] = value; }
         }
 
+        private Dictionary<string, string> notApprovedRow
+        {
+            get { return ViewState["notApprovedRow"] != null ? (Dictionary<string, string>)ViewState["notApprovedRow"]: null; }
+            set { ViewState["notApprovedRow"] = value; }
+        }
+
+        private Dictionary<string, string> notRecommendedRow
+        {
+            get { return ViewState["notRecommendedRow"] != null ? (Dictionary<string, string>)ViewState["notRecommendedRow"] : null; }
+            set { ViewState["notRecommendedRow"] = value; }
+        }
+
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -206,7 +219,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     whereBindGridView = $@"
                         WHERE
-                            e.employee_id = '{Session["emp_id"]}' 
+                            e.employee_id = '{user.currUserId}' 
                     ";
                 }
 
@@ -215,7 +228,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     whereBindGridView = $@"
                         WHERE
-                            supervisor_id = '{Session["emp_id"]}'
+                            supervisor_id = '{user.currUserId}'
                     ";
 
                     // ensure that the current supervisor viewing data is active
@@ -230,7 +243,7 @@ namespace HR_LEAVEv2.UserControls
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
 								FROM dbo.employeeposition sup_ep
-								WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}'
+								WHERE sup_ep.employee_id = '{user.currUserId}'
 							) HR_INFO
 							WHERE RowNum = 1) IS NULL
 
@@ -239,7 +252,7 @@ namespace HR_LEAVEv2.UserControls
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.start_date
 								FROM dbo.employeeposition sup_ep
-								WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}'
+								WHERE sup_ep.employee_id = '{user.currUserId}'
 							) HR_INFO
 							WHERE RowNum = 1) <= GETDATE()
                             
@@ -249,7 +262,7 @@ namespace HR_LEAVEv2.UserControls
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
 								FROM dbo.employeeposition sup_ep
-								WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}'
+								WHERE sup_ep.employee_id = '{user.currUserId}'
 							) HR_INFO
 							WHERE RowNum = 1) IS NOT NULL
 
@@ -259,7 +272,7 @@ namespace HR_LEAVEv2.UserControls
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
 								FROM dbo.employeeposition sup_ep
-								WHERE sup_ep.employee_id = '{Session["emp_id"].ToString()}'
+								WHERE sup_ep.employee_id = '{user.currUserId}'
 							) HR_INFO
 							WHERE RowNum = 1)
 						))";
@@ -273,7 +286,7 @@ namespace HR_LEAVEv2.UserControls
                     whereBindGridView = $@"
                         WHERE
                             status IN ('Not Recommended', 'Recommended', 'Approved', 'Not Approved') AND
-                            e.employee_id != '{Session["emp_id"]}'
+                            e.employee_id != '{user.currUserId}'
                     ";
 
                     // ensure that the type of leave shown to the HR can be approved by that HR 
@@ -337,7 +350,7 @@ namespace HR_LEAVEv2.UserControls
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
 								FROM dbo.employeeposition hr_ep
-								WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}'
+								WHERE hr_ep.employee_id = '{user.currUserId}'
 							) HR_INFO
 							WHERE RowNum = 1) IS NULL
 
@@ -346,7 +359,7 @@ namespace HR_LEAVEv2.UserControls
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.start_date
 								FROM dbo.employeeposition hr_ep
-								WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
+								WHERE hr_ep.employee_id = '{user.currUserId}' 
 							) HR_INFO
 							WHERE RowNum = 1) <= GETDATE()
                             
@@ -356,7 +369,7 @@ namespace HR_LEAVEv2.UserControls
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
 								FROM dbo.employeeposition hr_ep
-								WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
+								WHERE hr_ep.employee_id = '{user.currUserId}' 
 							) HR_INFO
 							WHERE RowNum = 1) IS NOT NULL
 
@@ -366,7 +379,7 @@ namespace HR_LEAVEv2.UserControls
 							FROM (
 								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
 								FROM dbo.employeeposition hr_ep
-								WHERE hr_ep.employee_id = '{Session["emp_id"].ToString()}' 
+								WHERE hr_ep.employee_id = '{user.currUserId}' 
 							) HR_INFO
 							WHERE RowNum = 1)
 						))
@@ -746,7 +759,7 @@ namespace HR_LEAVEv2.UserControls
                     setStatement = $@"
                         SET
                             [status]='{status}',
-                            [hr_manager_id] = '{Session["emp_id"]}', 
+                            [hr_manager_id] = '{user.currUserId}', 
                             [hr_manager_edit_date] = CURRENT_TIMESTAMP
                         ";
                     sqlCommand.CommandText = updateStatement + setStatement + whereStatement;
@@ -774,7 +787,7 @@ namespace HR_LEAVEv2.UserControls
                                 [dbo].[leavetransaction]
                             SET
                                 [status]='{status}', 
-                                [hr_manager_id] = '{Session["emp_id"]}', 
+                                [hr_manager_id] = '{user.currUserId}', 
                                 [hr_manager_edit_date] = CURRENT_TIMESTAMP 
                             WHERE 
                                 [transaction_id] = {transaction_id};
@@ -819,7 +832,7 @@ namespace HR_LEAVEv2.UserControls
                                 [dbo].[leavetransaction]
                             SET
                                 [status]='{status}', 
-                                [hr_manager_id] = '{Session["emp_id"]}', 
+                                [hr_manager_id] = '{user.currUserId}', 
                                 [hr_manager_edit_date] = CURRENT_TIMESTAMP 
                             WHERE 
                                 [transaction_id] = {transaction_id};
@@ -917,7 +930,7 @@ namespace HR_LEAVEv2.UserControls
                 // Cancel Leave
                 if (commandName == "cancelLeave")
                 {
-                    actingEmployeeID = affectedEmployeeId = Session["emp_id"].ToString();
+                    actingEmployeeID = affectedEmployeeId = user.currUserId;
                     action = "Canceled leave application";
                 }
 
@@ -926,7 +939,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     sendRecommendedNotifications(row, employee_id, employeeEmail);
 
-                    actingEmployeeID = Session["emp_id"].ToString();
+                    actingEmployeeID = user.currUserId;
                     affectedEmployeeId = employee_id;
                     action = "Recommended leave application";
                 }
@@ -975,7 +988,7 @@ namespace HR_LEAVEv2.UserControls
                         { "date_submitted", row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString() },
                         { "employee_name", row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString() },
                         { "employee_id", employee_id},
-                        { "supervisor_name", Session["emp_username"].ToString() },
+                        { "supervisor_name", user.currUserName },
                         { "start_date", row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString() },
                         { "end_date", row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString() },
                         { "days_taken", row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString() },
@@ -986,7 +999,8 @@ namespace HR_LEAVEv2.UserControls
                         { "employeeEmail", employeeEmail }
                     };
 
-                    ViewState["notRecommendedRow"] = rowData;
+
+                    notRecommendedRow = rowData;
 
                     // reset user feedback panels
                     noEditsMadePanel.Visible = false;
@@ -998,7 +1012,7 @@ namespace HR_LEAVEv2.UserControls
                     ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal({'show':true, 'backdrop':'static', 'keyboard':false});", true);
 
                     // populate audit log variables 
-                    actingEmployeeID = Session["emp_id"].ToString();
+                    actingEmployeeID = user.currUserId;
                     affectedEmployeeId = employee_id;
                     action = "Unrecommended leave application";
                 }
@@ -1009,7 +1023,7 @@ namespace HR_LEAVEv2.UserControls
 
                     sendApprovedNotifications(row, employee_id, GridView.DataKeys[index].Values["supervisor_id"].ToString(), employeeEmail, supervisorEmail);
 
-                    actingEmployeeID = Session["emp_id"].ToString();
+                    actingEmployeeID = user.currUserId;
                     affectedEmployeeId = employee_id;
                     action = "Approved leave application";
                 }
@@ -1071,7 +1085,7 @@ namespace HR_LEAVEv2.UserControls
                         { "isEmailSentAlready", row.Cells[GetColumnIndexByName(row, "status")].Text.ToString() == "Not Approved" ? "Yes" : "No"}
                     };
 
-                    ViewState["notApprovedRow"] = rowData;
+                    notApprovedRow = rowData;
 
                     // reset user feedback panels
                     noEditsMadePanel.Visible = false;
@@ -1082,7 +1096,7 @@ namespace HR_LEAVEv2.UserControls
                     // show modal for user to enter comment
                     ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#commentsModal').modal({'show':true, 'backdrop':'static', 'keyboard':false});", true);
 
-                    actingEmployeeID = Session["emp_id"].ToString();
+                    actingEmployeeID = user.currUserId;
                     affectedEmployeeId = employee_id;
                     action = "Unapproved leave application";
                 }
@@ -1090,7 +1104,7 @@ namespace HR_LEAVEv2.UserControls
                 // Undo Approve
                 if (commandName == "undoApprove")
                 {
-                    actingEmployeeID = Session["emp_id"].ToString();
+                    actingEmployeeID = user.currUserId;
                     affectedEmployeeId = employee_id;
                     action = "Undid approval for leave application";
                 }
@@ -1355,8 +1369,8 @@ namespace HR_LEAVEv2.UserControls
             // sends notifs to appropriate recipients (email and in house notifs)
 
             Dictionary<string, string> row = null;
-            if (ViewState["notApprovedRow"] != null)
-                row = (Dictionary<string, string>)ViewState["notApprovedRow"];
+            if (notApprovedRow != null)
+                row = notApprovedRow;
 
             Boolean isEmployeeEmailSent = false,
                     isSupervisorEmailSent = false;
@@ -1410,7 +1424,7 @@ namespace HR_LEAVEv2.UserControls
                 if (isEmployeeEmailSent && isSupervisorEmailSent)
                 {
                     row["isEmailSentAlready"] = "Yes";
-                    ViewState["notApprovedRow"] = row;
+                    notApprovedRow = row;
                 } else
                     errorSubmittingEmailMsgPanel.Visible = true;
 
@@ -1488,7 +1502,7 @@ namespace HR_LEAVEv2.UserControls
             MailMessage message = util.getEmployeeViewLeaveApplicationRecommended(
                     new Util.EmailDetails
                     {
-                        supervisor_name = Session["emp_username"].ToString(),
+                        supervisor_name = user.currUserName,
                         date_submitted = row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString(),
                         start_date = row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString(),
                         end_date = row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString(),
@@ -1586,7 +1600,7 @@ namespace HR_LEAVEv2.UserControls
             message = util.getHRViewLeaveApplicationRecommended(
                     new Util.EmailDetails
                     {
-                        supervisor_name = Session["emp_username"].ToString(),
+                        supervisor_name = user.currUserName,
                         employee_name = row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString(),
                         date_submitted = row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString(),
                         start_date = row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString(),
@@ -1604,7 +1618,7 @@ namespace HR_LEAVEv2.UserControls
 
             // send notif to employee
             string notif_header = $"Leave Application Recommended",
-                   notification = $"Your leave application to {Session["emp_username"].ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave was recommended";
+                   notification = $"Your leave application to {user.currUserName} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave was recommended";
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -1630,7 +1644,7 @@ namespace HR_LEAVEv2.UserControls
             foreach (string id in hr_info.Keys)
             {
                 notif_header = $"Leave application recommended for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}";
-                notification = $"{Session["emp_username"].ToString()} recommended the leave application of {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave";
+                notification = $"{user.currUserName} recommended the leave application of {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave";
                 try
                 {
                     using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -1660,8 +1674,8 @@ namespace HR_LEAVEv2.UserControls
             // sends email and in house notifs
 
             Dictionary<string, string> row = null;
-            if (ViewState["notRecommendedRow"] != null)
-                row = (Dictionary<string, string>)ViewState["notRecommendedRow"];
+            if (notRecommendedRow != null)
+                row = notRecommendedRow;
 
             if (row != null && row["isEmailSentAlready"] == "No")
             {
@@ -1692,11 +1706,11 @@ namespace HR_LEAVEv2.UserControls
                 if (util.sendMail(message))
                 {
                     row["isEmailSentAlready"] = "Yes";
-                    ViewState["notRecommendedRow"] = row;
+                    notRecommendedRow = row;
                 }
                 else
                 {
-                    ViewState["notRecommendedRow"] = null;
+                    notRecommendedRow = null;
                     errorSubmittingEmailMsgPanel.Visible = true;
                 }
                     
@@ -1705,7 +1719,7 @@ namespace HR_LEAVEv2.UserControls
                 
                 // send notif to employee
                 string notif_header = $"Leave Application Not Recommended",
-                       notification = $"Your leave application to {Session["emp_username"].ToString()} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not recommended.";
+                       notification = $"Your leave application to {user.currUserName} for {row["days_taken"]} day(s) {row["leave_type"]} leave was not recommended.";
 
                 if (!util.isNullOrEmpty(comment))
                     notification += $"Your supervisor said \" {comment} \"";
@@ -1738,7 +1752,7 @@ namespace HR_LEAVEv2.UserControls
         {
             // set number of notifications
             Label num_notifs = (Label)Page.Master.FindControl("num_notifications");
-            num_notifs.Text = util.resetNumNotifications(Session["emp_id"].ToString());
+            num_notifs.Text = util.resetNumNotifications(user.currUserId);
 
             UpdatePanel up = (UpdatePanel)Page.Master.FindControl("notificationsUpdatePanel");
             up.Update();
@@ -1810,7 +1824,7 @@ namespace HR_LEAVEv2.UserControls
                 // add audit log
                 string supOrHr = gridViewType == "sup" ? "supervisor comment" : "hr comment";
                 string action = $"Edited leave application; leave_transaction_id= {leaveId}, {supOrHr}= {comment}";
-                util.addAuditLog(Session["emp_id"].ToString(), employeeId, action);
+                util.addAuditLog(user.currUserId, employeeId, action);
             }
             else
             {
