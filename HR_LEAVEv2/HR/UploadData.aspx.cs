@@ -33,6 +33,12 @@ namespace HR_LEAVEv2.HR
             set { ViewState["empPositionValidationMsgs"] = value; }
         }
 
+        private string uploadedFileName
+        {
+            get { return Session["uploadedFile"] != null ? Session["uploadedFile"].ToString() : null; }
+            set { Session["uploadedFile"] = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             List<string> permissions = (List<string>)Session["permissions"];
@@ -43,11 +49,11 @@ namespace HR_LEAVEv2.HR
                 deleteUploadedFile();
 
             // hide clear file button if no file is uploaded
-            clearFileBtn.Visible = Session["uploadedFile"] != null;
+            clearFileBtn.Visible = uploadedFileName != null;
 
-            if(Session["uploadedFile"] != null)
+            if(uploadedFileName != null)
             {
-                uploadedFile.Text = $"Uploaded file: <strong>{Session["uploadedFile"]}</strong>";
+                uploadedFile.Text = $"Uploaded file: <strong>{uploadedFileName}</strong>";
                 uploadedFile.Visible = true;
             }
         }
@@ -120,7 +126,7 @@ namespace HR_LEAVEv2.HR
                 if (!isInvalidFileType && !isFileTooLarge)
                 {
                     // add files to session so they will persist after postback
-                    Session["uploadedFile"] = Path.GetFileName(fileToBeUploaded.FileName);
+                    uploadedFileName = Path.GetFileName(fileToBeUploaded.FileName);
                     try
                     {
                         Directory.CreateDirectory("C:/ProgramData/HRLS/temp");
@@ -145,9 +151,9 @@ namespace HR_LEAVEv2.HR
         protected void deleteUploadedFile()
         {
             resetUploadDataPage();
-            if (Session["uploadedFile"] != null && File.Exists(Path.Combine("C:/ProgramData/HRLS/temp", Session["uploadedFile"].ToString())))
-                File.Delete(Path.Combine("C:/ProgramData/HRLS/temp", Session["uploadedFile"].ToString()));
-            Session["uploadedFile"] = null;
+            if (uploadedFileName != null && File.Exists(Path.Combine("C:/ProgramData/HRLS/temp", uploadedFileName)))
+                File.Delete(Path.Combine("C:/ProgramData/HRLS/temp", uploadedFileName));
+            uploadedFileName = null;
             clearFileBtn.Visible = uploadedFile.Visible = false;
             FileUpload1.Dispose();
         }
@@ -333,9 +339,9 @@ namespace HR_LEAVEv2.HR
         {
             clearValidationMessages();
             Boolean isUploadSuccessful = false;
-            if (Session["uploadedFile"] != null)
+            if (uploadedFileName != null)
             {
-                string filePath = Path.Combine("C:/ProgramData/HRLS/temp", Session["uploadedFile"].ToString());
+                string filePath = Path.Combine("C:/ProgramData/HRLS/temp", uploadedFileName);
                 if (File.Exists(filePath))
                 {
                     // get metadata about table's columns like column name, data type, maximum length(if applicable) and whether it is nullable
