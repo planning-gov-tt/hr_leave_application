@@ -6,6 +6,8 @@ namespace HR_LEAVEv2.Classes
 {
     public class User 
     {
+        private Util util = new Util();
+
         public string currUserEmail
         {
             get { return HttpContext.Current.Session["emp_email"] != null ? HttpContext.Current.Session["emp_email"].ToString() : null; }
@@ -38,7 +40,7 @@ namespace HR_LEAVEv2.Classes
 
         public Boolean hasNoPermissions()
         {
-            return permissions == null || (permissions != null && permissions.Count == 0);
+            return permissions.Count == 0;
         }
 
         public Boolean isAdmin()
@@ -48,7 +50,9 @@ namespace HR_LEAVEv2.Classes
 
         public Boolean isUserAllowedToViewOrEditLeaveApplication(string employeeId, string employeeType ,string supervisorId, string typeOfLeave) 
         {
-            Util util = new Util();
+            // if no employement type is specified
+            if (util.isNullOrEmpty(employeeType))
+                return false;
 
             // if user trying to view/ edit is HR 1
             if (permissions.Contains("hr1_permissions"))
@@ -73,31 +77,27 @@ namespace HR_LEAVEv2.Classes
             // HR 2
             if (permissions.Contains("hr2_permissions"))
             {
-                if (!util.isNullOrEmpty(employeeType))
-                {
-                    // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
-                    if (
-                        (
-                            //check if hr can view applications from the relevant employment type 
-                            (employeeType == "Contract" && !permissions.Contains("contract_permissions"))
-                            ||
-                            (employeeType == "Public Service" && !permissions.Contains("public_officer_permissions"))
-                        )
-
+                
+                // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
+                if (
+                    (
+                        //check if hr can view applications from the relevant employment type 
+                        (employeeType == "Contract" && !permissions.Contains("contract_permissions"))
                         ||
-
-                        (
-                            //check if hr can view applications of the relevant leave type
-                            (typeOfLeave == "Sick" && !permissions.Contains("approve_sick"))
-                            ||
-                            (typeOfLeave == "Vacation" && !permissions.Contains("approve_vacation"))
-                            ||
-                            (typeOfLeave == "Casual" && !permissions.Contains("approve_casual"))
-                        )
+                        (employeeType == "Public Service" && !permissions.Contains("public_officer_permissions"))
                     )
-                        return false;
-                }
-                else
+
+                    ||
+
+                    (
+                        //check if hr can view applications of the relevant leave type
+                        (typeOfLeave == "Sick" && !permissions.Contains("approve_sick"))
+                        ||
+                        (typeOfLeave == "Vacation" && !permissions.Contains("approve_vacation"))
+                        ||
+                        (typeOfLeave == "Casual" && !permissions.Contains("approve_casual"))
+                    )
+                )
                     return false;
             }
             else
@@ -117,7 +117,68 @@ namespace HR_LEAVEv2.Classes
                 }
 
             }
-            return false;
+
+            return true;
+        }
+
+        public Boolean canViewAllEmployees()
+        {
+            return permissions.Contains("hr1_permissions");
+        }
+
+        public Dictionary<string, List<string>> getSubsetsOfEmployeesUserIsAllowedToView()
+        {
+            Dictionary<string, List<string>> subsets = new Dictionary<string, List<string>>();
+            subsets.Add("employment_types", new List<string>());
+            subsets.Add("depts", new List<string>());
+
+            if (permissions.Contains("contract_permissions"))
+                subsets["employment_types"].Add("'Contract'");
+            if (permissions.Contains("public_officer_permissions"))
+                subsets["employment_types"].Add("'Public Service'");
+
+            // add dept code here
+
+            return subsets;
+        }
+
+        public List<string> getTypesOfLeaveUserCanApprove()
+        {
+            List<string> leaveTypes = util.getListOfAllLeaveTypes();
+            // add single quotes around leave types
+            for (int i = 0; i < leaveTypes.Count; i++)
+                leaveTypes[i] = $"'{leaveTypes[i]}'";
+
+            if (permissions.Contains("hr1_permissions"))
+                return leaveTypes;
+
+            if (!permissions.Contains("approve_sick"))
+                leaveTypes.Remove("'Sick'");
+            if (!permissions.Contains("approve_casual"))
+                leaveTypes.Remove("'Casual'");
+            if (!permissions.Contains("approve_vacation"))
+                leaveTypes.Remove("'Vacation'");
+
+            return leaveTypes;
+        }
+
+        public Boolean isUserAllowedToViewOrEditEmployeeDetails(string employeeType)
+        {
+            if (util.isNullOrEmpty(employeeType))
+                return false;
+
+            if (permissions.Contains("hr1_permissions"))
+                return true;
+
+            // the HR 2, HR 3 must have permissions to view data for the same employment type as for the employee who submitted the application
+            Dictionary<string, List<string>> subsets = getSubsetsOfEmployeesUserIsAllowedToView();
+            List<string> allowedEmpTypes = subsets["employment_types"];
+
+            if (!allowedEmpTypes.Contains($"'{employeeType}'"))
+                return false;
+
+            // code to check by dept here
+            return true;
         }
     }
 }

@@ -10,7 +10,7 @@ using System.Web.UI.WebControls;
 
 namespace HR_LEAVEv2.HR
 {
-    public partial class AllEmployees : System.Web.UI.Page
+    public partial class AllEmployees : Page
     {
         User user = new User();
 
@@ -45,7 +45,7 @@ namespace HR_LEAVEv2.HR
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (user.permissions == null || (user.permissions != null && !(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions" ) || user.permissions.Contains("hr3_permissions"))))
+            if (!(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions" ) || user.permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)
@@ -68,7 +68,7 @@ namespace HR_LEAVEv2.HR
             {
                 string sql;
                 string isActive = "IN", activeLabel = "Active", bootstrapClass = "label-success";
-                if (user.permissions.Contains("hr1_permissions"))
+                if (user.canViewAllEmployees())
                 {
 
                     if(viewActive)
@@ -104,12 +104,8 @@ namespace HR_LEAVEv2.HR
                 }
                 else
                 {
-                    List<string> emp_type = new List<string>();
                     // HR 2 and HR 3
-                    if (user.permissions.Contains("contract_permissions"))
-                        emp_type.Add("'Contract'");
-                    if (user.permissions.Contains("public_officer_permissions"))
-                        emp_type.Add("'Public Service'");
+                    List<string> emp_type = user.getSubsetsOfEmployeesUserIsAllowedToView()["employment_types"];
 
                     if (viewActive)
                     {
@@ -211,7 +207,7 @@ namespace HR_LEAVEv2.HR
 
                 string sql;
                 string isActive = "IN", activeLabel = "Active", bootstrapClass = "label-success";
-                if (user.permissions.Contains("hr1_permissions"))
+                if (user.canViewAllEmployees())
                 {
                     // HR 1
 
@@ -249,12 +245,8 @@ namespace HR_LEAVEv2.HR
                 }
                 else
                 {
-                    List<string> emp_type = new List<string>();
                     // HR 2 and HR 3
-                    if (user.permissions.Contains("contract_permissions"))
-                        emp_type.Add("Contract");
-                    if (user.permissions.Contains("public_officer_permissions"))
-                        emp_type.Add("Public Service");
+                    List<string> emp_type = user.getSubsetsOfEmployeesUserIsAllowedToView()["employment_types"];
 
                     if (viewActive)
                     {

@@ -21,8 +21,6 @@ namespace HR_LEAVEv2.UserControls
         // used to identify which data and action buttons to show to user
         public string gridViewType { get; set; } // "emp", "sup", "hr"
 
-        private List<string> permissions;
-
         //SQL date formatting
         //    FORMAT(getdate(), 'dd-MM-yy') as date
 
@@ -157,8 +155,6 @@ namespace HR_LEAVEv2.UserControls
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            permissions = (List<string>)Session["permissions"];
-
 
             // 3 types of gridviews perspectives possible
             if (this.gridViewType == "emp")
@@ -289,54 +285,15 @@ namespace HR_LEAVEv2.UserControls
                             e.employee_id != '{user.currUserId}'
                     ";
 
-                    // ensure that the type of leave shown to the HR can be approved by that HR 
-                    List<string> allLeaveTypes = util.getListOfAllLeaveTypes();
-
-                    // remove these types since whether HR can interact with these types is up to their permissions
-                    allLeaveTypes.Remove("Sick");
-                    allLeaveTypes.Remove("Casual");
-                    allLeaveTypes.Remove("Vacation");
-
-                    // add single quotes around leave types
-                    for(int i = 0; i < allLeaveTypes.Count; i++)
-                        allLeaveTypes[i] = $"'{allLeaveTypes[i]}'";
-
-                    string leaveType = $"({String.Join(", ", allLeaveTypes.ToArray())}";
-
-                    if (permissions.Contains("approve_sick"))
-                    {
-                        leaveType += ", 'Sick'";
-                    }
-                    if (permissions.Contains("approve_casual"))
-                    {
-                        leaveType += ", 'Casual'";
-                    }
-                    if (permissions.Contains("approve_vacation"))
-                    {
-                        leaveType += ", 'Vacation'";
-                    }
-                    leaveType += ")";
+                    List<string> leaveTypes = user.getTypesOfLeaveUserCanApprove();
                     whereBindGridView += $@" 
-                        AND leave_type IN {leaveType}
+                        AND leave_type IN ({String.Join(", ", leaveTypes.ToArray())})
                     ";
 
                     // check if hr can see contracts, public_officers or both based on their permission pool
-                    string employmentTypes = "(";
-                    bool hasContract = false;
-                    if (permissions.Contains("contract_permissions"))
-                    {
-                        employmentTypes += "'Contract'";
-                        hasContract = true;
-                    }
-                    if (permissions.Contains("public_officer_permissions"))
-                    {
-                        if (hasContract)
-                            employmentTypes += ",";
-                        employmentTypes += "'Public Service'";
-                    }
-                    employmentTypes += ")";
+                    List<string> employmentTypes = user.getSubsetsOfEmployeesUserIsAllowedToView()["employment_types"];
                     whereBindGridView += $@"
-                        AND (relevant_ep.employment_type IN {employmentTypes})          
+                        AND (relevant_ep.employment_type IN ({String.Join(", ", employmentTypes.ToArray())}))        
                     ";
 
                     /* the following statement checks the start and actual end dates for the HR in order to find out whether they are active

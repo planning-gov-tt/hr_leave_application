@@ -48,7 +48,7 @@ namespace HR_LEAVEv2.Supervisor
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (user.permissions == null || (user.permissions != null && !user.permissions.Contains("sup_permissions")))
+            if (!user.permissions.Contains("sup_permissions"))
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)

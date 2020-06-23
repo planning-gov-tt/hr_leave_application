@@ -42,7 +42,7 @@ namespace HR_LEAVEv2.HR
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (user.permissions == null || (user.permissions != null && !(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions") || user.permissions.Contains("hr3_permissions"))))
+            if (!(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions") || user.permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)

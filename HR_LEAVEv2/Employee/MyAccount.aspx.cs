@@ -8,7 +8,7 @@ namespace HR_LEAVEv2.Employee
         User user = new User();
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (user.permissions == null)
+            if (user.hasNoPermissions())
                 Response.Redirect("~/AccessDenied.aspx");
         }
     }

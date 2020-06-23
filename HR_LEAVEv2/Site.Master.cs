@@ -54,7 +54,7 @@ namespace HR_LEAVEv2
                 user.currUserId = auth.getUserEmployeeId(user.currUserEmail);
 
             // store employee's permissions in Session
-            if (user.permissions == null && user.currUserId != null)
+            if (user.currUserId != null)
                 user.permissions = auth.getUserPermissions(user.currUserId);
 
 
@@ -121,43 +121,39 @@ namespace HR_LEAVEv2
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (user.permissions != null)
+            // set displays based on what role a user plays 
+
+            // supervisor
+            if (user.permissions.Contains("sup_permissions"))
             {
-                // set displays based on what role a user plays 
-
-                // supervisor
-                if (user.permissions.Contains("sup_permissions"))
-                {
-                    supervisorPanel.Style.Add("display", "block");
-                }
-                else
-                    supervisorPanel.Style.Add("display", "none");
-
-                // HR 1 or HR 2
-                if (user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions"))
-                {
-                    hr1_hr2Panel.Style.Add("display", "block");
-                }
-                else
-                    hr1_hr2Panel.Style.Add("display", "none");
-
-                // HR 3
-                if (user.permissions.Contains("hr3_permissions"))
-                {
-                    hr3Panel.Style.Add("display", "block");
-                }
-                else
-                    hr3Panel.Style.Add("display", "none");
-
-                // Admin
-                if (user.permissions.Contains("admin_permissions"))
-                {
-                    adminPanel.Style.Add("display", "block");
-                }
-                else
-                    adminPanel.Style.Add("display", "none");
-
+                supervisorPanel.Style.Add("display", "block");
             }
+            else
+                supervisorPanel.Style.Add("display", "none");
+
+            // HR 1 or HR 2
+            if (user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions"))
+            {
+                hr1_hr2Panel.Style.Add("display", "block");
+            }
+            else
+                hr1_hr2Panel.Style.Add("display", "none");
+
+            // HR 3
+            if (user.permissions.Contains("hr3_permissions"))
+            {
+                hr3Panel.Style.Add("display", "block");
+            }
+            else
+                hr3Panel.Style.Add("display", "none");
+
+            // Admin
+            if (user.isAdmin())
+            {
+                adminPanel.Style.Add("display", "block");
+            }
+            else
+                adminPanel.Style.Add("display", "none");
 
             // load drop down list
             if (!IsPostBack)

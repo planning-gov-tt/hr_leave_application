@@ -14,7 +14,7 @@ namespace HR_LEAVEv2.Supervisor
         protected void Page_Load(object sender, EventArgs e)
         {
             User user = new User();
-            if (user.permissions == null || (user.permissions != null && !user.permissions.Contains("sup_permissions")))
+            if (!user.permissions.Contains("sup_permissions"))
                 Response.Redirect("~/AccessDenied.aspx");
 
             // check if return btn should be shown

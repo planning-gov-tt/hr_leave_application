@@ -83,7 +83,7 @@ namespace HR_LEAVEv2.HR
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (user.permissions == null || (user.permissions != null && !(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions") || user.permissions.Contains("hr3_permissions"))))
+            if (!(user.permissions.Contains("hr1_permissions") || user.permissions.Contains("hr2_permissions") || user.permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
 
             // validator for end date when adding employment records
@@ -1306,13 +1306,8 @@ namespace HR_LEAVEv2.HR
             {
                 string empType = dataTable.Rows[0].ItemArray[(int)emp_records_columns.employment_type].ToString();
 
-                if (!user.permissions.Contains("hr1_permissions"))
-                {
-                    // the HR 2, HR 3 must have permissions to view data for the same employment type as for the employee who submitted the application
-                    //check if hr can view applications from the relevant employment type 
-                    if (util.isNullOrEmpty(empType) || (empType == "Contract" && !user.permissions.Contains("contract_permissions")) || (empType == "Public Service" && !user.permissions.Contains("public_officer_permissions")))
-                        Response.Redirect("~/AccessDenied.aspx");
-                }
+                if(!user.isUserAllowedToViewOrEditEmployeeDetails(empType))
+                    Response.Redirect("~/AccessDenied.aspx");
             }
 
 

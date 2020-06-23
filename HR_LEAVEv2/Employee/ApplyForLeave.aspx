@@ -192,13 +192,14 @@
                         <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success validation-msg" role="alert">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span id="successMsg" runat="server">Application successfully submitted</span>
-                            <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px" OnClick="refreshForm" />
+                            <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px; outline:none; border: none" OnClick="refreshForm" />
                         </asp:Panel>
+
                         <asp:Panel ID="successfulSubmitEditsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span id="Span2" runat="server">Edits successfully made</span>
-                            <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="returnToPreviousBtn_Click" />
-                            <asp:Button ID="refreshEditPageBtn" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="refreshForm" />
+                            <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px; outline:none; border: none" OnClick="returnToPreviousBtn_Click" />
+                            <asp:Button ID="refreshEditPageBtn" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px; outline:none; border: none" OnClick="refreshForm" />
                         </asp:Panel>
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
@@ -207,8 +208,8 @@
                         <asp:Panel ID="noEditsMadePanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block;" role="alert" Visible="false">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                             <span>No edits made</span>
-                            <asp:Button ID="Button2" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="returnToPreviousBtn_Click" />
-                            <asp:Button ID="refreshEditPageBtnNoEditsMade" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px;" OnClick="refreshForm" />
+                            <asp:Button ID="Button2" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px; outline:none; border: none;" OnClick="returnToPreviousBtn_Click" />
+                            <asp:Button ID="refreshEditPageBtnNoEditsMade" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px; outline:none; border: none" OnClick="refreshForm" />
                         </asp:Panel>
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NO EDITS MADE MESSAGE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
                     </ContentTemplate>
