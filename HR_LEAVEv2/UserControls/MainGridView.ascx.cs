@@ -9,7 +9,6 @@ using System.Data.SqlClient;
 using System.Net.Mail;
 using HR_LEAVEv2.Classes;
 using System.Web.UI;
-using System.Linq;
 
 namespace HR_LEAVEv2.UserControls
 {
@@ -1061,6 +1060,7 @@ namespace HR_LEAVEv2.UserControls
                 // Undo Approve
                 if (commandName == "undoApprove")
                 {
+                    sendApprovalUndoneNotifications(row, employee_id, GridView.DataKeys[index].Values["supervisor_id"].ToString(), employeeEmail, supervisorEmail);
                     actingEmployeeID = user.currUserId;
                     affectedEmployeeId = employee_id;
                     action = "Undid approval for leave application";
@@ -1703,6 +1703,99 @@ namespace HR_LEAVEv2.UserControls
                 }
             }
 
+        }
+
+        protected void sendApprovalUndoneNotifications(GridViewRow row,string employeeId, string supervisorId, string employeeEmail, string supervisorEmail)
+        {
+            // sends email and in house notifs
+
+
+            // SEND EMAILS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            // send email to employee notifying them that their supervisor recommended their leave to HR
+            MailMessage message = util.getEmployeeViewLeaveApprovalUndone(
+                    new Util.EmailDetails
+                    {
+                        supervisor_name = row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString(),
+                        date_submitted = row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString(),
+                        start_date = row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString(),
+                        end_date = row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString(),
+                        days_taken = row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString(),
+                        type_of_leave = row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString(),
+                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString(),
+                        subject = "Leave Application Approval Undone",
+                        recipient = employeeEmail
+                    }
+            );
+            util.sendMail(message);
+
+            // send email to supervisor letting them know that HR undid approval for employee
+            message = util.getSupervisorViewLeaveApprovalUndone(
+                    new Util.EmailDetails
+                    {
+                        employee_name = row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString(),
+                        date_submitted = row.Cells[GetColumnIndexByName(row, "date_submitted")].Text.ToString(),
+                        start_date = row.Cells[GetColumnIndexByName(row, "start_date")].Text.ToString(),
+                        end_date = row.Cells[GetColumnIndexByName(row, "end_date")].Text.ToString(),
+                        days_taken = row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString(),
+                        type_of_leave = row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString(),
+                        qualified = row.Cells[GetColumnIndexByName(row, "qualified")].Text.ToString(),
+                        recipient = supervisorEmail,
+                        subject = $"Leave Application Approval Undone for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()}"
+                    }
+                    );
+            util.sendMail(message);
+
+            // SEND IN APPLICATION NOTIFS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            // send notif to employee
+            string notif_header = $"Leave Application Approval Undone",
+                   notification = $"Your approval for the leave application to {row.Cells[GetColumnIndexByName(row, "supervisor_name")].Text.ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave was undone.";
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{employeeId}', '{util.getCurrentDate()}');
+                            ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        int rowsAffected = command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+            // send notif to supervisor
+            notif_header = $"Leave Application Approval for {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()} was Undone";
+            notification = $"The approval for the leave application of {row.Cells[GetColumnIndexByName(row, "employee_name")].Text.ToString()} for {row.Cells[GetColumnIndexByName(row, "days_taken")].Text.ToString()} day(s) {row.Cells[GetColumnIndexByName(row, "leave_type")].Text.ToString()} leave was undone.";
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+
+                    string sql = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('{notif_header}', '{notification}', 'No', '{supervisorId}', '{util.getCurrentDate()}');
+                            ";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        int rowsAffected = command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         protected void resetNumNotifications()

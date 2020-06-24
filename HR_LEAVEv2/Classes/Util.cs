@@ -292,14 +292,14 @@ namespace HR_LEAVEv2.Classes
             //smtp.Credentials = new NetworkCredential("hr.leave@planning.gov.tt", "p@ssword1");
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
-            //try
-            //{
-            //    smtp.Send(message);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return false;
-            //}
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
 
             return true;
         }
@@ -314,7 +314,7 @@ namespace HR_LEAVEv2.Classes
                     <br/>
 
                     This is a reminder to submit a leave application for the period of {details.start_date} to {details.end_date}. Apply for leave applications 
-                    by clicking <a href='http://webtest/deploy/Employee/ApplyForLeave.aspx'>here</a>.
+                    by clicking <a href='http://webtest/hrls/Employee/ApplyForLeave.aspx'>here</a>.
                 <div>
                 <div>
                     <br/>
@@ -323,312 +323,6 @@ namespace HR_LEAVEv2.Classes
                 </div>
             ";
 
-            return msg;
-        }
-
-         /* supervisor view: approved LA
-         * Get the email body for the email sent to a supervisor when their employee's LA is approved */
-        public MailMessage getSupervisorViewLeaveApplicationApproved(EmailDetails details)
-        {
-            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
-            msg.Body = $@"
-                        <style>
-                            #leaveDetails{{
-                                font-family: arial, sans-serif;
-                                border-collapse: collapse;
-                                width: 100%;
-                            }}
-
-                            #leaveDetails td,#leaveDetails th {{
-                                border: 1px solid #dddddd;
-                                text-align: left;
-                                padding: 8px;
-                            }}
-                        </style>
-                        <div style='margin-bottom:15px;'>
-                            DO NOT REPLY<br/>
-                            <br/>
-                            The leave application made by {details.employee_name} was approved. Details about the application can be found below: <br/>
-
-                            <table id='leaveDetails'>
-                                <tr>
-                                    <th> Date Submitted </th>
-                                    <th> Employee Name </th>
-                                    <th> Start Date </th>
-                                    <th> End Date </th>
-                                    <th> Days Taken </th>
-                                    <th> Leave Type </th>
-                                    <th> Status </th>
-                                    <th> Qualified </th>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        {details.date_submitted}
-                                    </td>
-                                    <td>
-                                        {details.employee_name}
-                                    </td>
-                                    <td>
-                                        {details.start_date}
-                                    </td>
-                                    <td>
-                                        {details.end_date}
-                                    </td>
-                                    <td>
-                                        {details.days_taken}
-                                    </td>
-                                    <td>
-                                        {details.type_of_leave}
-                                    </td>
-                                    <td>
-                                        Approved
-                                    </td>
-                                    <td>
-                                        {details.qualified}
-                                    </td>
-                                </tr>
-                            </table>
-                            <br/>
-                        </div>
-                        <div>
-                            Check the status of employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/deploy/Supervisor/MyEmployeeLeaveApplications.aspx'>here</a>. Contact HR for any further information. <br/> 
-                            <br/>
-                            Regards,<br/>
-                                HR
-                        </div>
-
-
-                    ";
-            return msg;
-        }
-
-
-         /* employee view: approved LA
-         * Get the email body for the email sent to an employee when their LA is approved */
-        public MailMessage getEmployeeViewLeaveApplicationApproved(EmailDetails details)
-        {
-            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
-            msg.Body = $@"
-                            <style>
-                                #leaveDetails{{
-                                    font-family: arial, sans-serif;
-                                    border-collapse: collapse;
-                                    width: 100%;
-                                }}
-
-                                #leaveDetails td,#leaveDetails th {{
-                                    border: 1px solid #dddddd;
-                                    text-align: left;
-                                    padding: 8px;
-                                }}
-                            </style>
-                            <div style='margin-bottom:15px;'>
-                                DO NOT REPLY<br/>
-                                <br/>
-                                Your leave application was approved by HR. Details about the application can be found below: <br/>
-
-                                <table id='leaveDetails'>
-                                    <tr>
-                                        <th> Date Submitted </th>
-                                        <th> Supervisor Name </th>
-                                        <th> Start Date </th>
-                                        <th> End Date </th>
-                                        <th> Days Taken </th>
-                                        <th> Leave Type </th>
-                                        <th> Status </th>
-                                        <th> Qualified </th>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {details.date_submitted}
-                                        </td>
-                                        <td>
-                                            {details.supervisor_name}
-                                        </td>
-                                        <td>
-                                            {details.start_date}
-                                        </td>
-                                        <td>
-                                            {details.end_date}
-                                        </td>
-                                        <td>
-                                            {details.days_taken}
-                                        </td>
-                                        <td>
-                                            {details.type_of_leave}
-                                        </td>
-                                        <td>
-                                            Approved
-                                        </td>
-                                        <td>
-                                            {details.qualified}
-                                        </td>
-                                    </tr>
-                                </table>
-                                <br/>
-                            </div>
-                            <div>
-                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
-                                <br/>
-                                Regards,<br/>
-                                    {details.supervisor_name}
-                            </div>
-
-
-                        ";
-            return msg;
-        }
-
-        /* supervisor view: not approved LA
-         * Get the email body for the email sent to a supervisor when their employee's LA is not approved */
-        public MailMessage getSupervisorViewLeaveApplicationNotApproved(EmailDetails details)
-        {
-            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
-            msg.Body = $@"
-                    <style>
-                        #leaveDetails{{
-                            font-family: arial, sans-serif;
-                            border-collapse: collapse;
-                            width: 100%;
-                        }}
-
-                        #leaveDetails td,#leaveDetails th {{
-                            border: 1px solid #dddddd;
-                            text-align: left;
-                            padding: 8px;
-                        }}
-
-                    </style>
-                    <div style='margin-bottom:15px;'>
-                        DO NOT REPLY<br/>
-                        <br/>
-                        The leave application of {details.employee_name} was not approved by HR. Details about the application can be found below: <br/>
-                        {details.comment}
-                        <table id='leaveDetails'>
-                            <tr>
-                                <th> Date Submitted </th>
-                                <th> Employee Name </th>
-                                <th> Start Date </th>
-                                <th> End Date </th>
-                                <th> Days Taken </th>
-                                <th> Leave Type </th>
-                                <th> Status </th>
-                                <th> Qualified </th>
-                            </tr>
-                            <tr>
-                                <td>
-                                    {details.date_submitted}
-                                </td>
-                                <td>
-                                    {details.employee_name}
-                                </td>
-                                <td>
-                                    {details.start_date}
-                                </td>
-                                <td>
-                                    {details.end_date}
-                                </td>
-                                <td>
-                                    {details.days_taken}
-                                </td>
-                                <td>
-                                    {details.type_of_leave}
-                                </td>
-                                <td>
-                                    Not Approved
-                                </td>
-                                <td>
-                                    {details.qualified}
-                                </td>
-                            </tr>
-                        </table>
-                        <br/>
-                    </div>
-                    <div>
-                        Check the status of employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/deploy/Supervisor/MyEmployeeLeaveApplications.aspx'>here</a>. Contact HR for any further information. <br/> 
-                        <br/>
-                        Regards,<br/>
-                            HR
-                    </div>
-
-
-                ";
-            return msg;
-        }
-
-        /*employee view: not approved LA
-         * Get the email body for the email sent to an employee when their LA is not approved */
-        public MailMessage getEmployeeViewLeaveApplicationNotApproved(EmailDetails details)
-        {
-            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
-            msg.Body = $@"
-                    <style>
-                        #leaveDetails{{
-                            font-family: arial, sans-serif;
-                            border-collapse: collapse;
-                            width: 100%;
-                        }}
-
-                        #leaveDetails td,#leaveDetails th {{
-                            border: 1px solid #dddddd;
-                            text-align: left;
-                            padding: 8px;
-                        }}
-                    </style>
-                    <div style='margin-bottom:15px;'>
-                        DO NOT REPLY<br/>
-                        <br/>
-                        Your leave application was not approved by HR. Details about the application can be found below: <br/>
-                        {details.comment}
-                        <table id='leaveDetails'>
-                            <tr>
-                                <th> Date Submitted </th>
-                                <th> Supervisor Name </th>
-                                <th> Start Date </th>
-                                <th> End Date </th>
-                                <th> Days Taken </th>
-                                <th> Leave Type </th>
-                                <th> Status </th>
-                                <th> Qualified </th>
-                            </tr>
-                            <tr>
-                                <td>
-                                    {details.date_submitted}
-                                </td>
-                                <td>
-                                    {details.supervisor_name}
-                                </td>
-                                <td>
-                                    {details.start_date}
-                                </td>
-                                <td>
-                                    {details.end_date}
-                                </td>
-                                <td>
-                                    {details.days_taken}
-                                </td>
-                                <td>
-                                    {details.type_of_leave}
-                                </td>
-                                <td>
-                                    Not Approved
-                                </td>
-                                <td>
-                                    {details.qualified}
-                                </td>
-                            </tr>
-                        </table>
-                        <br/>
-                    </div>
-                    <div>
-                        Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
-                        <br/>
-                        Regards,<br/>
-                            HR
-                    </div>
-
-
-                ";
             return msg;
         }
 
@@ -702,7 +396,7 @@ namespace HR_LEAVEv2.Classes
                         <br/>
                     </div>
                     <div>
-                        Check the status of employees' leave applications under HR Actions > Leave Applications or click <a href='http://webtest/deploy/HR/AllEmployeeLeaveApplications.aspx'>here</a>. Contact IT for any further information. <br/> 
+                        Check the status of employees' leave applications under HR Actions > Leave Applications or click <a href='http://webtest/hrls/HR/AllEmployeeLeaveApplications.aspx'>here</a>. Contact IT for any further information. <br/> 
                         <br/>
                         Regards,<br/>
                             HR
@@ -710,6 +404,459 @@ namespace HR_LEAVEv2.Classes
 
 
                 ";
+            return msg;
+        }
+
+        /* supervisor view: LA approval undone
+        *  Get the email body for the email sent to a supervisor when their empoyee's LA approval is undone */
+        public MailMessage getSupervisorViewLeaveApprovalUndone(EmailDetails details)
+        {
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
+            msg.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                    font-family: arial, sans-serif;
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                    border: 1px solid #dddddd;
+                                    text-align: left;
+                                    padding: 8px;
+                                }}
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                DO NOT REPLY<br/>
+                                <br/>
+                                The approval for the leave application of {details.employee_name} was undone by HR. Details about the application can be found below: <br/>
+
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Employee Name </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                        <th> Qualified </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {details.date_submitted}
+                                        </td>
+                                        <td>
+                                            {details.employee_name}
+                                        </td>
+                                        <td>
+                                            {details.start_date}
+                                        </td>
+                                        <td>
+                                            {details.end_date}
+                                        </td>
+                                        <td>
+                                            {details.days_taken}
+                                        </td>
+                                        <td>
+                                            {details.type_of_leave}
+                                        </td>
+                                        <td>
+                                            Recommended
+                                        </td>
+                                        <td>
+                                            {details.qualified}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/hrls/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
+            return msg;
+        }
+
+        /* supervisor view: approved LA
+        * Get the email body for the email sent to a supervisor when their employee's LA is approved */
+        public MailMessage getSupervisorViewLeaveApplicationApproved(EmailDetails details)
+        {
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
+            msg.Body = $@"
+                        <style>
+                            #leaveDetails{{
+                                font-family: arial, sans-serif;
+                                border-collapse: collapse;
+                                width: 100%;
+                            }}
+
+                            #leaveDetails td,#leaveDetails th {{
+                                border: 1px solid #dddddd;
+                                text-align: left;
+                                padding: 8px;
+                            }}
+                        </style>
+                        <div style='margin-bottom:15px;'>
+                            DO NOT REPLY<br/>
+                            <br/>
+                            The leave application made by {details.employee_name} was approved. Details about the application can be found below: <br/>
+
+                            <table id='leaveDetails'>
+                                <tr>
+                                    <th> Date Submitted </th>
+                                    <th> Employee Name </th>
+                                    <th> Start Date </th>
+                                    <th> End Date </th>
+                                    <th> Days Taken </th>
+                                    <th> Leave Type </th>
+                                    <th> Status </th>
+                                    <th> Qualified </th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {details.date_submitted}
+                                    </td>
+                                    <td>
+                                        {details.employee_name}
+                                    </td>
+                                    <td>
+                                        {details.start_date}
+                                    </td>
+                                    <td>
+                                        {details.end_date}
+                                    </td>
+                                    <td>
+                                        {details.days_taken}
+                                    </td>
+                                    <td>
+                                        {details.type_of_leave}
+                                    </td>
+                                    <td>
+                                        Approved
+                                    </td>
+                                    <td>
+                                        {details.qualified}
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/>
+                        </div>
+                        <div>
+                            Check the status of employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/hrls/Supervisor/MyEmployeeLeaveApplications.aspx'>here</a>. Contact HR for any further information. <br/> 
+                            <br/>
+                            Regards,<br/>
+                                HR
+                        </div>
+
+
+                    ";
+            return msg;
+        }
+
+        /* supervisor view: not approved LA
+         * Get the email body for the email sent to a supervisor when their employee's LA is not approved */
+        public MailMessage getSupervisorViewLeaveApplicationNotApproved(EmailDetails details)
+        {
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
+            msg.Body = $@"
+                    <style>
+                        #leaveDetails{{
+                            font-family: arial, sans-serif;
+                            border-collapse: collapse;
+                            width: 100%;
+                        }}
+
+                        #leaveDetails td,#leaveDetails th {{
+                            border: 1px solid #dddddd;
+                            text-align: left;
+                            padding: 8px;
+                        }}
+
+                    </style>
+                    <div style='margin-bottom:15px;'>
+                        DO NOT REPLY<br/>
+                        <br/>
+                        The leave application of {details.employee_name} was not approved by HR. Details about the application can be found below: <br/>
+                        {details.comment}
+                        <table id='leaveDetails'>
+                            <tr>
+                                <th> Date Submitted </th>
+                                <th> Employee Name </th>
+                                <th> Start Date </th>
+                                <th> End Date </th>
+                                <th> Days Taken </th>
+                                <th> Leave Type </th>
+                                <th> Status </th>
+                                <th> Qualified </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    {details.date_submitted}
+                                </td>
+                                <td>
+                                    {details.employee_name}
+                                </td>
+                                <td>
+                                    {details.start_date}
+                                </td>
+                                <td>
+                                    {details.end_date}
+                                </td>
+                                <td>
+                                    {details.days_taken}
+                                </td>
+                                <td>
+                                    {details.type_of_leave}
+                                </td>
+                                <td>
+                                    Not Approved
+                                </td>
+                                <td>
+                                    {details.qualified}
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                    </div>
+                    <div>
+                        Check the status of employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/hrls/Supervisor/MyEmployeeLeaveApplications.aspx'>here</a>. Contact HR for any further information. <br/> 
+                        <br/>
+                        Regards,<br/>
+                            HR
+                    </div>
+
+
+                ";
+            return msg;
+        }
+
+        /* supervisor view: submitted LA
+         * Get the email body for the email sent to a supervisor when an employee submits a LA */
+        public MailMessage getSupervisorViewEmployeeSubmittedLeaveApplication(EmailDetails details)
+        {
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
+            msg.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                  font-family: arial, sans-serif;
+                                  border-collapse: collapse;
+                                  width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                  border: 1px solid #dddddd;
+                                  text-align: left;
+                                  padding: 8px;
+                                }}
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                DO NOT REPLY <br/>
+                                <br/>
+                                {details.employee_name} submitted a leave application. Details about the application can be found below: <br/>
+                                
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Employee Name </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {details.date_submitted}
+                                        </td>
+                                        <td>
+                                            {details.employee_name}
+                                        </td>
+                                        <td>
+                                            {details.start_date}
+                                        </td>
+                                        <td>
+                                            {details.end_date}
+                                        </td>
+                                        <td>
+                                            {details.days_taken}
+                                        </td>
+                                        <td>
+                                            {details.type_of_leave}
+                                        </td>
+                                        <td>
+                                            Pending
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of your employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/hrls/Supervisor/MyEmployeeLeaveApplications'>here</a>. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
+            return msg;
+        }
+
+        /* employee view: LA approval undone
+        *  Get the email body for the email sent to an employee when their LA approval is undone */
+        public MailMessage getEmployeeViewLeaveApprovalUndone(EmailDetails details)
+        {
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
+            msg.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                    font-family: arial, sans-serif;
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                    border: 1px solid #dddddd;
+                                    text-align: left;
+                                    padding: 8px;
+                                }}
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                DO NOT REPLY<br/>
+                                <br/>
+                                Your leave application approval was undone by HR. Details about the application can be found below: <br/>
+
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Supervisor Name </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                        <th> Qualified </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {details.date_submitted}
+                                        </td>
+                                        <td>
+                                            {details.supervisor_name}
+                                        </td>
+                                        <td>
+                                            {details.start_date}
+                                        </td>
+                                        <td>
+                                            {details.end_date}
+                                        </td>
+                                        <td>
+                                            {details.days_taken}
+                                        </td>
+                                        <td>
+                                            {details.type_of_leave}
+                                        </td>
+                                        <td>
+                                            Recommended
+                                        </td>
+                                        <td>
+                                            {details.qualified}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/hrls/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
+            return msg;
+        }
+
+        /* employee view: approved LA
+        *  Get the email body for the email sent to an employee when their LA is approved */
+        public MailMessage getEmployeeViewLeaveApplicationApproved(EmailDetails details)
+        {
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
+            msg.Body = $@"
+                            <style>
+                                #leaveDetails{{
+                                    font-family: arial, sans-serif;
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                }}
+
+                                #leaveDetails td,#leaveDetails th {{
+                                    border: 1px solid #dddddd;
+                                    text-align: left;
+                                    padding: 8px;
+                                }}
+                            </style>
+                            <div style='margin-bottom:15px;'>
+                                DO NOT REPLY<br/>
+                                <br/>
+                                Your leave application was approved by HR. Details about the application can be found below: <br/>
+
+                                <table id='leaveDetails'>
+                                    <tr>
+                                        <th> Date Submitted </th>
+                                        <th> Supervisor Name </th>
+                                        <th> Start Date </th>
+                                        <th> End Date </th>
+                                        <th> Days Taken </th>
+                                        <th> Leave Type </th>
+                                        <th> Status </th>
+                                        <th> Qualified </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {details.date_submitted}
+                                        </td>
+                                        <td>
+                                            {details.supervisor_name}
+                                        </td>
+                                        <td>
+                                            {details.start_date}
+                                        </td>
+                                        <td>
+                                            {details.end_date}
+                                        </td>
+                                        <td>
+                                            {details.days_taken}
+                                        </td>
+                                        <td>
+                                            {details.type_of_leave}
+                                        </td>
+                                        <td>
+                                            Approved
+                                        </td>
+                                        <td>
+                                            {details.qualified}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <br/>
+                            </div>
+                            <div>
+                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/hrls/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                                <br/>
+                                Regards,<br/>
+                                    HR
+                            </div>
+
+
+                        ";
             return msg;
         }
 
@@ -778,7 +925,7 @@ namespace HR_LEAVEv2.Classes
                         <br/>
                     </div>
                     <div>
-                        Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                        Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/hrls/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
                         <br/>
                         Regards,<br/>
                             HR
@@ -789,7 +936,7 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /*  employee view: not recommended LA
+        /* employee view: not recommended LA
          * Get the email body for the email sent to an employee when a LA is not recommended by their supervisor */
         public MailMessage getEmployeeViewLeaveApplicationNotRecommended(EmailDetails details)
         {
@@ -855,7 +1002,7 @@ namespace HR_LEAVEv2.Classes
                         <br/>
                     </div>
                     <div>
-                        Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                        Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/hrls/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
                         <br/>
                         Regards,<br/>
                             HR
@@ -864,75 +1011,79 @@ namespace HR_LEAVEv2.Classes
             return msg;
         }
 
-        /* supervisor view: submitted LA
-         * Get the email body for the email sent to a supervisor when an employee submits a LA */
-        public MailMessage getSupervisorViewEmployeeSubmittedLeaveApplication(EmailDetails details)
+        /* employee view: not approved LA
+         * Get the email body for the email sent to an employee when their LA is not approved */
+        public MailMessage getEmployeeViewLeaveApplicationNotApproved(EmailDetails details)
         {
             MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
             msg.Body = $@"
-                            <style>
-                                #leaveDetails{{
-                                  font-family: arial, sans-serif;
-                                  border-collapse: collapse;
-                                  width: 100%;
-                                }}
+                    <style>
+                        #leaveDetails{{
+                            font-family: arial, sans-serif;
+                            border-collapse: collapse;
+                            width: 100%;
+                        }}
 
-                                #leaveDetails td,#leaveDetails th {{
-                                  border: 1px solid #dddddd;
-                                  text-align: left;
-                                  padding: 8px;
-                                }}
-                            </style>
-                            <div style='margin-bottom:15px;'>
-                                DO NOT REPLY <br/>
-                                <br/>
-                                {details.employee_name} submitted a leave application. Details about the application can be found below: <br/>
-                                
-                                <table id='leaveDetails'>
-                                    <tr>
-                                        <th> Date Submitted </th>
-                                        <th> Employee Name </th>
-                                        <th> Start Date </th>
-                                        <th> End Date </th>
-                                        <th> Days Taken </th>
-                                        <th> Leave Type </th>
-                                        <th> Status </th>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            {details.date_submitted}
-                                        </td>
-                                        <td>
-                                            {details.employee_name}
-                                        </td>
-                                        <td>
-                                            {details.start_date}
-                                        </td>
-                                        <td>
-                                            {details.end_date}
-                                        </td>
-                                        <td>
-                                            {details.days_taken}
-                                        </td>
-                                        <td>
-                                            {details.type_of_leave}
-                                        </td>
-                                        <td>
-                                            Pending
-                                        </td>
-                                    </tr>
-                                </table>
-                                <br/>
-                            </div>
-                            <div>
-                                Check the status of your employees' leave applications under Supervisor Actions > Leave Applications or click <a href='http://webtest/deploy/Supervisor/MyEmployeeLeaveApplications'>here</a>. Contact HR for any further information. <br/> 
-                                <br/>
-                                Regards,<br/>
-                                    HR
-                            </div>
+                        #leaveDetails td,#leaveDetails th {{
+                            border: 1px solid #dddddd;
+                            text-align: left;
+                            padding: 8px;
+                        }}
+                    </style>
+                    <div style='margin-bottom:15px;'>
+                        DO NOT REPLY<br/>
+                        <br/>
+                        Your leave application was not approved by HR. Details about the application can be found below: <br/>
+                        {details.comment}
+                        <table id='leaveDetails'>
+                            <tr>
+                                <th> Date Submitted </th>
+                                <th> Supervisor Name </th>
+                                <th> Start Date </th>
+                                <th> End Date </th>
+                                <th> Days Taken </th>
+                                <th> Leave Type </th>
+                                <th> Status </th>
+                                <th> Qualified </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    {details.date_submitted}
+                                </td>
+                                <td>
+                                    {details.supervisor_name}
+                                </td>
+                                <td>
+                                    {details.start_date}
+                                </td>
+                                <td>
+                                    {details.end_date}
+                                </td>
+                                <td>
+                                    {details.days_taken}
+                                </td>
+                                <td>
+                                    {details.type_of_leave}
+                                </td>
+                                <td>
+                                    Not Approved
+                                </td>
+                                <td>
+                                    {details.qualified}
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                    </div>
+                    <div>
+                        Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/hrls/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                        <br/>
+                        Regards,<br/>
+                            HR
+                    </div>
 
 
-                        ";
+                ";
             return msg;
         }
 
@@ -996,7 +1147,7 @@ namespace HR_LEAVEv2.Classes
                                 <br/>
                             </div>
                             <div>
-                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/deploy/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
+                                Check the status of your leave applications under My Account > View Leave Logs or click <a href='http://webtest/hrls/Employee/MyAccount.aspx'>here</a>. Contact HR for any further information. <br/> 
                                 <br/>
                                 Regards,<br/>
                                     HR
