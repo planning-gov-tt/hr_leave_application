@@ -198,7 +198,7 @@ namespace HR_LEAVEv2.Employee
                     string leaveId = Request.QueryString["leaveId"];
 
                     // populates page and authorizes user based on: their permissions, whether the leave application was submitted to them as a supervisor or various HR criteria
-                    LeaveTransactionDetails ltDetails = populatePage(leaveId);
+                    LeaveTransactionDetails ltDetails = populatePage(leaveId, mode);
 
                     if (mode == "view")
                         this.adjustPageForViewMode();
@@ -736,7 +736,7 @@ namespace HR_LEAVEv2.Employee
 
         
         // POPULATION OF DATA FIELDS ON PAGE FOR VIEW AND EDIT MODE
-        protected LeaveTransactionDetails populatePage(string leaveId)
+        protected LeaveTransactionDetails populatePage(string leaveId, string mode)
         {
             // populates the page with the relevant details 
             LeaveTransactionDetails ltDetails = null;
@@ -842,7 +842,7 @@ namespace HR_LEAVEv2.Employee
                             }
 
                             // check permissions of current user
-                            if(!user.isUserAllowedToViewOrEditLeaveApplication(ltDetails.empId, ltDetails.empType, ltDetails.supId, ltDetails.typeOfLeave))
+                            if(!user.isUserAllowedToViewOrEditLeaveApplication(ltDetails.empId, ltDetails.empType, ltDetails.supId, ltDetails.typeOfLeave, mode))
                                 Response.Redirect("~/AccessDenied.aspx");
 
                             //populate form

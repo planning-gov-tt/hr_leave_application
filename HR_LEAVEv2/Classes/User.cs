@@ -48,7 +48,7 @@ namespace HR_LEAVEv2.Classes
             return permissions.Contains("admin_permissions");
         }
 
-        public Boolean isUserAllowedToViewOrEditLeaveApplication(string employeeId, string employeeType ,string supervisorId, string typeOfLeave) 
+        public Boolean isUserAllowedToViewOrEditLeaveApplication(string employeeId, string employeeType ,string supervisorId, string typeOfLeave, string mode) 
         {
             // if no employement type is specified
             if (util.isNullOrEmpty(employeeType))
@@ -62,9 +62,13 @@ namespace HR_LEAVEv2.Classes
             if (currUserId == null)
                 return false;
 
-            // if user trying to view/ edit is the employee who submitted the application
-            if (currUserId == employeeId)
+            // if user trying to view is the employee who submitted the application
+            if (currUserId == employeeId && mode == "view")
                 return true;
+
+            // if user who submitted the application is trying to edit the application
+            if (currUserId == employeeId && mode == "edit")
+                return false;
 
             // All combinations of HR 2, HR 3, Supervisor and Employee that did not submit the application. This means that only people with HR 2 privileges or 
             // the supervisor who the LA was submitted to can see it
@@ -77,27 +81,11 @@ namespace HR_LEAVEv2.Classes
             // HR 2
             if (permissions.Contains("hr2_permissions"))
             {
+                List<string> allowedEmpTypes = getSubsetsOfEmployeesUserIsAllowedToView()["employment_types"],
+                             allowedLeaveTypes = getTypesOfLeaveUserCanApprove();
                 
-                // the HR 2 must have permissions to view data for the same employment type as for the employee who submitted the application
-                if (
-                    (
-                        //check if hr can view applications from the relevant employment type 
-                        (employeeType == "Contract" && !permissions.Contains("contract_permissions"))
-                        ||
-                        (employeeType == "Public Service" && !permissions.Contains("public_officer_permissions"))
-                    )
 
-                    ||
-
-                    (
-                        //check if hr can view applications of the relevant leave type
-                        (typeOfLeave == "Sick" && !permissions.Contains("approve_sick"))
-                        ||
-                        (typeOfLeave == "Vacation" && !permissions.Contains("approve_vacation"))
-                        ||
-                        (typeOfLeave == "Casual" && !permissions.Contains("approve_casual"))
-                    )
-                )
+                if (!allowedEmpTypes.Contains($"'{employeeType}'") || !allowedLeaveTypes.Contains($"'{typeOfLeave}'"))
                     return false;
             }
             else
