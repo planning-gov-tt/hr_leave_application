@@ -261,6 +261,7 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 ('Maternity'),
 ('Paternity'),
 ('Pre-retirement'),
+('Compensatory'),
 ('Paid'),
 ('No Pay');
 
@@ -420,6 +421,7 @@ INSERT INTO [dbo].[emptypeleavetype] ([employment_type], [leave_type]) VALUES
 ('Contract', 'Pre-retirement'),
 ('Contract', 'Sick'),
 ('Contract', 'Vacation'),
+('Contract', 'Compensatory'),
 ('Public Service', 'Bereavement'),
 ('Public Service', 'Maternity'),
 ('Public Service', 'Paternity'),
@@ -427,5 +429,6 @@ INSERT INTO [dbo].[emptypeleavetype] ([employment_type], [leave_type]) VALUES
 ('Public Service', 'Casual'),
 ('Public Service', 'Pre-retirement'),
 ('Public Service', 'Sick'),
-('Public Service', 'Vacation')
+('Public Service', 'Vacation'),
+('Public Service', 'Compensatory')
 ;
