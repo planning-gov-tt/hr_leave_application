@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data.SqlClient;
 using HR_LEAVEv2.Classes;
 using System.Data;
+using System.Net.Mail;
 
 namespace HR_LEAVEv2
 {
@@ -58,17 +59,26 @@ namespace HR_LEAVEv2
                 user.permissions = auth.getUserPermissions(user.currUserId);
 
 
-            DateTime startDate = DateTime.MinValue;
+            DateTime startDate = DateTime.MinValue,
+                     expectedEndDate = DateTime.MinValue,
+                     actualEndDate = DateTime.MinValue;
+            string employmentRecordId = string.Empty;
             int yearsWorked = -1;
             string empType = string.Empty;
+            Boolean hasReceivedNotifAboutEndOfContract = false;
 
             currentNumYearsWorked = -1;
             // get years worked
             string sql = $@"
-                        SELECT ep.start_date as startDate, ep.years_worked as yearsWorked, ep.employment_type as employmentType
+                        SELECT ep.id, 
+                               ep.start_date as startDate, 
+                               ep.expected_end_date as expectedEndDate, 
+                               ISNULL(ep.actual_end_date, '') as actualEndDate, 
+                               ep.years_worked as yearsWorked, 
+                               ep.employment_type as employmentType,
+                               ep.has_received_notif_about_end_of_contract as hasReceivedNotifAboutEndOfContract
                         FROM dbo.employeeposition ep
                         WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {user.currUserId};
-                    ;
                 ";
 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -80,15 +90,96 @@ namespace HR_LEAVEv2
                     {
                         while (reader.Read())
                         {
+                            employmentRecordId = reader["id"].ToString();
                             startDate = Convert.ToDateTime(reader["startDate"]);
+                            expectedEndDate = Convert.ToDateTime(reader["expectedEndDate"]);
+                            if (reader["actualEndDate"].ToString() != "1/1/1900 12:00:00 AM")
+                                actualEndDate = Convert.ToDateTime(reader["actualEndDate"]);
                             yearsWorked = Convert.ToInt32(reader["yearsWorked"]);
                             empType = reader["employmentType"].ToString();
-                        }
+                            hasReceivedNotifAboutEndOfContract = reader["hasReceivedNotifAboutEndOfContract"].ToString() == "True";
+                        }          
                     }
                 }
             }
 
+            if (!util.isNullOrEmpty(empType) && !util.isNullOrEmpty(employmentRecordId) && !hasReceivedNotifAboutEndOfContract)
+            {
+                DateTime endDate = DateTime.MinValue;
 
+                if (actualEndDate != DateTime.MinValue)
+                    endDate = actualEndDate;
+                else if (expectedEndDate != DateTime.MinValue)
+                    endDate = expectedEndDate;
+
+                if (endDate != DateTime.MinValue)
+                {
+                    DateTime oneMonthBeforeEndDate = endDate.AddMonths(-1);
+                    if (empType == "Contract" && DateTime.Compare(util.getCurrentDateToday(), oneMonthBeforeEndDate) >= 0 && DateTime.Compare(util.getCurrentDateToday(), endDate) < 0)
+                    {
+                        // check if employee is close to finishing their contract
+                        string endDateFormatted = endDate.ToString("MMMM dd yyyy");
+                        // send email to employee 
+                        MailMessage message = util.getReminderThatEmployeeContractIsEndingSoon(
+                            new Util.EmailDetails
+                            {
+                                expected_end_date = $"{endDateFormatted}",
+                                subject = "Contract End Date Imminent",
+                                recipient = user.currUserEmail
+                            }
+                            );
+                        util.sendMail(message);
+
+
+                        // send inhouse notifications
+                        // send employee notif
+                        try
+                        {
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                            {
+                                connection.Open();
+
+                                string sqlForContractEndingSoonNotif = $@"
+                                INSERT INTO [dbo].[notifications] ([notification_header], [notification], [is_read], [employee_id], [created_at])
+                                VALUES('Contract End Date Imminent',@Notification, 'No', '{user.currUserId}', '{util.getCurrentDate()}');
+                            ";
+                                using (SqlCommand command = new SqlCommand(sqlForContractEndingSoonNotif, connection))
+                                {
+                                    command.Parameters.AddWithValue("@Notification", $"This is a reminder that your contract is expected to be ending soon on {endDateFormatted}. Contact HR for more information");
+                                    int rowsAffected = command.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+
+                        try
+                        {
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                            {
+                                connection.Open();
+
+                                string sqlForUpdatingCheckBit = $@"
+                                    UPDATE dbo.employeeposition
+                                    SET [has_received_notif_about_end_of_contract] = 1
+                                    WHERE id = {employmentRecordId};
+                                ";
+                                using (SqlCommand command = new SqlCommand(sqlForUpdatingCheckBit, connection))
+                                {
+                                    int rowsAffected = command.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+
+                }
+            }
 
             if (startDate != DateTime.MinValue && yearsWorked != -1 && !util.isNullOrEmpty(empType))
             {

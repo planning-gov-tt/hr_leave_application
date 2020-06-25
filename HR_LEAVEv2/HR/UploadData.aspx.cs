@@ -245,22 +245,13 @@ namespace HR_LEAVEv2.HR
                     {
                         // record being checked is active
                         // must convert start date and actual end date (once not empty) to correct format before passing to isRecordActive
-                        if (util.isNullOrEmpty(dr.ItemArray[(int)empPositionColumns.actual_end_date].ToString()))
-                        {
-                            if (isRecordActive(Convert.ToDateTime(dr.ItemArray[(int)empPositionColumns.start_date]), DateTime.MinValue))
-                                numActiveRows++;
-                        }
-                        else
-                        {
-                            if (isRecordActive(Convert.ToDateTime(dr.ItemArray[(int)empPositionColumns.start_date]), Convert.ToDateTime(dr.ItemArray[(int)empPositionColumns.actual_end_date])))
-                                numActiveRows++;
-                        }
-                        
-
-
                         DateTime tableDataRowStartDate = Convert.ToDateTime(dr[(int)empPositionColumns.start_date]);
 
                         DateTime tableDataRowEndDate = !util.isNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? Convert.ToDateTime(dr[(int)empPositionColumns.actual_end_date]) : DateTime.MinValue;
+
+                        // check if current record being evaluated is active
+                        if (isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
+                            numActiveRows++;
 
                         // ensure that record does not overlap with another record
                         bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;

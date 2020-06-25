@@ -18,6 +18,7 @@ namespace HR_LEAVEv2.Classes
             public string date_submitted { get; set; }
             public string start_date { get; set; }
             public string end_date { get; set; }
+            public string expected_end_date { get; set; }
             public string days_taken { get; set; }
             public string type_of_leave { get; set; }
             public string qualified { get; set; }
@@ -41,7 +42,7 @@ namespace HR_LEAVEv2.Classes
         public DateTime getCurrentDateToday()
         {
             return DateTime.Today;
-            //return DateTime.ParseExact("10/05/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            //return DateTime.ParseExact("02/09/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         }
 
         public int getNumYearsBetween(DateTime start, DateTime end)
@@ -1155,6 +1156,26 @@ namespace HR_LEAVEv2.Classes
 
 
                         ";
+            return msg;
+        }
+
+        public MailMessage getReminderThatEmployeeContractIsEndingSoon(EmailDetails details)
+        {
+            MailMessage msg = getNewMailMessage(details.subject, new List<string>() { details.recipient });
+            msg.Body = $@"
+                <div style='margin-bottom:15px;'>
+                    DO NOT REPLY<br/>
+                    <br/>
+
+                    This is a reminder that your contract is expected to be ending soon on {details.expected_end_date}. Contact HR for more information.
+                <div>
+                <div>
+                    <br/>
+                    Regards,<br/>
+                        HR
+                </div>
+            ";
+
             return msg;
         }
         // _______________________________________________________________________________________________________________________________________________
