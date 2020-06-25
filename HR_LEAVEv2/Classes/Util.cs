@@ -41,8 +41,8 @@ namespace HR_LEAVEv2.Classes
 
         public DateTime getCurrentDateToday()
         {
-            return DateTime.Today;
-            //return DateTime.ParseExact("02/09/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            //return DateTime.Today;
+            return DateTime.ParseExact("02/09/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         }
 
         public int getNumYearsBetween(DateTime start, DateTime end)

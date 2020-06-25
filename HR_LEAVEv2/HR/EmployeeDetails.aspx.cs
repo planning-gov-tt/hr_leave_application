@@ -1880,6 +1880,26 @@ namespace HR_LEAVEv2.HR
                     // only if the record id is not '-1' and isChanged is '2' (representing a edited row) then update it
                     if (dr.ItemArray[(int)emp_records_columns.record_id].ToString() != "-1" && dr.ItemArray[(int)emp_records_columns.isChanged].ToString() == "2")
                     {
+                        string setFieldToSendNotifIfContractEnding = string.Empty;
+                        if(editedRecords != null)
+                        {
+                            Boolean isExpectedEndDateChanged = editedRecords[dr.ItemArray[(int)emp_records_columns.record_id].ToString()].Contains("Expected End Date"),
+                            isActualEndDateChanged = editedRecords[dr.ItemArray[(int)emp_records_columns.record_id].ToString()].Contains("Actual End Date");
+                            DateTime expectedEndDate = Convert.ToDateTime(dr.ItemArray[(int)emp_records_columns.expected_end_date].ToString()),
+                                     actualEndDate = !util.isNullOrEmpty(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString()) ? DateTime.ParseExact(dr.ItemArray[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
+
+                            // check if expected end date or actual end date were changed and if sp and a date is available and is a date past the current date then reset hasreceivednotifaboutendofcontract field to False
+                            if (
+                                (isExpectedEndDateChanged && expectedEndDate != DateTime.MinValue && DateTime.Compare(util.getCurrentDateToday(), expectedEndDate) < 0)
+                                ||
+                                (isActualEndDateChanged && actualEndDate != DateTime.MinValue && DateTime.Compare(util.getCurrentDateToday(), actualEndDate) < 0)
+                            )
+                            {
+                                if (!(isExpectedEndDateChanged && actualEndDate != DateTime.MinValue))
+                                    setFieldToSendNotifIfContractEnding = ", has_received_notif_about_end_of_contract = 0 ";
+                            }
+                        }
+
                         // edit record
                         try
                         {
@@ -1894,6 +1914,7 @@ namespace HR_LEAVEv2.HR
                                     years_worked = @YearsWorked,
                                     annual_vacation_amt = @AnnualVacationAmt,
                                     max_vacation_accumulation = @MaxVacationAccumulation
+                                    {setFieldToSendNotifIfContractEnding}
                                 WHERE id= @RecordId;
                             ";
 
