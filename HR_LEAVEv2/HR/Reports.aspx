@@ -28,12 +28,14 @@
                     </asp:LinkButton>
                 </asp:Panel>
 
-                <asp:Panel ID="msgPanel" runat="server">
-                    <asp:Panel ID="errorPanel" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Error occurred. Contact IT for more information</span>
-                    </asp:Panel>
-                </asp:Panel>
+                <asp:UpdatePanel ID="msgUpdatePanel" runat="server" Style="margin-top:15px;">
+                    <ContentTemplate>
+                        <asp:Panel ID="errorPanel" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span>Error occurred. Contact IT for more information</span>
+                        </asp:Panel>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
 
                 <%--Put in error messages--%>
             </div>
