@@ -46,7 +46,10 @@ namespace HR_LEAVEv2.HR
                 Response.Redirect("~/AccessDenied.aspx");
 
             if (!IsPostBack)
+            {
                 deleteUploadedFile();
+            }
+                
 
             // hide clear file button if no file is uploaded
             clearFileBtn.Visible = uploadedFileName != null;
