@@ -36,13 +36,13 @@ namespace HR_LEAVEv2.Classes
         public DateTime getCurrentDate()
         {
             return DateTime.Now;
-            //return DateTime.ParseExact("10/05/2020 8:00 am", "dd/MM/yyyy h:mm tt", CultureInfo.InvariantCulture);
+            //return DateTime.ParseExact("02/09/2020 8:00 am", "dd/MM/yyyy h:mm tt", CultureInfo.InvariantCulture);
         }
 
         public DateTime getCurrentDateToday()
         {
-            //return DateTime.Today;
-            return DateTime.ParseExact("02/09/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            return DateTime.Today;
+            //return DateTime.ParseExact("02/09/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         }
 
         public int getNumYearsBetween(DateTime start, DateTime end)
