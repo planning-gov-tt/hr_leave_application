@@ -28,6 +28,13 @@
                     </asp:LinkButton>
                 </asp:Panel>
 
+                <asp:Panel ID="msgPanel" runat="server">
+                    <asp:Panel ID="errorPanel" runat="server" CssClass="row alert alert-danger validation-msg" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Error occurred. Contact IT for more information</span>
+                    </asp:Panel>
+                </asp:Panel>
+
                 <%--Put in error messages--%>
             </div>
             <div class="tab-pane fade" id="hrReports" role="tabpanel" aria-labelledby="hrReportsTab">

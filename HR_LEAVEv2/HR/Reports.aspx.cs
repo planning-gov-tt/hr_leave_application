@@ -17,6 +17,8 @@ namespace HR_LEAVEv2.HR
             List<string> permissions = (List<string>)Session["permissions"];
             if (!(permissions.Contains("hr1_permissions") || permissions.Contains("hr2_permissions") || permissions.Contains("hr3_permissions")))
                 Response.Redirect("~/AccessDenied.aspx");
+
+            errorPanel.Style.Add("display", "none");
         }
 
         protected void getIhrisReportBtn_Click(object sender, EventArgs e)
@@ -105,6 +107,7 @@ namespace HR_LEAVEv2.HR
             else
             {
                 filesToDownloadPanel.Visible = false;
+                errorPanel.Style.Add("display", "inline-block");
             }
         }
 
