@@ -64,6 +64,7 @@ INSERT INTO [dbo].[rolepermission] ([role_id], [permission_id]) VALUES
 ('admin', 'admin_permissions')
 ;
 
+
 INSERT INTO [dbo].[employee] ([employee_id], [ihris_id], [username], [first_name], [last_name], [email], [vacation], [personal], [casual], [sick], [bereavement], [maternity], [paternity], [pre_retirement]) VALUES 
 -- IT
 ('1', '1', 'PLANNING\ Tristan Sankar', 'Tristan', 'Sankar', 'Tristan.Sankar@planning.gov.tt', 0, 5, 0, 14, 2, 0, 0, 0),
