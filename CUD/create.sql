@@ -110,7 +110,6 @@ CREATE TABLE [dbo].[position] (
   [vacation] INT -- the standard number of vacations days awarded per year per position 
 );
 
-
 CREATE TABLE [dbo].[employmenttype] (
   [type_id] NVARCHAR (15) PRIMARY KEY
 );
@@ -127,7 +126,8 @@ CREATE TABLE [dbo].[employeeposition] (
   [years_worked] INT NOT NULL,
   [annual_vacation_amt] INT NOT NULL,
   [max_vacation_accumulation] INT NOT NULL,
-  [can_accumulate_past_max] BIT
+  [can_accumulate_past_max] BIT DEFAULT 0,
+  [has_received_notif_about_end_of_contract] BIT DEFAULT 0
 
   FOREIGN KEY ([employee_id])
     REFERENCES [dbo].[employee] ([employee_id])
