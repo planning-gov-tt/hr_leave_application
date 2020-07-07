@@ -1846,7 +1846,7 @@ namespace HR_LEAVEv2.Employee
         protected void refreshForm(object sender, EventArgs e)
         {
             // refreshes form by redirecting back to the page
-            Response.Redirect($"~{Request.Url.PathAndQuery}");
+            Response.Redirect($"{Request.Url.PathAndQuery}");
         }
 
         protected void returnToPreviousBtn_Click(object sender, EventArgs e)
