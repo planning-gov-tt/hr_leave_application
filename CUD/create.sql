@@ -107,7 +107,7 @@ CREATE TABLE [dbo].[position] (
   [pos_id] INT IDENTITY (1, 1) PRIMARY KEY,
   [pos_name] NVARCHAR (30) NOT NULL,
   [pos_description] NVARCHAR (60),
-  [vacation] INT NOT NULL -- the standard number of vacations days awarded per year per position 
+  [vacation] INT -- the standard number of vacations days awarded per year per position 
 );
 
 
