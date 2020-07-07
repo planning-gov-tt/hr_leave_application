@@ -846,7 +846,7 @@
         </div>
     </div>
 
-    <asp:Panel ID="accPastLimitContainerPanel" runat="server" Visible="false" class="container text-center" style="width: 50%; background-color: #e0e0eb;padding-bottom: 15px;">
+    <asp:Panel ID="accPastLimitContainerPanel" runat="server" Visible="false" class="container text-center" style="width: 60%; background-color: #e0e0eb;padding-bottom: 15px;">
         <h3 style="margin-bottom:15px;">Allow Accumulation Past Max
             <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
             data-toggle="tooltip"
