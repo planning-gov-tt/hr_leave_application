@@ -310,7 +310,7 @@
                     <asp:Label ID="typeOfLeaveTxt" runat="server" Style="text-align: center; font-size: 1.05em;"></asp:Label>
 
                     <%--edit mode--%>
-                    <asp:LinkButton ID="convertToPaidLeave" runat="server" OnClick="convertToPaidLeave_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Convert to Paid Leave" Style="margin-left: 15px;" Visible="false">
+                    <%--<asp:LinkButton ID="convertToPaidLeave" runat="server" OnClick="convertToPaidLeave_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Convert to Paid Leave" Style="margin-left: 15px;" Visible="false">
                         <i class="fa fa-money" aria-hidden ="true" style="font-size:1.5em"></i>
                     </asp:LinkButton>
 
@@ -321,7 +321,7 @@
                                 <span>No files currently uploaded. Upload recommendation from PS and try again</span>
                             </asp:Panel>
                         </ContentTemplate>
-                    </asp:UpdatePanel>
+                    </asp:UpdatePanel>--%>
                 </asp:Panel>
 
             </div>

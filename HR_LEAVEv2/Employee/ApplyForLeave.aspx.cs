@@ -708,8 +708,8 @@ namespace HR_LEAVEv2.Employee
             applyModeTitle.Visible = false;
 
             // show convert to paid leave button if leave type is No Pay
-            if (typeOfLeaveTxt.Text == "No Pay")
-                convertToPaidLeave.Visible = true;
+            //if (typeOfLeaveTxt.Text == "No Pay")
+            //    convertToPaidLeave.Visible = true;
 
             // upload files
             fileUploadPanel.Visible = true;
@@ -1073,7 +1073,7 @@ namespace HR_LEAVEv2.Employee
                     }
                     else if (mode == "edit")
                     {
-                        filesNeededForConversionToPaidPanel.Visible = false;
+                        //filesNeededForConversionToPaidPanel.Visible = false;
                         filesToDownloadPanel.Style.Add("margin-top", "15px");
                     }
 
@@ -1613,11 +1613,11 @@ namespace HR_LEAVEv2.Employee
             if (isDaysTakenChanged || isSupCommentsChanged || isHrCommentsChanged || isLeaveTypeChanged || areFilesUploaded)
             {
 
-                if (isLeaveTypeChanged && !areFilesUploaded)
-                {
-                    filesNeededForConversionToPaidPanel.Visible = true;
-                    return;
-                }
+                //if (isLeaveTypeChanged && !areFilesUploaded)
+                //{
+                //    filesNeededForConversionToPaidPanel.Visible = true;
+                //    return;
+                //}
 
                 try
                 {
@@ -1856,19 +1856,19 @@ namespace HR_LEAVEv2.Employee
             Response.Redirect($"{returnUrl}");
         }
 
-        protected void convertToPaidLeave_Click(object sender, EventArgs e)
-        {
-            List<HttpPostedFile> files = uploadedFiles;
-            if(files != null)
-            {
-                // convert
-                typeOfLeaveTxt.Text = "Paid";
-            }
-            else
-            {
-                filesNeededForConversionToPaidPanel.Visible = true;
-            }
-        }
+        //protected void convertToPaidLeave_Click(object sender, EventArgs e)
+        //{
+        //    List<HttpPostedFile> files = uploadedFiles;
+        //    if(files != null)
+        //    {
+        //        // convert
+        //        typeOfLeaveTxt.Text = "Paid";
+        //    }
+        //    else
+        //    {
+        //        filesNeededForConversionToPaidPanel.Visible = true;
+        //    }
+        //}
 
 
 
