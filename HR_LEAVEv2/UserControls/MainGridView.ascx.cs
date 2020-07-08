@@ -797,7 +797,7 @@ namespace HR_LEAVEv2.UserControls
                             UPDATE 
                                 [dbo].[employee]
                             SET
-                                {leaveBalanceColumnName[leaveType]} = {leaveBalanceColumnName[leaveType]} {operation} {difference}
+                                {leaveBalanceColumnName[leaveType]} = IIF({leaveBalanceColumnName[leaveType]} {operation} {difference} >= 0, {leaveBalanceColumnName[leaveType]} {operation} {difference}, 0)
                             WHERE
                                 [employee_id] = '{employee_id}';
 
