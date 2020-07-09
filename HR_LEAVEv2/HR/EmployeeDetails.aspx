@@ -599,7 +599,7 @@
                                 </table>
                             </div>
 
-                            <div style="display:flex; justify-content: center; margin-top:10px; margin-bottom:25px;">
+                            <div style="display:flex; justify-content: center; margin-top:10px;">
                                 <asp:RadioButtonList ID="subsOrActingRadioBtnList" runat="server" CssClass="subOrActingList" RepeatLayout="Table" RepeatDirection="Vertical">
 
                                     <asp:ListItem Selected="True">Substantive</asp:ListItem>
