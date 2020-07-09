@@ -122,6 +122,7 @@ CREATE TABLE [dbo].[employeeposition] (
   [expected_end_date] DATETIME NOT NULL,
   [actual_end_date] DATETIME,
   [employment_type] NVARCHAR (15) NOT NULL,
+  [is_substantive_or_acting] BIT DEFAULT 1,
   [dept_id] INT NOT NULL,
   [years_worked] INT NOT NULL,
   [annual_vacation_amt] INT NOT NULL,

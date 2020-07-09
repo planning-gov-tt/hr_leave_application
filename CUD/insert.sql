@@ -263,7 +263,8 @@ INSERT INTO [dbo].[leavetype] ([type_id]) VALUES
 ('Pre-retirement'),
 ('Compensatory'),
 ('Paid'),
-('No Pay');
+('No Pay'),
+('Leave of Absence');
 
 
 SET IDENTITY_INSERT [dbo].[department] ON;
@@ -416,7 +417,7 @@ INSERT INTO [dbo].[emptypeleavetype] ([employment_type], [leave_type]) VALUES
 ('Contract', 'Bereavement'),
 ('Contract', 'Maternity'),
 ('Contract', 'Paternity'),
-('Contract', 'No Pay'),
+('Contract', 'Leave of Absence'),
 ('Contract', 'Personal'),
 ('Contract', 'Pre-retirement'),
 ('Contract', 'Sick'),
