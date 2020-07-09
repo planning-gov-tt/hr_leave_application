@@ -706,6 +706,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.RegularExpressionValidator maxAmtOfLeaveRegExpValidator;
         
         /// <summary>
+        /// subsOrActingRadioBtnList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButtonList subsOrActingRadioBtnList;
+        
+        /// <summary>
         /// invalidAnnualOrMaximumVacationLeaveAmtPanel control.
         /// </summary>
         /// <remarks>

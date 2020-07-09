@@ -35,7 +35,8 @@ namespace HR_LEAVEv2.HR
             status = 10,
             status_class = 11,
             annual_vacation_amt = 12,
-            max_vacation_accumulation = 13
+            max_vacation_accumulation = 13,
+            is_substantive_or_acting = 14
         };
 
         private DataTable empRecordsDataSource
@@ -429,6 +430,9 @@ namespace HR_LEAVEv2.HR
                 // max vacation accumulation possible
                 maxAmtOfLeaveTxt.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "max_vacation_accumulation")].Text.ToString();
 
+                // Substantive or Acting
+                subsOrActingRadioBtnList.SelectedIndex = empRecordsDataSource.Rows[index].ItemArray[Convert.ToInt32(emp_records_columns.is_substantive_or_acting)].ToString() == "Substantive" ? 0 : 1;
+
                 // highlight row being edited
                 empRecordGridView.Rows[index].CssClass = "highlighted-record";
 
@@ -621,7 +625,8 @@ namespace HR_LEAVEv2.HR
                 dept_id = deptList.SelectedValue,
                 dept_name = deptList.SelectedItem.Text,
                 annual_vacation_amt = annualAmtOfLeaveTxt.Text,
-                max_amt_of_vacation_accumulation = maxAmtOfLeaveTxt.Text;
+                max_amt_of_vacation_accumulation = maxAmtOfLeaveTxt.Text,
+                is_substantive_or_acting = subsOrActingRadioBtnList.SelectedItem.Text;
 
             Boolean isValidated = validateDates(startDate, endDate),
                 isRecordAllowed = true;
@@ -648,6 +653,7 @@ namespace HR_LEAVEv2.HR
                     dt.Columns.Add("status_class", typeof(string));
                     dt.Columns.Add("annual_vacation_amt", typeof(int));
                     dt.Columns.Add("max_vacation_accumulation", typeof(int));
+                    dt.Columns.Add("is_substantive_or_acting", typeof(string));
                 }
                 else
                     // get pre-existing data table
@@ -703,10 +709,10 @@ namespace HR_LEAVEv2.HR
                             // if start date is before or on Today then the record is active, otherwise it is not
                             if (DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) <= 0)
                                 //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
-                                dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success", annualVacationLeaveAmt, maxVacationLeaveAmt);
+                                dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success", annualVacationLeaveAmt, maxVacationLeaveAmt, is_substantive_or_acting);
                             else
                                 //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
-                                dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger", annualVacationLeaveAmt, maxVacationLeaveAmt);
+                                dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger", annualVacationLeaveAmt, maxVacationLeaveAmt, is_substantive_or_acting);
                             empRecordsDataSource = dt;
                         }
                         else
@@ -739,6 +745,8 @@ namespace HR_LEAVEv2.HR
 
             annualAmtOfLeaveTxt.Text = string.Empty;
             maxAmtOfLeaveTxt.Text = string.Empty;
+
+            subsOrActingRadioBtnList.SelectedIndex = 0;
         }
 
         protected void cancelNewRecordBtn_Click(object sender, EventArgs e)
@@ -967,7 +975,8 @@ namespace HR_LEAVEv2.HR
                     dept_id = deptList.SelectedValue,
                     dept_name = deptList.SelectedItem.Text,
                     annual_vacation_amt = annualAmtOfLeaveTxt.Text,
-                    max_amt_of_vacation_accumulation = maxAmtOfLeaveTxt.Text;
+                    max_amt_of_vacation_accumulation = maxAmtOfLeaveTxt.Text,
+                    is_substantive_or_acting = subsOrActingRadioBtnList.SelectedItem.Text;
 
                 // validate start and expected end date
                 Boolean isStartAndExpectedEndDateValidated = validateDates(startDate, expectedEndDate);
@@ -994,9 +1003,10 @@ namespace HR_LEAVEv2.HR
                             isActualEndDateChanged = dt.Rows[index][(int)emp_records_columns.actual_end_date].ToString() != actualEndDate,
                             isAnnualVacationAmtChanged = Convert.ToInt32(dt.Rows[index][(int)emp_records_columns.annual_vacation_amt]) != Convert.ToInt32(annual_vacation_amt),
                             isMaxAmtOfVacationAccChanged = Convert.ToInt32(dt.Rows[index][(int)emp_records_columns.max_vacation_accumulation]) != Convert.ToInt32(max_amt_of_vacation_accumulation),
+                            isSubstantiveOrActingChanged = dt.Rows[index][(int)emp_records_columns.is_substantive_or_acting].ToString() != is_substantive_or_acting,
                             isEditedRecordValid = true;
 
-                        if (isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isActualEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged)
+                        if (isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isActualEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged || isSubstantiveOrActingChanged)
                         {
                             List<string> editsMade = new List<string>();
                             try
@@ -1095,7 +1105,13 @@ namespace HR_LEAVEv2.HR
                                     editsMade.Add("Maximum accumulated Vacation leave");
                                 }
 
-                                if (isEditedRecordValid && (isActualEndDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged))
+                                if (isSubstantiveOrActingChanged)
+                                {
+                                    dt.Rows[index][(int)emp_records_columns.is_substantive_or_acting] = is_substantive_or_acting;
+                                    editsMade.Add("Is Substantive or Acting");
+                                }
+
+                                if (isEditedRecordValid && (isActualEndDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged || isSubstantiveOrActingChanged))
                                 {
                                     dt.Rows[index].SetField<string>((int)emp_records_columns.isChanged, "2");
 
@@ -1108,17 +1124,11 @@ namespace HR_LEAVEv2.HR
                                     {
                                         recordEdits = editedRecords;
 
-                                        // record already exists
-                                        if (recordEdits.Keys.Contains(dt.Rows[index][(int)emp_records_columns.record_id].ToString()))
-                                            recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
-                                        else
-                                        {
-                                            // record does not exist
+                                        // record does not exist
+                                        if (!recordEdits.Keys.Contains(dt.Rows[index][(int)emp_records_columns.record_id].ToString()))
                                             recordEdits.Add(dt.Rows[index][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
-                                            recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
-                                        }
 
-
+                                        recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
                                         editedRecords = recordEdits;
                                     } else
                                     {
@@ -1271,7 +1281,8 @@ namespace HR_LEAVEv2.HR
                                 IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'Active', 'Inactive') as status, 
                                 IIF(ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date), 'label-success', 'label-danger') as status_class,
                                 annual_vacation_amt,
-                                max_vacation_accumulation
+                                max_vacation_accumulation,
+                                IIF(is_substantive_or_acting = 1, 'Substantive', 'Acting') as is_substantive_or_acting
                                 
                             FROM [dbo].[employeeposition] ep
 
@@ -1464,8 +1475,8 @@ namespace HR_LEAVEv2.HR
              *  
              * Employment Records
              *  Datatable is formatted in the folowing manner in the ItemArray:
-                Index:         0             1            2         3        4        5          6               7              8           9           10          11
-                Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date  status  status_class
+                Index:         0             1            2         3        4        5          6               7              8           9           10          11             12                        13                         14
+                Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date  status  status_class  annual_vacation_amt  max_vacation_accumulation  is_substantive_or_acting
 
                 The record_id field is used to distinguish between records that are:
                     1. Newly added records (not yet in the db but must be added): record_id = -1
@@ -1805,7 +1816,8 @@ namespace HR_LEAVEv2.HR
                                         ,[dept_id]
                                         ,[years_worked]
                                         ,[annual_vacation_amt]
-                                        ,[max_vacation_accumulation])
+                                        ,[max_vacation_accumulation]
+                                        ,[is_substantive_or_acting])
                                 OUTPUT INSERTED.id
                                 VALUES
                                     ( @EmployeeId
@@ -1817,6 +1829,7 @@ namespace HR_LEAVEv2.HR
                                     ,@YearsWorked
                                     ,@AnnualVacationAmt
                                     ,@MaxVacationAccumulation
+                                    ,@IsSubstantiveOrActing
                                     );
                             ";
 
@@ -1838,6 +1851,7 @@ namespace HR_LEAVEv2.HR
 
                                     command.Parameters.AddWithValue("@AnnualVacationAmt", dr.ItemArray[(int)emp_records_columns.annual_vacation_amt]);
                                     command.Parameters.AddWithValue("@MaxVacationAccumulation", dr.ItemArray[(int)emp_records_columns.max_vacation_accumulation]);
+                                    command.Parameters.AddWithValue("@IsSubstantiveOrActing", dr.ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive");
                                     string new_record_id = command.ExecuteScalar().ToString();
                                     isEmpRecordInsertSuccessful = !util.isNullOrEmpty(new_record_id);
 
@@ -1913,7 +1927,8 @@ namespace HR_LEAVEv2.HR
                                     dept_id= {dr.ItemArray[(int)emp_records_columns.dept_id].ToString()},
                                     years_worked = @YearsWorked,
                                     annual_vacation_amt = @AnnualVacationAmt,
-                                    max_vacation_accumulation = @MaxVacationAccumulation
+                                    max_vacation_accumulation = @MaxVacationAccumulation,
+                                    is_substantive_or_acting = @IsSubstantiveOrActing
                                     {setFieldToSendNotifIfContractEnding}
                                 WHERE id= @RecordId;
                             ";
@@ -1953,6 +1968,8 @@ namespace HR_LEAVEv2.HR
 
                                     command.Parameters.AddWithValue("@AnnualVacationAmt", dr.ItemArray[(int)emp_records_columns.annual_vacation_amt]);
                                     command.Parameters.AddWithValue("@MaxVacationAccumulation", dr.ItemArray[(int)emp_records_columns.max_vacation_accumulation]);
+
+                                    command.Parameters.AddWithValue("@IsSubstantiveOrActing", dr.ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive");
 
                                     command.Parameters.AddWithValue("@RecordId", dr.ItemArray[(int)emp_records_columns.record_id]);
 
@@ -2438,7 +2455,8 @@ namespace HR_LEAVEv2.HR
                                     ,[dept_id]
                                     ,[years_worked]
                                     ,[annual_vacation_amt]
-                                    ,[max_vacation_accumulation])
+                                    ,[max_vacation_accumulation]
+                                    ,[is_substantive_or_acting])
                             VALUES
                                 ( @EmployeeId
                                 ,@PositionId
@@ -2449,6 +2467,7 @@ namespace HR_LEAVEv2.HR
                                 ,@YearsWorked
                                 ,@AnnualVacationAmt
                                 ,@MaxVacationAccumulation
+                                ,@IsSubstantiveOrActing
                                 );
                         ";
 
@@ -2473,6 +2492,7 @@ namespace HR_LEAVEv2.HR
 
                                     command.Parameters.AddWithValue("@AnnualVacationAmt", dr.ItemArray[(int)emp_records_columns.annual_vacation_amt]);
                                     command.Parameters.AddWithValue("@MaxVacationAccumulation", dr.ItemArray[(int)emp_records_columns.max_vacation_accumulation]);
+                                    command.Parameters.AddWithValue("@IsSubstantiveOrActing", dr.ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive");
 
 
                                     int rowsAffected = command.ExecuteNonQuery();

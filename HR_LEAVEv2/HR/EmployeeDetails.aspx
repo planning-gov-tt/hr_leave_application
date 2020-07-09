@@ -97,6 +97,18 @@
             border-radius: 50%;
         }
 
+        table.subOrActingList input {
+            width: 20px;
+            display: block;
+            float: left;
+        }
+        table.subOrActingList label {
+            width: 80px;
+            display: block;
+            float: left;
+            text-align:left;
+        }
+
     </style>
 
     <asp:LinkButton ID="returnToPreviousBtn" runat="server" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="right" title="Return to all employees" OnClick="returnToPreviousBtn_Click">
@@ -536,7 +548,7 @@
                                 </span>
                             </div>
 
-                            <div style="margin-top: 35px; display:flex; justify-content:center;">
+                            <div style="margin-top: 25px; display:flex; justify-content:center;">
                                 <table id="vacationAmtsTable">
                                     <tr>
                                         <td style="text-align:right;">
@@ -585,6 +597,14 @@
                                         </td>
                                     </tr>
                                 </table>
+                            </div>
+
+                            <div style="display:flex; justify-content: center; margin-top:10px; margin-bottom:25px;">
+                                <asp:RadioButtonList ID="subsOrActingRadioBtnList" runat="server" CssClass="subOrActingList" RepeatLayout="Table" RepeatDirection="Vertical">
+
+                                    <asp:ListItem Selected="True">Substantive</asp:ListItem>
+                                    <asp:ListItem>Acting</asp:ListItem>
+                                </asp:RadioButtonList>
                             </div>
 
                             <div id="validationDiv">
@@ -823,10 +843,14 @@
                             <%--Max Vacation Accumulation--%>
                             <asp:BoundField HeaderText="Max Vacation" DataField="max_vacation_accumulation" />
 
+                            <%--Is substantive or Acting--%>
+                            <%--<asp:BoundField HeaderText="Type" DataField="is_substantive_or_acting" Visible="false"/>--%>
+
                             <%--Status--%>
                             <asp:TemplateField HeaderText="Status">
                                 <ItemTemplate>
                                     <span id="status-label" class="label <%# Eval("status_class") %>"><%# Eval("status") %></span>
+                                    <span id="type-label" class="label label-primary"><%# Eval("is_substantive_or_acting") %></span>
                                     <asp:Label ID="new_record_label" runat="server" CssClass="label label-primary" Text="New" Visible ="false"></asp:Label>
                                     <asp:Label ID="edited_record_label" runat="server" CssClass="label label-warning" Text="Edited" Visible ="false"></asp:Label>
                                 </ItemTemplate>
