@@ -262,11 +262,26 @@ namespace HR_LEAVEv2.HR
             DataTable dt = empRecordsDataSource;
             if (dt != null)
             {
+                Boolean canDeleteRow = true;
                 // sets isChanged to 1
-                int indexOfRowInDt = e.RowIndex;
-                dt.Rows[indexOfRowInDt].SetField<string>((int)emp_records_columns.isChanged, "1");
-                empRecordsDataSource = dt;
-
+                if(dt.Rows[e.RowIndex].ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive" && dt.Rows[e.RowIndex].ItemArray[(int)emp_records_columns.status].ToString() == "Active")
+                {
+                    // check if there are any active acting records
+                    for(int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        if(i != e.RowIndex && dt.Rows[i].ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Acting" && dt.Rows[i].ItemArray[(int)emp_records_columns.status].ToString() == "Active")
+                        {
+                            canDeleteRow = false;
+                            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "alert('Record not deleted since employee must have at least one (1) active substantive employment record with their acting record');", true);
+                            break;
+                        }
+                    }
+                }
+                if (canDeleteRow)
+                {
+                    dt.Rows[e.RowIndex].SetField<string>((int)emp_records_columns.isChanged, "1");
+                    empRecordsDataSource = dt;
+                }
             }
             this.bindGridview();
         }
@@ -605,17 +620,141 @@ namespace HR_LEAVEv2.HR
             showEmplomentRecordForm();
         }
 
+        protected DataRow validateNewRecord(Dictionary<string, string> data, DataTable dt)
+        {
+            DateTime startDate = DateTime.ParseExact(data["start_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            if (isRecordValid(startDate, DateTime.MinValue, data["is_substantive_or_acting"], -1, multipleActiveRecordsAddRecordPanel, startDateClashAddRecordPanel, noSubstantiveRecordAddRecordPanel, actingStartDateBeforeSubAdd))
+            {
+                // case: where no end date is entered. If the employment record is for Contract then 3 years are added to the start date and 
+                // this date is entered for the expected end date value
+                DateTime expected_end_date = DateTime.MinValue;
+                if (util.isNullOrEmpty(data["expected_end_date"]))
+                {
+                    if (data["employment_type"] == "Contract")
+                        expected_end_date = startDate.AddYears(3);
+                }
+                else
+                    expected_end_date = DateTime.ParseExact(data["expected_end_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+
+
+                int annualVacationLeaveAmt = Convert.ToInt32(data["annual_vacation_amt"]),
+                    maxVacationLeaveAmt = Convert.ToInt32(data["max_vacation_accumulation"]);
+
+                if (maxVacationLeaveAmt > annualVacationLeaveAmt)
+                {
+                    DataRow dr = dt.NewRow();
+
+                    // if start date is before or on Today then the record is active, otherwise it is not
+                    if (DateTime.Compare(startDate, util.getCurrentDate()) <= 0)
+                    {
+                        // record_id
+                        dr["record_id"] = -1;
+
+                        // employment_type
+                        dr["employment_type"] = data["employment_type"];
+
+                        // dept_id
+                        dr["dept_id"] = data["dept_id"];
+
+                        // dept_name
+                        dr["dept_name"] = data["dept_name"];
+
+                        // pos_id
+                        dr["pos_id"] = data["pos_id"];
+
+                        // pos_name
+                        dr["pos_name"] = data["pos_name"];
+
+                        // start_date
+                        dr["start_date"] = startDate;
+
+                        // expected_end_date
+                        dr["expected_end_date"] = expected_end_date;
+
+                        // isChanged
+                        dr["isChanged"] = "0";
+
+                        // actual_end_date
+                        dr["actual_end_date"] = "";
+
+                        // status
+                        dr["status"] = "Active";
+
+                        // status_class
+                        dr["status_class"] = "label-success";
+
+                        // annual_vacation_amt
+                        dr["annual_vacation_amt"] = annualVacationLeaveAmt;
+
+                        // max_vacation_accumulation
+                        dr["max_vacation_accumulation"] = maxVacationLeaveAmt;
+
+                        // is_substantive_or_acting
+                        dr["is_substantive_or_acting"] = data["is_substantive_or_acting"];
+
+                        return dr;
+                    }
+                    else
+                    {
+                        // record_id
+                        dr["record_id"] = -1;
+
+                        // employment_type
+                        dr["employment_type"] = data["employment_type"];
+
+                        // dept_id
+                        dr["dept_id"] = data["dept_id"];
+
+                        // dept_name
+                        dr["dept_name"] = data["dept_name"];
+
+                        // pos_id
+                        dr["pos_id"] = data["pos_id"];
+
+                        // pos_name
+                        dr["pos_name"] = data["pos_name"];
+
+                        // start_date
+                        dr["start_date"] = startDate;
+
+                        // expected_end_date
+                        dr["expected_end_date"] = expected_end_date;
+
+                        // isChanged
+                        dr["isChanged"] = "0";
+
+                        // actual_end_date
+                        dr["actual_end_date"] = "";
+
+                        // status
+                        dr["status"] = "Inactive";
+
+                        // status_class
+                        dr["status_class"] = "label-danger";
+
+                        // annual_vacation_amt
+                        dr["annual_vacation_amt"] = annualVacationLeaveAmt;
+
+                        // max_vacation_accumulation
+                        dr["max_vacation_accumulation"] = maxVacationLeaveAmt;
+
+                        // is_substantive_or_acting
+                        dr["is_substantive_or_acting"] = data["is_substantive_or_acting"];
+
+                        return dr;
+                    }
+                }
+                else
+                    invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
+            }
+
+            return null;
+        }
+
         protected void addNewRecordBtn_Click(object sender, EventArgs e)
         {
             // adds new record to datatable 
 
-            /* data to be submitted
-             * 1. position
-             * 2. Start date
-             * 3. End date
-             * 4. employment type
-             * 5. dept
-             */
             clearErrors();
             string position_id = positionList.SelectedValue,
                 position_name = positionList.SelectedItem.Text,
@@ -628,8 +767,7 @@ namespace HR_LEAVEv2.HR
                 max_amt_of_vacation_accumulation = maxAmtOfLeaveTxt.Text,
                 is_substantive_or_acting = subsOrActingRadioBtnList.SelectedItem.Text;
 
-            Boolean isValidated = validateDates(startDate, endDate),
-                isRecordAllowed = true;
+            Boolean isValidated = validateDates(startDate, endDate);
 
             if (isValidated)
             {
@@ -659,72 +797,30 @@ namespace HR_LEAVEv2.HR
                     // get pre-existing data table
                     dt = empRecordsDataSource;
 
-                isRecordAllowed = isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), DateTime.MinValue, -1, multipleActiveRecordsAddRecordPanel, startDateClashAddRecordPanel);
-
-                if (isRecordAllowed)
+                Dictionary<string, string> data = new Dictionary<string, string>()
                 {
-                    // case: where no end date is entered. If the employment record is for Contract then 3 years are added to the start date and 
-                    // this date is entered for the expected end date value
-                    DateTime expected_end_date = DateTime.MinValue;
-                    if (util.isNullOrEmpty(endDate))
-                    {
-                        if (emp_type == "Contract")
-                        {
-                            expected_end_date = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            expected_end_date = expected_end_date.AddYears(3);
-                        }
-                    }
-                    else
-                        expected_end_date = DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    {"employment_type", emp_type },
+                    {"dept_id",  dept_id},
+                    {"dept_name", dept_name },
+                    {"pos_id", position_id},
+                    {"pos_name", position_name },
+                    {"start_date", startDate },
+                    {"expected_end_date", endDate },
+                    {"annual_vacation_amt", annual_vacation_amt},
+                    {"max_vacation_accumulation", max_amt_of_vacation_accumulation },
+                    {"is_substantive_or_acting", is_substantive_or_acting }
 
-                    // check that row is not a duplicate row by comparing employment_type, dept_id, pos_id and start_date
-                    bool isDuplicate = false;
-                    foreach (DataRow dr in dt.Rows)
-                    {
-                        // once row is not deleted
-                        if (dr.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
-                        {
-                            string dtEmpType = dr.ItemArray[(int)emp_records_columns.employment_type].ToString(),
-                               dtDeptId = dr.ItemArray[(int)emp_records_columns.dept_id].ToString(),
-                               dtPosId = dr.ItemArray[(int)emp_records_columns.pos_id].ToString(),
-                               dtStartDate = ((DateTime)dr.ItemArray[(int)emp_records_columns.start_date]).ToString("d/MM/yyyy");
+                };
 
-                            if (dtEmpType == emp_type && dtDeptId == dept_id && dtPosId == position_id && dtStartDate == startDate)
-                            {
-                                isDuplicate = true;
-                                break;
-                            }
-                        }
+                DataRow newRecord = validateNewRecord(data, dt);
 
-                    }
-
-                    if (!isDuplicate)
-                    {
-
-                        int annualVacationLeaveAmt = Convert.ToInt32(annual_vacation_amt),
-                            maxVacationLeaveAmt = Convert.ToInt32(max_amt_of_vacation_accumulation);
-
-                        if (maxVacationLeaveAmt > annualVacationLeaveAmt)
-                        {
-                            // if start date is before or on Today then the record is active, otherwise it is not
-                            if (DateTime.Compare(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), util.getCurrentDate()) <= 0)
-                                //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
-                                dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Active", "label-success", annualVacationLeaveAmt, maxVacationLeaveAmt, is_substantive_or_acting);
-                            else
-                                //record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date, status, status_class, annual_vacation_amt, max_vacation_accumulation
-                                dt.Rows.Add(-1, emp_type, dept_id, dept_name, position_id, position_name, DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), expected_end_date, "0", "", "Inactive", "label-danger", annualVacationLeaveAmt, maxVacationLeaveAmt, is_substantive_or_acting);
-                            empRecordsDataSource = dt;
-                        }
-                        else
-                            invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
-
-
-                    }
-                    else
-                        duplicateRecordPanel.Style.Add("display", "inline-block");
-
-                    this.bindGridview();
+                if (newRecord != null)
+                {
+                    dt.Rows.Add(newRecord);
+                    empRecordsDataSource = dt;
                 }
+                    
+                bindGridview();
             }
         }
 
@@ -773,7 +869,7 @@ namespace HR_LEAVEv2.HR
                 {
                     // edit datatable and rebind gridview
 
-                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end, indexInDt, multipleActiveRecordsEndRecordPanel, employmentRecordClashPanel))
+                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end, dt.Rows[indexInDt][(int)emp_records_columns.is_substantive_or_acting].ToString(), indexInDt, multipleActiveRecordsEndRecordPanel, employmentRecordClashPanel, null, null))
                     {
                         // set record to be edited
                         dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.isChanged, "2");
@@ -849,14 +945,14 @@ namespace HR_LEAVEv2.HR
                 return (DateTime.Compare(util.getCurrentDate(), proposedEndDate) < 0);
         }
 
-        protected Boolean isRecordValid(DateTime proposedSD, DateTime proposedAED, int index, Panel multipleActiveRecordsPanel, Panel clashingRecords)
+        protected Boolean isRecordValid(DateTime proposedSD, DateTime proposedAED, string proposedRecordType, int index, Panel multipleActiveRecordsPanel, Panel clashingRecords, Panel noSubsRecord, Panel actingStartDateBeforeSub)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
             // any other active records exist in order to validate the record.
 
             if (empRecordsDataSource != null)
             {
-                int numActiveRows = 0, currIndex = 0;
+                int numActiveRows = 0, currIndex = 0, numActiveSubsRecords = 0; ;
 
                 // state of passed end date and corresponding record
                 bool isProposedRecordActive = isRecordActive(proposedSD, proposedAED);
@@ -865,12 +961,17 @@ namespace HR_LEAVEv2.HR
                 DataTable dt = empRecordsDataSource;
                 foreach (DataRow dr in dt.Rows)
                 {
+                    if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && dr[(int)emp_records_columns.status].ToString() == "Active" && dr[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive")
+                            numActiveSubsRecords++;
+                   
                     // once the record is not deleted and is not the record currently being edited (the record to which the proposed end date will belong to)
-                    if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && currIndex != index)
+                    if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && currIndex != index && dr[(int)emp_records_columns.is_substantive_or_acting].ToString() == proposedRecordType)
                     {
+                        
                         if (dr[(int)emp_records_columns.status].ToString() == "Active")
+                        {
                             numActiveRows++;
-
+                        }
 
                         DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
 
@@ -938,6 +1039,21 @@ namespace HR_LEAVEv2.HR
 
                         }
 
+                    } else if (dr[(int)emp_records_columns.is_substantive_or_acting].ToString() != proposedRecordType)
+                    {
+                        DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
+
+                        // check that start date of acting record is not before start date of substantive record
+                        if (
+                            proposedRecordType == "Substantive" && DateTime.Compare(proposedSD, dtRowStartDate) > 0
+                            ||
+                            proposedRecordType == "Acting" && DateTime.Compare(proposedSD, dtRowStartDate) < 0
+                            )
+                        {
+                            if(actingStartDateBeforeSub != null)
+                                actingStartDateBeforeSub.Style.Add("display", "inline-block");
+                            return false;
+                        }
                     }
                     currIndex++;
                 }
@@ -945,7 +1061,17 @@ namespace HR_LEAVEv2.HR
                     numActiveRows++;
 
                 if (numActiveRows <= 1)
+                {
+                    if (numActiveSubsRecords == 0 && proposedRecordType == "Acting")
+                    {
+                        if (noSubsRecord != null)
+                            noSubsRecord.Style.Add("display", "inline-block");
+                        return false;
+                    }
+                        
                     return true;
+                }
+
                 else if (numActiveRows > 1 && multipleActiveRecordsPanel != null)
                     multipleActiveRecordsPanel.Style.Add("display", "inline-block");
             }
@@ -981,6 +1107,7 @@ namespace HR_LEAVEv2.HR
                 // validate actual end date
                 Boolean isActualEndDateValidated = validateActualEndDate(startDate, actualEndDate, recordEditEndDateInvalidPanel, recordEditEndDateOnWeekend, recordEditEndDateBeforeStartDate, null) != DateTime.MinValue;
 
+                // validate annual and max vacation
                 Boolean isAnnualAndMaxVacationAmtValidated = Convert.ToInt32(max_amt_of_vacation_accumulation) > Convert.ToInt32(annual_vacation_amt);
 
                 // index of record being edited
@@ -989,6 +1116,7 @@ namespace HR_LEAVEv2.HR
                 if (empRecordsDataSource != null)
                 {
                     DataTable dt = empRecordsDataSource;
+
                     if (isStartAndExpectedEndDateValidated && isActualEndDateValidated && isAnnualAndMaxVacationAmtValidated)
                     {
                         // check if any values are changed and edit relevant values in datatable
@@ -1029,7 +1157,7 @@ namespace HR_LEAVEv2.HR
 
                                 if (!util.isNullOrEmpty(startDate) && isStartDateChanged)
                                 {
-                                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(actualEndDate)? DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture): DateTime.MinValue, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel))
+                                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(actualEndDate)? DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture): DateTime.MinValue, is_substantive_or_acting, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel, noSubstantiveRecordEditRecordPanel, actingStartDateBeforeSubEdit))
                                     {
                                         editsMade.Add("Start Date");
                                         dt.Rows[index][(int)emp_records_columns.start_date] = DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
@@ -1065,7 +1193,7 @@ namespace HR_LEAVEv2.HR
                                 if (isActualEndDateChanged)
                                 {
                                     if (isEditedRecordValid && !isStartDateChanged)
-                                        isEditedRecordValid = isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(actualEndDate) ? DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel);
+                                        isEditedRecordValid = isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(actualEndDate) ? DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue, is_substantive_or_acting, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel, noSubstantiveRecordEditRecordPanel, actingStartDateBeforeSubEdit);
 
                                     // does edit make employee have more than one record that is active (end date is not null and today is before end date) or (end date is null)
                                     if (isEditedRecordValid) {
@@ -1104,8 +1232,13 @@ namespace HR_LEAVEv2.HR
 
                                 if (isSubstantiveOrActingChanged)
                                 {
-                                    dt.Rows[index][(int)emp_records_columns.is_substantive_or_acting] = is_substantive_or_acting;
-                                    editsMade.Add("Is Substantive or Acting");
+                                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(actualEndDate) ? DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue, is_substantive_or_acting, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel, noSubstantiveRecordEditRecordPanel, actingStartDateBeforeSubEdit))
+                                    {
+                                        dt.Rows[index][(int)emp_records_columns.is_substantive_or_acting] = is_substantive_or_acting;
+                                        editsMade.Add("Is Substantive or Acting");
+                                    }
+                                    else
+                                        isEditedRecordValid = false;
                                 }
 
                                 if (isEditedRecordValid && (isActualEndDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged || isSubstantiveOrActingChanged))
@@ -1137,7 +1270,7 @@ namespace HR_LEAVEv2.HR
                                     editEmpRecordSuccTxt.InnerText = $"{String.Join(", ", editsMade.ToArray())} edits successfully made to employment record. Don't forget to save your changes";
                                     editEmploymentRecordSuccessful.Style.Add("display", "inline-block");
                                 }
-                                else if (!(isActualEndDateChanged || isStartDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isExpectedEndDateChanged))
+                                else if (!(isActualEndDateChanged || isStartDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isExpectedEndDateChanged || isSubstantiveOrActingChanged))
                                     noEditsToRecordsMade.Style.Add("display", "inline-block");
 
                             }
@@ -1213,9 +1346,10 @@ namespace HR_LEAVEv2.HR
             dateComparisonValidationMsgPanel.Style.Add("display", "none");
             startDateIsWeekendPanel.Style.Add("display", "none");
             endDateIsWeekendPanel.Style.Add("display", "none");
-            duplicateRecordPanel.Style.Add("display", "none");
             multipleActiveRecordsAddRecordPanel.Style.Add("display", "none");
+            noSubstantiveRecordAddRecordPanel.Style.Add("display", "none");
             startDateClashAddRecordPanel.Style.Add("display", "none");
+            actingStartDateBeforeSubAdd.Style.Add("display", "none");
 
             // EDIT
             recordEditEndDateInvalidPanel.Style.Add("display", "none");
@@ -1227,6 +1361,8 @@ namespace HR_LEAVEv2.HR
             multipleActiveRecordsEditRecordPanel.Style.Add("display", "none");
             startDateClashEditRecordPanel.Style.Add("display", "none");
             employmentRecordClashPanel.Style.Add("display", "none");
+            noSubstantiveRecordEditRecordPanel.Style.Add("display", "none");
+            actingStartDateBeforeSubEdit.Style.Add("display", "none");
 
             // END EMPLOYMENT RECORD
             invalidEndDatePanel.Style.Add("display", "none");

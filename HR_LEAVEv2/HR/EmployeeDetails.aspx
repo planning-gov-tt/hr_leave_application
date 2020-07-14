@@ -660,12 +660,7 @@
 
 
                                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORD VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                                <asp:Panel ID="duplicateRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
-                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                    <span>Cannot add duplicate record</span>
-                                </asp:Panel>
-                                
-
+                              
                                 <asp:Panel ID="startDateClashEditRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
@@ -692,7 +687,7 @@
                                 <asp:Panel ID="multipleActiveRecordsAddRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
-                                        Record not added since this would result in two employment records being marked active simultaneously. Edit employment records accordingly 
+                                        Record not added since this would result in two employment records of the same type being marked active simultaneously. Edit employment records accordingly 
                                         to ensure only one active record
                                     </span>
                                 </asp:Panel>
@@ -700,8 +695,36 @@
                                 <asp:Panel ID="multipleActiveRecordsEditRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
-                                        Actual end date not edited since the date entered would result in two employment records being marked active simultaneously. Edit employment records accordingly 
+                                        Record not edited since this would result in two employment records of the same type being marked active simultaneously. Edit employment records accordingly 
                                         to ensure only one active record
+                                    </span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="noSubstantiveRecordAddRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>
+                                        Record not added since employee must have at least one (1) active substantive employment record in order to add an acting record
+                                    </span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="noSubstantiveRecordEditRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>
+                                        Record not edited since employee must have at least one (1) active substantive employment record
+                                    </span>
+                                </asp:Panel>
+                                
+                                <asp:Panel ID="actingStartDateBeforeSubAdd" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>
+                                        Record not added since the start date of the acting record is before the start date of the active substantive record
+                                    </span>
+                                </asp:Panel>
+
+                                <asp:Panel ID="actingStartDateBeforeSubEdit" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>
+                                        Record not edited since this would result in the substantive record's start date being later than the acting record's start date
                                     </span>
                                 </asp:Panel>
                                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORD VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>

@@ -823,15 +823,6 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel recordEditEndDateOnWeekend;
         
         /// <summary>
-        /// duplicateRecordPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel duplicateRecordPanel;
-        
-        /// <summary>
         /// startDateClashEditRecordPanel control.
         /// </summary>
         /// <remarks>
@@ -875,6 +866,42 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsEditRecordPanel;
+        
+        /// <summary>
+        /// noSubstantiveRecordAddRecordPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noSubstantiveRecordAddRecordPanel;
+        
+        /// <summary>
+        /// noSubstantiveRecordEditRecordPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noSubstantiveRecordEditRecordPanel;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubAdd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel actingStartDateBeforeSubAdd;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel actingStartDateBeforeSubEdit;
         
         /// <summary>
         /// editUnsuccessful control.
