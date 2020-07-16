@@ -710,7 +710,7 @@
                                 <asp:Panel ID="noSubstantiveRecordEditRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
-                                        Record not edited since employee must have at least one (1) active substantive employment record
+                                        Record not edited since employee must have at least one (1) active substantive employment record in order to have active acting records
                                     </span>
                                 </asp:Panel>
                                 
@@ -874,7 +874,7 @@
                                 <ItemTemplate>
                                     <span id="status-label" class="label <%# Eval("status_class") %>"><%# Eval("status") %></span>
                                     <span id="type-label" class="label label-primary"><%# Eval("is_substantive_or_acting") %></span>
-                                    <asp:Label ID="new_record_label" runat="server" CssClass="label label-primary" Text="New" Visible ="false"></asp:Label>
+                                    <asp:Label ID="new_record_label" runat="server" CssClass="label label-info" Text="New" Visible ="false"></asp:Label>
                                     <asp:Label ID="edited_record_label" runat="server" CssClass="label label-warning" Text="Edited" Visible ="false"></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
@@ -1070,6 +1070,13 @@
                                 <span>
                                     Actual end date not edited since the date entered would result in two employment records being marked active simultaneously. Edit employment records accordingly 
                                     to ensure only one active record
+                                </span>
+                            </asp:Panel>
+
+                            <asp:Panel ID="noSubstantiveRecordEndRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span>
+                                    Record not ended since employee must have one (1) active substantive record in order to have active acting records
                                 </span>
                             </asp:Panel>
 

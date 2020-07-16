@@ -110,12 +110,12 @@ namespace HR_LEAVEv2.Employee
                         FROM dbo.employee e
 
                         LEFT JOIN dbo.employeeposition ep
-                        ON e.employee_id = ep.employee_id AND (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date))
+                        ON e.employee_id = ep.employee_id
 
                         JOIN dbo.emptypeleavetype elt
                         ON elt.employment_type = ep.employment_type
 
-                        WHERE e.employee_id = '{user.currUserId}'
+                        WHERE e.employee_id = '{user.currUserId}' AND ep.id = dbo.getActiveRecord({user.currUserId})
                         ORDER BY elt.leave_type DESC;
                     ";
 
@@ -152,10 +152,10 @@ namespace HR_LEAVEv2.Employee
                         try
                         {
                             string sql = $@"
-                        SELECT ep.start_date
-                        FROM dbo.employeeposition ep
-                        WHERE ep.employee_id = '{user.currUserId}' AND (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date))
-                    ";
+                                SELECT ep.start_date
+                                FROM dbo.employeeposition ep
+                                WHERE ep.id = dbo.getActiveRecord({user.currUserId})
+                            ";
                             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                             {
                                 connection.Open();
@@ -1295,7 +1295,7 @@ namespace HR_LEAVEv2.Employee
                         OUTPUT INSERTED.transaction_id
                         VALUES
                            ( '{empId}'
-                            , (SELECT id FROM [dbo].[employeeposition] WHERE start_date <= GETDATE() AND (actual_end_date IS NULL OR GETDATE() <= actual_end_date) AND employee_id = '{empId}')
+                            , [dbo].getActiveRecord({empId})
                             ,'{leaveType}'
                             ,'{DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'
                             ,'{DateTime.ParseExact(endDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture).ToString("MM/d/yyyy")}'

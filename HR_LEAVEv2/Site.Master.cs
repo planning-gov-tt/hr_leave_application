@@ -59,6 +59,11 @@ namespace HR_LEAVEv2
                 user.permissions = auth.getUserPermissions(user.currUserId);
 
 
+            // TODO: if substantive record becomes inactive then make any active acting record inactive by populating actual end date of acting record
+            // INSERT CODE HERE
+            // ____________________________________________________________________________________
+
+
             DateTime startDate = DateTime.MinValue,
                      expectedEndDate = DateTime.MinValue,
                      actualEndDate = DateTime.MinValue;

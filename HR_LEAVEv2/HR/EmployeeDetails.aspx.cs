@@ -869,7 +869,7 @@ namespace HR_LEAVEv2.HR
                 {
                     // edit datatable and rebind gridview
 
-                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end, dt.Rows[indexInDt][(int)emp_records_columns.is_substantive_or_acting].ToString(), indexInDt, multipleActiveRecordsEndRecordPanel, employmentRecordClashPanel, null, null))
+                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end, dt.Rows[indexInDt][(int)emp_records_columns.is_substantive_or_acting].ToString(), indexInDt, multipleActiveRecordsEndRecordPanel, employmentRecordClashPanel, noSubstantiveRecordEndRecordPanel, null))
                     {
                         // set record to be edited
                         dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.isChanged, "2");
@@ -892,31 +892,34 @@ namespace HR_LEAVEv2.HR
                         empRecordsDataSource = dt;
                         this.bindGridview();
 
-                        // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for audit logs
-                        Dictionary<string, HashSet<string>> recordEdits = new Dictionary<string, HashSet<string>>();
-                        if (editedRecords != null)
+                        if(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString() != "-1")
                         {
-                            recordEdits = editedRecords;
+                            // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for audit logs
+                            Dictionary<string, HashSet<string>> recordEdits = new Dictionary<string, HashSet<string>>();
+                            if (editedRecords != null)
+                            {
+                                recordEdits = editedRecords;
 
-                            // record already exists
-                            if (recordEdits.Keys.Contains(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()))
-                                recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
+                                // record already exists
+                                if (recordEdits.Keys.Contains(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()))
+                                    recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
+                                else
+                                {
+                                    // record does not exist
+                                    recordEdits.Add(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
+                                    recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
+                                }
+
+
+                                editedRecords = recordEdits;
+                            }
                             else
                             {
-                                // record does not exist
                                 recordEdits.Add(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
                                 recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
+                                editedRecords = recordEdits;
                             }
-
-
-                            editedRecords = recordEdits;
-                        }
-                        else
-                        {
-                            recordEdits.Add(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
-                            recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
-                            editedRecords = recordEdits;
-                        }
+                        }               
 
                         empRecordBeingEditedRowIndex = -1;
 
@@ -1043,17 +1046,22 @@ namespace HR_LEAVEv2.HR
                     {
                         DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
 
-                        // check that start date of acting record is not before start date of substantive record
-                        if (
-                            proposedRecordType == "Substantive" && DateTime.Compare(proposedSD, dtRowStartDate) > 0
-                            ||
-                            proposedRecordType == "Acting" && DateTime.Compare(proposedSD, dtRowStartDate) < 0
-                            )
+                        // check that start date of acting record is not before start date of current active substantive record
+                        if (proposedRecordType == "Acting" && dr[(int)emp_records_columns.status].ToString() == "Active" && DateTime.Compare(proposedSD, dtRowStartDate) < 0)
                         {
-                            if(actingStartDateBeforeSub != null)
+                            if (actingStartDateBeforeSub != null)
                                 actingStartDateBeforeSub.Style.Add("display", "inline-block");
                             return false;
                         }
+
+                        // check that subst cannot become inactive when there is an active acting record
+                        if(proposedRecordType == "Substantive" && !isProposedRecordActive && dr[(int)emp_records_columns.status].ToString() == "Active")
+                        {
+                            if (noSubsRecord != null)
+                                noSubsRecord.Style.Add("display", "inline-block");
+                            return false;
+                        }
+                       
                     }
                     currIndex++;
                 }
@@ -1248,29 +1256,33 @@ namespace HR_LEAVEv2.HR
                                     empRecordsDataSource = dt;
                                     bindGridview();
 
-                                    // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for adding audit log. 
-                                    Dictionary<string, HashSet<string>> recordEdits = new Dictionary<string, HashSet<string>>();
-                                    if (editedRecords != null)
+                                    if(dt.Rows[index][(int)emp_records_columns.record_id].ToString() != "-1")
                                     {
-                                        recordEdits = editedRecords;
+                                        // set Dictionary containing info including: id of record edited (KEY) and a list of the fields edited in the record (VALUE). Used for adding audit log. 
+                                        Dictionary<string, HashSet<string>> recordEdits = new Dictionary<string, HashSet<string>>();
+                                        if (editedRecords != null)
+                                        {
+                                            recordEdits = editedRecords;
 
-                                        // record does not exist
-                                        if (!recordEdits.Keys.Contains(dt.Rows[index][(int)emp_records_columns.record_id].ToString()))
+                                            // record does not exist
+                                            if (!recordEdits.Keys.Contains(dt.Rows[index][(int)emp_records_columns.record_id].ToString()))
+                                                recordEdits.Add(dt.Rows[index][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
+
+                                            recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
+                                            editedRecords = recordEdits;
+                                        }
+                                        else
+                                        {
                                             recordEdits.Add(dt.Rows[index][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
-
-                                        recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
-                                        editedRecords = recordEdits;
-                                    } else
-                                    {
-                                        recordEdits.Add(dt.Rows[index][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
-                                        recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
-                                        editedRecords = recordEdits;
+                                            recordEdits[dt.Rows[index][(int)emp_records_columns.record_id].ToString()].UnionWith(editsMade);
+                                            editedRecords = recordEdits;
+                                        }
                                     }
-
+                                   
                                     editEmpRecordSuccTxt.InnerText = $"{String.Join(", ", editsMade.ToArray())} edits successfully made to employment record. Don't forget to save your changes";
                                     editEmploymentRecordSuccessful.Style.Add("display", "inline-block");
                                 }
-                                else if (!(isActualEndDateChanged || isStartDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isExpectedEndDateChanged || isSubstantiveOrActingChanged))
+                                else if (!(isActualEndDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged || isSubstantiveOrActingChanged))
                                     noEditsToRecordsMade.Style.Add("display", "inline-block");
 
                             }
@@ -1370,6 +1382,7 @@ namespace HR_LEAVEv2.HR
             endDateBeforeStartDatePanel.Style.Add("display", "none");
             actualEndDateIsWeekendPanel.Style.Add("display", "none");
             multipleActiveRecordsEndRecordPanel.Style.Add("display", "none");
+            noSubstantiveRecordEndRecordPanel.Style.Add("display", "none");
         }
 
         protected void populatePage(string empId)
