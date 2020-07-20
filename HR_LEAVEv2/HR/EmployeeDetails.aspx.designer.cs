@@ -994,6 +994,15 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.LinkButton showFormBtn;
         
         /// <summary>
+        /// UpdatePanel2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel UpdatePanel2;
+        
+        /// <summary>
         /// accPastLimitContainerPanel control.
         /// </summary>
         /// <remarks>
@@ -1039,6 +1048,24 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.LinkButton btnDeleteFile;
         
         /// <summary>
+        /// UpdatePanel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
+        
+        /// <summary>
+        /// sliderPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel sliderPanel;
+        
+        /// <summary>
         /// chkOnOff control.
         /// </summary>
         /// <remarks>
@@ -1064,6 +1091,15 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel noFilesUploadedDisclaimerPanel;
+        
+        /// <summary>
+        /// filesUpdatePanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel filesUpdatePanel;
         
         /// <summary>
         /// fileUploadPanel control.
@@ -1118,15 +1154,6 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ListView filesUploadedListView;
-        
-        /// <summary>
-        /// filesUpdatePanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel filesUpdatePanel;
         
         /// <summary>
         /// duplicateFileNamesPanel control.
