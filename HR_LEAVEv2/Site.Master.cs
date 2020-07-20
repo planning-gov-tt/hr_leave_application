@@ -47,7 +47,7 @@ namespace HR_LEAVEv2
                 string username = auth.getUserInfoFromActiveDirectory(user.currUserEmail);
                 username = util.isNullOrEmpty(username) ? "User not in Active Directory" : username;
                 user.currUserName = username;
-            }else
+            } else
                 user.currUserName = "Anon";
 
             // store employee's id in Session
@@ -59,31 +59,102 @@ namespace HR_LEAVEv2
                 user.permissions = auth.getUserPermissions(user.currUserId);
 
 
-            // TODO: if substantive record becomes inactive then make any active acting record inactive by populating actual end date of acting record
-            // INSERT CODE HERE
+            // if substantive record becomes inactive then make any active acting record inactive by populating actual end date of acting record
+            string sql = $@"
+                            SELECT id,
+                                   IIF(is_substantive_or_acting = 1, 'Substantive', 'Acting') as is_substantive_or_acting,
+                                   IIF(dbo.isRecordActive(id) = 1, 'Active', 'Inactive') as status
+                            FROM dbo.employeeposition 
+                            WHERE employee_id = {user.currUserId};
+                    ";
+
+            try
+            {
+                DataTable empRecords = new DataTable();
+                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(empRecords);
+                        }
+                    }
+                }
+
+                // check if any substantive record exists and if not then change any acting record to inactive
+                Boolean isActiveSubstantiveAvailable = false;
+                foreach (DataRow dr in empRecords.Rows)
+                {
+                    if (dr.Field<string>("status") == "Active" && dr.Field<string>("is_substantive_or_acting") == "Substantive")
+                    {
+                        isActiveSubstantiveAvailable = true;
+                        break;
+                    }
+
+                }
+
+                if (!isActiveSubstantiveAvailable)
+                {
+                    // add actual end date as today for any active acting record
+                    string activeActingRecordId = "-1";
+                    foreach (DataRow dr in empRecords.Rows)
+                    {
+                        if (dr.Field<string>("status") == "Active" && dr.Field<string>("is_substantive_or_acting") == "Acting")
+                        {
+                            activeActingRecordId = dr.Field<int>("id").ToString();
+                            break;
+                        }
+
+                    }
+
+                    if (activeActingRecordId != "-1")
+                    {
+                        sql = $@"
+                            UPDATE dbo.employeeposition 
+                            SET actual_end_date = CAST('{util.getCurrentDateToday()}' as datetime)
+                            WHERE id = {activeActingRecordId};
+                    ";
+                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        {
+                            connection.Open();
+                            using (SqlCommand command = new SqlCommand(sql, connection))
+                            {
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+
+                }
+            }
+            catch (Exception exc)
+            {
+                throw exc;
+            }
             // ____________________________________________________________________________________
 
 
             DateTime startDate = DateTime.MinValue,
                      expectedEndDate = DateTime.MinValue,
                      actualEndDate = DateTime.MinValue;
-            string employmentRecordId = string.Empty;
+            string employmentRecordId = string.Empty,
+                   empType = string.Empty;
             int yearsWorked = -1;
-            string empType = string.Empty;
             Boolean hasReceivedNotifAboutEndOfContract = false;
-
             currentNumYearsWorked = -1;
             // get years worked
-            string sql = $@"
+            sql = $@"
                         SELECT ep.id, 
                                ep.start_date as startDate, 
                                ep.expected_end_date as expectedEndDate, 
                                ISNULL(ep.actual_end_date, '') as actualEndDate, 
+                               IIF(ep.is_substantive_or_acting = 1, 'Substantive', 'Acting') as is_substantive_or_acting,
                                ep.years_worked as yearsWorked, 
                                ep.employment_type as employmentType,
                                ep.has_received_notif_about_end_of_contract as hasReceivedNotifAboutEndOfContract
                         FROM dbo.employeeposition ep
-                        WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {user.currUserId};
+                        WHERE ep.id = dbo.getActiveRecord({user.currUserId});
                 ";
 
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))

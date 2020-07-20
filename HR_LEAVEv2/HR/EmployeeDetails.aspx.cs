@@ -1724,18 +1724,23 @@ namespace HR_LEAVEv2.HR
                             int activeRecordId = -1;
                             while (reader.Read())
                             {
-                                activeRecordId = Convert.ToInt32(reader["id"]);
+                                if(reader["id"] != DBNull.Value)
+                                    activeRecordId = Convert.ToInt32(reader["id"]);
                             }
-                            for (int i = 0; i < dataTable.Rows.Count; i++)
+                            if(activeRecordId != -1)
                             {
-                                if (dataTable.Rows[i].ItemArray[(int)emp_records_columns.record_id].ToString() == $"{activeRecordId}")
+                                for (int i = 0; i < dataTable.Rows.Count; i++)
                                 {
-                                    empRecordAssociatedWithAccumulation = dataTable.Rows[i];
-                                    activeIndex = i;
-                                    break;
+                                    if (dataTable.Rows[i].ItemArray[(int)emp_records_columns.record_id].ToString() == $"{activeRecordId}")
+                                    {
+                                        empRecordAssociatedWithAccumulation = dataTable.Rows[i];
+                                        activeIndex = i;
+                                        break;
+                                    }
+
                                 }
-                                    
                             }
+                            
                         }
                     }
                 }
@@ -2052,8 +2057,8 @@ namespace HR_LEAVEv2.HR
             // EDIT EMPLOYMENT RECORDS--------------------------------------------------------------------------------------------------------------------------
             /**
                 * datatable is formatted in the folowing manner in the ItemArray:
-                * Index:         0             1            2         3        4        5          6               7              8           9           10          11             12                        13                         14
-                Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date  status  status_class  annual_vacation_amt  max_vacation_accumulation  is_substantive_or_acting
+                * Index:         0             1            2         3        4        5          6               7              8           9           10          11             12                        13                         14                    15
+                Columns : record_id, employment_type, dept_id, dept_name, pos_id, pos_name, start_date, expected_end_date, isChanged, actual_end_date  status  status_class  annual_vacation_amt  max_vacation_accumulation  is_substantive_or_acting can_accumulate_past_max
             * */
 
             if (dt.Rows.Count > 0)
