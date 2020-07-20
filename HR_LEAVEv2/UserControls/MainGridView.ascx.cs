@@ -31,7 +31,7 @@ namespace HR_LEAVEv2.UserControls
                               
                 e.employee_id employee_id,
                 e.last_name + ', ' + LEFT(e.first_name, 1) + '.' AS employee_name,
-                IIF(relevant_ep.employment_type IS NOT NULL AND (relevant_ep.start_date <= GETDATE() AND (relevant_ep.actual_end_date IS NULL OR GETDATE() <= relevant_ep.actual_end_date)), 'Yes', 'No') isLAfromActiveUser,
+                IIF(relevant_ep.employment_type IS NOT NULL AND dbo.isRecordActive(relevant_ep.id) = 1, 'Yes', 'No') isLAfromActiveUser,
 
                 lt.leave_type leave_type,
                 lt.start_date,
@@ -227,50 +227,7 @@ namespace HR_LEAVEv2.UserControls
                     ";
 
                     // ensure that the current supervisor viewing data is active
-                    /* the following statement checks the start and actual end dates for the supervisor in order to find out whether they are active
-                     * 
-                     * The partition is used to get the active record's start and actual end date. After getting these dates, it checks the following conditions:
-                     *          actual_end_date IS NULL OR (start_date <= GETDATE() AND actual_end_date IS NOT NULL AND GETDATE() <= actual_end_date)
-                     * 
-                     * */
-                    whereBindGridView += $@"
-                        AND ((SELECT actual_end_date
-							FROM (
-								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
-								FROM dbo.employeeposition sup_ep
-								WHERE sup_ep.employee_id = '{user.currUserId}'
-							) HR_INFO
-							WHERE RowNum = 1) IS NULL
-
-						OR (
-                            (SELECT start_date
-							FROM (
-								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.start_date
-								FROM dbo.employeeposition sup_ep
-								WHERE sup_ep.employee_id = '{user.currUserId}'
-							) HR_INFO
-							WHERE RowNum = 1) <= GETDATE()
-                            
-                            AND
-
-							(SELECT actual_end_date
-							FROM (
-								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
-								FROM dbo.employeeposition sup_ep
-								WHERE sup_ep.employee_id = '{user.currUserId}'
-							) HR_INFO
-							WHERE RowNum = 1) IS NOT NULL
-
-							AND 
-
-							GETDATE() <= (SELECT actual_end_date
-							FROM (
-								SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date
-								FROM dbo.employeeposition sup_ep
-								WHERE sup_ep.employee_id = '{user.currUserId}'
-							) HR_INFO
-							WHERE RowNum = 1)
-						))";
+                    whereBindGridView += $@" AND dbo.getActiveRecord({user.currUserId}) IS NOT NULL ";
                 }
 
                 // hr gridview (most complex)
@@ -294,52 +251,9 @@ namespace HR_LEAVEv2.UserControls
                     whereBindGridView += $@"
                         AND (relevant_ep.employment_type IN ({String.Join(", ", employmentTypes.ToArray())}))        
                     ";
-
-                    /* the following statement checks the start and actual end dates for the HR in order to find out whether they are active
-                     * 
-                     * The partition is used to get the active record's start and actual end date. After getting these dates, it checks the following conditions:
-                     *          actual_end_date IS NULL OR (start_date <= GETDATE() AND actual_end_date IS NOT NULL AND GETDATE() <= actual_end_date)
-                     * 
-                     * */
-                    whereBindGridView += $@"
-                        AND ((SELECT actual_end_date
-							FROM (
-								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
-								FROM dbo.employeeposition hr_ep
-								WHERE hr_ep.employee_id = '{user.currUserId}'
-							) HR_INFO
-							WHERE RowNum = 1) IS NULL
-
-						OR (
-                            (SELECT start_date
-							FROM (
-								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.start_date
-								FROM dbo.employeeposition hr_ep
-								WHERE hr_ep.employee_id = '{user.currUserId}' 
-							) HR_INFO
-							WHERE RowNum = 1) <= GETDATE()
-                            
-                            AND
-
-							(SELECT actual_end_date
-							FROM (
-								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
-								FROM dbo.employeeposition hr_ep
-								WHERE hr_ep.employee_id = '{user.currUserId}' 
-							) HR_INFO
-							WHERE RowNum = 1) IS NOT NULL
-
-							AND 
-
-							GETDATE() <= (SELECT actual_end_date
-							FROM (
-								SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.actual_end_date
-								FROM dbo.employeeposition hr_ep
-								WHERE hr_ep.employee_id = '{user.currUserId}' 
-							) HR_INFO
-							WHERE RowNum = 1)
-						))
-                    ";
+                    
+                    // ensure hr is active
+                    whereBindGridView += $@" AND dbo.getActiveRecord({user.currUserId}) IS NOT NULL ";
 
                 }// end hr if
 
@@ -420,11 +334,11 @@ namespace HR_LEAVEv2.UserControls
                 {
                     if(LAfromActiveInactiveEmp == "Active")
                         whereFilterGridView += $@"
-                            AND relevant_ep.employment_type IS NOT NULL AND (relevant_ep.start_date <= GETDATE() AND (relevant_ep.actual_end_date IS NULL OR GETDATE() <= relevant_ep.actual_end_date))
+                            AND relevant_ep.employment_type IS NOT NULL AND dbo.isRecordActive(relevant_ep.id) = 1
                         ";
                     else if(LAfromActiveInactiveEmp == "Inactive")
                         whereFilterGridView += $@"
-                            AND NOT (relevant_ep.employment_type IS NOT NULL AND (relevant_ep.start_date <= GETDATE() AND (relevant_ep.actual_end_date IS NULL OR GETDATE() <= relevant_ep.actual_end_date)))
+                            AND NOT (relevant_ep.employment_type IS NOT NULL AND dbo.isRecordActive(relevant_ep.id) = 1)
                         ";
                     // else if viewing both then add no where clause
                 }
@@ -1501,7 +1415,7 @@ namespace HR_LEAVEv2.UserControls
 			                                    ON e.employee_id = {employee_id}
 
 			                                    LEFT JOIN dbo.employeeposition ep                                          
-			                                    ON ep.employee_id = e.employee_id AND (ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date))
+			                                    ON ep.employee_id = e.employee_id AND dbo.isRecordActive(ep.id) = 1
 
 			                                    WHERE er.role_id =  IIF(ep.employment_type = 'Contract', 'hr_contract', 'hr_public_officer')
 		                                    )
@@ -1525,7 +1439,7 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
-		                                    ON hr_ep.employee_id = er.employee_id AND (hr_ep.start_date <= GETDATE() AND (hr_ep.actual_end_date IS NULL OR GETDATE() <= hr_ep.actual_end_date))
+		                                    ON hr_ep.employee_id = er.employee_id AND dbo.isRecordActive(hr_ep.id) = 1
 
 		                                    WHERE hr_ep.dept_id = 2
 	                                    )

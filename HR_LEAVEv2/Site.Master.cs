@@ -367,7 +367,7 @@ namespace HR_LEAVEv2
                             FROM [dbo].[accumulations] a
                             LEFT JOIN dbo.employeeposition ep
                             ON ep.employment_type = a.employment_type
-                            WHERE ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date) AND ep.employee_id = {user.currUserId};
+                            WHERE ep.id = dbo.getActiveRecord({user.currUserId});
                         ;
                     ";
 
