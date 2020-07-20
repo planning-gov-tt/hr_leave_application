@@ -214,7 +214,8 @@ CREATE TABLE [dbo].[employeefiles](
   [file_id] UNIQUEIDENTIFIER NOT NULL,
 
   FOREIGN KEY ([leave_transaction_id]) REFERENCES [dbo].[leavetransaction] ([transaction_id]),
-  FOREIGN KEY ([emp_record_id]) REFERENCES [dbo].[employeeposition] ([id]),
+  FOREIGN KEY ([emp_record_id]) REFERENCES [dbo].[employeeposition] ([id])
+	ON DELETE CASCADE,
   FOREIGN KEY([employee_id]) REFERENCES [dbo].[employee] ([employee_id]),
   FOREIGN KEY([file_id]) REFERENCES [dbo].[filestorage] ([file_id])
 	ON DELETE CASCADE
