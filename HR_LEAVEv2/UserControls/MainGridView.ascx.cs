@@ -1439,7 +1439,7 @@ namespace HR_LEAVEv2.UserControls
 		                                    FROM dbo.employeerole er
 
 		                                    LEFT JOIN dbo.employeeposition hr_ep
-		                                    ON hr_ep.employee_id = er.employee_id AND hr_ep.id = dbo.getActiveRecord({employee_id})
+		                                    ON hr_ep.employee_id = er.employee_id AND dbo.isRecordActive(hr_ep.id) = 1
 
 		                                    WHERE hr_ep.dept_id = 2
 	                                    )

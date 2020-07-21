@@ -132,7 +132,18 @@ namespace HR_LEAVEv2.Classes
 
         public List<string> getTypesOfLeaveUserCanApprove()
         {
-            List<string> leaveTypes = util.getListOfAllLeaveTypes();
+            List<string> typesOfEmployeesUserCanApprove = null;
+
+            if(permissions.Contains("contract_permissions") || permissions.Contains("public_officer_permissions"))
+            {
+                typesOfEmployeesUserCanApprove = new List<string>();
+                if (permissions.Contains("contract_permissions"))
+                    typesOfEmployeesUserCanApprove.Add("'Contract'");
+                if (permissions.Contains("public_officer_permissions"))
+                    typesOfEmployeesUserCanApprove.Add("'Public Service'");
+            }
+
+            List<string> leaveTypes = util.getListOfAllLeaveTypes(typesOfEmployeesUserCanApprove);
             // add single quotes around leave types
             for (int i = 0; i < leaveTypes.Count; i++)
                 leaveTypes[i] = $"'{leaveTypes[i]}'";

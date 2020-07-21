@@ -130,38 +130,73 @@ namespace HR_LEAVEv2.Classes
             return !leaveMappings.ContainsKey(leaveType);
         }
 
-        public List<string> getListOfAllLeaveTypes()
+        public List<string> getListOfAllLeaveTypes(List<string> permissions = null)
         {
-            // returns a List<string> of all the leave types in the DB
+            // returns a List<string> of all the leave types in the DB or leave types specific to a certain employment type Contract or Public service
 
             List<string> leaveTypes = new List<string>();
-            try
+
+            if(permissions == null)
             {
-                using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                try
                 {
-                    connection.Open();
-                    string sql = $@"
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
                         SELECT [type_id] FROM [dbo].[leavetype]
                     ";
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        using (SqlCommand command = new SqlCommand(sql, connection))
                         {
-                            while (reader.Read())
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                leaveTypes.Add(reader["type_id"].ToString());
+                                while (reader.Read())
+                                {
+                                    leaveTypes.Add(reader["type_id"].ToString());
+                                }
                             }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    return null;
+                }
             }
-            catch (Exception ex)
+            else
             {
-                //exception logic
-                return null;
+                // assumes permissions is a list containing either 'Contract' or 'Public Service'
+                try
+                {
+                    using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                    {
+                        connection.Open();
+                        string sql = $@"
+                        SELECT DISTINCT [leave_type] FROM [dbo].[emptypeleavetype] WHERE [employment_type] IN ({String.Join(", ", permissions.ToArray())})
+                    ";
+                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        {
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    leaveTypes.Add(reader["leave_type"].ToString());
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //exception logic
+                    return null;
+                }
             }
+           
             return leaveTypes;
         }
+
         // _______________________________________________________________________________________________________________________________________________
 
         // _______________________________________________________________________________________________________________________________________________
