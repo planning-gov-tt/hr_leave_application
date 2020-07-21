@@ -95,7 +95,7 @@ namespace HR_LEAVEv2.HR
                             (
                                 select ep.employee_id
                                 from dbo.employeeposition ep
-                                where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
+                                where dbo.isRecordActive(ep.id) = 1
                                 group by ep.employee_id
                                 having count(*) > 0
                             ) 
@@ -127,45 +127,72 @@ namespace HR_LEAVEv2.HR
                      * records are ordered by actual end date, effectively creating a sorted list with the most recent record at row number = 1. This will allow HR to be able to view the relevant employees 
                      * (Contract or Public Service) regardless of whether they are active or not.
                      */
+
                     sql = $@"
-                        SELECT *
-                        FROM(
-                            SELECT
-                                ROW_NUMBER() OVER(PARTITION BY ep.employee_id ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum,
-                                e.employee_id, 
-                                e.ihris_id, 
-                                e.first_name + ' ' + e.last_name as 'Name', 
-                                e.email, 
-                                ep.employment_type,
-                                '{activeLabel}' as isActive, 
-                                'label {bootstrapClass}' as bootstrapClass,
+                    
+                        SELECT DISTINCT
+                            e.employee_id, 
+                            e.ihris_id, 
+                            e.first_name + ' ' + e.last_name as 'Name', 
+                            e.email, 
+                            ep.employment_type,
+                            '{activeLabel}' as isActive, 
+                            'label {bootstrapClass}' as bootstrapClass
+                        FROM dbo.employee e
 
-                                -- check to ensure HR is active
-	                            (SELECT IIF(start_date <= GETDATE() AND (actual_end_date IS NULL OR GETDATE() <= actual_end_date), 'Yes', 'No')
-		                            FROM (
-			                            SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.start_date, hr_ep.actual_end_date
-			                            FROM dbo.employeeposition hr_ep
-			                            WHERE hr_ep.employee_id = '{user.currUserId}' 
-		                            ) HR_INFO
-		                          WHERE RowNum = 1) as 'is_hr_active'
+                        JOIN employeeposition ep
+                        ON ep.employee_id = e.employee_id
 
-                                FROM dbo.employee e
+                        WHERE ep.employee_id <> '{user.currUserId}' AND ep.employee_id {isActive}
+                                                    (
+                                                        select ep.employee_id
+                                                        from dbo.employeeposition ep
+                                                        where dbo.isRecordActive(ep.id) = 1
+                                                        group by ep.employee_id
+                                                        having count(*) > 0
+                                                    ) 
+	                            AND dbo.getMostRecentEmploymentType(e.employee_id) IN ({String.Join(", ", emp_type.ToArray())}) AND dbo.getActiveRecord({user.currUserId}) IS NOT NULL
 
-                                JOIN employeeposition ep
-                                ON ep.employee_id = e.employee_id
-
-                                WHERE ep.employee_id <> '{user.currUserId}' AND ep.employee_id {isActive}
-                                (
-                                    select ep.employee_id
-                                    from dbo.employeeposition ep
-                                    where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
-                                    group by ep.employee_id
-                                    having count(*) > 0
-                                ) 
-                        ) Employees
-
-                        WHERE RowNum = 1 AND employment_type IN ({String.Join(", ", emp_type.ToArray())}) AND Employees.is_hr_active = 'Yes';
                     ";
+                    //sql = $@"
+                    //    SELECT *
+                    //    FROM(
+                    //        SELECT
+                    //            ROW_NUMBER() OVER(PARTITION BY ep.employee_id ORDER BY ISNULL(ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum,
+                    //            e.employee_id, 
+                    //            e.ihris_id, 
+                    //            e.first_name + ' ' + e.last_name as 'Name', 
+                    //            e.email, 
+                    //            ep.employment_type,
+                    //            '{activeLabel}' as isActive, 
+                    //            'label {bootstrapClass}' as bootstrapClass,
+
+                    //            -- check to ensure HR is active
+	                   //         (SELECT IIF(start_date <= GETDATE() AND (actual_end_date IS NULL OR GETDATE() <= actual_end_date), 'Yes', 'No')
+		                  //          FROM (
+			                 //           SELECT ROW_NUMBER() OVER(PARTITION BY hr_ep.employee_id ORDER BY ISNULL(hr_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, hr_ep.start_date, hr_ep.actual_end_date
+			                 //           FROM dbo.employeeposition hr_ep
+			                 //           WHERE hr_ep.employee_id = '{user.currUserId}' 
+		                  //          ) HR_INFO
+		                  //        WHERE RowNum = 1) as 'is_hr_active'
+
+                    //            FROM dbo.employee e
+
+                    //            JOIN employeeposition ep
+                    //            ON ep.employee_id = e.employee_id
+
+                    //            WHERE ep.employee_id <> '{user.currUserId}' AND ep.employee_id {isActive}
+                    //            (
+                    //                select ep.employee_id
+                    //                from dbo.employeeposition ep
+                    //                where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
+                    //                group by ep.employee_id
+                    //                having count(*) > 0
+                    //            ) 
+                    //    ) Employees
+
+                    //    WHERE RowNum = 1 AND employment_type IN ({String.Join(", ", emp_type.ToArray())}) AND Employees.is_hr_active = 'Yes';
+                    //";
                 }
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -232,16 +259,32 @@ namespace HR_LEAVEv2.HR
                             FROM dbo.employee e
 
                             WHERE e.employee_id <> {user.currUserId} 
-                                AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
-                                AND e.employee_id {isActive} 
-                                (
-                                    select ep.employee_id
-                                    from dbo.employeeposition ep
-                                    where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
-                                    group by ep.employee_id
-                                    having count(*) > 0
-                                ) 
+                            AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
+                            AND e.employee_id {isActive} 
+                            (
+                                select ep.employee_id
+                                from dbo.employeeposition ep
+                                where dbo.isRecordActive(ep.id) = 1
+                                group by ep.employee_id
+                                having count(*) > 0
+                            ) 
                     ";
+                    //sql = $@"
+                    //    SELECT
+                    //        DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email, '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
+                    //        FROM dbo.employee e
+
+                    //        WHERE e.employee_id <> {user.currUserId} 
+                    //            AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
+                    //            AND e.employee_id {isActive} 
+                    //            (
+                    //                select ep.employee_id
+                    //                from dbo.employeeposition ep
+                    //                where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
+                    //                group by ep.employee_id
+                    //                having count(*) > 0
+                    //            ) 
+                    //";
                 }
                 else
                 {
@@ -262,23 +305,51 @@ namespace HR_LEAVEv2.HR
                     }
 
                     sql = $@"
-                        SELECT
-                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email , '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
-                            FROM dbo.employee e
-                            JOIN employeeposition ep
-                            ON ep.employee_id = e.employee_id
-                            WHERE e.employee_id <> {user.currUserId} 
-                                AND ep.employment_type IN ({String.Join(", ", emp_type.ToArray())})
+                    
+                        SELECT DISTINCT
+                            e.employee_id, 
+                            e.ihris_id, 
+                            e.first_name + ' ' + e.last_name as 'Name', 
+                            e.email, 
+                            ep.employment_type,
+                            '{activeLabel}' as isActive, 
+                            'label {bootstrapClass}' as bootstrapClass
+                        FROM dbo.employee e
+
+                        JOIN employeeposition ep
+                        ON ep.employee_id = e.employee_id
+
+                        WHERE ep.employee_id <> '{user.currUserId}' AND ep.employee_id {isActive}
+                                                    (
+                                                        select ep.employee_id
+                                                        from dbo.employeeposition ep
+                                                        where dbo.isRecordActive(ep.id) = 1
+                                                        group by ep.employee_id
+                                                        having count(*) > 0
+                                                    ) 
+	                            AND dbo.getMostRecentEmploymentType(e.employee_id) IN ({String.Join(", ", emp_type.ToArray())}) AND dbo.getActiveRecord({user.currUserId}) IS NOT NULL
                                 AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
-                                AND e.employee_id {isActive} 
-                                (
-                                    select ep.employee_id
-                                    from dbo.employeeposition ep
-                                    where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
-                                    group by ep.employee_id
-                                    having count(*) > 0
-                                ) 
+
                     ";
+
+                    //sql = $@"
+                    //    SELECT
+                    //        DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email , '{activeLabel}' as isActive, 'label {bootstrapClass}' as bootstrapClass
+                    //        FROM dbo.employee e
+                    //        JOIN employeeposition ep
+                    //        ON ep.employee_id = e.employee_id
+                    //        WHERE e.employee_id <> {user.currUserId} 
+                    //            AND ep.employment_type IN ({String.Join(", ", emp_type.ToArray())})
+                    //            AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString)) 
+                    //            AND e.employee_id {isActive} 
+                    //            (
+                    //                select ep.employee_id
+                    //                from dbo.employeeposition ep
+                    //                where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
+                    //                group by ep.employee_id
+                    //                having count(*) > 0
+                    //            ) 
+                    //";
                 }
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
