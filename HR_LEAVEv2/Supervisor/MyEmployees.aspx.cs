@@ -64,37 +64,18 @@ namespace HR_LEAVEv2.Supervisor
             {
                 // the following sql gets all employees that are supervised by the current supervisor and that are currently active
                 string sql = $@"
-                    SELECT *
-                    FROM (
-	                    SELECT
-	                    e.employee_id, 
-	                    e.ihris_id, 
-	                    e.first_name + ' ' + e.last_name as 'Name', 
-	                    e.email,
-	                    (
-		                    SELECT IIF(start_date <= GETDATE() AND (actual_end_date IS NULL OR GETDATE() <= actual_end_date), 'Yes', 'No')
-		                    FROM (
-			                    SELECT ROW_NUMBER() OVER(PARTITION BY sup_ep.employee_id ORDER BY ISNULL(sup_ep.actual_end_date, CAST('1/1/9999' AS DATE)) DESC) as RowNum, sup_ep.actual_end_date, sup_ep.start_date
-			                    FROM dbo.employeeposition sup_ep
-			                    WHERE sup_ep.employee_id = '{user.currUserId}' 
-		                    ) SUP_INFO
-		                    WHERE RowNum = 1
-	                    ) as 'is_sup_active'
+                    SELECT
+                        e.employee_id, 
+                        e.ihris_id, 
+                        e.first_name + ' ' + e.last_name as 'Name', 
+                        e.email
 
-	                    FROM dbo.employee e
-                    ) Employees
+                    FROM dbo.employee e
 
                     JOIN [dbo].assignment a
-                    ON Employees.employee_id = a.supervisee_id
+                    ON employee_id = a.supervisee_id
 
-                    WHERE Employees.is_sup_active = 'Yes' AND a.supervisor_id = '{user.currUserId}' AND Employees.employee_id IN
-                    (
-                        select ep.employee_id
-                        from dbo.employeeposition ep
-                        where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
-                        group by ep.employee_id
-                        having count(*) > 0
-                    ) 
+                    WHERE dbo.getActiveRecord({user.currUserId} ) IS NOT NULL AND a.supervisor_id = {user.currUserId}  AND dbo.getActiveRecord(e.employee_id) IS NOT NULL;
                     ";
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                 {
@@ -134,21 +115,23 @@ namespace HR_LEAVEv2.Supervisor
             try
             {
                 string sql = $@"
+
                         SELECT
-                            DISTINCT e.employee_id, e.ihris_id, e.first_name + ' ' + e.last_name as 'Name', e.email
-                            FROM dbo.employee e
-                            JOIN [dbo].assignment a
-                            ON e.employee_id = a.supervisee_id
-                            WHERE a.supervisor_id = {user.currUserId} 
-                                AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString))
-                                AND e.employee_id IN
-                                (
-                                    select ep.employee_id
-                                    from dbo.employeeposition ep
-                                    where ep.start_date <= GETDATE() AND (ep.actual_end_date IS NULL OR GETDATE() <= ep.actual_end_date)
-                                    group by ep.employee_id
-                                    having count(*) > 0
-                                ) 
+                            e.employee_id, 
+                            e.ihris_id, 
+                            e.first_name + ' ' + e.last_name as 'Name', 
+                            e.email
+
+                        FROM dbo.employee e
+
+                        JOIN [dbo].assignment a
+                        ON employee_id = a.supervisee_id
+
+                        WHERE 
+                            dbo.getActiveRecord({user.currUserId} ) IS NOT NULL 
+                            AND a.supervisor_id = {user.currUserId}  
+                            AND dbo.getActiveRecord(e.employee_id) IS NOT NULL
+                            AND ((e.employee_id LIKE '@SearchString') OR (e.ihris_id LIKE @SearchString) OR (e.first_name LIKE @SearchString) OR (e.last_name LIKE @SearchString) OR (e.email LIKE @SearchString));
                     ";
 
                 using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
