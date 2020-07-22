@@ -197,7 +197,7 @@
         BorderStyle="None" CssClass="table" GridLines="Horizontal"
         AutoGenerateColumns="false"
         AllowSorting="true" OnSorting="GridView_Sorting"
-        AllowPaging="true" PageSize="5" OnPageIndexChanging="GridView_PageIndexChanging"
+        AllowPaging="true" PageSize="2" OnPageIndexChanging="GridView_PageIndexChanging"
         OnRowCommand="GridView_RowCommand"
         OnRowDataBound="GridView_RowDataBound"
         DataKeyNames="transaction_id, employee_id, supervisor_id, hr_manager_id"

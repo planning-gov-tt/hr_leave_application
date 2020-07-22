@@ -262,51 +262,6 @@ namespace HR_LEAVEv2.HR
             this.bindGridview();
         }
 
-        protected void empRecordGridView_RowDeleting(object sender, GridViewDeleteEventArgs e)
-        {
-            DataTable dt = empRecordsDataSource;
-            if (dt != null)
-            {
-                Boolean canDeleteRow = true;
-                // sets isChanged to 1
-                if(dt.Rows[e.RowIndex].ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive" && dt.Rows[e.RowIndex].ItemArray[(int)emp_records_columns.status].ToString() == "Active")
-                {
-                    // check if there are any active acting records
-                    for(int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        if(i != e.RowIndex && dt.Rows[i].ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Acting" && dt.Rows[i].ItemArray[(int)emp_records_columns.status].ToString() == "Active" && dt.Rows[i].ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
-                        {
-                            canDeleteRow = false;
-                            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "alert('Record not deleted since employee must have at least one (1) active substantive employment record with their acting record');", true);
-                            break;
-                        }
-                    }
-                }
-                if (canDeleteRow)
-                {
-                    dt.Rows[e.RowIndex].SetField((int)emp_records_columns.isChanged, "1");
-
-                    empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
-                    if(empRecordAssociatedWithAccumulation != null)
-                    {
-                        accPastLimitContainerPanel.Visible = true;
-                        chkOnOff.Checked = empRecordAssociatedWithAccumulation.ItemArray[(int)emp_records_columns.can_accumulate_past_max].ToString() == "True";
-                        resetFiles();
-                        //loadPreviouslyUploadedFiles(Request.QueryString["empId"].ToString());
-                    }
-                    else
-                    {
-                        accPastLimitContainerPanel.Visible = true;
-                        sliderPanel.Visible= false;
-                        resetFiles();
-                    }
-
-                    empRecordsDataSource = dt;
-                }
-            }
-            this.bindGridview();
-        }
-
         protected void empRecordGridView_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             // Executes after data is bound for each row. This method is used to make changes as to what a user sees on the gridview based on the data in the table
@@ -376,7 +331,8 @@ namespace HR_LEAVEv2.HR
         protected void empRecordGridView_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             // this method fires whenever an Action button is clicked in the Gridview
-
+            int indexInDt = empRecordGridView.PageSize * empRecordGridView.PageIndex + Convert.ToInt32(e.CommandArgument);
+            int indexInGridview = Convert.ToInt32(e.CommandArgument);
             // end employment record
             if (e.CommandName == "endEmpRecord")
             {
@@ -385,8 +341,7 @@ namespace HR_LEAVEv2.HR
                 txtEmpRecordEndDate.Text = string.Empty;
 
                 // store data about row which must be edited
-                int index = Convert.ToInt32(e.CommandArgument);
-                empRecordBeingEditedRowIndex = index;
+                empRecordBeingEditedRowIndex = indexInDt;
 
                 // show modal
                 ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "$('#cancelEmpRecordModal').modal('show');", true);
@@ -417,9 +372,6 @@ namespace HR_LEAVEv2.HR
                 addNewRecordBtn.Visible = false;
                 editRecordBtn.Visible = true;
 
-                // index of row being edited
-                int index = Convert.ToInt32(e.CommandArgument);
-
                 // rebind the dropdown lists so that they can be set to the correct selected item
                 empTypeList.DataBind();
                 deptList.DataBind();
@@ -427,9 +379,9 @@ namespace HR_LEAVEv2.HR
 
                 // these search strings are neccessary since the FindByText method will not match ASCII characters. For eg. a single quote in any of the inputs (position,
                 // employment type or departmen would cause an error ). As such, these search strins must be sanitized for COVID-19
-                string posSearchString = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "pos_name")].Text.ToString(),
-                    emptypeSearchString = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "employment_type")].Text.ToString(),
-                    deptSearchString = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "dept_name")].Text.ToString();
+                string posSearchString = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "pos_name")].Text.ToString(),
+                    emptypeSearchString = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "employment_type")].Text.ToString(),
+                    deptSearchString = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "dept_name")].Text.ToString();
 
                 // sanitize search strings for any ASCII characters (and COVID-19) that may cause trouble with the FindByText function below
                 // such as single quote ('), double quote ("), open bracket and close bracket
@@ -447,11 +399,11 @@ namespace HR_LEAVEv2.HR
                 // position
                 positionList.Items.FindByText(posSearchString).Selected = true;
                 // start date
-                txtStartDate.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "start_date")].Text.ToString();
+                txtStartDate.Text = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "start_date")].Text.ToString();
                 // expected end date (if any)
-                txtEndDate.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "expected_end_date")].Text.ToString();
+                txtEndDate.Text = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "expected_end_date")].Text.ToString();
                 // actual end date (if any)
-                string actualEndDate = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "actual_end_date")].Text.ToString();
+                string actualEndDate = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "actual_end_date")].Text.ToString();
 
                 // show actual end date textbox if actual end date is populated
                 if (!util.isNullOrEmpty(actualEndDate))
@@ -461,19 +413,64 @@ namespace HR_LEAVEv2.HR
                 }
 
                 // annual vacation amt
-                annualAmtOfLeaveTxt.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "annual_vacation_amt")].Text.ToString();
+                annualAmtOfLeaveTxt.Text = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "annual_vacation_amt")].Text.ToString();
 
                 // max vacation accumulation possible
-                maxAmtOfLeaveTxt.Text = empRecordGridView.Rows[index].Cells[GetColumnIndexByName(empRecordGridView.Rows[index], "max_vacation_accumulation")].Text.ToString();
+                maxAmtOfLeaveTxt.Text = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "max_vacation_accumulation")].Text.ToString();
 
                 // Substantive or Acting
-                subsOrActingRadioBtnList.SelectedIndex = empRecordsDataSource.Rows[index].ItemArray[Convert.ToInt32(emp_records_columns.is_substantive_or_acting)].ToString() == "Substantive" ? 0 : 1;
+                subsOrActingRadioBtnList.SelectedIndex = empRecordsDataSource.Rows[indexInDt].ItemArray[Convert.ToInt32(emp_records_columns.is_substantive_or_acting)].ToString() == "Substantive" ? 0 : 1;
 
                 // highlight row being edited
-                empRecordGridView.Rows[index].CssClass = "highlighted-record";
+                empRecordGridView.Rows[indexInGridview].CssClass = "highlighted-record";
 
                 // to be used when saving edits made to employment record to DataTable dt for Employment Records. User must still save all their changes
-                recordBeingEdited = index;
+                recordBeingEdited = indexInDt;
+            }
+
+            if(e.CommandName == "deleteRecord")
+            {
+                DataTable dt = empRecordsDataSource;
+                if (dt != null)
+                {
+                    Boolean canDeleteRow = true;
+                    // sets isChanged to 1
+                    if (dt.Rows[indexInDt].ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive" && dt.Rows[indexInDt].ItemArray[(int)emp_records_columns.status].ToString() == "Active")
+                    {
+                        // check if there are any active acting records
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            if (i != indexInDt && dt.Rows[i].ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Acting" && dt.Rows[i].ItemArray[(int)emp_records_columns.status].ToString() == "Active" && dt.Rows[i].ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
+                            {
+                                canDeleteRow = false;
+                                ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "alert('Record not deleted since employee must have at least one (1) active substantive employment record with their acting record');", true);
+                                break;
+                            }
+                        }
+                    }
+                    if (canDeleteRow)
+                    {
+                        dt.Rows[indexInDt].SetField((int)emp_records_columns.isChanged, "1");
+
+                        empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
+                        if (empRecordAssociatedWithAccumulation != null)
+                        {
+                            accPastLimitContainerPanel.Visible = true;
+                            chkOnOff.Checked = empRecordAssociatedWithAccumulation.ItemArray[(int)emp_records_columns.can_accumulate_past_max].ToString() == "True";
+                            resetFiles();
+                            //loadPreviouslyUploadedFiles(Request.QueryString["empId"].ToString());
+                        }
+                        else
+                        {
+                            accPastLimitContainerPanel.Visible = true;
+                            sliderPanel.Visible = false;
+                            resetFiles();
+                        }
+
+                        empRecordsDataSource = dt;
+                    }
+                }
+                bindGridview();
             }
 
         }

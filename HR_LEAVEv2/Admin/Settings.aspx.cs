@@ -162,7 +162,7 @@ namespace HR_LEAVEv2.Admin
             // get row index in which button was clicked
             int index = Convert.ToInt32(e.CommandArgument);
             GridViewRow row = GridView1.Rows[index];
-            int indexInTableData = GridView1.PageCount * GridView1.PageIndex + index;
+            int indexInTableData = GridView1.PageSize * GridView1.PageIndex + index;
             if (row.RowType == DataControlRowType.DataRow)
             {
                 if (e.CommandName == "editRow")

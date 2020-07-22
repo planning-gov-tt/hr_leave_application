@@ -79,7 +79,8 @@ namespace HR_LEAVEv2.HR
 
             DataTable dt = GridView1.DataSource as DataTable;
             Boolean isDeleteSuccessful = false;
-            string id = dt.Rows[e.RowIndex].ItemArray[0].ToString();
+            int index = GridView1.PageSize * GridView1.PageIndex + e.RowIndex;
+            string id = dt.Rows[index].ItemArray[0].ToString();
 
             // delete from db
             try
