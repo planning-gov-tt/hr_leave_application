@@ -83,7 +83,7 @@ namespace HR_LEAVEv2
                     }
                 }
 
-                // check if any substantive record exists and if not then change any acting record to inactive
+                // check if any substantive record exists and if not then change any active acting record to inactive
                 Boolean isActiveSubstantiveAvailable = false;
                 foreach (DataRow dr in empRecords.Rows)
                 {
@@ -231,6 +231,7 @@ namespace HR_LEAVEv2
                             throw ex;
                         }
 
+                        // set has received notifs to 1 (True)
                         try
                         {
                             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))

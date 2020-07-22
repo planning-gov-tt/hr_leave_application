@@ -139,6 +139,24 @@ namespace HR_LEAVEv2.Admin {
         protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsPanel;
         
         /// <summary>
+        /// noSubstantiveRecordPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noSubstantiveRecordPanel;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel actingStartDateBeforeSubPanel;
+        
+        /// <summary>
         /// invalidStartDateValidationMsgPanel control.
         /// </summary>
         /// <remarks>

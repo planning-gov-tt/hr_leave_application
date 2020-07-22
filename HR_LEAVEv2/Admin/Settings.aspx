@@ -100,12 +100,24 @@
                     <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORDS VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
                     <asp:Panel ID="clashingRecordsPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Employment record being inserted/edited clashes with another employment record</span>
+                        <span>Record not inserted/edited since the insert/edit would result in a clash between employment records. This means that the insert/edit causes more than one employment record of the same type to overlap</span>
                     </asp:Panel>
 
                     <asp:Panel ID="multipleActiveRecordsPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Employment record being inserted/edited would result in multiple active records</span>
+                        <span> Record not inserted/edited since this would result in two employment records of the same type being marked active simultaneously</span>
+                    </asp:Panel>
+
+                    <asp:Panel ID="noSubstantiveRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Record not inserted/edited since employee must have at least one (1) active substantive employment record in order to have active acting records
+                        </span>
+                    </asp:Panel>
+                                
+                    <asp:Panel ID="actingStartDateBeforeSubPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Record not inserted/edited since the start date of the acting record is before the start date of the active substantive record
+                        </span>
                     </asp:Panel>
                     <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORDS VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 

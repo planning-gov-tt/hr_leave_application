@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
@@ -98,6 +99,21 @@ namespace HR_LEAVEv2.Classes
             }
 
             return holidaysInBetween;
+        }
+
+        public DateTime getDateFromDataRow(DataRow dr, string columnName)
+        {
+            DateTime date;
+            try
+            {
+                date = dr.Field<DateTime>(columnName);
+            }
+            catch (Exception e)
+            {
+                date = DateTime.MinValue;
+            }
+
+            return date;
         }
         // _______________________________________________________________________________________________________________________________________________
 

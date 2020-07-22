@@ -19,19 +19,6 @@ namespace HR_LEAVEv2.Admin
 
         string selectedTable = string.Empty;
 
-        enum empPositionColumns
-        {
-            record_id = 0,
-            employee_id = 1,
-            position_id = 2,
-            start_date = 3,
-            expected_end_date = 4,
-            actual_end_date = 5,
-            employment_type = 6,
-            dept_id = 7,
-            years_worked = 8
-        };
-
         // holds data in the following format:
         // COLNAME, DATA TYPE, MAX AMT OF CHARS, IS NULLABLE
         // Number of rows = number of columns for the currently selected table
@@ -175,7 +162,7 @@ namespace HR_LEAVEv2.Admin
             // get row index in which button was clicked
             int index = Convert.ToInt32(e.CommandArgument);
             GridViewRow row = GridView1.Rows[index];
-
+            int indexInTableData = GridView1.PageCount * GridView1.PageIndex + index;
             if (row.RowType == DataControlRowType.DataRow)
             {
                 if (e.CommandName == "editRow")
@@ -183,15 +170,11 @@ namespace HR_LEAVEv2.Admin
                     Dictionary<string, string> previousData = new Dictionary<string, string>();
 
                     //store all old values
-                    for (int i = 0; i < TableData.Rows[row.RowIndex].ItemArray.Length; i++)
+                    for (int i = 0; i < TableData.Rows[indexInTableData].ItemArray.Length; i++)
                     {
-                        previousData[TableData.Columns[i].ToString()] = TableData.Rows[row.RowIndex].ItemArray[i].ToString();
+                        previousData[TableData.Columns[i].ToString()] = TableData.Rows[indexInTableData].ItemArray[i].ToString();
                     }
 
-                    //for (int i = 1; i < row.Cells.Count; i++)
-                    //{
-                    //    previousData[GridView1.HeaderRow.Cells[i].Text] = row.Cells[i].Text;
-                    //}
                     dataBeforeEdit = previousData;
 
                     /* get relevant data from row by determining whether the selected table has an integer id or not. this is relevant since 
@@ -201,17 +184,17 @@ namespace HR_LEAVEv2.Admin
                     int startingIndex = (new string[] { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" }.Contains(selectedTable)) ? 0 : 1;
 
                     // repopulate form
-                    for (int i = startingIndex; i < TableData.Rows[row.RowIndex].ItemArray.Length; i++)
+                    for (int i = startingIndex; i < TableData.Rows[indexInTableData].ItemArray.Length; i++)
                     {
                         TextBox tb = ((TextBox)formPlaceholder.FindControl($"text_{TableData.Columns[i].ToString()}_{selectedTable}"));
 
-                        if (!util.isNullOrEmpty(TableData.Rows[row.RowIndex].ItemArray[i].ToString()))
+                        if (!util.isNullOrEmpty(TableData.Rows[indexInTableData].ItemArray[i].ToString()))
                         {
                             // check if column type is datetime and convert data to proper format
                             if (TableMetaData.Rows[i].ItemArray[1].ToString() == "datetime")
-                                tb.Text = Convert.ToDateTime(TableData.Rows[row.RowIndex].ItemArray[i]).ToString("d/MM/yyyy");
+                                tb.Text = Convert.ToDateTime(TableData.Rows[indexInTableData].ItemArray[i]).ToString("d/MM/yyyy");
                             else
-                                tb.Text = TableData.Rows[row.RowIndex].ItemArray[i].ToString();
+                                tb.Text = TableData.Rows[indexInTableData].ItemArray[i].ToString();
                         }
                         else
                         {
@@ -220,28 +203,6 @@ namespace HR_LEAVEv2.Admin
 
 
                     }
-                    //int startingIndex = (new string[] { "permission", "role", "rolepermission", "employee", "employeerole", "assignment", "leavetype", "employmenttype" }.Contains(selectedTable)) ? 1 : 2;
-
-                    //// repopulate form
-                    //for (int i = startingIndex; i < row.Cells.Count; i++)
-                    //{
-                    //    TextBox tb = ((TextBox)formPlaceholder.FindControl($"text_{GridView1.HeaderRow.Cells[i].Text}_{selectedTable}"));
-
-                    //    if (!util.isNullOrEmpty(row.Cells[i].Text))
-                    //    {
-                    //        // check if column type is datetime and convert data to proper format
-                    //        if (TableMetaData.Rows[i - 1].ItemArray[1].ToString() == "datetime")
-                    //            tb.Text = Convert.ToDateTime(row.Cells[i].Text).ToString("d/MM/yyyy");
-                    //        else
-                    //            tb.Text = row.Cells[i].Text;
-                    //    }
-                    //    else
-                    //    {
-                    //        tb.Text = string.Empty;
-                    //    }
-
-
-                    //}
 
                     // setup form for edit mode
                     headerForForm.InnerText = "Edit";
@@ -252,94 +213,117 @@ namespace HR_LEAVEv2.Admin
                 }
                 else if (e.CommandName == "deleteRow")
                 {
-                    string[] bridgeTables = new string[] { "assignment", "employeerole", "emptypeleavetype", "rolepermission" };
-                    Boolean isDeleteSuccessful = false;
-                    try
+                    Boolean canDeleteRow = true;
+
+                    Boolean isRowActive = isRecordActive(util.getDateFromDataRow(TableData.Rows[indexInTableData], "start_date"), util.getDateFromDataRow(TableData.Rows[indexInTableData], "actual_end_date"));
+
+                    string isTableDataRowSubstantiveOrActing = TableData.Rows[indexInTableData].Field<Boolean>("is_substantive_or_acting") ? "Substantive" : "Acting";
+
+                    if (isTableDataRowSubstantiveOrActing == "Substantive" && isRowActive)
                     {
-                        using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                        // check if there are any active acting records
+                        for (int i = 0; i < TableData.Rows.Count; i++)
                         {
-                            connection.Open();
+                            isRowActive = isRecordActive(util.getDateFromDataRow(TableData.Rows[i], "start_date"), util.getDateFromDataRow(TableData.Rows[i], "actual_end_date"));
+                            isTableDataRowSubstantiveOrActing = TableData.Rows[i].Field<Boolean>("is_substantive_or_acting") ? "Substantive" : "Acting";
 
-                            /* used to construct the where clause based on whether the table being deleted is a bridge entity or not. Bridge entities
-                               require all their elements to be included in the where to determine identity for the delete. Other tables, however,
-                               only require the first element which is their primary key since only the bridge entities have a composite primary key
-                            */
-                            List<string> parameters = new List<string>();
+                            if (TableData.Rows[i].Field<int>("id") != TableData.Rows[indexInTableData].Field<int>("id") && TableData.Rows[i].Field<string>("employee_id") == TableData.Rows[indexInTableData].Field<string>("employee_id") && isTableDataRowSubstantiveOrActing == "Acting" && isRowActive)
+                            {
+                                canDeleteRow = false;
+                                ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", $"alert('Record not deleted since employee with id {TableData.Rows[i].Field<string>("employee_id")} must have at least one (1) active substantive employment record with their acting record');", true);
+                                break;
+                            }
+                        }
+                    }
+                    if (canDeleteRow)
+                    {
+                        string[] bridgeTables = new string[] { "assignment", "employeerole", "emptypeleavetype", "rolepermission" };
+                        Boolean isDeleteSuccessful = false;
+                        try
+                        {
+                            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
+                            {
+                                connection.Open();
 
-                            string sql = $"DELETE FROM dbo.{selectedTable} WHERE ";
+                                /* used to construct the where clause based on whether the table being deleted is a bridge entity or not. Bridge entities
+                                   require all their elements to be included in the where to determine identity for the delete. Other tables, however,
+                                   only require the first element which is their primary key since only the bridge entities have a composite primary key
+                                */
+                                List<string> parameters = new List<string>();
 
+                                string sql = $"DELETE FROM dbo.{selectedTable} WHERE ";
+
+                                if (bridgeTables.Contains(selectedTable))
+                                {
+                                    // use all columns in where clause for identity
+                                    List<string> whereClauseComponents = new List<string>();
+                                    for (int i = 1; i < GridView1.HeaderRow.Cells.Count; i++)
+                                    {
+                                        parameters.Add($"@{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
+                                        whereClauseComponents.Add($"{GridView1.HeaderRow.Cells[i].Text} = @{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
+                                    }
+
+                                    sql += $"{String.Join(" AND ", whereClauseComponents.ToArray())}";
+                                }
+                                else
+                                {
+                                    // use only the first column in where clause. This column is the primary key of the table.
+                                    parameters.Add($"@{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}");
+                                    sql += $"{GridView1.HeaderRow.Cells[1].Text} = @{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}"; // use only first column to get identity
+                                }
+
+                                using (SqlCommand command = new SqlCommand(sql, connection))
+                                {
+                                    /*
+                                        starts with 1 because all parameters added start at the first column but depending on whether the selected table
+                                        is a bridge entity or not, may or may not include data past just the first column.
+                                    */
+                                    int cellIndex = 1;
+                                    foreach (string parameter in parameters)
+                                    {
+                                        command.Parameters.AddWithValue(parameter, row.Cells[cellIndex].Text.ToString());
+                                        cellIndex++;
+                                    }
+                                    int rowsAffected = command.ExecuteNonQuery();
+                                    isDeleteSuccessful = rowsAffected > 0;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            //exception logic
+                            isDeleteSuccessful = false;
+                        }
+
+
+                        if (isDeleteSuccessful)
+                        {
+                            deleteSuccessfulPanel.Style.Add("display", "inline-block"); //show delete success
+
+                            List<string> primaryKeys = new List<string>();
                             if (bridgeTables.Contains(selectedTable))
                             {
-                                // use all columns in where clause for identity
-                                List<string> whereClauseComponents = new List<string>();
-                                for (int i = 1; i < GridView1.HeaderRow.Cells.Count; i++)
-                                {
-                                    parameters.Add($"@{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
-                                    whereClauseComponents.Add($"{GridView1.HeaderRow.Cells[i].Text} = @{GridView1.HeaderRow.Cells[i].Text.Replace("_", string.Empty)}");
-                                }
-
-                                sql += $"{String.Join(" AND ", whereClauseComponents.ToArray())}";
+                                for (int i = 1; i < row.Cells.Count; i++)
+                                    primaryKeys.Add($"{row.Cells[i].Text.ToString()}");
                             }
                             else
-                            {
-                                // use only the first column in where clause. This column is the primary key of the table.
-                                parameters.Add($"@{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}");
-                                sql += $"{GridView1.HeaderRow.Cells[1].Text} = @{GridView1.HeaderRow.Cells[1].Text.Replace("_", string.Empty)}"; // use only first column to get identity
-                            }
+                                primaryKeys.Add($"{row.Cells[1].Text.ToString()}");
 
-                            using (SqlCommand command = new SqlCommand(sql, connection))
-                            {
-                                /*
-                                    starts with 1 because all parameters added start at the first column but depending on whether the selected table
-                                    is a bridge entity or not, may or may not include data past just the first column.
-                                */
-                                int cellIndex = 1;
-                                foreach (string parameter in parameters)
-                                {
-                                    command.Parameters.AddWithValue(parameter, row.Cells[cellIndex].Text.ToString());
-                                    cellIndex++;
-                                }
-                                int rowsAffected = command.ExecuteNonQuery();
-                                isDeleteSuccessful = rowsAffected > 0;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        //exception logic
-                        isDeleteSuccessful = false;
-                    }
-
-
-                    if (isDeleteSuccessful)
-                    {
-                        deleteSuccessfulPanel.Style.Add("display", "inline-block"); //show delete success
-
-                        List<string> primaryKeys = new List<string>();
-                        if (bridgeTables.Contains(selectedTable))
-                        {
-                            for (int i = 1; i < row.Cells.Count; i++)
-                                primaryKeys.Add($"{row.Cells[i].Text.ToString()}");
+                            // add audit log
+                            util.addAuditLog(user.currUserId, user.currUserId, $"Admin deleted record with id = {String.Join(", ", primaryKeys.ToArray())} from {selectedTable}");
                         }
                         else
-                            primaryKeys.Add($"{row.Cells[1].Text.ToString()}");
+                            deleteUnsuccessfulPanel.Style.Add("display", "inline-block"); // show delete failure
 
-                        // add audit log
-                        util.addAuditLog(user.currUserId, user.currUserId, $"Admin deleted record with id = {String.Join(", ", primaryKeys.ToArray())} from {selectedTable}");
+                        // rebind gridview based on whether search string is present and valid
+                        if (searchString == null || util.isNullOrEmpty(searchString))
+                        {
+                            TableData = null; // null TableData reloads gridview from db
+                            bindGridview();
+                        }
+                        else
+                            searchForData(searchString); // reloads data from db based on search string
                     }
-                        
-                    else
-                        deleteUnsuccessfulPanel.Style.Add("display", "inline-block"); // show delete failure
-
-                    // rebind gridview based on whether search string is present and valid
-                    if (searchString == null || util.isNullOrEmpty(searchString))
-                    {
-                        TableData = null; // null TableData reloads gridview from db
-                        bindGridview();
-                    }
-                    else
-                        searchForData(searchString); // reloads data from db based on search string
-
                 }
             }
 
@@ -506,6 +490,9 @@ namespace HR_LEAVEv2.Admin
 
             editSuccessfulPanel.Style.Add("display", "none");
             editUnsuccessfulPanel.Style.Add("display", "none");
+
+            noSubstantiveRecordPanel.Style.Add("display", "none");
+            actingStartDateBeforeSubPanel.Style.Add("display", "none");
         }
 
         protected void clearValidationErrors()
@@ -580,6 +567,8 @@ namespace HR_LEAVEv2.Admin
         protected Boolean isRecordActive(DateTime proposedStartDate, DateTime proposedEndDate)
         {
             // returns a Boolean which represents whether the proposed actual end date passed will make a record active or inactive. The date passed is assumed to be validated
+            if (proposedStartDate == DateTime.MinValue)
+                return false;
 
             // check if start date of record is a day in the future, meaning the record is currently inactive
             if (DateTime.Compare(proposedStartDate, util.getCurrentDate()) > 0)
@@ -593,14 +582,14 @@ namespace HR_LEAVEv2.Admin
                 return (DateTime.Compare(util.getCurrentDate(), proposedEndDate) < 0);
         }
 
-        protected Boolean isRecordValid(string employeeId, string id, DateTime proposedSD, DateTime proposedAED)
+        protected Boolean isRecordValid(string employeeId, string id, string proposedRecordType, DateTime proposedSD, DateTime proposedAED)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing employment position records. 
             // This method checks the other records to see if any other active records exist in order to validate the record. 
 
             if (TableData != null)
             {
-                int numActiveRows = 0;
+                int numActiveRows = 0, numActiveSubsRecords = 0;
 
                 // state of proposed record
                 bool isProposedRecordActive = isRecordActive(proposedSD, proposedAED);
@@ -608,12 +597,17 @@ namespace HR_LEAVEv2.Admin
                 // check all rows in employeeposition except the row with the id passed as a parameter to this method
                 foreach (DataRow dr in TableData.Rows)
                 {
-                    if (dr.ItemArray[(int)empPositionColumns.employee_id].ToString() == employeeId && dr.ItemArray[(int)empPositionColumns.record_id].ToString() != id)
+                    DateTime tableDataRowStartDate = util.getDateFromDataRow(dr, "start_date");
+
+                    DateTime tableDataRowEndDate = util.getDateFromDataRow(dr, "actual_end_date");
+
+                    string isTableDataRowSubstantiveOrActing = dr.Field<Boolean>("is_substantive_or_acting") ? "Substantive" : "Acting";
+
+                    if (isTableDataRowSubstantiveOrActing == "Substantive" && isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
+                        numActiveSubsRecords++;
+
+                    if (dr.Field<string>("employee_id") == employeeId && dr.Field<int>("id").ToString() != id && isTableDataRowSubstantiveOrActing == proposedRecordType)
                     {
-                        DateTime tableDataRowStartDate = Convert.ToDateTime(dr[(int)empPositionColumns.start_date]);
-
-                        DateTime tableDataRowEndDate = !util.isNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? Convert.ToDateTime(dr[(int)empPositionColumns.actual_end_date]) : DateTime.MinValue;
-
                         // check if current record being evaluated is active
                         if (isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
                             numActiveRows++;
@@ -662,8 +656,7 @@ namespace HR_LEAVEv2.Admin
                             // proposed actual end date is empty - proposed record is active
                             else
                             {
-                                if (multipleActiveRecordsPanel != null)
-                                    multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                                multipleActiveRecordsPanel.Style.Add("display", "inline-block");
                                 return false; // proposed record is invalid since record already exists that is active and proposed record is active
                             }
 
@@ -676,13 +669,38 @@ namespace HR_LEAVEv2.Admin
 
                         }
                     }
+                    else if (isTableDataRowSubstantiveOrActing != proposedRecordType)
+                    {
 
+                        // check that start date of acting record is not before start date of current active substantive record
+                        if (proposedRecordType == "Acting" && isRecordActive(tableDataRowStartDate, tableDataRowEndDate) && DateTime.Compare(proposedSD, tableDataRowStartDate) < 0)
+                        {
+                            actingStartDateBeforeSubPanel.Style.Add("display", "inline-block");
+                            return false;
+                        }
+
+                        // check that subst cannot become inactive when there is an active acting record
+                        if (proposedRecordType == "Substantive" && !isRecordActive(proposedSD, proposedAED) && isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
+                        {
+                            noSubstantiveRecordPanel.Style.Add("display", "inline-block");
+                            return false;
+                        }
+
+
+                    }
                 }
                 if (isProposedRecordActive)
                     numActiveRows++;
 
                 if (numActiveRows <= 1)
+                {
+                    if (numActiveSubsRecords == 0 && proposedRecordType == "Acting")
+                    {
+                        noSubstantiveRecordPanel.Style.Add("display", "inline-block");
+                        return false;
+                    }
                     return true;
+                }
                 else if (numActiveRows > 1)
                     multipleActiveRecordsPanel.Style.Add("display", "inline-block");
             }
@@ -827,7 +845,8 @@ namespace HR_LEAVEv2.Admin
             // both start date and actual end date will already be validated in the proper form of d/MM/yyyy
             if (selectedTable == "employeeposition")
             {
-                isNewRecordValid = isRecordValid(data["employee_id"], "-1", DateTime.ParseExact(data["start_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(data["actual_end_date"]) ? DateTime.ParseExact(data["actual_end_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue);
+                string isSubstantiveOrActing = data["is_substantive_or_acting"].ToString().ToLower() == "true" ? "Substantive" : "Acting";
+                isNewRecordValid = isRecordValid(data["employee_id"], "-1", isSubstantiveOrActing, DateTime.ParseExact(data["start_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(data["actual_end_date"]) ? DateTime.ParseExact(data["actual_end_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue);
                 isAnnualAndMaxVacationAmtValid = Convert.ToInt32(data["annual_vacation_amt"]) < Convert.ToInt32(data["max_vacation_accumulation"]);
                 if (!isAnnualAndMaxVacationAmtValid)
                     invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
@@ -957,12 +976,13 @@ namespace HR_LEAVEv2.Admin
                     (isActualEndDateChanged && actualEndDate != DateTime.MinValue && DateTime.Compare(util.getCurrentDateToday(), actualEndDate) < 0)
                 )
                 {
+                    // once actual end date is populated then use actual end date regardless of if expected end date was changed
                     if (!(isExpectedEndDateChanged && actualEndDate != DateTime.MinValue))
                         data["has_received_notif_about_end_of_contract"] = "False";
                 }
-                    
 
-                isEditedRecordValid = isRecordValid(data["employee_id"], dataBeforeEdit["id"], DateTime.ParseExact(data["start_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(data["actual_end_date"]) ? DateTime.ParseExact(data["actual_end_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue);
+                string isSubstantiveOrActing = data["is_substantive_or_acting"].ToString().ToLower() == "true" ? "Substantive" : "Acting";
+                isEditedRecordValid = isRecordValid(data["employee_id"], dataBeforeEdit["id"], isSubstantiveOrActing, DateTime.ParseExact(data["start_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(data["actual_end_date"]) ? DateTime.ParseExact(data["actual_end_date"], "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue);
                 isAnnualAndMaxVacationAmtValid = Convert.ToInt32(data["annual_vacation_amt"]) < Convert.ToInt32(data["max_vacation_accumulation"]);
                 if (!isAnnualAndMaxVacationAmtValid)
                     invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
