@@ -317,7 +317,7 @@ namespace HR_LEAVEv2.HR
                     {
                         foreach (DataRow row in dt.Rows)
                         {
-                            if (row.ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
+                            if (row.Field<string>("isChanged") != "1")
                                 isTableEmpty = false;
                         }
                     }
@@ -419,7 +419,7 @@ namespace HR_LEAVEv2.HR
                 maxAmtOfLeaveTxt.Text = empRecordGridView.Rows[indexInGridview].Cells[GetColumnIndexByName(empRecordGridView.Rows[indexInGridview], "max_vacation_accumulation")].Text.ToString();
 
                 // Substantive or Acting
-                subsOrActingRadioBtnList.SelectedIndex = empRecordsDataSource.Rows[indexInDt].ItemArray[Convert.ToInt32(emp_records_columns.is_substantive_or_acting)].ToString() == "Substantive" ? 0 : 1;
+                subsOrActingRadioBtnList.SelectedIndex = empRecordsDataSource.Rows[indexInDt].Field<string>("is_substantive_or_acting") == "Substantive" ? 0 : 1;
 
                 // highlight row being edited
                 empRecordGridView.Rows[indexInGridview].CssClass = "highlighted-record";
@@ -435,12 +435,12 @@ namespace HR_LEAVEv2.HR
                 {
                     Boolean canDeleteRow = true;
                     // sets isChanged to 1
-                    if (dt.Rows[indexInDt].ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive" && dt.Rows[indexInDt].ItemArray[(int)emp_records_columns.status].ToString() == "Active")
+                    if (dt.Rows[indexInDt].Field<string>("is_substantive_or_acting") == "Substantive" && dt.Rows[indexInDt].Field<string>("status") == "Active")
                     {
                         // check if there are any active acting records
                         for (int i = 0; i < dt.Rows.Count; i++)
                         {
-                            if (i != indexInDt && dt.Rows[i].ItemArray[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Acting" && dt.Rows[i].ItemArray[(int)emp_records_columns.status].ToString() == "Active" && dt.Rows[i].ItemArray[(int)emp_records_columns.isChanged].ToString() != "1")
+                            if (i != indexInDt && dt.Rows[i].Field<string>("is_substantive_or_acting") == "Acting" && dt.Rows[i].Field<string>("status") == "Active" && dt.Rows[i].Field<string>("isChanged") != "1")
                             {
                                 canDeleteRow = false;
                                 ScriptManager.RegisterStartupScript(Page, Page.GetType(), "none", "alert('Record not deleted since employee must have at least one (1) active substantive employment record with their acting record');", true);
@@ -450,13 +450,13 @@ namespace HR_LEAVEv2.HR
                     }
                     if (canDeleteRow)
                     {
-                        dt.Rows[indexInDt].SetField((int)emp_records_columns.isChanged, "1");
+                        dt.Rows[indexInDt].SetField("isChanged", "1");
 
                         empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
                         if (empRecordAssociatedWithAccumulation != null)
                         {
                             accPastLimitContainerPanel.Visible = true;
-                            chkOnOff.Checked = empRecordAssociatedWithAccumulation.ItemArray[(int)emp_records_columns.can_accumulate_past_max].ToString() == "True";
+                            chkOnOff.Checked = empRecordAssociatedWithAccumulation.Field<string>("can_accumulate_past_max") == "True";
                             resetFiles();
                             //loadPreviouslyUploadedFiles(Request.QueryString["empId"].ToString());
                         }
@@ -844,7 +844,7 @@ namespace HR_LEAVEv2.HR
                     dt.Rows.Add(newRecord);
 
                     // set previously active record to not accumulate
-                    if (empRecordAssociatedWithAccumulation != null)
+                    if (empRecordAssociatedWithAccumulation != null && getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt) != -1)
                         dt.Rows[getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt)].SetField("can_accumulate_past_max", "False");
 
                     // get new active record
@@ -901,44 +901,44 @@ namespace HR_LEAVEv2.HR
 
                 Boolean isRecordAssociatedWithAccumulation = areRowsEqual(dt.Rows[indexInDt], empRecordAssociatedWithAccumulation);
 
-                string startDate = Convert.ToDateTime(dt.Rows[indexInDt][(int)emp_records_columns.start_date]).ToString("d/MM/yyyy");
+                string startDate = util.getDateFromDataRow(dt.Rows[indexInDt], "start_date").ToString("d/MM/yyyy");
                 DateTime end = validateActualEndDate(startDate, txtEmpRecordEndDate.Text, invalidEndDatePanel, actualEndDateIsWeekendPanel, endDateBeforeStartDatePanel, emptyEndDatePanel);
                 if (end != DateTime.MinValue)
                 {
                     // edit datatable and rebind gridview
 
-                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end, dt.Rows[indexInDt][(int)emp_records_columns.is_substantive_or_acting].ToString(), indexInDt, multipleActiveRecordsEndRecordPanel, employmentRecordClashPanel, noSubstantiveRecordEndRecordPanel, null))
+                    if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end, dt.Rows[indexInDt].Field<string>("is_substantive_or_acting"), indexInDt, multipleActiveRecordsEndRecordPanel, employmentRecordClashPanel, noSubstantiveRecordEndRecordPanel, null))
                     {
                         // set record to be edited
-                        dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.isChanged, "2");
+                        dt.Rows[indexInDt].SetField<string>("isChanged", "2");
 
                         // set actual end date
-                        dt.Rows[indexInDt].SetField<string>((int)emp_records_columns.actual_end_date, end.ToString("d/MM/yyyy"));
+                        dt.Rows[indexInDt].SetField<string>("actual_end_date", end.ToString("d/MM/yyyy"));
 
                         // change status 
                         if (isRecordActive(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), end))
                         {
-                            dt.Rows[indexInDt][(int)emp_records_columns.status] = "Active";
-                            dt.Rows[indexInDt][(int)emp_records_columns.status_class] = "label-success";
+                            dt.Rows[indexInDt].SetField<string>("status", "Active");
+                            dt.Rows[indexInDt].SetField<string>("status_class", "label-success");
 
                         }
                         else
                         {
-                            dt.Rows[indexInDt][(int)emp_records_columns.status] = "Inactive";
-                            dt.Rows[indexInDt][(int)emp_records_columns.status_class] = "label-danger";
+                            dt.Rows[indexInDt].SetField<string>("status", "Inactive");
+                            dt.Rows[indexInDt].SetField<string>("status_class", "label-danger");
                         }
 
                         // check if active record associated with accumulation is inactive and set can accumulate past limit to false
-                        if (isRecordAssociatedWithAccumulation && dt.Rows[indexInDt][(int)emp_records_columns.status].ToString() == "Inactive")
+                        if (isRecordAssociatedWithAccumulation && dt.Rows[indexInDt].Field<string>("status") == "Inactive")
                         {
-                            dt.Rows[indexInDt][(int)emp_records_columns.can_accumulate_past_max] = "False";
+                            dt.Rows[indexInDt].SetField<string>("can_accumulate_past_max", "False"); 
                             empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
 
                             int nextActiveRecord = getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt);
                             if (nextActiveRecord != -1)
                             {
                                 accPastLimitContainerPanel.Visible = true;
-                                chkOnOff.Checked = fileUploadPanel.Visible = dt.Rows[nextActiveRecord][(int)emp_records_columns.can_accumulate_past_max].ToString() == "True";
+                                chkOnOff.Checked = fileUploadPanel.Visible = dt.Rows[nextActiveRecord].Field<string>("can_accumulate_past_max") == "True";
                                 resetFiles();
                             }
                             else
@@ -1020,105 +1020,110 @@ namespace HR_LEAVEv2.HR
                 DataTable dt = empRecordsDataSource;
                 foreach (DataRow dr in dt.Rows)
                 {
-                    if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && dr[(int)emp_records_columns.status].ToString() == "Active" && dr[(int)emp_records_columns.is_substantive_or_acting].ToString() == "Substantive")
+                    if(currIndex != index)
+                    {
+                        if (dr.Field<string>("isChanged") != "1" && dr.Field<string>("status") == "Active" && dr.Field<string>("is_substantive_or_acting") == "Substantive")
                             numActiveSubsRecords++;
-                   
-                    // once the record is not deleted and is not the record currently being edited (the record to which the proposed end date will belong to)
-                    if (dr[(int)emp_records_columns.isChanged].ToString() != "1" && currIndex != index && dr[(int)emp_records_columns.is_substantive_or_acting].ToString() == proposedRecordType)
-                    {
-                        
-                        if (dr[(int)emp_records_columns.status].ToString() == "Active")
-                        {
-                            numActiveRows++;
-                        }
 
-                        DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
-
-                        DateTime dtRowEndDate = !util.isNullOrEmpty(dr[(int)emp_records_columns.actual_end_date].ToString()) ? DateTime.ParseExact(dr[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
-
-                        // ensure that record does not overlap with another record
-                        bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
-
-
-                        // if record being checked has an end date
-                        if (dtRowEndDate != DateTime.MinValue)
+                        // once the record is not deleted and is not the record currently being edited (the record to which the proposed end date will belong to)
+                        if (dr.Field<string>("isChanged") != "1" && dr.Field<string>("is_substantive_or_acting") == proposedRecordType)
                         {
 
-                            bool isRowStartDateInProposedPeriod = false, isRowEndDateinProposedPeriod = false;
-                            // proposed actual end date is not empty
-                            if (proposedAED != DateTime.MinValue)
+                            if (dr.Field<string>("status") == "Active")
                             {
-                                // check if period represented by proposed start date to proposed end date coincides with the given data row's period
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowStartDate) >= 0 && DateTime.Compare(proposedSD, dtRowEndDate) <= 0;
-                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, dtRowStartDate) >= 0 && DateTime.Compare(proposedAED, dtRowEndDate) <= 0;
+                                numActiveRows++;
+                            }
 
-                                isRowStartDateInProposedPeriod = DateTime.Compare(dtRowStartDate, proposedSD) >= 0 && DateTime.Compare(dtRowStartDate, proposedAED) <= 0;
-                                isRowEndDateinProposedPeriod = DateTime.Compare(dtRowEndDate, proposedSD) >= 0 && DateTime.Compare(dtRowEndDate, proposedAED) <= 0;
+                            DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
+
+                            DateTime dtRowEndDate = !util.isNullOrEmpty(dr[(int)emp_records_columns.actual_end_date].ToString()) ? DateTime.ParseExact(dr[(int)emp_records_columns.actual_end_date].ToString(), "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue;
+
+                            // ensure that record does not overlap with another record
+                            bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
+
+
+                            // if record being checked has an end date
+                            if (dtRowEndDate != DateTime.MinValue)
+                            {
+
+                                bool isRowStartDateInProposedPeriod = false, isRowEndDateinProposedPeriod = false;
+                                // proposed actual end date is not empty
+                                if (proposedAED != DateTime.MinValue)
+                                {
+                                    // check if period represented by proposed start date to proposed end date coincides with the given data row's period
+                                    isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowStartDate) >= 0 && DateTime.Compare(proposedSD, dtRowEndDate) <= 0;
+                                    isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, dtRowStartDate) >= 0 && DateTime.Compare(proposedAED, dtRowEndDate) <= 0;
+
+                                    isRowStartDateInProposedPeriod = DateTime.Compare(dtRowStartDate, proposedSD) >= 0 && DateTime.Compare(dtRowStartDate, proposedAED) <= 0;
+                                    isRowEndDateinProposedPeriod = DateTime.Compare(dtRowEndDate, proposedSD) >= 0 && DateTime.Compare(dtRowEndDate, proposedAED) <= 0;
+
+                                }
+                                // proposed actual end date is empty- proposed record is active
+                                else
+                                {
+                                    isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowEndDate) <= 0 || DateTime.Compare(proposedSD, dtRowStartDate) <= 0;
+                                }
+
+                                if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
+                                {
+                                    if (clashingRecords != null)
+                                        clashingRecords.Style.Add("display", "inline-block");
+                                    return false;
+                                }
 
                             }
-                            // proposed actual end date is empty- proposed record is active
+                            // if record being checked is active
                             else
                             {
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowEndDate) <= 0 || DateTime.Compare(proposedSD, dtRowStartDate) <= 0;
+                                // proposed actual end date is not empty
+                                if (proposedAED != DateTime.MinValue)
+                                {
+                                    // check if period represented by proposed start date is in active record's period
+                                    isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowStartDate) >= 0;
+                                    isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, dtRowStartDate) >= 0;
+                                }
+                                // proposed actual end date is empty - proposed record is active
+                                else
+                                {
+                                    if (multipleActiveRecordsPanel != null)
+                                        multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                                    return false; // proposed record is invalid since record already exists that is active and proposed record is active
+                                }
+
+
+                                if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
+                                {
+                                    if (clashingRecords != null)
+                                        clashingRecords.Style.Add("display", "inline-block");
+                                    return false;
+                                }
+
                             }
 
-                            if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
+                        }
+                        else if (dr.Field<string>("is_substantive_or_acting") != proposedRecordType && dr.Field<string>("isChanged") != "1")
+                        {
+                            DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
+
+                            // check that start date of acting record is not before start date of current active substantive record
+                            if (proposedRecordType == "Acting" && dr.Field<string>("status") == "Active" && DateTime.Compare(proposedSD, dtRowStartDate) < 0)
                             {
-                                if (clashingRecords != null)
-                                    clashingRecords.Style.Add("display", "inline-block");
+                                if (actingStartDateBeforeSub != null)
+                                    actingStartDateBeforeSub.Style.Add("display", "inline-block");
+                                return false;
+                            }
+
+                            // check that subst cannot become inactive when there is an active acting record
+                            if (proposedRecordType == "Substantive" && !isProposedRecordActive && dr.Field<string>("status") == "Active")
+                            {
+                                if (noSubsRecord != null)
+                                    noSubsRecord.Style.Add("display", "inline-block");
                                 return false;
                             }
 
                         }
-                        // if record being checked is active
-                        else
-                        {
-                            // proposed actual end date is not empty
-                            if (proposedAED != DateTime.MinValue)
-                            {
-                                // check if period represented by proposed start date is in active record's period
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, dtRowStartDate) >= 0;
-                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, dtRowStartDate) >= 0;
-                            }
-                            // proposed actual end date is empty - proposed record is active
-                            else
-                            {
-                                if (multipleActiveRecordsPanel != null)
-                                    multipleActiveRecordsPanel.Style.Add("display", "inline-block");
-                                return false; // proposed record is invalid since record already exists that is active and proposed record is active
-                            }
-
-
-                            if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
-                            {
-                                if (clashingRecords != null)
-                                    clashingRecords.Style.Add("display", "inline-block");
-                                return false;
-                            }
-
-                        }
-
-                    } else if (dr[(int)emp_records_columns.is_substantive_or_acting].ToString() != proposedRecordType && dr[(int)emp_records_columns.isChanged].ToString() != "1")
-                    {
-                        DateTime dtRowStartDate = (DateTime)dr[(int)emp_records_columns.start_date];
-
-                        // check that start date of acting record is not before start date of current active substantive record
-                        if (proposedRecordType == "Acting" && dr[(int)emp_records_columns.status].ToString() == "Active" && DateTime.Compare(proposedSD, dtRowStartDate) < 0)
-                        {
-                            if (actingStartDateBeforeSub != null)
-                                actingStartDateBeforeSub.Style.Add("display", "inline-block");
-                            return false;
-                        }
-
-                        // check that subst cannot become inactive when there is an active acting record
-                        if(proposedRecordType == "Substantive" && !isProposedRecordActive && dr[(int)emp_records_columns.status].ToString() == "Active")
-                        {
-                            if (noSubsRecord != null)
-                                noSubsRecord.Style.Add("display", "inline-block");
-                            return false;
-                        }
-                       
                     }
+                    
                     currIndex++;
                 }
                 if (isProposedRecordActive)
@@ -1187,13 +1192,13 @@ namespace HR_LEAVEv2.HR
                         // check if any values are changed and edit relevant values in datatable
                         Boolean isPositionChanged = dt.Rows[index].ItemArray[(int)emp_records_columns.pos_id].ToString() != position_id,
                             isDeptChanged = dt.Rows[index].ItemArray[(int)emp_records_columns.dept_id].ToString() != dept_id,
-                            isEmpTypeChanged = dt.Rows[index].ItemArray[(int)emp_records_columns.employment_type].ToString() != emp_type,
+                            isEmpTypeChanged = dt.Rows[index].Field<string>("employment_type") != emp_type,
                             isStartDateChanged = Convert.ToDateTime(dt.Rows[index].ItemArray[(int)emp_records_columns.start_date]).ToString("d/MM/yyyy") != startDate,
                             isExpectedEndDateChanged = Convert.ToDateTime(dt.Rows[index].ItemArray[(int)emp_records_columns.expected_end_date]).ToString("d/MM/yyyy") != expectedEndDate,
                             isActualEndDateChanged = dt.Rows[index][(int)emp_records_columns.actual_end_date].ToString() != actualEndDate,
                             isAnnualVacationAmtChanged = Convert.ToInt32(dt.Rows[index][(int)emp_records_columns.annual_vacation_amt]) != Convert.ToInt32(annual_vacation_amt),
                             isMaxAmtOfVacationAccChanged = Convert.ToInt32(dt.Rows[index][(int)emp_records_columns.max_vacation_accumulation]) != Convert.ToInt32(max_amt_of_vacation_accumulation),
-                            isSubstantiveOrActingChanged = dt.Rows[index][(int)emp_records_columns.is_substantive_or_acting].ToString() != is_substantive_or_acting,
+                            isSubstantiveOrActingChanged = dt.Rows[index].Field<string>("is_substantive_or_acting") != is_substantive_or_acting,
                             isEditedRecordValid = true;
 
                         if (isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isActualEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged || isSubstantiveOrActingChanged)
@@ -1204,18 +1209,18 @@ namespace HR_LEAVEv2.HR
                                 if (isPositionChanged)
                                 {
                                     dt.Rows[index][(int)emp_records_columns.pos_id] = position_id;
-                                    dt.Rows[index][(int)emp_records_columns.pos_name] = position_name;
+                                    dt.Rows[index].SetField<string>("pos_name", position_name);
                                     editsMade.Add("Position");
                                 }
                                 if (isDeptChanged)
                                 {
                                     dt.Rows[index][(int)emp_records_columns.dept_id] = dept_id;
-                                    dt.Rows[index][(int)emp_records_columns.dept_name] = dept_name;
+                                    dt.Rows[index].SetField<string>("dept_name", dept_name);
                                     editsMade.Add("Department");
                                 }
                                 if (isEmpTypeChanged)
                                 {
-                                    dt.Rows[index][(int)emp_records_columns.employment_type] = emp_type;
+                                    dt.Rows[index].SetField<string>("employment_type", emp_type);
                                     editsMade.Add("Employment Type");
                                 }
 
@@ -1229,13 +1234,13 @@ namespace HR_LEAVEv2.HR
 
                                         if (isRecordActive(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(actualEndDate) ? DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue))
                                         {
-                                            dt.Rows[index][(int)emp_records_columns.status] = "Active";
-                                            dt.Rows[index][(int)emp_records_columns.status_class] = "label-success";
+                                            dt.Rows[index].SetField<string>("status", "Active");
+                                            dt.Rows[index].SetField<string>("status_class", "label-success"); 
                                         }
                                         else
                                         {
-                                            dt.Rows[index][(int)emp_records_columns.status] = "Inactive";
-                                            dt.Rows[index][(int)emp_records_columns.status_class] = "label-danger";
+                                            dt.Rows[index].SetField<string>("status", "Inactive");
+                                            dt.Rows[index].SetField<string>("status_class", "label-danger");
                                         }
                                     }
                                     else
@@ -1271,13 +1276,13 @@ namespace HR_LEAVEv2.HR
 
                                         if (isRecordActive(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(actualEndDate) ? DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue))
                                         {
-                                            dt.Rows[index][(int)emp_records_columns.status] = "Active";
-                                            dt.Rows[index][(int)emp_records_columns.status_class] = "label-success";
+                                            dt.Rows[index].SetField<string>("status", "Active");
+                                            dt.Rows[index].SetField<string>("status_class", "label-success");
                                         }
                                         else
                                         {
-                                            dt.Rows[index][(int)emp_records_columns.status] = "Inactive";
-                                            dt.Rows[index][(int)emp_records_columns.status_class] = "label-danger";
+                                            dt.Rows[index].SetField<string>("status", "Inactive");
+                                            dt.Rows[index].SetField<string>("status_class", "label-danger");
                                         }
                                     }
 
@@ -1299,7 +1304,7 @@ namespace HR_LEAVEv2.HR
                                 {
                                     if (isRecordValid(DateTime.ParseExact(startDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture), !util.isNullOrEmpty(actualEndDate) ? DateTime.ParseExact(actualEndDate, "d/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture) : DateTime.MinValue, is_substantive_or_acting, index, multipleActiveRecordsEditRecordPanel, employmentRecordClashPanel, noSubstantiveRecordEditRecordPanel, actingStartDateBeforeSubEdit))
                                     {
-                                        dt.Rows[index][(int)emp_records_columns.is_substantive_or_acting] = is_substantive_or_acting;
+                                        dt.Rows[index].SetField<string>("is_substantive_or_acting", is_substantive_or_acting);
                                         editsMade.Add("Is Substantive or Acting");
                                     }
                                     else
@@ -1308,21 +1313,21 @@ namespace HR_LEAVEv2.HR
 
                                 if (isEditedRecordValid && (isActualEndDateChanged || isPositionChanged || isDeptChanged || isEmpTypeChanged || isStartDateChanged || isExpectedEndDateChanged || isAnnualVacationAmtChanged || isMaxAmtOfVacationAccChanged || isSubstantiveOrActingChanged))
                                 {
-                                    dt.Rows[index].SetField<string>((int)emp_records_columns.isChanged, "2");
+                                    dt.Rows[index].SetField<string>("isChanged", "2");
 
-                                    if (isRecordAssociatedWithAccumulation || (empRecordAssociatedWithAccumulation == null && dt.Rows[index][(int)emp_records_columns.status].ToString() == "Active"))
+                                    if (isRecordAssociatedWithAccumulation || (empRecordAssociatedWithAccumulation == null && dt.Rows[index].Field<string>("status") == "Active"))
                                     {
                                         // check if active record associated with accumulation is inactive and set can accumulate past limit to false
-                                        if (dt.Rows[index][(int)emp_records_columns.status].ToString() == "Inactive")
+                                        if (dt.Rows[index].Field<string>("status") == "Inactive")
                                         {
-                                            dt.Rows[index][(int)emp_records_columns.can_accumulate_past_max] = "False";
+                                            dt.Rows[index].SetField<string>("can_accumulate_past_max", "False");
                                             empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
 
                                             int nextActiveRecord = getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt);
                                             if (nextActiveRecord != -1)
                                             {
                                                 accPastLimitContainerPanel.Visible = true;
-                                                chkOnOff.Checked = fileUploadPanel.Visible = dt.Rows[nextActiveRecord][(int)emp_records_columns.can_accumulate_past_max].ToString() == "True";
+                                                chkOnOff.Checked = fileUploadPanel.Visible = dt.Rows[nextActiveRecord].Field<string>("can_accumulate_past_max") == "True";
                                                 resetFiles();
                                             }
                                             else
@@ -1332,7 +1337,7 @@ namespace HR_LEAVEv2.HR
                                         else
                                         {
                                             accPastLimitContainerPanel.Visible = true;
-                                            chkOnOff.Checked = fileUploadPanel.Visible = dt.Rows[index][(int)emp_records_columns.can_accumulate_past_max].ToString() == "True";
+                                            chkOnOff.Checked = fileUploadPanel.Visible = dt.Rows[index].Field<string>("can_accumulate_past_max") == "True";
                                             resetFiles();
                                         }
                                     }

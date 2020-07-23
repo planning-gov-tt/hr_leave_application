@@ -724,7 +724,7 @@
                                 <asp:Panel ID="actingStartDateBeforeSubEdit" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>
-                                        Record not edited since this would result in the substantive record's start date being later than the acting record's start date
+                                        Record not edited since this would result in the active substantive record's start date being later than the acting record's start date
                                     </span>
                                 </asp:Panel>
                                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORD VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
