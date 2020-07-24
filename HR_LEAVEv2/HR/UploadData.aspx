@@ -113,6 +113,16 @@
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="actualEndDateIsWeekendTxt" runat="server">Actual end date is on the weekend</span>
                 </asp:Panel>
+
+                <asp:Panel ID="noSubstantiveRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="noSubstantiveRecordTxt" runat="server">Record not inserted since employee must have at least one (1) active substantive employment record in order to have active acting records</span>
+                </asp:Panel>
+                                
+                <asp:Panel ID="actingStartDateBeforeSubPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="actingStartDateBeforeSubTxt" runat="server">Record not inserted since the start date of the acting record is before the start date of the active substantive record</span>
+                </asp:Panel>
                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
                 

@@ -310,6 +310,42 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl actualEndDateIsWeekendTxt;
         
         /// <summary>
+        /// noSubstantiveRecordPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noSubstantiveRecordPanel;
+        
+        /// <summary>
+        /// noSubstantiveRecordTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl noSubstantiveRecordTxt;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel actingStartDateBeforeSubPanel;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl actingStartDateBeforeSubTxt;
+        
+        /// <summary>
         /// nullableErrorPanel control.
         /// </summary>
         /// <remarks>

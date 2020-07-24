@@ -992,6 +992,9 @@ namespace HR_LEAVEv2.HR
         {
             // returns a Boolean which represents whether the proposed actual end date passed will make a record active or inactive. The date passed is assumed to be validated
 
+            if (proposedStartDate == DateTime.MinValue)
+                return false;
+
             // check if start date of record is a day in the future, meaning the record is currently inactive
             if (DateTime.Compare(proposedStartDate, util.getCurrentDate()) > 0)
                 return false;
@@ -1008,10 +1011,12 @@ namespace HR_LEAVEv2.HR
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing records. This method checks the other records to see if
             // any other active records exist in order to validate the record.
+            if (proposedSD == DateTime.MinValue)
+                return false;
 
             if (empRecordsDataSource != null)
             {
-                int numActiveRows = 0, currIndex = 0, numActiveSubsRecords = 0; ;
+                int numActiveRows = 0, currIndex = 0, numActiveSubsRecords = 0; 
 
                 // state of passed end date and corresponding record
                 bool isProposedRecordActive = isRecordActive(proposedSD, proposedAED);

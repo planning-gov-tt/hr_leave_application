@@ -591,6 +591,9 @@ namespace HR_LEAVEv2.Admin
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing employment position records. 
             // This method checks the other records to see if any other active records exist in order to validate the record. 
 
+            if (proposedSD == DateTime.MinValue)
+                return false;
+
             if (TableData != null)
             {
                 int numActiveRows = 0, numActiveSubsRecords = 0;

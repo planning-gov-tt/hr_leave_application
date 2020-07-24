@@ -83,6 +83,8 @@ namespace HR_LEAVEv2.HR
 
             multipleActiveRecordsPanel.Style.Add("display", "none");
             clashingRecordsPanel.Style.Add("display", "none");
+            noSubstantiveRecordPanel.Style.Add("display", "none");
+            actingStartDateBeforeSubPanel.Style.Add("display", "none");
 
             wrongTablePanel.Style.Add("display", "none");
             invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "none");
@@ -216,6 +218,9 @@ namespace HR_LEAVEv2.HR
         {
             // returns a Boolean which represents whether the proposed actual end date passed will make a record active or inactive. The date passed is assumed to be validated
 
+            if (proposedStartDate == DateTime.MinValue)
+                return false;
+
             // check if start date of record is a day in the future, meaning the record is currently inactive
             if (DateTime.Compare(proposedStartDate, util.getCurrentDate()) > 0)
                 return false;
@@ -228,14 +233,17 @@ namespace HR_LEAVEv2.HR
                 return (DateTime.Compare(util.getCurrentDate(), proposedEndDate) < 0);      
         }
 
-        protected Boolean isRecordValid(DataTable TableData, string employeeId, string id, DateTime proposedSD, DateTime proposedAED, string row)
+        protected Boolean isRecordValid(DataTable TableData, string employeeId, string id, string proposedRecordType ,DateTime proposedSD, DateTime proposedAED, string row)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing employment position records. 
             // This method checks the other records to see if any other active records exist in order to validate the record. 
 
+            if (proposedSD == DateTime.MinValue)
+                return false;
+
             if (TableData != null)
             {
-                int numActiveRows = 0;
+                int numActiveRows = 0, numActiveSubsRecords = 0;
 
                 // state of proposed record
                 bool isProposedRecordActive = isRecordActive(proposedSD, proposedAED);
@@ -244,75 +252,101 @@ namespace HR_LEAVEv2.HR
                 // check all rows in employeeposition except the row with the id passed as a parameter to this method
                 foreach (DataRow dr in TableData.Rows)
                 {
-                    if (dr.ItemArray[(int)empPositionColumns.employee_id].ToString() == employeeId && dr.ItemArray[(int)empPositionColumns.record_id].ToString() != id)
+                    if (dr.Field<string>("employee_id") == employeeId && dr.Field<int>("id").ToString() != id)
                     {
-                        // record being checked is active
-                        // must convert start date and actual end date (once not empty) to correct format before passing to isRecordActive
-                        DateTime tableDataRowStartDate = Convert.ToDateTime(dr[(int)empPositionColumns.start_date]);
+                        DateTime tableDataRowStartDate = util.getDateFromDataRow(dr, "start_date");
 
-                        DateTime tableDataRowEndDate = !util.isNullOrEmpty(dr[(int)empPositionColumns.actual_end_date].ToString()) ? Convert.ToDateTime(dr[(int)empPositionColumns.actual_end_date]) : DateTime.MinValue;
+                        DateTime tableDataRowEndDate = util.getDateFromDataRow(dr, "actual_end_date");
 
-                        // check if current record being evaluated is active
-                        if (isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
-                            numActiveRows++;
+                        string isTableDataRowSubstantiveOrActing = dr.Field<Boolean>("is_substantive_or_acting") ? "Substantive" : "Acting";
 
-                        // ensure that record does not overlap with another record
-                        bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
+                        // check how much substantive records available and do not account for the record being proposed if it is acting 
+                        if (isTableDataRowSubstantiveOrActing == "Substantive" && isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
+                            numActiveSubsRecords++;
 
-
-                        // if record from employeeposition being checked has an end date
-                        if (tableDataRowEndDate != DateTime.MinValue)
+                        if (isTableDataRowSubstantiveOrActing == proposedRecordType)
                         {
+                            // check if current record being evaluated is active
+                            if (isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
+                                numActiveRows++;
 
-                            bool isRowStartDateInProposedPeriod = false, isRowEndDateinProposedPeriod = false;
-                            // proposed actual end date is not empty
-                            if (proposedAED != DateTime.MinValue)
+                            // ensure that record does not overlap with another record
+                            bool isProposedStartDateInRowPeriod = false, isProposedEndDateInRowPeriod = false;
+
+                            // if record from employeeposition being checked has an end date
+                            if (tableDataRowEndDate != DateTime.MinValue)
                             {
-                                // check if period represented by proposed start date to proposed end date coincides with the given data row's period
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowStartDate) >= 0 && DateTime.Compare(proposedSD, tableDataRowEndDate) <= 0;
-                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, tableDataRowStartDate) >= 0 && DateTime.Compare(proposedAED, tableDataRowEndDate) <= 0;
 
-                                isRowStartDateInProposedPeriod = DateTime.Compare(tableDataRowStartDate, proposedSD) >= 0 && DateTime.Compare(tableDataRowStartDate, proposedAED) <= 0;
-                                isRowEndDateinProposedPeriod = DateTime.Compare(tableDataRowEndDate, proposedSD) >= 0 && DateTime.Compare(tableDataRowEndDate, proposedAED) <= 0;
+                                bool isRowStartDateInProposedPeriod = false, isRowEndDateinProposedPeriod = false;
+                                // proposed actual end date is not empty
+                                if (proposedAED != DateTime.MinValue)
+                                {
+                                    // check if period represented by proposed start date to proposed end date coincides with the given data row's period
+                                    isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowStartDate) >= 0 && DateTime.Compare(proposedSD, tableDataRowEndDate) <= 0;
+                                    isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, tableDataRowStartDate) >= 0 && DateTime.Compare(proposedAED, tableDataRowEndDate) <= 0;
+
+                                    isRowStartDateInProposedPeriod = DateTime.Compare(tableDataRowStartDate, proposedSD) >= 0 && DateTime.Compare(tableDataRowStartDate, proposedAED) <= 0;
+                                    isRowEndDateinProposedPeriod = DateTime.Compare(tableDataRowEndDate, proposedSD) >= 0 && DateTime.Compare(tableDataRowEndDate, proposedAED) <= 0;
+
+                                }
+                                // proposed actual end date is empty- proposed record is active
+                                else
+                                    isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowEndDate) <= 0 || DateTime.Compare(proposedSD, tableDataRowStartDate) <= 0;
+
+                                if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
+                                {
+                                    empPositionValidationMsgs["clashingRecords"].Add(row);
+                                    return false;
+                                }
 
                             }
-                            // proposed actual end date is empty- proposed record is active
-                            else
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowEndDate) <= 0 || DateTime.Compare(proposedSD, tableDataRowStartDate) <= 0;
-
-                            if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
-                            {
-                                empPositionValidationMsgs["clashingRecords"].Add(row);
-                                return false;
-                            }
-
-                        }
-                        // if record being checked is active
-                        else
-                        {
-                            // proposed actual end date is not empty
-                            if (proposedAED != DateTime.MinValue)
-                            {
-                                // check if period represented by proposed start date is in active record's period
-                                isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowStartDate) >= 0;
-                                isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, tableDataRowStartDate) >= 0;
-                            }
-                            // proposed actual end date is empty - proposed record is active
+                            // if record being checked is active
                             else
                             {
-                                if (multipleActiveRecordsPanel != null)
+                                // proposed actual end date is not empty
+                                if (proposedAED != DateTime.MinValue)
+                                {
+                                    // check if period represented by proposed start date is in active record's period
+                                    isProposedStartDateInRowPeriod = DateTime.Compare(proposedSD, tableDataRowStartDate) >= 0;
+                                    isProposedEndDateInRowPeriod = DateTime.Compare(proposedAED, tableDataRowStartDate) >= 0;
+                                }
+                                // proposed actual end date is empty - proposed record is active
+                                else
+                                {
                                     empPositionValidationMsgs["multipleActiveRecords"].Add(row);
-                                return false; // proposed record is invalid since record already exists that is active and proposed record is active
+                                    return false; // proposed record is invalid since record already exists that is active and proposed record is active
+                                }
+
+
+                                if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
+                                {
+                                    empPositionValidationMsgs["clashingRecords"].Add(row);
+                                    return false;
+                                }
+
                             }
+                        }
+                        else if (isTableDataRowSubstantiveOrActing != proposedRecordType)
+                        {
 
-
-                            if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
+                            // check that start date of acting record is not before start date of current active substantive record
+                            if (proposedRecordType == "Acting" && isRecordActive(tableDataRowStartDate, tableDataRowEndDate) && DateTime.Compare(proposedSD, tableDataRowStartDate) < 0)
                             {
-                                empPositionValidationMsgs["clashingRecords"].Add(row);
+                                empPositionValidationMsgs["actingStartDateBeforeSub"].Add(row);
                                 return false;
                             }
 
+                            // check that subst cannot become inactive when there is an active acting record
+                            if (proposedRecordType == "Substantive" && !isRecordActive(proposedSD, proposedAED) && isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
+                            {
+                                empPositionValidationMsgs["noSubstantiveRecord"].Add(row);
+                                return false;
+                            }
+
+
                         }
+
+                       
                     }
 
                 }
@@ -320,7 +354,14 @@ namespace HR_LEAVEv2.HR
                     numActiveRows++;
 
                 if (numActiveRows <= 1)
+                {
+                    if (numActiveSubsRecords == 0 && proposedRecordType == "Acting")
+                    {
+                        empPositionValidationMsgs["noSubstantiveRecord"].Add(row);
+                        return false;
+                    }
                     return true;
+                }
                 else if (numActiveRows > 1)
                     empPositionValidationMsgs["multipleActiveRecords"].Add(row);
             }
@@ -530,14 +571,16 @@ namespace HR_LEAVEv2.HR
                             {"actualEndDateIsWeekend", new List<string>() },
                             {"clashingRecords", new List<string>() },
                             {"multipleActiveRecords", new List<string>() },
-                            {"invalidAnnualAndMaxVacationAmt", new List<string>() }
+                            {"invalidAnnualAndMaxVacationAmt", new List<string>() },
+                            {"noSubstantiveRecord", new List<string>() },
+                            {"actingStartDateBeforeSub", new List<string>() }
                         };
                         // check employment records for consistency for employeeposition table
                         DataTable employmentRecordsDt = new DataTable();
                         try
                         {
                             // empPositionValidationMsgs is initialized with column names already
-                            Boolean areDatesValid;
+                            Boolean areDatesValid = false, areRecordsValid = false, areVacationAmtsValid = false;
                             for (int rowIndex = 0; rowIndex < dt.Rows.Count; rowIndex++)
                             {
                                 DataRow dr = dt.Rows[rowIndex];
@@ -559,7 +602,8 @@ namespace HR_LEAVEv2.HR
                                         }
                                     }
                                 }
-                                areDatesValid = false;
+                                areDatesValid = areRecordsValid = areVacationAmtsValid = false;
+
                                 DateTime start = DateTime.MinValue,
                                          expectedEnd = DateTime.MinValue,
                                          actualEnd = DateTime.MinValue;
@@ -581,17 +625,26 @@ namespace HR_LEAVEv2.HR
                                     areDatesValid = areDatesValid && validateDates(start, actualEnd, false, (rowIndex + 1).ToString());
                                 }
                                    
-                                // validate record if employment record to ensure more than one active record is not added
+                                // validate record to ensure more than one active record is not added
                                 // populates empPositionValidationMsgs
                                 if (areDatesValid)
-                                    isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", start, actualEnd, (rowIndex + 1).ToString());
+                                {
+                                    string isSubstantiveOrActing = dr.Field<string>("is_substantive_or_acting").ToLower() == "true" ? "Substantive" : "Acting";
+                                    areRecordsValid = isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", isSubstantiveOrActing, start, actualEnd, (rowIndex + 1).ToString());
+                                    //areRecordsValid = areRecordsValid && isRecordValid(dt, dr.Field<string>("employee_id"), "-1", isSubstantiveOrActing, start, actualEnd, (rowIndex + 1).ToString());
 
-                                if(Convert.ToInt32(dr.Field<string>("annual_vacation_amt")) > Convert.ToInt32(dr.Field<string>("max_vacation_accumulation")))
+                                }
+
+                                areVacationAmtsValid = Convert.ToInt32(dr.Field<string>("annual_vacation_amt")) > Convert.ToInt32(dr.Field<string>("max_vacation_accumulation"));
+                                if (areVacationAmtsValid)
                                     empPositionValidationMsgs["invalidAnnualAndMaxVacationAmt"].Add((rowIndex + 1).ToString());
+
+                                
                             }
+                            isDataValid = areDatesValid && areRecordsValid && areVacationAmtsValid;
 
                             // check errors and show appropriate messages
-                            foreach(KeyValuePair<string, List<string>> kvp in empPositionValidationMsgs)
+                            foreach (KeyValuePair<string, List<string>> kvp in empPositionValidationMsgs)
                             {
                                 if(kvp.Value.Count > 0)
                                 {
@@ -642,6 +695,14 @@ namespace HR_LEAVEv2.HR
                                             invalidAnnualOrMaximumVacationLeaveAmtTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in annual amount of vacation leave being more than maximum accumulated vacation leave";
                                             invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
                                             break;
+                                        case "noSubstantiveRecord":
+                                            noSubstantiveRecordTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} must have at least one (1) active substantive employment record in order to have active acting records";
+                                            noSubstantiveRecordPanel.Style.Add("display", "inline-block");
+                                            break;
+                                        case "actingStartDateBeforeSub":
+                                            actingStartDateBeforeSubTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in the start date of the acting record being before the start date of the active substantive record";
+                                            actingStartDateBeforeSubPanel.Style.Add("display", "inline-block");
+                                            break;
                                     }
                                 }  
                             }
@@ -681,6 +742,8 @@ namespace HR_LEAVEv2.HR
                             isUploadSuccessful = false;
                         }
                     }
+                    else
+                        isUploadSuccessful = false;
 
                     
                 }
