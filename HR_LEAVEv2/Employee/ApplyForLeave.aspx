@@ -117,7 +117,7 @@
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FILE UPLOAD NEEDED VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
                         <asp:Panel ID="fileUploadNeededPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                            <span>No files currently uploaded. Upload supporting documentation to submit your application</span>
+                            <span>No files currently uploaded. Upload supporting documentation to support your application</span>
                         </asp:Panel>
 
                         <asp:Panel ID="moreThan2DaysConsecutiveSickLeave" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">

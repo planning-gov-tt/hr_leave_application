@@ -115,6 +115,15 @@ namespace HR_LEAVEv2.HR
                                 FROM [dbo].[leavetype] 
                             ";
 
+                        //string sql = $@"
+                        //        SELECT etlt.leave_type as 'leave_type', 'Please enter valid ' + etlt.leave_type + ' Leave number' as 'validation', 'Enter ' + etlt.leave_type + ' Leave balance' as 'placeholder'
+                        //        FROM [dbo].employeeposition ep
+
+                        //        LEFT JOIN emptypeleavetype etlt
+                        //        ON etlt.employment_type = ep.employment_type
+
+                        //        WHERE ep.id = dbo.getActiveRecord({empId}); 
+                        //    ";
                         using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
                         {
                             connection.Open();

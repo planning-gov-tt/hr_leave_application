@@ -479,8 +479,9 @@ namespace HR_LEAVEv2.Employee
                         isValid = "No";
                         errTxt = "Not eligible for amount of leave entered";
                         fileUploadNeededPanel.Style.Add("display", "inline-block");
-                    }
-                        
+                    } else
+                        fileUploadNeededPanel.Style.Add("display", "none");
+
 
 
                     empType = util.isNullOrEmpty(empType) ? "unregistered" : empType;
@@ -524,7 +525,8 @@ namespace HR_LEAVEv2.Employee
             {
                 invalidLeaveTypeTxt.InnerText = errTxt;
                 invalidLeaveTypePanel.Style.Add("display", "inline-block");
-            }
+            } else
+                invalidLeaveTypePanel.Style.Add("display", "none");
 
             return isValid == "Yes" && util.isNullOrEmpty(errTxt);
         }
