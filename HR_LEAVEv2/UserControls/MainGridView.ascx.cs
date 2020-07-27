@@ -223,6 +223,7 @@ namespace HR_LEAVEv2.UserControls
                 {
                     whereBindGridView = $@"
                         WHERE
+                            status IN ('Not Recommended', 'Recommended', 'Pending') AND
                             supervisor_id = '{user.currUserId}'
                     ";
 

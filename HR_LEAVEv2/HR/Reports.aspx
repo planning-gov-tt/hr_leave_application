@@ -53,8 +53,8 @@
 
         Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             var storage = sessionStorage;
-            var lastActiveItem = storage.getItem("lastActiveItemId");
-            var lastActiveItemContent = storage.getItem("lastActiveItemContentId");
+            var lastActiveItem = storage.getItem("reportsLastActiveItemId");
+            var lastActiveItemContent = storage.getItem("reportsLastActiveItemContentId");
             if (lastActiveItem != null && lastActiveItemContent != null) {
                 // remove active class from item tab
                 $('.nav-item').removeClass('active');
@@ -76,8 +76,8 @@
             var contentId = itemId.replace('Item', '');
 
             var storage = sessionStorage;
-            storage.setItem('lastActiveItemId', itemId);
-            storage.setItem('lastActiveItemContentId', contentId);
+            storage.setItem('reportsLastActiveItemId', itemId);
+            storage.setItem('reportsLastActiveItemContentId', contentId);
         });
 
     </script>

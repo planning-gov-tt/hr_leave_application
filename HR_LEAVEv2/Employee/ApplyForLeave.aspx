@@ -299,7 +299,7 @@
 
                 <%--apply mode--%>
                 <asp:Panel ID="typeOfLeaveDropdownPanel" runat="server" Style="display: inline;">
-                    <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="150px" Height="35px" Style="display: inline;" AutoPostBack="true" OnSelectedIndexChanged="typeOfLeave_SelectedIndexChanged">
+                    <asp:DropDownList ID="typeOfLeave" runat="server" CssClass="form-control" Width="165px" Height="35px" Style="display: inline;" AutoPostBack="true" OnSelectedIndexChanged="typeOfLeave_SelectedIndexChanged">
                     </asp:DropDownList>
                 </asp:Panel>
 
