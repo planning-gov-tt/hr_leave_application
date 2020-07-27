@@ -1,5 +1,18 @@
 ﻿<%@ Page Title="Notifications" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Notifications.aspx.cs" Inherits="HR_LEAVEv2.Employee.Notifications" MaintainScrollPositionOnPostback="true" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <style>
+        .is-read{
+            background-color: #e8e6e6;
+            color:#3a87ad;
+            border-color:#bce8f1;
+        }
+
+        .is-unread{
+            background-color:#d9edf7;
+            color:#3a87ad;
+            border-color:#bce8f1;
+        }
+    </style>
     <h1><%: Title %></h1>
 
     <asp:Panel ID="notifsPanel" runat="server" Style="height: 85%; width: 50%; margin: 0 auto; margin-top: 30px; text-align:center">
@@ -38,8 +51,8 @@
             </GroupTemplate>
 
             <ItemTemplate>
-                <div class="panel panel-info" style="text-align:left;">
-                    <div class="panel-heading">
+                <div class="panel" style="text-align:left; border-color: #bce8f1">
+                    <div class="<%#Eval("background_color") %> panel-heading ">
                         <span style="font-size: 1.1em;">
                             <%#Eval("notification_header") %>
                             <span class="label <%#Eval("bootstrap_class") %>"><%#Eval("status") %></span>

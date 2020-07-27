@@ -61,14 +61,45 @@
 
 
                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORD VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
-                <asp:Panel ID="clashingRecordsPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                <asp:Panel ID="clashingRecordsDbPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="clashingRecordsTxt" runat="server">Employment record being inserted clashes with another employment record</span>
+                    <span id="clashingRecordsDbTxt" runat="server">Employment record being inserted clashes with another employment record</span>
                 </asp:Panel>
 
-                <asp:Panel ID="multipleActiveRecordsPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px" role="alert">
+                <asp:Panel ID="multipleActiveRecordsDbPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="multipleActiveRecordsTxt" runat="server">Employment record being inserted would result in multiple active records</span>
+                    <span id="multipleActiveRecordsDbTxt" runat="server">Employment record being inserted would result in multiple active records</span>
+                </asp:Panel>
+
+                <asp:Panel ID="noSubstantiveRecordDbPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="noSubstantiveRecordDbTxt" runat="server">Record not inserted since employee must have at least one (1) active substantive employment record in order to have active acting records</span>
+                </asp:Panel>
+                                
+                <asp:Panel ID="actingStartDateBeforeSubDbPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="actingStartDateBeforeSubDbTxt" runat="server">Record not inserted since the start date of the acting record is before the start date of the active substantive record</span>
+                </asp:Panel>
+
+
+                 <asp:Panel ID="clashingRecordsExcelPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="clashingRecordsExcelTxt" runat="server">Employment record being inserted clashes with another employment record</span>
+                </asp:Panel>
+
+                <asp:Panel ID="multipleActiveRecordsExcelPanel" runat="server" CssClass="row alert alert-warning" Style="display: none; margin: 5px" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="multipleActiveRecordsExcelTxt" runat="server">Employment record being inserted would result in multiple active records</span>
+                </asp:Panel>
+
+                <asp:Panel ID="noSubstantiveRecordExcelPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="noSubstantiveRecordExcelTxt" runat="server">Record not inserted since employee must have at least one (1) active substantive employment record in order to have active acting records</span>
+                </asp:Panel>
+                                
+                <asp:Panel ID="actingStartDateBeforeSubExcelPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <span id="actingStartDateBeforeSubExcelTxt" runat="server">Record not inserted since the start date of the acting record is before the start date of the active substantive record</span>
                 </asp:Panel>
                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~EMPLOYMENT RECORD VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
@@ -112,16 +143,6 @@
                 <asp:Panel ID="actualEndDateOnWeekendPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                     <span id="actualEndDateIsWeekendTxt" runat="server">Actual end date is on the weekend</span>
-                </asp:Panel>
-
-                <asp:Panel ID="noSubstantiveRecordPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="noSubstantiveRecordTxt" runat="server">Record not inserted since employee must have at least one (1) active substantive employment record in order to have active acting records</span>
-                </asp:Panel>
-                                
-                <asp:Panel ID="actingStartDateBeforeSubPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="actingStartDateBeforeSubTxt" runat="server">Record not inserted since the start date of the acting record is before the start date of the active substantive record</span>
                 </asp:Panel>
                 <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DATE VALIDATION MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 

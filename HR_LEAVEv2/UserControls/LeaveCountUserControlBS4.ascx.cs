@@ -49,8 +49,8 @@ namespace HR_LEAVEv2.UserControls
                             SELECT e.[sick], e.[vacation], e.[personal], e.[casual], ep.employment_type, FORMAT(ep.start_date, 'MM/dd/yy') as start_date
                             FROM [dbo].[employee] e
                             LEFT JOIN [dbo].employeeposition ep
-                            ON e.employee_id = ep.employee_id AND (ep.start_date <= GETDATE() AND ep.actual_end_date IS NULL OR GETDATE() < ep.actual_end_date)
-                            WHERE e.[employee_id] = '{user.currUserId}'
+                            ON e.employee_id = ep.employee_id 
+                            WHERE e.[employee_id] = '{user.currUserId}' AND ep.id = dbo.getActiveRecord({user.currUserId})
                             ;
                         ";
                     using (SqlCommand cmd = new SqlCommand(getEmpDetailsSql, con))

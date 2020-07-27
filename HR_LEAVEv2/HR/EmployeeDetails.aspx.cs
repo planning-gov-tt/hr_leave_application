@@ -1146,8 +1146,13 @@ namespace HR_LEAVEv2.HR
                     return true;
                 }
 
-                else if (numActiveRows > 1 && multipleActiveRecordsPanel != null)
-                    multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                else if (numActiveRows > 1)
+                {
+                    if(multipleActiveRecordsPanel != null)
+                        multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                    return false;
+                }
+                    
             }
 
             return true;

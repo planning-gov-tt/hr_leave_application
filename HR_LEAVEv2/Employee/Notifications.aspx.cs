@@ -43,6 +43,7 @@ namespace HR_LEAVEv2.Employee
                            n.[notification], 
                            IIF(n.[is_read] = 'No', 'Unread', 'Read') AS status,
                            IIF(n.[is_read] = 'No', 'label-primary', 'label-default') AS bootstrap_class,
+                           IIF(n.[is_read] = 'No', 'is-unread', 'is-read') AS background_color,
                            n.[is_read], 
                            FORMAT(n.[created_at],  'h:mmtt MMM dd yyyy') AS created_at
                     FROM [dbo].[notifications] n

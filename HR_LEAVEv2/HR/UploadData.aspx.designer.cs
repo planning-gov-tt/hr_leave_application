@@ -130,40 +130,148 @@ namespace HR_LEAVEv2.HR {
         protected global::System.Web.UI.WebControls.Panel noFileUploaded;
         
         /// <summary>
-        /// clashingRecordsPanel control.
+        /// clashingRecordsDbPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel clashingRecordsPanel;
+        protected global::System.Web.UI.WebControls.Panel clashingRecordsDbPanel;
         
         /// <summary>
-        /// clashingRecordsTxt control.
+        /// clashingRecordsDbTxt control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl clashingRecordsTxt;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl clashingRecordsDbTxt;
         
         /// <summary>
-        /// multipleActiveRecordsPanel control.
+        /// multipleActiveRecordsDbPanel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsPanel;
+        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsDbPanel;
         
         /// <summary>
-        /// multipleActiveRecordsTxt control.
+        /// multipleActiveRecordsDbTxt control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl multipleActiveRecordsTxt;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl multipleActiveRecordsDbTxt;
+        
+        /// <summary>
+        /// noSubstantiveRecordDbPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noSubstantiveRecordDbPanel;
+        
+        /// <summary>
+        /// noSubstantiveRecordDbTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl noSubstantiveRecordDbTxt;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubDbPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel actingStartDateBeforeSubDbPanel;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubDbTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl actingStartDateBeforeSubDbTxt;
+        
+        /// <summary>
+        /// clashingRecordsExcelPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel clashingRecordsExcelPanel;
+        
+        /// <summary>
+        /// clashingRecordsExcelTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl clashingRecordsExcelTxt;
+        
+        /// <summary>
+        /// multipleActiveRecordsExcelPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel multipleActiveRecordsExcelPanel;
+        
+        /// <summary>
+        /// multipleActiveRecordsExcelTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl multipleActiveRecordsExcelTxt;
+        
+        /// <summary>
+        /// noSubstantiveRecordExcelPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noSubstantiveRecordExcelPanel;
+        
+        /// <summary>
+        /// noSubstantiveRecordExcelTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl noSubstantiveRecordExcelTxt;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubExcelPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel actingStartDateBeforeSubExcelPanel;
+        
+        /// <summary>
+        /// actingStartDateBeforeSubExcelTxt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl actingStartDateBeforeSubExcelTxt;
         
         /// <summary>
         /// invalidStartDateValidationMsgPanel control.
@@ -308,42 +416,6 @@ namespace HR_LEAVEv2.HR {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl actualEndDateIsWeekendTxt;
-        
-        /// <summary>
-        /// noSubstantiveRecordPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel noSubstantiveRecordPanel;
-        
-        /// <summary>
-        /// noSubstantiveRecordTxt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl noSubstantiveRecordTxt;
-        
-        /// <summary>
-        /// actingStartDateBeforeSubPanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel actingStartDateBeforeSubPanel;
-        
-        /// <summary>
-        /// actingStartDateBeforeSubTxt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl actingStartDateBeforeSubTxt;
         
         /// <summary>
         /// nullableErrorPanel control.

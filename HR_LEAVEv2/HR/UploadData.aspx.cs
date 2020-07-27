@@ -28,11 +28,11 @@ namespace HR_LEAVEv2.HR
         Util util = new Util();
         User user = new User();
 
-        private Dictionary<string, List<string>> empPositionValidationMsgs
-        {
-            get { return ViewState["empPositionValidationMsgs"] != null ? ViewState["empPositionValidationMsgs"] as Dictionary<string, List<string>> : null; }
-            set { ViewState["empPositionValidationMsgs"] = value; }
-        }
+        //private Dictionary<string, List<string>> empPositionValidationMsgs
+        //{
+        //    get { return ViewState["empPositionValidationMsgs"] != null ? ViewState["empPositionValidationMsgs"] as Dictionary<string, List<string>> : null; }
+        //    set { ViewState["empPositionValidationMsgs"] = value; }
+        //}
 
         private string uploadedFileName
         {
@@ -81,10 +81,15 @@ namespace HR_LEAVEv2.HR
             invalidActualEndDatePanel.Style.Add("display", "none");
             actualEndDateOnWeekendPanel.Style.Add("display", "none");
 
-            multipleActiveRecordsPanel.Style.Add("display", "none");
-            clashingRecordsPanel.Style.Add("display", "none");
-            noSubstantiveRecordPanel.Style.Add("display", "none");
-            actingStartDateBeforeSubPanel.Style.Add("display", "none");
+            multipleActiveRecordsExcelPanel.Style.Add("display", "none");
+            clashingRecordsExcelPanel.Style.Add("display", "none");
+            noSubstantiveRecordExcelPanel.Style.Add("display", "none");
+            actingStartDateBeforeSubExcelPanel.Style.Add("display", "none");
+
+            multipleActiveRecordsDbPanel.Style.Add("display", "none");
+            clashingRecordsDbPanel.Style.Add("display", "none");
+            noSubstantiveRecordDbPanel.Style.Add("display", "none");
+            actingStartDateBeforeSubDbPanel.Style.Add("display", "none");
 
             wrongTablePanel.Style.Add("display", "none");
             invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "none");
@@ -168,7 +173,7 @@ namespace HR_LEAVEv2.HR
             deleteUploadedFile();
         }
 
-        protected Boolean validateDates(DateTime start, DateTime end, Boolean isEndDateExpected, string row)
+        protected Boolean validateDates(DateTime start, DateTime end, Boolean isEndDateExpected, string row, Dictionary<string, List<string>> empPositionValidationMsgs)
         {
             Boolean isValidated = true;
 
@@ -233,7 +238,7 @@ namespace HR_LEAVEv2.HR
                 return (DateTime.Compare(util.getCurrentDate(), proposedEndDate) < 0);      
         }
 
-        protected Boolean isRecordValid(DataTable TableData, string employeeId, string id, string proposedRecordType ,DateTime proposedSD, DateTime proposedAED, string row)
+        protected Boolean isRecordValid(DataTable TableData, string employeeId, string id, string proposedRecordType ,DateTime proposedSD, DateTime proposedAED, string row, Dictionary<string, List<string>> empPositionValidationMsgs)
         {
             // returns a Boolean representing whether the proposed start date and proposed end date passed is valid in terms of the rest of existing employment position records. 
             // This method checks the other records to see if any other active records exist in order to validate the record. 
@@ -295,8 +300,10 @@ namespace HR_LEAVEv2.HR
 
                                 if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod || isRowStartDateInProposedPeriod || isRowEndDateinProposedPeriod)
                                 {
-                                    empPositionValidationMsgs["clashingRecords"].Add(row);
+                                    if(!empPositionValidationMsgs["clashingRecords"].Contains(row))
+                                        empPositionValidationMsgs["clashingRecords"].Add(row);
                                     return false;
+
                                 }
 
                             }
@@ -313,14 +320,16 @@ namespace HR_LEAVEv2.HR
                                 // proposed actual end date is empty - proposed record is active
                                 else
                                 {
-                                    empPositionValidationMsgs["multipleActiveRecords"].Add(row);
-                                    return false; // proposed record is invalid since record already exists that is active and proposed record is active
+                                    if (!empPositionValidationMsgs["multipleActiveRecords"].Contains(row))
+                                        empPositionValidationMsgs["multipleActiveRecords"].Add(row);
+                                    return false;
                                 }
 
 
                                 if (isProposedStartDateInRowPeriod || isProposedEndDateInRowPeriod)
                                 {
-                                    empPositionValidationMsgs["clashingRecords"].Add(row);
+                                    if (!empPositionValidationMsgs["clashingRecords"].Contains(row))
+                                        empPositionValidationMsgs["clashingRecords"].Add(row);
                                     return false;
                                 }
 
@@ -332,16 +341,18 @@ namespace HR_LEAVEv2.HR
                             // check that start date of acting record is not before start date of current active substantive record
                             if (proposedRecordType == "Acting" && isRecordActive(tableDataRowStartDate, tableDataRowEndDate) && DateTime.Compare(proposedSD, tableDataRowStartDate) < 0)
                             {
-                                empPositionValidationMsgs["actingStartDateBeforeSub"].Add(row);
+                                if (!empPositionValidationMsgs["actingStartDateBeforeSub"].Contains(row))
+                                    empPositionValidationMsgs["actingStartDateBeforeSub"].Add(row);
                                 return false;
                             }
 
-                            // check that subst cannot become inactive when there is an active acting record
-                            if (proposedRecordType == "Substantive" && !isRecordActive(proposedSD, proposedAED) && isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
-                            {
-                                empPositionValidationMsgs["noSubstantiveRecord"].Add(row);
-                                return false;
-                            }
+                            //// check that subst cannot become inactive when there is an active acting record
+                            //if (proposedRecordType == "Substantive" && !isRecordActive(proposedSD, proposedAED) && isRecordActive(tableDataRowStartDate, tableDataRowEndDate))
+                            //{
+                            //    if (!empPositionValidationMsgs["noSubstantiveRecord"].Contains(row))
+                            //        empPositionValidationMsgs["noSubstantiveRecord"].Add(row);
+                            //    return false;
+                            //}
 
 
                         }
@@ -357,16 +368,119 @@ namespace HR_LEAVEv2.HR
                 {
                     if (numActiveSubsRecords == 0 && proposedRecordType == "Acting")
                     {
-                        empPositionValidationMsgs["noSubstantiveRecord"].Add(row);
+                        if (!empPositionValidationMsgs["noSubstantiveRecord"].Contains(row))
+                            empPositionValidationMsgs["noSubstantiveRecord"].Add(row);
                         return false;
                     }
                     return true;
                 }
                 else if (numActiveRows > 1)
-                    empPositionValidationMsgs["multipleActiveRecords"].Add(row);
+                {
+                    if (!empPositionValidationMsgs["multipleActiveRecords"].Contains(row))
+                        empPositionValidationMsgs["multipleActiveRecords"].Add(row);
+                    return false;
+                }
+                    
             }
 
             return true;
+
+        }
+
+        protected void populateErrorMessages(Dictionary<string, List<string>> msgs, string type)
+        {
+            // check errors and show appropriate messages
+            foreach (KeyValuePair<string, List<string>> kvp in msgs)
+            {
+                if (kvp.Value.Count > 0)
+                {
+                    if(type == "date")
+                    {
+                        switch (kvp.Key)
+                        {
+                            case "startDateInvalid":
+                                invalidStartDateTxt.InnerText = $"Start date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
+                                invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "expectedEndDateInvalid":
+                                invalidExpectedEndDateTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
+                                invalidExpectedEndDatePanel.Style.Add("display", "inline-block");
+                                break;
+                            case "actualEndDateInvalid":
+                                invalidActualEndDateTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
+                                invalidActualEndDatePanel.Style.Add("display", "inline-block");
+                                break;
+                            case "dateComparisonExpected":
+                                dateComparisonExpectedTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} cannot precede their corresponding start date";
+                                dateComparisonExpectedValidationMsgPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "dateComparisonActual":
+                                dateComparisionActualTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} cannot precede their corresponding start date";
+                                dateComparisonActualValidationMsgPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "startDateIsWeekend":
+                                startDateIsWeekendTxt.InnerText = $"Start date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
+                                startDateIsWeekendPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "expectedEndDateIsWeekend":
+                                expectedEndDateIsWeekendTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
+                                expectedEndDateIsWeekendPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "actualEndDateIsWeekend":
+                                actualEndDateIsWeekendTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
+                                actualEndDateOnWeekendPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "invalidAnnualAndMaxVacationAmt":
+                                invalidAnnualOrMaximumVacationLeaveAmtTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in annual amount of vacation leave being more than maximum accumulated vacation leave";
+                                invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
+                                break;
+                        }
+                    } else if(type == "dbRecords")
+                    {
+                        switch (kvp.Key)
+                        {
+                            case "clashingRecords":
+                                clashingRecordsDbTxt.InnerText = $"IN DB:Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} clash/clashes with another employment record of the same type for their corresponding employee";
+                                clashingRecordsDbPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "multipleActiveRecords":
+                                multipleActiveRecordsDbTxt.InnerText = $"IN DB:Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in multiple active records of the same type for their corresponding employee";
+                                multipleActiveRecordsDbPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "noSubstantiveRecord":
+                                noSubstantiveRecordDbTxt.InnerText = $"IN DB:On row(s) {String.Join(", ", kvp.Value.ToArray())} at least one (1) active substantive employment record in order to have active acting records";
+                                noSubstantiveRecordDbPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "actingStartDateBeforeSub":
+                                actingStartDateBeforeSubDbTxt.InnerText = $"IN DB:Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in the start date of the acting record being before the start date of the active substantive record";
+                                actingStartDateBeforeSubDbPanel.Style.Add("display", "inline-block");
+                                break;
+                        }
+                    } else if (type== "excelRecords")
+                    {
+                        switch (kvp.Key)
+                        {
+                            case "clashingRecords":
+                                clashingRecordsExcelTxt.InnerText = $"IN EXCEL SHEET: Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} clash/clashes with another employment record of the same type for their corresponding employee";
+                                clashingRecordsExcelPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "multipleActiveRecords":
+                                multipleActiveRecordsExcelTxt.InnerText = $"IN EXCEL SHEET:Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in multiple active records of the same type for their corresponding employee";
+                                multipleActiveRecordsExcelPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "noSubstantiveRecord":
+                                noSubstantiveRecordExcelTxt.InnerText = $"IN EXCEL SHEET:On row(s) {String.Join(", ", kvp.Value.ToArray())} at least one (1) active substantive employment record in order to have active acting records";
+                                noSubstantiveRecordExcelPanel.Style.Add("display", "inline-block");
+                                break;
+                            case "actingStartDateBeforeSub":
+                                actingStartDateBeforeSubExcelTxt.InnerText = $"IN EXCEL SHEET:Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in the start date of the acting record being before the start date of the active substantive record";
+                                actingStartDateBeforeSubExcelPanel.Style.Add("display", "inline-block");
+                                break;
+                        }
+                    }
+                    
+                }
+            }
 
         }
 
@@ -559,7 +673,7 @@ namespace HR_LEAVEv2.HR
                     if (isDataValid && tableSelectDdl.SelectedValue == "employeeposition")
                     {
                         // reset empPositionValidationMsgs
-                        empPositionValidationMsgs = new Dictionary<string, List<string>>()
+                        Dictionary<string, List<string>> empPositionDateAndVacationValidationMsgs = new Dictionary<string, List<string>>()
                         {
                             {"startDateInvalid", new List<string>() },
                             {"expectedEndDateInvalid", new List<string>() },
@@ -569,9 +683,21 @@ namespace HR_LEAVEv2.HR
                             {"startDateIsWeekend", new List<string>() },
                             {"expectedEndDateIsWeekend", new List<string>() },
                             {"actualEndDateIsWeekend", new List<string>() },
+                            {"invalidAnnualAndMaxVacationAmt", new List<string>() }
+                        };
+
+                        Dictionary<string, List<string>> empPositionDbValidationMsgs = new Dictionary<string, List<string>>()
+                        {
                             {"clashingRecords", new List<string>() },
                             {"multipleActiveRecords", new List<string>() },
-                            {"invalidAnnualAndMaxVacationAmt", new List<string>() },
+                            {"noSubstantiveRecord", new List<string>() },
+                            {"actingStartDateBeforeSub", new List<string>() }
+                        };
+
+                        Dictionary<string, List<string>> empPositionExcelValidationMsgs = new Dictionary<string, List<string>>()
+                        {
+                            {"clashingRecords", new List<string>() },
+                            {"multipleActiveRecords", new List<string>() },
                             {"noSubstantiveRecord", new List<string>() },
                             {"actingStartDateBeforeSub", new List<string>() }
                         };
@@ -581,7 +707,19 @@ namespace HR_LEAVEv2.HR
                         {
                             // empPositionValidationMsgs is initialized with column names already
                             Boolean areDatesValid = false, areRecordsValid = false, areVacationAmtsValid = false;
-                            for (int rowIndex = 0; rowIndex < dt.Rows.Count; rowIndex++)
+                            DataTable temp = new DataTable();
+                            temp = dt.Clone();
+                            temp.Columns.Add("id", typeof(int));
+                            temp.Columns[temp.Columns.IndexOf("start_date")].DataType = typeof(DateTime);
+                            temp.Columns[temp.Columns.IndexOf("expected_end_date")].DataType = typeof(DateTime);
+                            temp.Columns[temp.Columns.IndexOf("actual_end_date")].DataType = typeof(DateTime);
+                            temp.Columns[temp.Columns.IndexOf("is_substantive_or_acting")].DataType = typeof(Boolean);
+                            for (int i = 0; i < dt.Rows.Count; i++)
+                            {
+                                temp.ImportRow(dt.Rows[i]);
+                                temp.Rows[i].SetField<int>("id", i);
+                            }
+                            for (int rowIndex = 0; rowIndex < temp.Rows.Count; rowIndex++)
                             {
                                 DataRow dr = dt.Rows[rowIndex];
                                 employmentRecordsDt = new DataTable();
@@ -590,9 +728,9 @@ namespace HR_LEAVEv2.HR
                                 {
                                     connection.Open();
                                     string sql = $@"
-                                    SELECT * FROM dbo.employeeposition 
-                                    WHERE employee_id = {dr.Field<string>("employee_id")};
-                                ";
+                                        SELECT * FROM dbo.employeeposition 
+                                        WHERE employee_id = {dr.Field<string>("employee_id")};
+                                    ";
                                     using (SqlCommand command = new SqlCommand(sql, connection))
                                     {
                                         using (SqlDataAdapter adapter = new SqlDataAdapter(command))
@@ -612,9 +750,9 @@ namespace HR_LEAVEv2.HR
                                 {
                                     start = Convert.ToDateTime(dr.Field<string>("start_date"));
                                     expectedEnd = Convert.ToDateTime(dr.Field<string>("expected_end_date"));
-                                    areDatesValid = validateDates(start, expectedEnd, true, (rowIndex + 1).ToString());
+                                    areDatesValid = validateDates(start, expectedEnd, true, (rowIndex + 1).ToString(), empPositionDateAndVacationValidationMsgs);
                                 }
-                                    
+
 
                                 // validate start date and actual end date
                                 if (dt.Columns.Contains("start_date") && dt.Columns.Contains("actual_end_date"))
@@ -622,96 +760,44 @@ namespace HR_LEAVEv2.HR
                                     start = Convert.ToDateTime(dr.Field<string>("start_date"));
                                     if (!util.isNullOrEmpty(dr.Field<string>("actual_end_date")))
                                         actualEnd = Convert.ToDateTime(dr.Field<string>("actual_end_date"));
-                                    areDatesValid = areDatesValid && validateDates(start, actualEnd, false, (rowIndex + 1).ToString());
+                                    areDatesValid = areDatesValid && validateDates(start, actualEnd, false, (rowIndex + 1).ToString(), empPositionDateAndVacationValidationMsgs);
                                 }
-                                   
+
                                 // validate record to ensure more than one active record is not added
                                 // populates empPositionValidationMsgs
                                 if (areDatesValid)
                                 {
+                                    // ensure records are valid given records in db
                                     string isSubstantiveOrActing = dr.Field<string>("is_substantive_or_acting").ToLower() == "true" ? "Substantive" : "Acting";
-                                    areRecordsValid = isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", isSubstantiveOrActing, start, actualEnd, (rowIndex + 1).ToString());
-                                    //areRecordsValid = areRecordsValid && isRecordValid(dt, dr.Field<string>("employee_id"), "-1", isSubstantiveOrActing, start, actualEnd, (rowIndex + 1).ToString());
+                                    areRecordsValid = isRecordValid(employmentRecordsDt, dr.Field<string>("employee_id"), "-1", isSubstantiveOrActing, start, actualEnd, (rowIndex + 1).ToString(), empPositionDbValidationMsgs);
+
+                                    // ensure records are valid with other records in excel sheet
+
+                                    //isSubstantiveOrActing = dr.Field<string>("is_substantive_or_acting").ToLower() == "true" ? "Substantive" : "Acting";
+                                    //areRecordsValid = areRecordsValid && isRecordValid(temp, dr.Field<string>("employee_id"), rowIndex.ToString(), isSubstantiveOrActing, start, actualEnd, (rowIndex + 1).ToString(), empPositionExcelValidationMsgs);
 
                                 }
 
-                                areVacationAmtsValid = Convert.ToInt32(dr.Field<string>("annual_vacation_amt")) > Convert.ToInt32(dr.Field<string>("max_vacation_accumulation"));
-                                if (areVacationAmtsValid)
-                                    empPositionValidationMsgs["invalidAnnualAndMaxVacationAmt"].Add((rowIndex + 1).ToString());
+                                areVacationAmtsValid = Convert.ToInt32(dr.Field<string>("annual_vacation_amt")) < Convert.ToInt32(dr.Field<string>("max_vacation_accumulation"));
+                                if (!areVacationAmtsValid)
+                                    empPositionDateAndVacationValidationMsgs["invalidAnnualAndMaxVacationAmt"].Add((rowIndex + 1).ToString());
 
-                                
+
                             }
                             isDataValid = areDatesValid && areRecordsValid && areVacationAmtsValid;
 
-                            // check errors and show appropriate messages
-                            foreach (KeyValuePair<string, List<string>> kvp in empPositionValidationMsgs)
+                            if (!isDataValid)
                             {
-                                if(kvp.Value.Count > 0)
-                                {
-                                    isDataValid = isUploadSuccessful = false;
-                                    switch (kvp.Key)
-                                    {
-                                        case "startDateInvalid":
-                                            invalidStartDateTxt.InnerText = $"Start date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
-                                            invalidStartDateValidationMsgPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "expectedEndDateInvalid":
-                                            invalidExpectedEndDateTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
-                                            invalidExpectedEndDatePanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "actualEndDateInvalid":
-                                            invalidActualEndDateTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are not valid";
-                                            invalidActualEndDatePanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "dateComparisonExpected":
-                                            dateComparisonExpectedTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} cannot precede their corresponding start date";
-                                            dateComparisonExpectedValidationMsgPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "dateComparisionActual":
-                                            dateComparisionActualTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} cannot precede their corresponding start date";
-                                            dateComparisonActualValidationMsgPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "startDateIsWeekend":
-                                            startDateIsWeekendTxt.InnerText = $"Start date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
-                                            startDateIsWeekendPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "expectedEndDateIsWeekend":
-                                            expectedEndDateIsWeekendTxt.InnerText = $"Expected end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
-                                            expectedEndDateIsWeekendPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "actualEndDateIsWeekend":
-                                            actualEndDateIsWeekendTxt.InnerText = $"Actual end date on row(s) {String.Join(", ", kvp.Value.ToArray())} is/are on the weekend";
-                                            actualEndDateOnWeekendPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "clashingRecords":
-                                            clashingRecordsTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} clash/clashes with another employment record for their corresponding employee";
-                                            clashingRecordsPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "multipleActiveRecords":
-                                            multipleActiveRecordsTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in multiple active records for their corresponding employee";
-                                            multipleActiveRecordsPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "invalidAnnualAndMaxVacationAmt":
-                                            invalidAnnualOrMaximumVacationLeaveAmtTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in annual amount of vacation leave being more than maximum accumulated vacation leave";
-                                            invalidAnnualOrMaximumVacationLeaveAmtPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "noSubstantiveRecord":
-                                            noSubstantiveRecordTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} must have at least one (1) active substantive employment record in order to have active acting records";
-                                            noSubstantiveRecordPanel.Style.Add("display", "inline-block");
-                                            break;
-                                        case "actingStartDateBeforeSub":
-                                            actingStartDateBeforeSubTxt.InnerText = $"Employment records being inserted on row(s) {String.Join(", ", kvp.Value.ToArray())} would result in the start date of the acting record being before the start date of the active substantive record";
-                                            actingStartDateBeforeSubPanel.Style.Add("display", "inline-block");
-                                            break;
-                                    }
-                                }  
+                                populateErrorMessages(empPositionDateAndVacationValidationMsgs, "date");
+                                populateErrorMessages(empPositionDbValidationMsgs, "dbRecords");
+                                populateErrorMessages(empPositionExcelValidationMsgs, "excelRecords");
                             }
-
+                            
                         }
                         catch (Exception ex)
                         {
                             //exception logic
-                            isUploadSuccessful = false;
+                            isDataValid = false;
                         }            
                     }
 

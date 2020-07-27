@@ -714,7 +714,11 @@ namespace HR_LEAVEv2.Admin
                     return true;
                 }
                 else if (numActiveRows > 1)
+                {
                     multipleActiveRecordsPanel.Style.Add("display", "inline-block");
+                    return false;
+                }
+                    
             }
 
             return true;
