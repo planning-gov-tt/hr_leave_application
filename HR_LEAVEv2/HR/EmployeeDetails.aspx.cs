@@ -280,12 +280,12 @@ namespace HR_LEAVEv2.HR
             {
                 // hide deleted row, row is a deleted record if isChanged = 1
                 i = GetColumnIndexByName(e.Row, "isChanged");
-                if (e.Row.Cells[i].Text.ToString() == "1" && this.isEditMode)
+                if (e.Row.Cells[i].Text.ToString() == "1")
                     e.Row.Visible = false;
 
                 // adds badge to new records
                 i = GetColumnIndexByName(e.Row, "record_id");
-                if (e.Row.Cells[i].Text.ToString() == "-1" && this.isEditMode)
+                if (e.Row.Cells[i].Text.ToString() == "-1")
                 {
                     // row is a new record if record_id = -1
                     Label newRecordLabel = (Label)e.Row.FindControl("new_record_label");
@@ -294,7 +294,7 @@ namespace HR_LEAVEv2.HR
 
                 // add badge to edited records
                 i = GetColumnIndexByName(e.Row, "isChanged");
-                if (e.Row.Cells[i].Text.ToString() == "2" && this.isEditMode)
+                if (e.Row.Cells[i].Text.ToString() == "2")
                 {
                     // row is an edited record if isChanged = 2
                     Label editedRecordLabel = (Label)e.Row.FindControl("edited_record_label");
@@ -461,19 +461,23 @@ namespace HR_LEAVEv2.HR
                     {
                         dt.Rows[indexInDt].SetField("isChanged", "1");
 
-                        empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
-                        if (empRecordAssociatedWithAccumulation != null)
+                        if (isEditMode)
                         {
-                            accPastLimitContainerPanel.Visible = true;
-                            chkOnOff.Checked = empRecordAssociatedWithAccumulation.Field<string>("can_accumulate_past_max") == "True";
-                            resetFiles();
-                            //loadPreviouslyUploadedFiles(Request.QueryString["empId"].ToString());
-                        }
-                        else
-                        {
-                            accPastLimitContainerPanel.Visible = true;
-                            sliderPanel.Visible = false;
-                            resetFiles();
+                            empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
+                            if (empRecordAssociatedWithAccumulation != null)
+                            {
+                                accPastLimitContainerPanel.Visible = sliderPanel.Visible = true;
+                                chkOnOff.Checked = empRecordAssociatedWithAccumulation.Field<string>("can_accumulate_past_max") == "True";
+                                fileUploadPanel.Visible = false;
+                                resetFiles();
+                                //loadPreviouslyUploadedFiles(Request.QueryString["empId"].ToString());
+                            }
+                            else
+                            {
+                                accPastLimitContainerPanel.Visible = false;
+                                sliderPanel.Visible = false;
+                                resetFiles();
+                            }
                         }
 
                         empRecordsDataSource = dt;
@@ -852,15 +856,21 @@ namespace HR_LEAVEv2.HR
                 {
                     dt.Rows.Add(newRecord);
 
-                    // set previously active record to not accumulate
-                    if (empRecordAssociatedWithAccumulation != null && getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt) != -1)
-                        dt.Rows[getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt)].SetField("can_accumulate_past_max", "False");
+                    if (this.isEditMode)
+                    {
+                        // set previously active record to not accumulate
+                        if (empRecordAssociatedWithAccumulation != null && getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt) != -1)
+                            dt.Rows[getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt)].SetField("can_accumulate_past_max", "False");
 
-                    // get new active record
-                    empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
-                    accPastLimitContainerPanel.Visible = true;
-                    chkOnOff.Checked = fileUploadPanel.Visible = false;
-                    resetFiles();
+                        // get new active record
+                        empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
+                        accPastLimitContainerPanel.Visible = sliderPanel.Visible = true;
+                        chkOnOff.Checked = fileUploadPanel.Visible = false;
+                        resetFiles();
+                    }
+                    else
+                        accPastLimitContainerPanel.Visible = false;
+                    
 
                     empRecordsDataSource = dt;
                 }
@@ -938,7 +948,7 @@ namespace HR_LEAVEv2.HR
                         }
 
                         // check if active record associated with accumulation is inactive and set can accumulate past limit to false
-                        if (isRecordAssociatedWithAccumulation && dt.Rows[indexInDt].Field<string>("status") == "Inactive")
+                        if (isRecordAssociatedWithAccumulation && dt.Rows[indexInDt].Field<string>("status") == "Inactive" && isEditMode)
                         {
                             dt.Rows[indexInDt].SetField<string>("can_accumulate_past_max", "False"); 
                             empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
@@ -967,12 +977,18 @@ namespace HR_LEAVEv2.HR
 
                                 // record already exists
                                 if (recordEdits.Keys.Contains(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()))
+                                {
                                     recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
+                                    if (isRecordAssociatedWithAccumulation && dt.Rows[indexInDt].Field<string>("status") == "Inactive" && isEditMode)
+                                        recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Accumulate Past Max");
+                                }   
                                 else
                                 {
                                     // record does not exist
                                     recordEdits.Add(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
                                     recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
+                                    if (isRecordAssociatedWithAccumulation && dt.Rows[indexInDt].Field<string>("status") == "Inactive" && isEditMode)
+                                        recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Accumulate Past Max");
                                 }
 
 
@@ -982,6 +998,8 @@ namespace HR_LEAVEv2.HR
                             {
                                 recordEdits.Add(dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString(), new HashSet<string>());
                                 recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Actual End Date");
+                                if (isRecordAssociatedWithAccumulation && dt.Rows[indexInDt].Field<string>("status") == "Inactive" && isEditMode)
+                                    recordEdits[dt.Rows[indexInDt][(int)emp_records_columns.record_id].ToString()].Add("Accumulate Past Max");
                                 editedRecords = recordEdits;
                             }
                         }               
@@ -1163,7 +1181,18 @@ namespace HR_LEAVEv2.HR
                 }
                     
             }
-
+            else
+            {
+                //emprecords data source is null
+                if (proposedRecordType == "Acting")
+                {
+                    if (noSubsRecord != null)
+                        noSubsRecord.Style.Add("display", "inline-block");
+                    return false;
+                }
+                else
+                    return true;
+            }
             return true;
 
         }
@@ -1334,14 +1363,27 @@ namespace HR_LEAVEv2.HR
                                 {
                                     dt.Rows[index].SetField<string>("isChanged", "2");
 
-                                    if (isRecordAssociatedWithAccumulation || (empRecordAssociatedWithAccumulation == null && dt.Rows[index].Field<string>("status") == "Active"))
+                                    // if it is the record associated with accumulation or is it is the next active record
+                                    if (isEditMode && isRecordAssociatedWithAccumulation || (!isRecordAssociatedWithAccumulation && areRowsEqual(dt.Rows[index], getActiveEmployeeRecord(dt))))
                                     {
+                                        // ensure that if the currently edited record is the new active record then the old one is reset to false
+                                        if (!isRecordAssociatedWithAccumulation && areRowsEqual(dt.Rows[index], getActiveEmployeeRecord(dt)))
+                                        {
+                                            int oldActiveRecord = getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt);
+                                            if (oldActiveRecord != -1)
+                                            {
+                                                dt.Rows[oldActiveRecord].SetField<string>("can_accumulate_past_max", "False");
+                                            }
+
+                                        }
+
+                                        empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
+
                                         // check if active record associated with accumulation is inactive and set can accumulate past limit to false
                                         if (dt.Rows[index].Field<string>("status") == "Inactive")
                                         {
                                             dt.Rows[index].SetField<string>("can_accumulate_past_max", "False");
-                                            empRecordAssociatedWithAccumulation = getActiveEmployeeRecord(dt);
-
+                                            editsMade.Add("Accumulate Past max");
                                             int nextActiveRecord = getIndexInDtOfRecord(empRecordAssociatedWithAccumulation, dt);
                                             if (nextActiveRecord != -1)
                                             {
@@ -1355,11 +1397,12 @@ namespace HR_LEAVEv2.HR
                                         // check if active record associated with accumulation is active and reset accumulation section accordingly
                                         else
                                         {
-                                            accPastLimitContainerPanel.Visible = true;
+                                            accPastLimitContainerPanel.Visible = sliderPanel.Visible = true;
                                             chkOnOff.Checked = fileUploadPanel.Visible = dt.Rows[index].Field<string>("can_accumulate_past_max") == "True";
                                             resetFiles();
                                         }
                                     }
+                                   
                                         
 
                                     empRecordsDataSource = dt;
@@ -2239,7 +2282,7 @@ namespace HR_LEAVEv2.HR
                     if (dr.ItemArray[(int)emp_records_columns.record_id].ToString() != "-1" && dr.ItemArray[(int)emp_records_columns.isChanged].ToString() == "2")
                     {
                         string setFieldToSendNotifIfContractEnding = string.Empty;
-                        if(editedRecords != null)
+                        if(editedRecords != null && editedRecords.Keys.Contains(dr.ItemArray[(int)emp_records_columns.record_id].ToString()))
                         {
                             Boolean isExpectedEndDateChanged = editedRecords[dr.ItemArray[(int)emp_records_columns.record_id].ToString()].Contains("Expected End Date"),
                             isActualEndDateChanged = editedRecords[dr.ItemArray[(int)emp_records_columns.record_id].ToString()].Contains("Actual End Date");
@@ -2465,51 +2508,12 @@ namespace HR_LEAVEv2.HR
                     if (uploadedFilesIds.Count > 0)
                     {
                         fileActionString = $"Files uploaded: {String.Join(", ", uploadedFilesIds.Select(lb => "id= " + lb).ToArray())}";
-                        util.addAuditLog(user.currUserId, user.currUserId, fileActionString);
+                        util.addAuditLog(user.currUserId, empId, fileActionString);
                     }
                     isFilesChanged = true;
                 }
             }
             // END ADDITION OF FILES--------------------------------------------------------------------------------------------------------------
-
-            // ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
-            //if(ViewState["prevAccPastLimitStatus"] != null)
-            //{
-            //    if (chkOnOff.Checked != Convert.ToBoolean(ViewState["prevAccPastLimitStatus"]) && ((chkOnOff.Checked && isFilesChanged && isFileUploadSuccessful) || !chkOnOff.Checked))
-            //    {
-            //        try
-            //        {
-
-            //            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
-            //            {
-            //                connection.Open();
-            //                string status = chkOnOff.Checked ? "1" : "0";
-            //                string id = empRecordAssociatedWithAccumulation != -1 ? $"{empRecordAssociatedWithAccumulation}" : $"dbo.getActiveRecord({empId})";
-            //                string sql = $@"
-            //                        UPDATE [dbo].[employeeposition]
-            //                        SET can_accumulate_past_max = {status}
-            //                        WHERE id = {id};
-            //                ";
-            //                using (SqlCommand command = new SqlCommand(sql, connection))
-            //                {
-            //                    int rowsAffected = command.ExecuteNonQuery();
-            //                    isAccumulatePastLimitSuccessful = rowsAffected > 0;
-            //                }
-            //                if (isAccumulatePastLimitSuccessful)
-            //                {
-            //                    util.addAuditLog(user.currUserId, empId, "Employee can now accumulate past their limit");
-            //                    isAccumulatePastLimitStatusChangedInDb = true;
-            //                }
-            //            }
-
-            //        }
-            //        catch (Exception exc)
-            //        {
-            //            isAccumulatePastLimitSuccessful = false;
-            //        }
-            //    }
-            //}
-            // END ACCUMULATE PAST LIMIT-------------------------------------------------------------------------------
 
             // reset page so it is ready for new edits
             Boolean isAccumulatePastLimitStatusChangedOnScreen = chkOnOff.Checked != Convert.ToBoolean(ViewState["prevAccPastLimitStatus"]);
@@ -3045,8 +3049,10 @@ namespace HR_LEAVEv2.HR
             clearAllFilesBtn.Visible = false;
 
             // add more criteria for this
-            if(chkOnOff.Checked && fileUploadPanel.Visible)
+            if (chkOnOff.Checked && fileUploadPanel.Visible)
                 noFilesUploadedDisclaimerPanel.Visible = true;
+            else
+                noFilesUploadedDisclaimerPanel.Visible = false;
         }
 
         protected void loadPreviouslyUploadedFiles(string empId)

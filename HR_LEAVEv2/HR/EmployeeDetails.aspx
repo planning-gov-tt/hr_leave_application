@@ -338,7 +338,7 @@
                     <asp:RegularExpressionValidator ValidationGroup="submitFullFormGroup" 
                         ID="empIdRegExpValidator" runat="server" 
                         ControlToValidate="employeeIdInput" 
-                        ErrorMessage="Please enter valid employee ID" ForeColor="Red" 
+                        ErrorMessage="Employee ID must be in numerical format" ForeColor="Red" 
                         ValidationExpression="^[0-9]*$" 
                         Display="Dynamic" 
                         Style="float: right;">  
@@ -354,7 +354,7 @@
                         ID="ihrisIDRegExpValidator" 
                         runat="server" 
                         ControlToValidate="ihrisNumInput" 
-                        ErrorMessage="Please enter valid IHRIS ID" 
+                        ErrorMessage="IHRIS ID must be in numerical format" 
                         ForeColor="Red" 
                         ValidationExpression="^[0-9]*$" 
                         Display="Dynamic" 
