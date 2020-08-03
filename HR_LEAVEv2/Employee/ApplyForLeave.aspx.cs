@@ -49,6 +49,12 @@ namespace HR_LEAVEv2.Employee
             set { ViewState["activeRecordStartDate"] = value; }
         }
 
+        private string ActivePosition
+        {
+            get { return ViewState["ActivePosition"] != null ? ViewState["ActivePosition"].ToString() : null; }
+            set { ViewState["ActivePosition"] = value; }
+        }
+
         private List<HttpPostedFile> uploadedFiles
         {
             get { return Session["uploadedFiles"] != null ? (List<HttpPostedFile>)Session["uploadedFiles"] : null; }
@@ -146,14 +152,18 @@ namespace HR_LEAVEv2.Employee
 
                     // populate active record start date to ensure employee does not submit for leave before the start of their employment
                     DateTime activeRecordStartDate = DateTime.MinValue;
+                    string position = string.Empty;
 
-                    if (ActiveRecordStartDate == null)
+                    if (ActiveRecordStartDate == null || ActivePosition == null)
                     {
                         try
                         {
                             string sql = $@"
-                                SELECT ep.start_date
+                                SELECT ep.start_date, p.pos_name
                                 FROM dbo.employeeposition ep
+
+                                LEFT JOIN dbo.position p
+                                ON p.pos_id = ep.position_id
                                 WHERE ep.id = dbo.getActiveRecord({user.currUserId})
                             ";
                             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["dbConnectionString"].ConnectionString))
@@ -167,6 +177,7 @@ namespace HR_LEAVEv2.Employee
                                         if (reader.Read())
                                         {
                                             activeRecordStartDate = (DateTime)reader["start_date"];
+                                            position = reader["pos_name"].ToString();
                                         }
                                     }
                                 }
@@ -179,6 +190,9 @@ namespace HR_LEAVEv2.Employee
 
                         if (activeRecordStartDate != DateTime.MinValue)
                             ActiveRecordStartDate = activeRecordStartDate != null ? activeRecordStartDate.ToString("d/MM/yyyy") : string.Empty;
+
+                        if (!util.isNullOrEmpty(position))
+                            ActivePosition = position;
                     }
                     /*~~~~~~~~~~~Active Record of Employee applying for leave POPULATION~~~~~~~~~~~~~~~*/
 
@@ -194,6 +208,7 @@ namespace HR_LEAVEv2.Employee
                 }
                 else 
                 {
+
                     // id of leave application to either be edited or viewed
                     string leaveId = Request.QueryString["leaveId"];
 
@@ -223,6 +238,9 @@ namespace HR_LEAVEv2.Employee
             {
                 container.Visible = !util.isNullOrEmpty(ActiveRecordStartDate);
                 employeeInactivePanel.Visible = util.isNullOrEmpty(ActiveRecordStartDate);
+
+                container.Visible = !(!util.isNullOrEmpty(ActivePosition) && (ActivePosition == "Permanent Secretary" || ActivePosition == "Minister"));
+                empIsPsOrMinisterPanel.Visible = !util.isNullOrEmpty(ActivePosition) && (ActivePosition == "Permanent Secretary" || ActivePosition == "Minister");
             }
         }
 

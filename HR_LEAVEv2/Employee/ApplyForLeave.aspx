@@ -192,14 +192,14 @@
                         <asp:Panel ID="successMsgPanel" runat="server" CssClass="row alert alert-success validation-msg" role="alert">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span id="successMsg" runat="server">Application successfully submitted</span>
-                            <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px; outline:none; border: none" OnClick="refreshForm" />
+                            <asp:Button ID="submitAnotherLA" runat="server" Text="Submit another" CssClass="btn btn-success" Style="display: inline; margin-left: 10px; outline: none; border: none" OnClick="refreshForm" />
                         </asp:Panel>
 
                         <asp:Panel ID="successfulSubmitEditsMsgPanel" runat="server" CssClass="row alert alert-success" Style="display: inline-block;" role="alert" Visible="false">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span id="Span2" runat="server">Edits successfully made</span>
-                            <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px; outline:none; border: none" OnClick="returnToPreviousBtn_Click" />
-                            <asp:Button ID="refreshEditPageBtn" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px; outline:none; border: none" OnClick="refreshForm" />
+                            <asp:Button ID="Button1" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px; outline: none; border: none" OnClick="returnToPreviousBtn_Click" />
+                            <asp:Button ID="refreshEditPageBtn" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px; outline: none; border: none" OnClick="refreshForm" />
                         </asp:Panel>
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SUCCESS MESSAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
 
@@ -208,8 +208,8 @@
                         <asp:Panel ID="noEditsMadePanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block;" role="alert" Visible="false">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                             <span>No edits made</span>
-                            <asp:Button ID="Button2" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px; outline:none; border: none;" OnClick="returnToPreviousBtn_Click" />
-                            <asp:Button ID="refreshEditPageBtnNoEditsMade" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px; outline:none; border: none" OnClick="refreshForm" />
+                            <asp:Button ID="Button2" runat="server" Text="Go back" CssClass="btn btn-primary" Style="margin-left: 3px; outline: none; border: none;" OnClick="returnToPreviousBtn_Click" />
+                            <asp:Button ID="refreshEditPageBtnNoEditsMade" runat="server" Text="Reset Page" CssClass="btn btn-primary" Style="margin-left: 3px; outline: none; border: none" OnClick="refreshForm" />
                         </asp:Panel>
                         <%--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NO EDITS MADE MESSAGE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--%>
                     </ContentTemplate>
@@ -523,9 +523,13 @@
         </div>
     </asp:Panel>
 
-
-   
-    
+    <%--Show disclaimer if employee is PS or Minister--%>
+    <asp:Panel ID="empIsPsOrMinisterPanel" runat="server" Visible ="false" Style="text-align:center; margin-top:30px;">
+        <div  class="row alert alert-info" style="display:inline-block; margin:0 auto" role="alert">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <span>Both Permanent Secretary and Minister do not submit leave via this application</span>
+        </div>
+    </asp:Panel>
    
 </asp:Content>
 
