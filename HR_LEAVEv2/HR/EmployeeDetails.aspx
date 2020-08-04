@@ -896,131 +896,131 @@
 
     <asp:UpdatePanel ID="UpdatePanel2" runat="server">
         <ContentTemplate>
-             <asp:Panel ID="accPastLimitContainerPanel" runat="server" Visible="false" class="container text-center" style="width: 65%; background-color: #e0e0eb;padding-bottom: 15px;">
-        <h3 style="margin-bottom:15px;">Allow Accumulation Past Max
-            <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
-            data-toggle="tooltip"
-            data-placement="right"
-            title="Allow employee to accumulate vacation leave past their maximum amount if a letter from PS is uploaded"></i>
-        </h3>
+            <asp:Panel ID="accPastLimitContainerPanel" runat="server" Visible="false" class="container text-center" Style="width: 65%; background-color: #e0e0eb; padding-bottom: 15px;">
+                <h3 style="margin-bottom: 15px;">Allow Accumulation Past Max
+                <i class="fa fa-info-circle content-tooltipped" aria-hidden="true" style="margin-left: 5px; cursor: pointer; font-size: 14px;"
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    title="Allow employee to accumulate vacation leave past their maximum amount if a letter from PS is uploaded"></i>
+                </h3>
 
-        <%-- Create, Edit mode: shows a downloadable list of all the files associated with an employee--%>
-        <asp:Panel ID="filesToDownloadPanel" runat="server" Style="margin-bottom:15px;" Visible="false">
+                <%-- Create, Edit mode: shows a downloadable list of all the files associated with an employee--%>
+                <asp:Panel ID="filesToDownloadPanel" runat="server" Style="margin-bottom: 15px;" Visible="false">
 
-            <label for="filesToDownloadList" style="font-size: 1.05em; display: inline;">Previously uploaded files:</label>
+                    <label for="filesToDownloadList" style="font-size: 1.05em; display: inline;">Previously uploaded files:</label>
 
-            <asp:DropDownList ID="filesToDownloadList" runat="server"></asp:DropDownList>
+                    <asp:DropDownList ID="filesToDownloadList" runat="server"></asp:DropDownList>
 
-            <asp:LinkButton ID="btnDownloadFiles" runat="server" OnClick="btnDownloadFiles_Click" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Download file" Style="display: inline-block; margin-left: 5px;">
+                    <asp:LinkButton ID="btnDownloadFiles" runat="server" OnClick="btnDownloadFiles_Click" CssClass="btn btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Download file" Style="display: inline-block; margin-left: 5px;">
                 <i class="fa fa-download" aria-hidden="true"></i>
-            </asp:LinkButton>
+                    </asp:LinkButton>
 
-            <asp:LinkButton ID="btnDeleteFile" runat="server" OnClick="btnDeleteFile_Click" OnClientClick="return confirm('Delete file?');" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete file" Style="display: inline-block; margin-left: 5px;">
-            <i class="fa fa-trash-o" aria-hidden="true"></i>
-            </asp:LinkButton>
+                    <asp:LinkButton ID="btnDeleteFile" runat="server" OnClick="btnDeleteFile_Click" OnClientClick="return confirm('Delete file?');" CssClass="btn btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Delete file" Style="display: inline-block; margin-left: 5px;">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </asp:LinkButton>
 
-        </asp:Panel>
-
-        <asp:UpdatePanel ID="UpdatePanel1" runat="server">
-            <Triggers>
-                <asp:PostBackTrigger ControlID="chkOnOff"/>
-            </Triggers>
-            <ContentTemplate>
-                <asp:Panel ID="sliderPanel" runat="server">
-                    <label class="switch">
-                        <asp:CheckBox ID="chkOnOff" runat="server" AutoPostBack="true" OnCheckedChanged="chkOnOff_CheckedChanged" />
-                        <span class="slider round"></span>
-                    </label>
                 </asp:Panel>
-                
-            </ContentTemplate>
-        </asp:UpdatePanel>
-        
 
-        <asp:UpdatePanel ID="disclaimerForNoFilesUploadedUpdatePanel" runat="server">
-            <ContentTemplate>
-                <asp:Panel ID="noFilesUploadedDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block; margin: 0px 5px; width:450px;" role="alert" Visible="false">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    <span>No Files currently uploaded. Without a letter from PS, the employee will not be able to accumulate vacation leave past their max</span>
-                </asp:Panel>
-            </ContentTemplate>
-        </asp:UpdatePanel>
+                <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                    <Triggers>
+                        <asp:PostBackTrigger ControlID="chkOnOff" />
+                    </Triggers>
+                    <ContentTemplate>
+                        <asp:Panel ID="sliderPanel" runat="server">
+                            <label class="switch">
+                                <asp:CheckBox ID="chkOnOff" runat="server" AutoPostBack="true" OnCheckedChanged="chkOnOff_CheckedChanged" />
+                                <span class="slider round"></span>
+                            </label>
+                        </asp:Panel>
 
-        <asp:UpdatePanel ID="filesUpdatePanel" runat="server" Style="text-align: center;">
-            <ContentTemplate>
-                <asp:Panel ID="fileUploadPanel" runat="server" Style="margin: 15px auto; text-align: center" CssClass="row form-group" Visible="false">
+                    </ContentTemplate>
+                </asp:UpdatePanel>
 
-                    <label for="FileUpload1" style="font-size: 1.05em; display: inline;">Upload letter from PS:</label>
 
-                    <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin: 0 auto; display: inline-block; background-color: lightgrey" AllowMultiple="true" />
+                <asp:UpdatePanel ID="disclaimerForNoFilesUploadedUpdatePanel" runat="server">
+                    <ContentTemplate>
+                        <asp:Panel ID="noFilesUploadedDisclaimerPanel" runat="server" CssClass="row alert alert-info" Style="display: inline-block; margin: 0px 5px; width: 450px;" role="alert" Visible="false">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            <span>No Files currently uploaded. Without a letter from PS, the employee will not be able to accumulate vacation leave past their max</span>
+                        </asp:Panel>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
 
-                    <asp:LinkButton ID="uploadFilesBtn" runat="server" OnClick="uploadFilesBtn_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Upload files">
+                <asp:UpdatePanel ID="filesUpdatePanel" runat="server" Style="text-align: center;">
+                    <ContentTemplate>
+                        <asp:Panel ID="fileUploadPanel" runat="server" Style="margin: 15px auto; text-align: center" CssClass="row form-group" Visible="false">
+
+                            <label for="FileUpload1" style="font-size: 1.05em; display: inline;">Upload letter from PS:</label>
+
+                            <asp:FileUpload ID="FileUpload1" runat="server" Width="475px" Style="margin: 0 auto; display: inline-block; background-color: lightgrey" AllowMultiple="true" />
+
+                            <asp:LinkButton ID="uploadFilesBtn" runat="server" OnClick="uploadFilesBtn_Click" CssClass="btn btn-sm btn-primary content-tooltipped" data-toggle="tooltip" data-placement="top" title="Upload files">
                 <i class="fa fa-upload" aria-hidden="true"></i>
-                    </asp:LinkButton>
+                            </asp:LinkButton>
 
-                    <asp:LinkButton ID="clearAllFilesBtn" runat="server" OnClientClick="return confirm('Clear all files?');" CssClass="btn btn-sm btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Clear all uploaded files" OnClick="clearAllFilesBtn_Click">
+                            <asp:LinkButton ID="clearAllFilesBtn" runat="server" OnClientClick="return confirm('Clear all files?');" CssClass="btn btn-sm btn-danger content-tooltipped" data-toggle="tooltip" data-placement="top" title="Clear all uploaded files" OnClick="clearAllFilesBtn_Click">
                 <i class="fa fa-times" aria-hidden="true"></i>
-                    </asp:LinkButton>
+                            </asp:LinkButton>
 
-                    <br />
+                            <br />
 
-                    <%--Shows the files uploaded to Session--%>
-                    <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align: left; margin: 0 auto; display: inline-block;" Visible="false">
-                        <asp:ListView ID="filesUploadedListView" runat="server" GroupItemCount="10">
-                            <GroupTemplate>
-                                <div id="itemPlaceholderContainer" runat="server">
-                                    <div id="itemPlaceholder" runat="server"></div>
-                                </div>
-                            </GroupTemplate>
+                            <%--Shows the files uploaded to Session--%>
+                            <asp:Panel ID="filesUploadedPanel" runat="server" Style="text-align: left; margin: 0 auto; display: inline-block;" Visible="false">
+                                <asp:ListView ID="filesUploadedListView" runat="server" GroupItemCount="10">
+                                    <GroupTemplate>
+                                        <div id="itemPlaceholderContainer" runat="server">
+                                            <div id="itemPlaceholder" runat="server"></div>
+                                        </div>
+                                    </GroupTemplate>
 
-                            <ItemTemplate>
-                                <div style="margin-top: 5px;">
-                                    <span>
-                                        <asp:LinkButton ID="clearIndividualFileBtn" data-id='<%#Eval("file_name") %>' OnClick="clearIndividualFileBtn_Click" runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
+                                    <ItemTemplate>
+                                        <div style="margin-top: 5px;">
+                                            <span>
+                                                <asp:LinkButton ID="clearIndividualFileBtn" data-id='<%#Eval("file_name") %>' OnClick="clearIndividualFileBtn_Click" runat="server" CssClass="btn btn-danger btn-sm content-tooltipped" data-toggle="tooltip" data-placement="left" title="Clear file">
                                     <i class="fa fa-times" aria-hidden="true"></i>
-                                        </asp:LinkButton>
-                                    </span>
-                                    <span><%#Eval("file_name") %></span>
-                                </div>
-                            </ItemTemplate>
+                                                </asp:LinkButton>
+                                            </span>
+                                            <span><%#Eval("file_name") %></span>
+                                        </div>
+                                    </ItemTemplate>
 
 
-                            <LayoutTemplate>
-                                <div id="groupPlaceholderContainer" runat="server">
-                                    <div id="groupPlaceholder" runat="server"></div>
-                                </div>
-                            </LayoutTemplate>
+                                    <LayoutTemplate>
+                                        <div id="groupPlaceholderContainer" runat="server">
+                                            <div id="groupPlaceholder" runat="server"></div>
+                                        </div>
+                                    </LayoutTemplate>
 
-                        </asp:ListView>
-                    </asp:Panel>
-                </asp:Panel>
+                                </asp:ListView>
+                            </asp:Panel>
+                        </asp:Panel>
 
-                <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="duplicateFileNameTxt" runat="server">File name already exists</span>
-                </asp:Panel>
+                        <asp:Panel ID="duplicateFileNamesPanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="duplicateFileNameTxt" runat="server">File name already exists</span>
+                        </asp:Panel>
 
-                <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
-                </asp:Panel>
+                        <asp:Panel ID="invalidFileTypePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="invalidFileTypeErrorTxt" runat="server">Invalid file type</span>
+                        </asp:Panel>
 
-                <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
-                </asp:Panel>
+                        <asp:Panel ID="fileUploadedTooLargePanel" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span id="fileUploadTooLargeTxt" runat="server">File upload too large</span>
+                        </asp:Panel>
 
-                <asp:Panel ID="noFileUploaded" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    <span>No file was uploaded</span>
-                </asp:Panel>
-            </ContentTemplate>
-            <Triggers>
-                <asp:PostBackTrigger ControlID="uploadFilesBtn" />
-            </Triggers>
-        </asp:UpdatePanel>
+                        <asp:Panel ID="noFileUploaded" runat="server" CssClass="row alert alert-warning validation-msg" role="alert">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span>No file was uploaded</span>
+                        </asp:Panel>
+                    </ContentTemplate>
+                    <Triggers>
+                        <asp:PostBackTrigger ControlID="uploadFilesBtn" />
+                    </Triggers>
+                </asp:UpdatePanel>
 
-    </asp:Panel>
+            </asp:Panel>
         </ContentTemplate>
     </asp:UpdatePanel>
    
